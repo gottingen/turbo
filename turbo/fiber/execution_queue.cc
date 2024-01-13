@@ -83,7 +83,7 @@ namespace turbo {
             fiber_id_t tid;
             // We start the execution thread in background instead of foreground as
             // we can't determine whether the code after execute() is urgent (like
-            // unlock a pthread_mutex_t) in which case implicit context switch may
+            // unlock a std::mutex) in which case implicit context switch may
             // cause undefined behavior (e.g. deadlock)
             if (!fiber_start_background(&tid, &_options.fiber_attr,
                                          _execute_tasks, node).ok()) {

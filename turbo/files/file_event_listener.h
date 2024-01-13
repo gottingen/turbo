@@ -19,7 +19,7 @@
 #include <functional>
 #include <cstdio>
 #include "turbo/files/internal/filesystem.h"
-#include "turbo/files/internal/fwd.h"
+#include "turbo/system/io.h"
 
 namespace turbo {
 

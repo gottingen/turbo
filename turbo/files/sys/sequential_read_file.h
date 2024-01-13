@@ -19,7 +19,7 @@
 #include "turbo/files/internal/filesystem.h"
 #include "turbo/platform/port.h"
 #include "turbo/files/file_event_listener.h"
-#include "turbo/files/file_option.h"
+#include "turbo/system/io.h"
 #include "turbo/files/fwd.h"
 
 namespace turbo {
@@ -68,7 +68,7 @@ namespace turbo {
          * @param path file path
          * @param option file option
          */
-        [[nodiscard]] turbo::Status open(const turbo::filesystem::path &path, const turbo::FileOption &option = FileOption::kDefault) noexcept override;
+        [[nodiscard]] turbo::Status open(const turbo::filesystem::path &path, const turbo::OpenOption &option = kDefaultReadOption) noexcept override;
 
         /**
          * @brief read file content sequentially from the current position to the specified length.
@@ -132,7 +132,7 @@ namespace turbo {
 
         FILE_HANDLER _fd{INVALID_FILE_HANDLER};
         turbo::filesystem::path _file_path;
-        turbo::FileOption _option;
+        turbo::OpenOption _option;
         FileEventListener _listener;
         size_t _position{0};
     };

@@ -454,23 +454,23 @@ namespace turbo::fiber_internal {
     TEST_CASE("FDTest, invalid_epoll_events") {
         errno = 0;
 #if defined(TURBO_PLATFORM_LINUX)
-        REQUIRE(turbo::is_invalid_argument(turbo::fiber_fd_wait(-1, EPOLLIN)));
+        REQUIRE_EQ(turbo::fiber_fd_wait(-1, EPOLLIN).raw_code(), turbo::kEINVAL);
 #elif defined(TURBO_PLATFORM_OSX)
-        REQUIRE(turbo::is_invalid_argument(fiber_fd_wait(-1, EVFILT_READ)));
+        REQUIRE_EQ(turbo::fiber_fd_wait(-1, EVFILT_READ).raw_code(), turbo::kEINVAL);
 #endif
         REQUIRE_EQ(EINVAL, errno);
         errno = 0;
 #if defined(TURBO_PLATFORM_LINUX)
-        REQUIRE(turbo::is_invalid_argument(turbo::fiber_fd_timedwait(-1, EPOLLIN, nullptr)));
+        REQUIRE_EQ(turbo::fiber_fd_timedwait(-1, EPOLLIN, nullptr).raw_code(), turbo::kEINVAL);
 #elif defined(TURBO_PLATFORM_OSX)
-        REQUIRE(turbo::is_invalid_argument(fiber_fd_timedwait(-1, EVFILT_READ, nullptr)));
+        REQUIRE_EQ(turbo::fiber_fd_timedwait(-1, EVFILT_READ, nullptr).raw_code(), turbo::kEINVAL);
 #endif
         REQUIRE_EQ(EINVAL, errno);
 
         int fds[2];
         REQUIRE_EQ(0, pipe(fds));
 #if defined(TURBO_PLATFORM_LINUX)
-        REQUIRE(turbo::is_invalid_argument(turbo::fiber_fd_wait(fds[0], EPOLLET)));
+        REQUIRE_EQ(turbo::fiber_fd_wait(fds[0], EPOLLET).raw_code(), turbo::kEINVAL);
         REQUIRE_EQ(EINVAL, errno);
 #endif
         fiber_id_t th;

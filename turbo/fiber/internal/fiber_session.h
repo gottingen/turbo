@@ -4,7 +4,7 @@
 
 #include "turbo/platform/port.h"              // TURBO_STRINGIFY
 #include "turbo/fiber/internal/types.h"
-#include "turbo/fiber/internal/mutex.h"
+#include "turbo/fiber/fiber_mutex.h"
 
 namespace turbo::fiber_internal {
 
@@ -135,10 +135,10 @@ namespace turbo::fiber_internal {
 
     // Following 2 functions wrap above process.
     int fiber_session_list_reset_pthreadsafe(
-            FiberSessionList *list, int error_code, pthread_mutex_t *mutex);
+            FiberSessionList *list, int error_code, std::mutex *mutex);
 
     int fiber_session_list_reset_fibersafe(
-            FiberSessionList *list, int error_code, fiber_mutex_t *mutex);
+            FiberSessionList *list, int error_code, FiberMutex *mutex);
 
 
     // cpp specific API, with an extra `error_text' so that error information
@@ -161,11 +161,11 @@ namespace turbo::fiber_internal {
 
     int fiber_session_list_reset2_pthreadsafe(FiberSessionList *list, int error_code,
                                               const std::string &error_text,
-                                              pthread_mutex_t *mutex);
+                                              std::mutex *mutex);
 
     int fiber_session_list_reset2_fibersafe(FiberSessionList *list, int error_code,
                                             const std::string &error_text,
-                                            fiber_mutex_t *mutex);
+                                            FiberMutex *mutex);
 
 }  // namespace turbo::fiber_internal
 

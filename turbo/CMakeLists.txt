@@ -174,6 +174,7 @@ set(TURBO_ALL_SRC
         "system/io/iobuf_printer.cc"
         "system/io/fd_utility.cc"
         "system/io/zero_copy_stream.cc"
+        "system/io/sys_io.cc"
         "system/endpoint.cc"
         "system/env.cc"
         "system/threading/thread_name_registry.cc"

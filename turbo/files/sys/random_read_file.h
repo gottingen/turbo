@@ -71,7 +71,7 @@ namespace turbo {
          * @param path file path
          * @param option file option
          */
-        [[nodiscard]] turbo::Status open(const turbo::filesystem::path &path, const turbo::FileOption &option = FileOption::kDefault) noexcept override;
+        [[nodiscard]] turbo::Status open(const turbo::filesystem::path &path, const turbo::OpenOption &option = kDefaultReadOption) noexcept override;
 
         /**
          * @brief read file content from offset to the specified length.
@@ -115,7 +115,7 @@ namespace turbo {
         TURBO_NON_COPYABLE(RandomReadFile);
         int        _fd;
         turbo::filesystem::path _file_path;
-        turbo::FileOption _option;
+        turbo::OpenOption _option;
         FileEventListener _listener;
     };
 

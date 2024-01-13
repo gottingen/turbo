@@ -17,7 +17,7 @@
 
 #include <turbo/log/tweakme.h>
 #include "turbo/log/details/null_mutex.h"
-#include "turbo/files/file_option.h"
+#include "turbo/files/filesystem.h"
 
 #include <atomic>
 #include <chrono>
@@ -80,8 +80,6 @@ namespace turbo::tlog {
     using sink_ptr = std::shared_ptr<sinks::sink>;
     using sinks_init_list = std::initializer_list<sink_ptr>;
     using err_handler = std::function<void(const std::string &err_msg)>;
-
-    namespace fmt_lib = turbo;
 
     using memory_buf_t = turbo::basic_memory_buffer<char, 250>;
 
@@ -252,11 +250,18 @@ namespace turbo::tlog {
         }
 
     } // namespace details
-    static constexpr turbo::FileOption  kLogFileOption = turbo::FileOption{
-            5,
-            10,
-            true,
-            false
-    };
+
+    constexpr turbo::OpenOption get_append_option() {
+        turbo::OpenOption option = turbo::kDefaultAppendWriteOption;
+        return option.create(true).append(true).tries(5).interval(10).create_dir(true);
+    }
+
+    static constexpr turbo::OpenOption  kLogAppendOpenOption = get_append_option();
+
+    static constexpr turbo::OpenOption  kLogTruncateOpenOption = []() {
+        turbo::OpenOption option = turbo::kDefaultTruncateWriteOption;
+        return option.create(true).truncate(true).tries(5).interval(10).create_dir(true);
+    }();
+
 } // namespace turbo::tlog
 

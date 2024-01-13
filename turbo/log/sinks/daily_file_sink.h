@@ -43,7 +43,7 @@ namespace turbo::tlog {
             static filename_t calc_filename(const filename_t &filename, const tm &now_tm) {
                 filename_t basename, ext;
                 std::tie(basename, ext) = turbo::split_by_extension(filename);
-                return fmt_lib::format(FMT_STRING(TLOG_FILENAME_T("{}_{:04d}-{:02d}-{:02d}{}")), basename,
+                return turbo::format(FMT_STRING(TLOG_FILENAME_T("{}_{:04d}-{:02d}-{:02d}{}")), basename,
                                        now_tm.tm_year + 1900,
                                        now_tm.tm_mon + 1, now_tm.tm_mday, ext);
             }
@@ -105,7 +105,8 @@ namespace turbo::tlog {
 
                 auto now = log_clock::now();
                 auto filename = FileNameCalc::calc_filename(base_filename_, now_tm(now));
-                auto r = file_writer_.open(filename, truncate_,kLogFileOption);
+                auto & open_option = truncate ? kLogTruncateOpenOption : kLogAppendOpenOption;
+                auto r = file_writer_.open(filename, open_option);
                 if(!r.ok()) {
                     throw_tlog_ex(r.to_string());
                 }
@@ -127,7 +128,8 @@ namespace turbo::tlog {
                 bool should_rotate = time >= rotation_tp_;
                 if (should_rotate) {
                     auto filename = FileNameCalc::calc_filename(base_filename_, now_tm(time));
-                    auto r = file_writer_.open(filename, truncate_, kLogFileOption);
+                    auto & operation = truncate_ ? kLogTruncateOpenOption : kLogAppendOpenOption;
+                    auto r = file_writer_.open(filename, operation);
                     if(!r.ok()) {
                         throw_tlog_ex(r.to_string());
                     }

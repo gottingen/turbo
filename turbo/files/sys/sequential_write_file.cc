@@ -33,13 +33,11 @@ namespace turbo {
         close();
     }
 
-    turbo::Status SequentialWriteFile::open(const turbo::filesystem::path &fname, bool truncate, const turbo::FileOption &option)  noexcept {
+    turbo::Status SequentialWriteFile::open(const turbo::filesystem::path &fname, const turbo::OpenOption &option)  noexcept {
         close();
         _option = option;
         _file_path = fname;
         TURBO_ASSERT(!_file_path.empty());
-        auto *mode = "ab";
-        auto *trunc_mode = "wb";
 
         if (_listener.before_open) {
             _listener.before_open(_file_path);
@@ -60,18 +58,7 @@ namespace turbo {
                     }
                 }
             }
-            if (truncate) {
-                // Truncate by opening-and-closing a tmp file in "wb" mode, always
-                // opening the actual log-we-write-to in "ab" mode, since that
-                // interacts more politely with eternal processes that might
-                // rotate/truncate the file underneath us.
-                auto rs = turbo::sys_io::open_write(_file_path, trunc_mode, _option);
-                if (!rs.ok()) {
-                    continue;
-                }
-                ::close(rs.value());
-            }
-            auto rs = turbo::sys_io::open_write(_file_path, mode, _option);
+            auto rs = turbo::open_file(_file_path, _option);
             if (rs.ok()) {
                 _fd = rs.value();
                 if (_listener.after_open) {
@@ -91,13 +78,18 @@ namespace turbo {
         if (_file_path.empty()) {
             return turbo::invalid_argument_error("file name empty");
         }
-        return open(_file_path, truncate);
+        OpenOption option = _option;
+        if(truncate) {
+            option.truncate();
+        }
+        return open(_file_path, option);
     }
 
     turbo::Status SequentialWriteFile::write(const void *data, size_t size) {
         INVALID_FD_RETURN(_fd);
-        if (::write(_fd, data, size) != size) {
-            return turbo::errno_to_status(errno, turbo::format("Failed writing to file {}", _file_path.c_str()));
+        auto rs = turbo::sys_write(_fd, data, size);
+        if (rs < 0) {
+            return make_status();
         }
         return turbo::ok_status();
     }

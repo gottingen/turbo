@@ -310,8 +310,6 @@ namespace turbo::fiber_internal {
             g->current_task()->local_storage.keytable = old_kt;
         }
         // TODO: return_keytable may race with this function, we don't destroy
-        // the mutex right now.
-        // pthread_mutex_destroy(&pool->mutex);
         return 0;
     }
 

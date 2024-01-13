@@ -87,7 +87,7 @@ TEST_CASE("color range test1 [pattern_formatter]")
                                                                       "\n");
 
     memory_buf_t buf;
-    turbo::tlog::fmt_lib::format_to(std::back_inserter(buf), "Hello");
+    turbo::format_to(std::back_inserter(buf), "Hello");
     memory_buf_t formatted;
     std::string logger_name = "test";
     turbo::tlog::details::log_msg msg(logger_name, turbo::tlog::level::info,
@@ -380,7 +380,7 @@ public:
         if (some_txt == "throw_me") {
             throw turbo::tlog::tlog_ex("custom_flag_exception_test");
         } else if (some_txt == "time") {
-            auto formatted = turbo::tlog::fmt_lib::format("{:d}:{:02d}{:s}", tm.tm_hour % 12, tm.tm_min,
+            auto formatted = turbo::format("{:d}:{:02d}{:s}", tm.tm_hour % 12, tm.tm_min,
                                                           tm.tm_hour / 12 ? "PM" : "AM");
             dest.append(formatted.data(), formatted.data() + formatted.size());
             return;
@@ -413,7 +413,7 @@ TEST_CASE("clone-custom_formatter [pattern_formatter]")
     formatter_1->format(msg, formatted_1);
     formatter_2->format(msg, formatted_2);
 
-    auto expected = turbo::tlog::fmt_lib::format("[logger-name] [custom_output] some message{}",
+    auto expected = turbo::format("[logger-name] [custom_output] some message{}",
                                                  turbo::tlog::details::os::default_eol);
 
     REQUIRE_EQ(to_string_view(formatted_1), expected);
@@ -489,7 +489,7 @@ TEST_CASE("custom flags [pattern_formatter]")
     turbo::tlog::details::log_msg msg(turbo::tlog::source_loc{}, "logger-name", turbo::tlog::level::info,
                                       "some message");
     formatter->format(msg, formatted);
-    auto expected = turbo::tlog::fmt_lib::format("[logger-name] [custom1] [custom2] some message{}",
+    auto expected = turbo::format("[logger-name] [custom1] [custom2] some message{}",
                                                  turbo::tlog::details::os::default_eol);
 
     REQUIRE_EQ(to_string_view(formatted), expected);
@@ -506,7 +506,7 @@ TEST_CASE("custom flags-padding [pattern_formatter]")
     turbo::tlog::details::log_msg msg(turbo::tlog::source_loc{}, "logger-name", turbo::tlog::level::info,
                                       "some message");
     formatter->format(msg, formatted);
-    auto expected = turbo::tlog::fmt_lib::format("[logger-name] [custom1] [     custom2] some message{}",
+    auto expected = turbo::format("[logger-name] [custom1] [     custom2] some message{}",
                                                  turbo::tlog::details::os::default_eol);
 
     REQUIRE_EQ(to_string_view(formatted), expected);

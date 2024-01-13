@@ -77,8 +77,7 @@ namespace turbo {
          * @return the status of the operation.
          */
 
-        [[nodiscard]] turbo::Status open(const turbo::filesystem::path &fname,
-                           bool truncate = false, const turbo::FileOption &option = FileOption::kDefault) noexcept override;
+        [[nodiscard]] turbo::Status open(const turbo::filesystem::path &fname, const turbo::OpenOption &option) noexcept override;
 
         /**
          * @brief reopen file with path and option specified by user.
@@ -105,7 +104,7 @@ namespace turbo {
          * @param str [input] file content, can not be empty.
          * @return the status of the operation.
          */
-        [[nodiscard]] turbo::Status write(std::string_view str) {
+        [[nodiscard]] turbo::Status write(std::string_view str) override {
             return write(str.data(), str.size());
         }
 
@@ -143,7 +142,7 @@ namespace turbo {
          * @brief flush file.
          */
         [[nodiscard]]
-        turbo::Status flush();
+        turbo::Status flush() override;
 
         /**
          * @brief get file path.
@@ -155,7 +154,7 @@ namespace turbo {
         static const size_t npos = std::numeric_limits<size_t>::max();
         FILE_HANDLER  _fd{INVALID_FILE_HANDLER};
         turbo::filesystem::path _file_path;
-        turbo::FileOption _option;
+        turbo::OpenOption _option;
         FileEventListener _listener;
     };
 } // namespace turbo

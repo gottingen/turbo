@@ -52,7 +52,7 @@ namespace turbo {
             return turbo::ok_status();
         }
         _file_path = generate_temp_file_name(prefix, ext, bits);
-        auto rs = _file.open(_file_path, true);
+        auto rs = _file.open(_file_path,kDefaultTruncateWriteOption);
         if(!rs.ok()) {
             return rs;
         }

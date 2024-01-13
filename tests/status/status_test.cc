@@ -23,29 +23,32 @@
 #include "turbo/status/error.h"
 #include "turbo/status/turbo_module.h"
 
-TURBO_REGISTER_ERRNO(30, "TEST_ERROR");
+namespace turbo {
+    TURBO_DECLARE_ERRNO(TEST_ERROR, 300);
+}
+TURBO_REGISTER_ERRNO(turbo::TEST_ERROR, "TEST_ERROR");
 TURBO_REGISTER_MODULE_INDEX(1, "TEST_MODULE");
 
 namespace {
     TEST_CASE("StatusCode") {
         SUBCASE("registry")
         {
-            const turbo::StatusCode code = 30;
+            const turbo::StatusCode code = turbo::TEST_ERROR;
             REQUIRE_EQ(turbo::status_code_to_string(code), "TEST_ERROR");
-            turbo::Status s(30, "");
-            REQUIRE_EQ(s.code(), 30);
-            REQUIRE_EQ(s.raw_code(), 30);
+            turbo::Status s(code, "");
+            REQUIRE_EQ(s.code(), code);
+            REQUIRE_EQ(s.raw_code(), code);
             REQUIRE_EQ(s.index(), 0);
 
-            turbo::Status si(1, 30, "");
-            REQUIRE_EQ(si.raw_code(), 30);
+            turbo::Status si(1, code, "");
+            REQUIRE_EQ(si.raw_code(), code);
             REQUIRE_EQ(si.index(), 1);
             std::ostringstream oss;
 
             oss << si;
             REQUIRE_EQ(oss.str(), "TEST_MODULE::TEST_ERROR: ");
 
-            turbo::Status sim(1, 30, "fail");
+            turbo::Status sim(1, code, "fail");
             std::ostringstream oss1;
 
             oss1 << sim;
@@ -57,7 +60,7 @@ namespace {
             const turbo::StatusCode code = turbo::kUnknown;
             std::ostringstream oss;
             oss << code;
-            REQUIRE_EQ(oss.str(), "2");
+            REQUIRE_EQ(oss.str(), "162");
             REQUIRE_EQ(turbo::status_code_to_string(code), "UNKNOWN");
         }
     }
@@ -502,7 +505,7 @@ namespace {
             for (int i = 0; i < status_arr.size(); i++) {
                 for (int j = 0; j < status_arr.size(); j++) {
                     if (i == j) {
-                        REQUIRE(status_arr[i] == status_arr[j]);
+                        REQUIRE_EQ(status_arr[i], status_arr[j]);
                         REQUIRE_FALSE(status_arr[i] != status_arr[j]);
                     } else {
                         REQUIRE(status_arr[i] != status_arr[j]);

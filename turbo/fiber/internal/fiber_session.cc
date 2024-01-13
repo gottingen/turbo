@@ -666,13 +666,13 @@ namespace turbo::fiber_internal {
     }
 
     int fiber_session_list_reset_pthreadsafe(FiberSessionList *list, int error_code,
-                                           pthread_mutex_t *mutex) {
+                                           std::mutex *mutex) {
         return fiber_session_list_reset2_pthreadsafe(
                 list, error_code, std::string(), mutex);
     }
 
     int fiber_session_list_reset_fibersafe(FiberSessionList *list, int error_code,
-                                         fiber_mutex_t *mutex) {
+                                         turbo::FiberMutex *mutex) {
         return fiber_session_list_reset2_fibersafe(
                 list, error_code, std::string(), mutex);
     }
@@ -743,7 +743,7 @@ namespace turbo::fiber_internal {
     int fiber_session_list_reset2_pthreadsafe(FiberSessionList *list,
                                             int error_code,
                                             const std::string &error_text,
-                                            pthread_mutex_t *mutex) {
+                                              std::mutex *mutex) {
         if (mutex == nullptr) {
             return EINVAL;
         }
@@ -756,9 +756,9 @@ namespace turbo::fiber_internal {
             return rc;
         }
         // Swap out the list then reset. The critical section is very small.
-        pthread_mutex_lock(mutex);
+        mutex->lock();
         std::swap(list->impl, tmplist.impl);
-        pthread_mutex_unlock(mutex);
+        mutex->unlock();
         const int rc2 = fiber_session_reset2(&tmplist, error_code, error_text);
         fiber_session_list_destroy(&tmplist);
         return rc2;
@@ -767,7 +767,7 @@ namespace turbo::fiber_internal {
     int fiber_session_list_reset2_fibersafe(FiberSessionList *list,
                                           int error_code,
                                           const std::string &error_text,
-                                          fiber_mutex_t *mutex) {
+                                          FiberMutex *mutex) {
         if (mutex == nullptr) {
             return EINVAL;
         }
@@ -780,9 +780,9 @@ namespace turbo::fiber_internal {
             return rc;
         }
         // Swap out the list then reset. The critical section is very small.
-        TURBO_UNUSED(turbo::fiber_internal::fiber_mutex_lock(mutex));
+        mutex->lock();
         std::swap(list->impl, tmplist.impl);
-        turbo::fiber_internal::fiber_mutex_unlock(mutex);
+        mutex->unlock();
         const int rc2 = fiber_session_reset2(&tmplist, error_code, error_text);
         fiber_session_list_destroy(&tmplist);
         return rc2;

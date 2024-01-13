@@ -22,7 +22,6 @@
 #include "turbo/files/internal/filesystem.h"
 #include "turbo/files/internal/fwd.h"
 #include "turbo/status/result_status.h"
-#include "turbo/files/file_option.h"
 #include "turbo/system/io.h"
 #include <string>
 
@@ -33,7 +32,7 @@ namespace turbo {
 
         virtual  ~SequentialFileReader()   = default;
 
-        [[nodiscard]] virtual turbo::Status open(const turbo::filesystem::path &path, const turbo::FileOption &option = FileOption::kDefault) noexcept = 0;
+        [[nodiscard]] virtual turbo::Status open(const turbo::filesystem::path &path, const turbo::OpenOption &option = kDefaultReadOption) noexcept = 0;
 
         [[nodiscard]] virtual turbo::Status skip(off_t n) = 0;
 
@@ -60,7 +59,7 @@ namespace turbo {
 
             virtual  ~RandomAccessFileReader()   = default;
 
-            [[nodiscard]] virtual turbo::Status open(const turbo::filesystem::path &path, const turbo::FileOption &option = FileOption::kDefault) noexcept = 0;
+            [[nodiscard]] virtual turbo::Status open(const turbo::filesystem::path &path, const turbo::OpenOption &option = kDefaultReadOption) noexcept = 0;
 
             [[nodiscard]] virtual turbo::ResultStatus<size_t> read(off_t offset, void *buff, size_t len) = 0;
 

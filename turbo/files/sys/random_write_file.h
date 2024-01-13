@@ -89,7 +89,7 @@ namespace turbo {
          * @param truncate truncate file if true, default is false.
          * @return the status of the operation. If the file is opened successfully, the status is OK.
          */
-        [[nodiscard]] turbo::Status open(const turbo::filesystem::path &path, bool truncate = false,const turbo::FileOption &option = FileOption::kDefault) noexcept override;
+        [[nodiscard]] turbo::Status open(const turbo::filesystem::path &path, const turbo::OpenOption &option) noexcept override;
         /**
          * @brief reopen file with path and option specified by user.
          *        The option can be set by set_option function. @see set_option.
@@ -131,7 +131,7 @@ namespace turbo {
          * @param size [input] file length.
          * @return the status of the operation.
          */
-        [[nodiscard]] turbo::Status truncate(size_t size);
+        [[nodiscard]] turbo::Status truncate(size_t size) override;
 
         /**
          * @brief get file size.
@@ -142,14 +142,14 @@ namespace turbo {
         /**
          * @brief close file.
          */
-        void close();
+        void close() override;
 
         /**
          * @brief flush file.
          * @return the status of the operation.
          */
         [[nodiscard]]
-        turbo::Status flush();
+        turbo::Status flush() override;
 
         /**
          * @brief get file path.
@@ -161,7 +161,7 @@ namespace turbo {
         static const size_t npos = std::numeric_limits<size_t>::max();
         int        _fd{-1};
         turbo::filesystem::path _file_path;
-        turbo::FileOption _option;
+        turbo::OpenOption _option;
         FileEventListener _listener;
     };
 }  // namespace turbo

@@ -183,7 +183,7 @@ TEST_CASE("to_file [async]")
     require_message_count(TEST_FILENAME, messages);
     auto contents = file_contents(TEST_FILENAME);
     using turbo::tlog::details::os::default_eol;
-    REQUIRE(ends_with(contents, turbo::tlog::fmt_lib::format("Hello message #1023{}", default_eol)));
+    REQUIRE(ends_with(contents, turbo::format("Hello message #1023{}", default_eol)));
 }
 
 TEST_CASE("to_file multi-workers [async]")

@@ -37,7 +37,7 @@ TEST_CASE("simple_file_logger [simple_logger]]")
     require_message_count(SIMPLE_LOG, 2);
     using turbo::tlog::details::os::default_eol;
     REQUIRE(file_contents(SIMPLE_LOG) ==
-            turbo::tlog::fmt_lib::format("Test message 1{}Test message 2{}", default_eol, default_eol));
+            turbo::format("Test message 1{}Test message 2{}", default_eol, default_eol));
 }
 
 TEST_CASE("flush_on [flush_on]]")
@@ -59,7 +59,7 @@ TEST_CASE("flush_on [flush_on]]")
     require_message_count(SIMPLE_LOG, 3);
     using turbo::tlog::details::os::default_eol;
     REQUIRE(file_contents(SIMPLE_LOG) ==
-            turbo::tlog::fmt_lib::format("Should not be flushed{}Test message 1{}Test message 2{}", default_eol,
+            turbo::format("Should not be flushed{}Test message 1{}Test message 2{}", default_eol,
                                          default_eol, default_eol));
 }
 

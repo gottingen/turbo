@@ -16,11 +16,10 @@
 #include "turbo/files/sys/sys_io.h"
 #include "turbo/base/casts.h"
 #include "turbo/log/logging.h"
-#include <cerrno>
 #include <cstdio>
-#include <cstring>
 #include <fcntl.h>
 #include <unistd.h>
+#include "turbo/status/error.h"
 
 namespace turbo {
 
@@ -34,7 +33,7 @@ namespace turbo {
     }
 
     turbo::Status
-    SequentialReadFile::open(const turbo::filesystem::path &path, const turbo::FileOption &option) noexcept {
+    SequentialReadFile::open(const turbo::filesystem::path &path, const turbo::OpenOption &option) noexcept {
         close();
         _option = option;
         _file_path = path;
@@ -44,7 +43,7 @@ namespace turbo {
         }
 
         for (int tries = 0; tries < _option.open_tries; ++tries) {
-            auto rs = turbo::sys_io::open_read(_file_path, "rb", _option);
+            auto rs = turbo::open_file(_file_path, _option);
             if (rs.ok()) {
                 _fd = rs.value();
                 if (_listener.after_open) {
@@ -56,7 +55,7 @@ namespace turbo {
                 turbo::sleep_for(turbo::milliseconds(_option.open_interval));
             }
         }
-        return turbo::errno_to_status(errno, turbo::format("Failed opening file {} for reading", _file_path.c_str()));
+        return turbo::make_status(errno, turbo::format("Failed opening file {} for reading", _file_path.c_str()));
     }
 
     turbo::ResultStatus<size_t> SequentialReadFile::read(void *buff, size_t len) {
@@ -64,22 +63,12 @@ namespace turbo {
         if (len == 0) {
             return 0;
         }
-        size_t has_read = 0;
-        char *pdata = static_cast<char *>(buff);
-        while (has_read < len) {
-            auto left = len - has_read;
-            auto n = ::read(_fd, pdata + static_cast<std::ptrdiff_t>(has_read), left);
-            if (n < 0) {
-                return turbo::errno_to_status(errno, "");
-            }
-            _position += n;
-            has_read += n;
-            if (n < left) {
-                break;
-            }
-
-        };
-        return has_read;
+        auto nread = turbo::sys_read(_fd, buff, len);
+        if(nread < 0) {
+            return make_status();
+        }
+        _position += nread;
+        return nread;
     }
 
     turbo::ResultStatus<size_t> SequentialReadFile::read(std::string *content, size_t n) {
@@ -95,14 +84,14 @@ namespace turbo {
         auto pre_len = content->size();
         content->resize(pre_len + len);
         char *pdata = content->data() + pre_len;
-        auto rs = read(pdata, len);
-        if (!rs.ok()) {
+        auto nread = turbo::sys_read(_fd, pdata, len);
+        if(nread < 0) {
             content->resize(pre_len);
-            return rs;
+            return make_status();
         }
-        content->resize(pre_len + rs.value());
-        _position += rs.value();
-        return rs.value();
+        _position += nread;
+        content->resize(pre_len + nread);
+        return nread;
     }
 
     turbo::ResultStatus<size_t> SequentialReadFile::read(turbo::IOBuf *buf, size_t n) {

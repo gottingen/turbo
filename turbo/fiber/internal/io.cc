@@ -192,7 +192,7 @@ namespace turbo::fiber_internal {
             std::atomic<EpollFutex *> *p = fd_futexes.get_or_new(fd);
             if (nullptr == p) {
                 errno = ENOMEM;
-                return turbo::resource_exhausted_error("");
+                return make_status();
             }
 
             EpollFutex *futex = p->load(std::memory_order_consume);
@@ -213,7 +213,7 @@ namespace turbo::fiber_internal {
 
             while (futex == CLOSING_GUARD) {  // fiber_fd_close() is running.
                 if (sched_yield() < 0) {
-                    return turbo::internal_error("");
+                    return make_status();
                 }
                 futex = p->load(std::memory_order_consume);
             }
@@ -228,16 +228,16 @@ namespace turbo::fiber_internal {
             evt.data.fd = fd;
             if (epoll_ctl(_epfd, EPOLL_CTL_ADD, fd, &evt) < 0 &&
                 errno != EEXIST) {
-                //TLOG_CRITICAL("Fail to add fd={} into epfd={} errno={}", fd, _epfd, errno);
-                return turbo::internal_error("");
+                TLOG_CRITICAL("Fail to add fd={} into epfd={} errno={}", fd, _epfd, errno);
+                return make_status();
             }
 #elif defined(TURBO_PLATFORM_OSX)
             struct kevent kqueue_event;
             EV_SET(&kqueue_event, fd, events, EV_ADD | EV_ENABLE | EV_ONESHOT,
                    0, 0, futex);
             if (kevent(_epfd, &kqueue_event, 1, nullptr, 0, nullptr) < 0) {
-                TURBO_PLOG(FATAL) << "Fail to add fd=" << fd << " into kqueuefd=" << _epfd;
-                return -1;
+                TLOG_CRITICAL("Fail to add fd={} into kqueuefd={}", fd, _epfd);
+                return make_status();
             }
 #endif
             auto rs = waitable_event_wait(futex, expected_val, abstime);
@@ -251,19 +251,19 @@ namespace turbo::fiber_internal {
             if (fd < 0) {
                 // what close(-1) returns
                 errno = EBADF;
-                return turbo::invalid_argument_error("");
+                return make_status();
             }
             std::atomic<EpollFutex *> *pfutex = turbo::fiber_internal::fd_futexes.get(fd);
             if (nullptr == pfutex) {
                 // Did not call fiber_fd functions, close directly.
-                return close(fd) ? turbo::internal_error("") : turbo::ok_status();
+                return close(fd) ? make_status() : turbo::ok_status();
             }
             EpollFutex *futex = pfutex->exchange(
                     CLOSING_GUARD, std::memory_order_relaxed);
             if (futex == CLOSING_GUARD) {
                 // concurrent double close detected.
                 errno = EBADF;
-                return turbo::failed_precondition_error("");
+                return make_status();
             }
             if (futex != nullptr) {
                 futex->fetch_add(1, std::memory_order_relaxed);
@@ -280,7 +280,7 @@ namespace turbo::fiber_internal {
 #endif
             const int rc = close(fd);
             pfutex->exchange(futex, std::memory_order_relaxed);
-            return rc == 0 ? turbo::ok_status() : turbo::internal_error("");
+            return rc == 0 ? turbo::ok_status() : make_status();
         }
 
         bool started() const {
@@ -428,7 +428,7 @@ namespace turbo::fiber_internal {
             int64_t abstime_us = turbo::to_unix_micros(turbo::time_from_timespec(*abstime));
             if (abstime_us <= now_us) {
                 errno = ETIMEDOUT;
-                return turbo::deadline_exceeded_error("");
+                return make_status();
             }
             diff_ms = (abstime_us - now_us + 999L) / 1000L;
         }
@@ -439,20 +439,20 @@ namespace turbo::fiber_internal {
 #endif
         if (poll_events == 0) {
             errno = EINVAL;
-            return turbo::invalid_argument_error("");
+            return make_status();
         }
         pollfd ufds = {fd, poll_events, 0};
         const int rc = poll(&ufds, 1, diff_ms);
         if (rc < 0) {
-            return turbo::internal_error("");
+            return make_status();
         }
         if (rc == 0) {
             errno = ETIMEDOUT;
-            return turbo::deadline_exceeded_error("");
+            return make_status();
         }
         if (ufds.revents & POLLNVAL) {
             errno = EBADF;
-            return turbo::failed_precondition_error("");
+            return make_status();
         }
         return turbo::ok_status();
     }
@@ -464,7 +464,7 @@ namespace turbo {
     turbo::Status fiber_fd_wait(int fd, unsigned events) {
         if (fd < 0) {
             errno = EINVAL;
-            return turbo::invalid_argument_error("");
+            return make_status();
         }
         turbo::fiber_internal::FiberWorker *g = turbo::fiber_internal::tls_task_group;
         if (nullptr != g && !g->is_current_pthread_task()) {
@@ -480,7 +480,7 @@ namespace turbo {
         }
         if (fd < 0) {
             errno = EINVAL;
-            return turbo::invalid_argument_error("");
+            return make_status();
         }
         turbo::fiber_internal::FiberWorker *g = turbo::fiber_internal::tls_task_group;
         if (nullptr != g && !g->is_current_pthread_task()) {
@@ -495,34 +495,31 @@ namespace turbo {
         turbo::fiber_internal::FiberWorker *g = turbo::fiber_internal::tls_task_group;
         if (nullptr == g || g->is_current_pthread_task()) {
             auto r = ::connect(sockfd, serv_addr, addrlen);
-            if(r != 0) {
-                turbo::errno_to_status(errno, "");
-            }
-            return turbo::ok_status();
+            return  r == 0 ?turbo::ok_status() : make_status();
         }
         // FIXME: Scoped non-blocking?
         turbo::make_non_blocking(sockfd);
         const int rc = connect(sockfd, serv_addr, addrlen);
         if (rc == 0 || errno != EINPROGRESS) {
-            return errno_to_status(errno, "connect");
+            return make_status();
         }
 #if defined(TURBO_PLATFORM_LINUX)
         if (!fiber_fd_wait(sockfd, EPOLLOUT).ok()) {
 #elif defined(TURBO_PLATFORM_OSX)
             if (fiber_fd_wait(sockfd, EVFILT_WRITE) < 0) {
 #endif
-            return turbo::internal_error("");
+            return make_status();
         }
         int err;
         socklen_t errlen = sizeof(err);
         if (getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &err, &errlen) < 0) {
             TLOG_CRITICAL("Fail to getsockopt");
-            return turbo::internal_error("");
+            return make_status();
         }
         if (err != 0) {
             TDLOG_CHECK(err != EINPROGRESS);
             errno = err;
-            return turbo::errno_to_status(err, "getsockopt");
+            return make_status();
         }
         return turbo::ok_status();
     }

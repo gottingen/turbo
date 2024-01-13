@@ -14,32 +14,33 @@
 
 #include "turbo/status/error.h"
 #include <cstdlib> // EXIT_FAILURE
-#include <cerrno> // errno
 #include <cstdio>  // snprintf
 #include <mutex>
-#include <cstring>
-
-#include "turbo/platform/port.h"
 
 namespace turbo {
 
-
-    static const char *errno_desc[ERRNO_END - ERRNO_BEGIN] = {};
     static std::mutex modify_desc_mutex;
+
+    std::array<const char*, ERRNO_END - ERRNO_BEGIN> errno_desc_array = {};
 
     int describe_customized_errno(
             int error_code, const char *error_name, const char *description) {
+        if (description == nullptr) {
+            ::fprintf(stderr, "description is nullptr, abort.");
+            std::abort();
+        }
         std::unique_lock<std::mutex> l(modify_desc_mutex);
         if (error_code < ERRNO_BEGIN || error_code >= ERRNO_END) {
             // error() is a non-portable GNU extension that should not be used.
             ::fprintf(stderr, "Fail to define %s(%d) which is out of range, abort.",
-                    error_name, error_code);
-            std::exit(1);
+                      error_name, error_code);
+            std::abort();
         }
         const auto index = error_code - ERRNO_BEGIN;
-        const std::string_view  desc = errno_desc_array[index];
-        if (!desc.empty()) {
-                ::fprintf(stderr, "WARNING: Detected shared library loading\n");
+        const char* desc = errno_desc_array[index];
+        if (desc != nullptr) {
+            ::fprintf(stderr, "WARNING: Detected shared library loading\n");
+            std::abort();
         }
         errno_desc_array[index] = description;
         return 0;  // must

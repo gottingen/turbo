@@ -1190,7 +1190,7 @@ namespace turbo {
         return name;
     }
 
-// Obtains short name of type.
+    // Obtains short name of type.
     template<typename T>
     [[nodiscard]] constexpr auto nameof_short_type() noexcept -> detail::enable_if_has_short_name_t<T, string_view> {
         static_assert(detail::nameof_type_supported<T>::value,
@@ -1202,7 +1202,7 @@ namespace turbo {
         return name;
     }
 
-// Obtains name of member.
+    // Obtains name of member.
     template<auto V>
     [[nodiscard]] constexpr auto
     nameof_member() noexcept -> std::enable_if_t<std::is_member_pointer_v<decltype(V)>, string_view> {
@@ -1214,7 +1214,7 @@ namespace turbo {
         return name;
     }
 
-// Obtains name of a function, a global or class static variable.
+    // Obtains name of a function, a global or class static variable.
     template<auto V>
     [[nodiscard]] constexpr auto
     nameof_pointer() noexcept -> std::enable_if_t<std::is_pointer_v<decltype(V)>, string_view> {

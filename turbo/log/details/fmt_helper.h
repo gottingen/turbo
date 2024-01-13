@@ -78,7 +78,7 @@ namespace turbo::tlog {
                     dest.push_back(static_cast<char>('0' + n % 10));
                 } else // unlikely, but just in case, let fmt deal with it
                 {
-                    fmt_lib::format_to(std::back_inserter(dest), FMT_STRING("{:02}"), n);
+                    turbo::format_to(std::back_inserter(dest), FMT_STRING("{:02}"), n);
                 }
             }
 

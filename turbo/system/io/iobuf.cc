@@ -20,124 +20,12 @@
 #include <stdexcept>                       // std::invalid_argument
 #include "turbo/system/io.h"                 // butil::fd_guard
 #include "turbo/system/io/iobuf.h"
+#include "turbo/system/io/sys_io.h"
 #include "turbo/system/atexit.h"
 #include "turbo/log/logging.h"
 
 namespace turbo::files_internal {
     namespace iobuf {
-
-        typedef ssize_t (*iov_function)(int fd, const struct iovec *vector,
-                                        int count, off_t offset);
-
-        // Userpsace preadv
-        static ssize_t user_preadv(int fd, const struct iovec *vector,
-                                   int count, off_t offset) {
-            ssize_t total_read = 0;
-            for (int i = 0; i < count; ++i) {
-                const ssize_t rc = ::pread(fd, vector[i].iov_base, vector[i].iov_len, offset);
-                if (rc <= 0) {
-                    return total_read > 0 ? total_read : rc;
-                }
-                total_read += rc;
-                offset += rc;
-                if (rc < (ssize_t) vector[i].iov_len) {
-                    break;
-                }
-            }
-            return total_read;
-        }
-
-        static ssize_t user_pwritev(int fd, const struct iovec *vector,
-                                    int count, off_t offset) {
-            ssize_t total_write = 0;
-            for (int i = 0; i < count; ++i) {
-                const ssize_t rc = ::pwrite(fd, vector[i].iov_base, vector[i].iov_len, offset);
-                if (rc <= 0) {
-                    return total_write > 0 ? total_write : rc;
-                }
-                total_write += rc;
-                offset += rc;
-                if (rc < (ssize_t) vector[i].iov_len) {
-                    break;
-                }
-            }
-            return total_write;
-        }
-
-#if defined(TURBO_PROCESSOR_X86_64)
-
-#ifndef SYS_preadv
-#define SYS_preadv 295
-#endif  // SYS_preadv
-
-#ifndef SYS_pwritev
-#define SYS_pwritev 296
-#endif // SYS_pwritev
-
-        // SYS_preadv/SYS_pwritev is available since Linux 2.6.30
-        static ssize_t sys_preadv(int fd, const struct iovec *vector,
-                                  int count, off_t offset) {
-            return syscall(SYS_preadv, fd, vector, count, offset);
-        }
-
-        static ssize_t sys_pwritev(int fd, const struct iovec *vector,
-                                   int count, off_t offset) {
-            return syscall(SYS_pwritev, fd, vector, count, offset);
-        }
-
-        inline iov_function get_preadv_func() {
-#if defined(TURBO_PLATFORM_OSX)
-            return user_preadv;
-#endif
-            turbo::FDGuard fd(open("/dev/zero", O_RDONLY));
-            if (fd < 0) {
-                TLOG_WARN("Fail to open /dev/zero");
-                return user_preadv;
-            }
-            char dummy[1];
-            iovec vec = { dummy, sizeof(dummy) };
-            const int rc = syscall(SYS_preadv, (int)fd, &vec, 1, 0);
-            if (rc < 0) {
-                TLOG_WARN("The kernel doesn't support SYS_preadv, "
-                          " use user_preadv instead");
-                return user_preadv;
-            }
-            return sys_preadv;
-        }
-
-        inline iov_function get_pwritev_func() {
-            turbo::FDGuard fd(open("/dev/null", O_WRONLY));
-            if (fd < 0) {
-                TLOG_ERROR("Fail to open /dev/null");
-                return user_pwritev;
-            }
-#if defined(TURBO_PLATFORM_OSX)
-            return user_pwritev;
-#endif
-            char dummy[1];
-            iovec vec = { dummy, sizeof(dummy) };
-            const int rc = syscall(SYS_pwritev, (int)fd, &vec, 1, 0);
-            if (rc < 0) {
-                TLOG_WARN("The kernel doesn't support SYS_pwritev, "
-                          " use user_pwritev instead");
-                return user_pwritev;
-            }
-            return sys_pwritev;
-        }
-
-#else   // ARCH_CPU_X86_64
-
-#warning "We don't check if the kernel supports SYS_preadv or SYS_pwritev on non-X86_64, use implementation on pread/pwrite directly."
-
-        inline iov_function get_preadv_func() {
-            return user_preadv;
-        }
-
-        inline iov_function get_pwritev_func() {
-            return user_pwritev;
-        }
-
-#endif  // ARCH_CPU_X86_64
 
         inline void *cp(void *__restrict dest, const void *__restrict src, size_t n) {
             // memcpy in gcc 4.8 seems to be faster enough.
@@ -926,8 +814,7 @@ namespace turbo::files_internal {
         ssize_t nw = 0;
 
         if (offset >= 0) {
-            static iobuf::iov_function pwritev_func = iobuf::get_pwritev_func();
-            nw = pwritev_func(fd, vec, nvec, offset);
+            nw = sys_pwritev(fd, vec, nvec, offset);
         } else {
             nw = ::writev(fd, vec, nvec);
         }
@@ -986,8 +873,7 @@ namespace turbo::files_internal {
 
         ssize_t nw = 0;
         if (offset >= 0) {
-            static iobuf::iov_function pwritev_func = iobuf::get_pwritev_func();
-            nw = pwritev_func(fd, vec, nvec, offset);
+            nw = sys_pwritev(fd, vec, nvec, offset);
         } else {
             nw = ::writev(fd, vec, nvec);
         }
@@ -1541,8 +1427,7 @@ namespace turbo::files_internal {
         if (offset < 0) {
             nr = readv(fd, vec, nvec);
         } else {
-            static iobuf::iov_function preadv_func = iobuf::get_preadv_func();
-            nr = preadv_func(fd, vec, nvec, offset);
+            nr = sys_preadv(fd, vec, nvec, offset);
         }
         if (nr <= 0) {  // -1 or 0
             if (empty()) {

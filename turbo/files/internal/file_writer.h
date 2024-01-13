@@ -35,8 +35,7 @@ namespace turbo {
 
         virtual  ~SequentialFileWriter() = default;
 
-        [[nodiscard]] virtual turbo::Status open(const turbo::filesystem::path &path, bool truncate,
-                                                 const turbo::FileOption &option = FileOption::kDefault) noexcept = 0;
+        [[nodiscard]] virtual turbo::Status open(const turbo::filesystem::path &path,const turbo::OpenOption &option) noexcept = 0;
 
         [[nodiscard]] virtual  turbo::Status write(const void *buff, size_t len) = 0;
 
@@ -69,8 +68,7 @@ namespace turbo {
 
         virtual ~RandomFileWriter() = default;
 
-        [[nodiscard]] virtual turbo::Status open(const turbo::filesystem::path &path, bool truncate = false,
-                                                 const turbo::FileOption &option = FileOption::kDefault) noexcept = 0;
+        [[nodiscard]] virtual turbo::Status open(const turbo::filesystem::path &path, const turbo::OpenOption &option) noexcept = 0;
 
         [[nodiscard]] virtual  turbo::Status
         write(off_t offset, const void *buff, size_t len, bool truncate = false) = 0;

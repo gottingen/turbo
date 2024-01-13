@@ -48,7 +48,7 @@ TEST_CASE("daily_logger with dateonly calculator [daily_logger]")
     turbo::tlog::filename_t basename = TLOG_FILENAME_T("test_logs/daily_dateonly");
     std::tm tm = turbo::tlog::details::os::localtime();
     filename_memory_buf_t w;
-    turbo::tlog::fmt_lib::format_to(
+    turbo::format_to(
             std::back_inserter(w), TLOG_FILENAME_T("{}_{:04d}-{:02d}-{:02d}"), basename, tm.tm_year + 1900,
             tm.tm_mon + 1, tm.tm_mday);
 
@@ -65,7 +65,7 @@ TEST_CASE("daily_logger with dateonly calculator [daily_logger]")
 struct custom_daily_file_name_calculator {
     static turbo::tlog::filename_t calc_filename(const turbo::tlog::filename_t &basename, const tm &now_tm) {
         filename_memory_buf_t w;
-        turbo::tlog::fmt_lib::format_to(std::back_inserter(w), TLOG_FILENAME_T("{}{:04d}{:02d}{:02d}"), basename,
+        turbo::format_to(std::back_inserter(w), TLOG_FILENAME_T("{}{:04d}{:02d}{:02d}"), basename,
                                         now_tm.tm_year + 1900,
                                         now_tm.tm_mon + 1, now_tm.tm_mday);
 
@@ -83,7 +83,7 @@ TEST_CASE("daily_logger with custom calculator [daily_logger]")
     turbo::tlog::filename_t basename = TLOG_FILENAME_T("test_logs/daily_dateonly");
     std::tm tm = turbo::tlog::details::os::localtime();
     filename_memory_buf_t w;
-    turbo::tlog::fmt_lib::format_to(
+    turbo::format_to(
             std::back_inserter(w), TLOG_FILENAME_T("{}{:04d}{:02d}{:02d}"), basename, tm.tm_year + 1900, tm.tm_mon + 1,
             tm.tm_mday);
 
@@ -146,7 +146,7 @@ TEST_CASE("daily_file_sink::daily_filename_format_calculator [daily_file_sink]]"
     auto filename = turbo::tlog::sinks::daily_filename_format_calculator::calc_filename(TLOG_FILENAME_T("example-%Y-%m-%d.log"), tm);
 
     REQUIRE_EQ(filename,
-            turbo::tlog::fmt_lib::format(TLOG_FILENAME_T("example-{:04d}-{:02d}-{:02d}.log"), tm.tm_year + 1900,
+            turbo::format(TLOG_FILENAME_T("example-{:04d}-{:02d}-{:02d}.log"), tm.tm_year + 1900,
                                          tm.tm_mon + 1, tm.tm_mday));
 }*/
 

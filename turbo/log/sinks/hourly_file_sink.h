@@ -40,7 +40,7 @@ namespace turbo::tlog {
             static filename_t calc_filename(const filename_t &filename, const tm &now_tm) {
                 filename_t basename, ext;
                 std::tie(basename, ext) = turbo::split_by_extension(filename);
-                return fmt_lib::format(TLOG_FILENAME_T("{}_{:04d}-{:02d}-{:02d}_{:02d}{}"), basename,
+                return turbo::format(TLOG_FILENAME_T("{}_{:04d}-{:02d}-{:02d}_{:02d}{}"), basename,
                                        now_tm.tm_year + 1900, now_tm.tm_mon + 1,
                                        now_tm.tm_mday, now_tm.tm_hour, ext);
             }

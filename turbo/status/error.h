@@ -68,7 +68,7 @@ namespace turbo {
 
     static constexpr StatusCode ERRNO_END = 32768;
 
-    static std::array<std::string_view, ERRNO_END - ERRNO_BEGIN> errno_desc_array = {};
+    extern std::array<const char*, ERRNO_END - ERRNO_BEGIN> errno_desc_array;
 
     // You should not call this function, use TURBO_REGISTER_ERRNO instead.
     extern int describe_customized_errno(int, const char *, const char *);
@@ -94,14 +94,14 @@ class TurboErrorRegister {
 
 #ifndef TURBO_PLATFORM_WINDOWS
 namespace turbo {
-    constexpr std::string_view terror(int error_code) {
+    constexpr const char* terror(int error_code) {
         if (error_code >= turbo::ERRNO_BEGIN && error_code < turbo::ERRNO_END) {
             return turbo::errno_desc_array[error_code - turbo::ERRNO_BEGIN];
         }
         return "";
     }
 
-    inline std::string_view terror() {
+    inline const char* terror() {
         return terror(errno);
     }
 

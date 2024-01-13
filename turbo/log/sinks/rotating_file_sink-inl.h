@@ -45,7 +45,7 @@ namespace turbo::tlog {
             if (max_files > 200000) {
                 throw_tlog_ex("rotating sink constructor: max_files arg cannot exceed 200000");
             }
-            auto r = file_writer_.open(calc_filename(base_filename_, 0), true, kLogFileOption);
+            auto r = file_writer_.open(calc_filename(base_filename_, 0), kLogTruncateOpenOption);
             if (!r.ok()) {
                 throw_tlog_ex(r.to_string());
             }
@@ -60,8 +60,8 @@ namespace turbo::tlog {
             }
         }
 
-// calc filename according to index and file extension if exists.
-// e.g. calc_filename("logs/mylog.txt, 3) => "logs/mylog.3.txt".
+        // calc filename according to index and file extension if exists.
+        // e.g. calc_filename("logs/mylog.txt, 3) => "logs/mylog.3.txt".
         template<typename Mutex>
         filename_t rotating_file_sink<Mutex>::calc_filename(const filename_t &filename, std::size_t index) {
             if (index == 0u) {
@@ -70,7 +70,7 @@ namespace turbo::tlog {
 
             filename_t basename, ext;
             std::tie(basename, ext) = turbo::split_by_extension(filename);
-            return fmt_lib::format(TLOG_FILENAME_T("{}.{}{}"), basename, index, ext);
+            return turbo::format(TLOG_FILENAME_T("{}.{}{}"), basename, index, ext);
         }
 
         template<typename Mutex>

@@ -32,7 +32,7 @@ namespace turbo {
 
 
     turbo::Status
-    RandomWriteFile::open(const turbo::filesystem::path &fname, bool truncate, const FileOption &option) noexcept {
+    RandomWriteFile::open(const turbo::filesystem::path &fname, const OpenOption &option) noexcept {
         close();
         _option = option;
         _file_path = fname;
@@ -59,18 +59,7 @@ namespace turbo {
                     }
                 }
             }
-            if (truncate) {
-                // Truncate by opening-and-closing a tmp file in "wb" mode, always
-                // opening the actual log-we-write-to in "ab" mode, since that
-                // interacts more politely with eternal processes that might
-                // rotate/truncate the file underneath us.
-                auto rs = turbo::sys_io::open_write(_file_path, trunc_mode, _option);
-                if (!rs.ok()) {
-                    continue;
-                }
-                ::close(rs.value());
-            }
-            auto rs = turbo::sys_io::open_write(_file_path, mode, _option);
+            auto rs = turbo::open_file(_file_path, _option);
             if (rs.ok()) {
                 _fd = rs.value();
                 if (_listener.after_open) {
@@ -90,7 +79,11 @@ namespace turbo {
         if (_file_path.empty()) {
             return turbo::invalid_argument_error("file name empty");
         }
-        return open(_file_path, truncate);
+        OpenOption option = _option;
+        if (truncate) {
+            option.truncate();
+        }
+        return open(_file_path, option);
     }
 
     turbo::Status RandomWriteFile::write(off_t offset, const void *data, size_t size, bool truncate) {

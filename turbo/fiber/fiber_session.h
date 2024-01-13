@@ -120,12 +120,12 @@ namespace turbo {
         return turbo::fiber_internal::fiber_session_list_reset(list, error_code);
     }
 
-    inline int fiber_session_list_reset_pthreadsafe(fiber_session_list_t *list, int error_code, pthread_mutex_t *mutex) {
+    inline int fiber_session_list_reset_pthreadsafe(fiber_session_list_t *list, int error_code, std::mutex *mutex) {
         return turbo::fiber_internal::fiber_session_list_reset_pthreadsafe(list, error_code, mutex);
     }
 
     inline int fiber_session_list_reset_fibersafe(
-            fiber_session_list_t *list, int error_code, fiber_mutex_t *mutex) {
+            fiber_session_list_t *list, int error_code, FiberMutex *mutex) {
         return turbo::fiber_internal::fiber_session_list_reset_fibersafe(list, error_code, mutex);
     }
 

@@ -41,7 +41,7 @@ namespace turbo {
     }
 
     turbo::Status
-    RandomReadFile::open(const turbo::filesystem::path &path, const turbo::FileOption &option) noexcept {
+    RandomReadFile::open(const turbo::filesystem::path &path, const turbo::OpenOption &option) noexcept {
         close();
         _option = option;
         _file_path = path;
@@ -53,7 +53,7 @@ namespace turbo {
         }
 
         for (int tries = 0; tries < _option.open_tries; ++tries) {
-            auto rs = turbo::sys_io::open_read(_file_path, "rb", _option);
+            auto rs = turbo::open_file(_file_path, _option);
             if (rs.ok()) {
                 _fd = rs.value();
                 if (_listener.after_open) {
@@ -65,16 +65,16 @@ namespace turbo {
                 turbo::sleep_for(turbo::milliseconds(_option.open_interval));
             }
         }
-        return turbo::errno_to_status(errno, turbo::format("Failed opening file {} for reading", _file_path.c_str()));
+        return turbo::make_status(errno, turbo::format("Failed opening file {} for reading", _file_path.c_str()));
     }
 
     turbo::ResultStatus<size_t> RandomReadFile::read(off_t offset, void *buff, size_t len) {
         INVALID_FD_RETURN(_fd);
         size_t has_read = 0;
         /// _fd may > 0 with _fp valid
-        ssize_t read_size = ::pread(_fd, buff, len, static_cast<off_t>(offset));
+        ssize_t read_size = sys_pread(_fd, buff, len, static_cast<off_t>(offset));
         if(read_size < 0 ) {
-            return turbo::errno_to_status(errno, _file_path.c_str());
+            return turbo::make_status();
         }
         // read_size > 0 means read the end of file
         return has_read;
@@ -93,13 +93,13 @@ namespace turbo {
         auto pre_len = content->size();
         content->resize(pre_len + len);
         char* pdata = content->data() + pre_len;
-        auto rs = read(offset, pdata, len);
-        if(!rs.ok()) {
+        auto rs = turbo::sys_pread(_fd, pdata, len, offset);
+        if(rs < 0) {
             content->resize(pre_len);
-            return rs;
+            return make_status();
         }
-        content->resize(pre_len + rs.value());
-        return rs.value();
+        content->resize(pre_len + rs);
+        return rs;
     }
 
     turbo::ResultStatus<size_t> RandomReadFile::read(off_t offset, turbo::IOBuf *buf, size_t n) {
