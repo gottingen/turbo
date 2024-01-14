@@ -96,7 +96,7 @@ namespace {
         while (state.KeepRunning()) {
             std::swap(t, t2);
             t += turbo::seconds(1);
-            benchmark::DoNotOptimize(t.In(tz));
+            benchmark::DoNotOptimize(tz.at(t));
         }
     }
 
@@ -125,7 +125,7 @@ namespace {
         turbo::Time t = turbo::from_unix_seconds(1384569027);
         while (state.KeepRunning()) {
             t += turbo::seconds(1);
-            benchmark::DoNotOptimize(t.In(tz));
+            benchmark::DoNotOptimize(tz.at(t));
         }
     }
 
@@ -146,9 +146,9 @@ namespace {
 
     BENCHMARK(BM_Time_ToDateTimeUTC_Libc);
 
-//
-// from_unix_micros
-//
+    //
+    // from_unix_micros
+    //
 
     void BM_Time_FromUnixMicros(benchmark::State &state) {
         int i = 0;
@@ -196,16 +196,16 @@ namespace {
 
     BENCHMARK(BM_Time_ToUnixSeconds);
 
-//
-// from_civil
-//
-// In each "from_civil" benchmark we switch between two YMDhms values
-// separated by at least one transition in order to defeat any internal
-// caching of previous results (e.g., see time_local_hint_).
-//
-// The "UTC" variants use UTC instead of the Google/local time zone.
-// The "Day0" variants require normalization of the day of month.
-//
+    //
+    // from_civil
+    //
+    // In each "from_civil" benchmark we switch between two YMDhms values
+    // separated by at least one transition in order to defeat any internal
+    // caching of previous results (e.g., see time_local_hint_).
+    //
+    // The "UTC" variants use UTC instead of the Google/local time zone.
+    // The "Day0" variants require normalization of the day of month.
+    //
 
     void BM_Time_FromCivil_Turbo(benchmark::State &state) {
         const turbo::TimeZone tz =
@@ -309,9 +309,9 @@ namespace {
 
     BENCHMARK(BM_Time_FromCivilDay0_Libc);
 
-//
-// To/FromTimespec
-//
+    //
+    // To/FromTimespec
+    //
 
     void BM_Time_ToTimespec(benchmark::State &state) {
         turbo::Time now = turbo::time_now();
@@ -335,9 +335,9 @@ namespace {
 
     BENCHMARK(BM_Time_FromTimespec);
 
-//
-// Comparison with infinite_future/Past
-//
+    //
+    // Comparison with infinite_future/Past
+    //
 
     void BM_Time_InfiniteFuture(benchmark::State &state) {
         while (state.KeepRunning()) {

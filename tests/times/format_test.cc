@@ -150,7 +150,7 @@ namespace {
 
         REQUIRE(turbo::parse_time("%Y-%m-%d %H:%M:%S %z",
                                      "2013-06-28 19:08:09 -0800", &t, &err));
-        const auto ci = turbo::fixed_time_zone(-8 * 60 * 60).At(t);
+        const auto ci = turbo::fixed_time_zone(-8 * 60 * 60).at(t);
         REQUIRE_EQ(turbo::CivilSecond(2013, 6, 28, 19, 8, 9), ci.cs);
         REQUIRE_EQ(turbo::zero_duration(), ci.subsecond);
     }
@@ -173,7 +173,7 @@ namespace {
         REQUIRE(
                 turbo::parse_time("%Y-%m-%d %H:%M:%S", "2013-06-28 19:08:09", tz, &t, &e))
                             ;
-        auto ci = tz.At(t);
+        auto ci = tz.at(t);
         REQUIRE_EQ(turbo::CivilSecond(2013, 6, 28, 19, 8, 9), ci.cs);
         REQUIRE_EQ(turbo::zero_duration(), ci.subsecond);
 
@@ -181,7 +181,7 @@ namespace {
         REQUIRE(turbo::parse_time("%Y-%m-%d %H:%M:%S %z",
                                      "2013-06-28 19:08:09 +0800", tz, &t, &e))
                             ;
-        ci = turbo::fixed_time_zone(8 * 60 * 60).At(t);
+        ci = turbo::fixed_time_zone(8 * 60 * 60).at(t);
         REQUIRE_EQ(turbo::CivilSecond(2013, 6, 28, 19, 8, 9), ci.cs);
         REQUIRE_EQ(turbo::zero_duration(), ci.subsecond);
     }
@@ -328,15 +328,15 @@ namespace {
         REQUIRE(turbo::parse_time("infinite-future %H:%M", "infinite-future 03:04",
                                      &t, &err));
         REQUIRE_NE(turbo::infinite_future(), t);
-        REQUIRE_EQ(3, tz.At(t).cs.hour());
-        REQUIRE_EQ(4, tz.At(t).cs.minute());
+        REQUIRE_EQ(3, tz.at(t).cs.hour());
+        REQUIRE_EQ(4, tz.at(t).cs.minute());
 
         // "infinite-past" as literal string
         REQUIRE(
                 turbo::parse_time("infinite-past %H:%M", "infinite-past 03:04", &t, &err));
         REQUIRE_NE(turbo::infinite_past(), t);
-        REQUIRE_EQ(3, tz.At(t).cs.hour());
-        REQUIRE_EQ(4, tz.At(t).cs.minute());
+        REQUIRE_EQ(3, tz.at(t).cs.hour());
+        REQUIRE_EQ(4, tz.at(t).cs.minute());
 
         // The input doesn't match the format.
         REQUIRE_FALSE(turbo::parse_time("infinite-future %H:%M", "03:04", &t, &err));

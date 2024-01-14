@@ -876,44 +876,6 @@ namespace turbo {
             return *this;
         }
 
-        // Time::Breakdown
-        //
-        // The calendar and wall-clock (aka "civil time") components of an
-        // `turbo::Time` in a certain `turbo::TimeZone`. This struct is not
-        // intended to represent an instant in time. So, rather than passing
-        // a `Time::Breakdown` to a function, pass an `turbo::Time` and an
-        // `turbo::TimeZone`.
-        //
-        // Deprecated. Use `turbo::TimeZone::CivilInfo`.
-        struct
-        Breakdown {
-            int64_t year;        // year (e.g., 2013)
-            int month;           // month of year [1:12]
-            int day;             // day of month [1:31]
-            int hour;            // hour of day [0:23]
-            int minute;          // minute of hour [0:59]
-            int second;          // second of minute [0:59]
-            Duration subsecond;  // [seconds(0):seconds(1)) if finite
-            int weekday;         // 1==Mon, ..., 7=Sun
-            int yearday;         // day of year [1:366]
-
-            // Note: The following fields exist for backward compatibility
-            // with older APIs.  Accessing these fields directly is a sign of
-            // imprudent logic in the calling code.  Modern time-related code
-            // should only access this data indirectly by way of format_time().
-            // These fields are undefined for infinite_future() and infinite_past().
-            int offset;             // seconds east of UTC
-            bool is_dst;            // is offset non-standard?
-            const char *zone_abbr;  // time-zone abbreviation (e.g., "PST")
-        };
-
-        // Time::In()
-        //
-        // Returns the breakdown of this instant in the given TimeZone.
-        //
-        // Deprecated. Use `turbo::TimeZone::At(Time)`.
-        Breakdown In(TimeZone tz) const;
-
         template<typename H>
         friend H hash_value(H h, Time t) {
             return H::combine(std::move(h), t.rep_);
@@ -1257,6 +1219,26 @@ namespace turbo {
     std::chrono::system_clock::time_point
     to_chrono_time(Time);
 
+    // TimeZone::CivilInfo
+    //
+    // Information about the civil time corresponding to an absolute time.
+    // This struct is not intended to represent an instant in time. So, rather
+    // than passing a `TimeZone::CivilInfo` to a function, pass an `turbo::Time`
+    // and an `turbo::TimeZone`.
+    struct CivilInfo {
+        CivilSecond cs;
+        Duration subsecond;
+
+        // Note: The following fields exist for backward compatibility
+        // with older APIs.  Accessing these fields directly is a sign of
+        // imprudent logic in the calling code.  Modern time-related code
+        // should only access this data indirectly by way of format_time().
+        // These fields are undefined for infinite_future() and infinite_past().
+        int offset;             // seconds east of UTC
+        bool is_dst;            // is offset non-standard?
+        const char *zone_abbr;  // time-zone abbreviation (e.g., "PST")
+    };
+
     /**
      * @ingroup turbo_times_time_zone
      * @brief The `turbo::TimeZone` is an opaque, small, value-type class representing a
@@ -1301,26 +1283,6 @@ namespace turbo {
 
         std::string name() const { return cz_.name(); }
 
-        // TimeZone::CivilInfo
-        //
-        // Information about the civil time corresponding to an absolute time.
-        // This struct is not intended to represent an instant in time. So, rather
-        // than passing a `TimeZone::CivilInfo` to a function, pass an `turbo::Time`
-        // and an `turbo::TimeZone`.
-        struct CivilInfo {
-            CivilSecond cs;
-            Duration subsecond;
-
-            // Note: The following fields exist for backward compatibility
-            // with older APIs.  Accessing these fields directly is a sign of
-            // imprudent logic in the calling code.  Modern time-related code
-            // should only access this data indirectly by way of format_time().
-            // These fields are undefined for infinite_future() and infinite_past().
-            int offset;             // seconds east of UTC
-            bool is_dst;            // is offset non-standard?
-            const char *zone_abbr;  // time-zone abbreviation (e.g., "PST")
-        };
-
         /**
          * @brief Returns the civil time for this TimeZone at a certain `turbo::Time`.
          *        If the input time is infinite, the output civil second will be set to
@@ -1338,7 +1300,7 @@ namespace turbo {
          * @param t the time to convert
          * @return the converted time
          */
-        CivilInfo At(Time t) const;
+        CivilInfo at(Time t) const;
 
         /**
          * @brief Information about the absolute times corresponding to a civil time.
@@ -1507,6 +1469,11 @@ namespace turbo {
         return TimeZone(time_internal::cctz::local_time_zone());
     }
 
+    inline CivilInfo to_civil_info(Time t,
+                                       TimeZone tz) {
+        return tz.at(t);  // already a CivilSecond
+    }
+
     /**
      * @ingroup turbo_times_time_zone
      * @brief Helpers for TimeZone::At(Time) to return particularly aligned civil times.
@@ -1522,7 +1489,7 @@ namespace turbo {
      */
     inline CivilSecond to_civil_second(Time t,
                                        TimeZone tz) {
-        return tz.At(t).cs;  // already a CivilSecond
+        return tz.at(t).cs;  // already a CivilSecond
     }
 
     /**
@@ -1535,7 +1502,7 @@ namespace turbo {
      */
     inline CivilMinute to_civil_minute(Time t,
                                        TimeZone tz) {
-        return CivilMinute(tz.At(t).cs);
+        return CivilMinute(tz.at(t).cs);
     }
 
     /**
@@ -1547,7 +1514,7 @@ namespace turbo {
      * @return
      */
     inline CivilHour to_civil_hour(Time t, TimeZone tz) {
-        return CivilHour(tz.At(t).cs);
+        return CivilHour(tz.at(t).cs);
     }
 
     /**
@@ -1559,7 +1526,7 @@ namespace turbo {
      * @return
      */
     inline CivilDay to_civil_day(Time t, TimeZone tz) {
-        return CivilDay(tz.At(t).cs);
+        return CivilDay(tz.at(t).cs);
     }
 
     /**
@@ -1572,7 +1539,7 @@ namespace turbo {
      */
     inline CivilMonth to_civil_month(Time t,
                                    TimeZone tz) {
-        return CivilMonth(tz.At(t).cs);
+        return CivilMonth(tz.at(t).cs);
     }
 
     /**
@@ -1584,7 +1551,7 @@ namespace turbo {
      * @return
      */
     inline CivilYear to_civil_year(Time t, TimeZone tz) {
-        return CivilYear(tz.At(t).cs);
+        return CivilYear(tz.at(t).cs);
     }
 
     /**

@@ -65,42 +65,8 @@ namespace turbo {
                    : q - 1;
         }
 
-        inline turbo::Time::Breakdown InfiniteFutureBreakdown() {
-            turbo::Time::Breakdown bd;
-            bd.year = std::numeric_limits<int64_t>::max();
-            bd.month = 12;
-            bd.day = 31;
-            bd.hour = 23;
-            bd.minute = 59;
-            bd.second = 59;
-            bd.subsecond = turbo::infinite_duration();
-            bd.weekday = 4;
-            bd.yearday = 365;
-            bd.offset = 0;
-            bd.is_dst = false;
-            bd.zone_abbr = "-00";
-            return bd;
-        }
-
-        inline turbo::Time::Breakdown InfinitePastBreakdown() {
-            Time::Breakdown bd;
-            bd.year = std::numeric_limits<int64_t>::min();
-            bd.month = 1;
-            bd.day = 1;
-            bd.hour = 0;
-            bd.minute = 0;
-            bd.second = 0;
-            bd.subsecond = -turbo::infinite_duration();
-            bd.weekday = 7;
-            bd.yearday = 1;
-            bd.offset = 0;
-            bd.is_dst = false;
-            bd.zone_abbr = "-00";
-            return bd;
-        }
-
-        inline turbo::TimeZone::CivilInfo InfiniteFutureCivilInfo() {
-            TimeZone::CivilInfo ci;
+        inline turbo::CivilInfo InfiniteFutureCivilInfo() {
+            CivilInfo ci;
             ci.cs = CivilSecond::max();
             ci.subsecond = infinite_duration();
             ci.offset = 0;
@@ -109,8 +75,8 @@ namespace turbo {
             return ci;
         }
 
-        inline turbo::TimeZone::CivilInfo InfinitePastCivilInfo() {
-            TimeZone::CivilInfo ci;
+        inline turbo::CivilInfo InfinitePastCivilInfo() {
+            CivilInfo ci;
             ci.cs = CivilSecond::min();
             ci.subsecond = -infinite_duration();
             ci.offset = 0;
@@ -197,35 +163,6 @@ namespace turbo {
         }
 
     }  // namespace
-
-    //
-    // Time
-    //
-
-    turbo::Time::Breakdown Time::In(turbo::TimeZone tz) const {
-        if (*this == turbo::infinite_future()) return InfiniteFutureBreakdown();
-        if (*this == turbo::infinite_past()) return InfinitePastBreakdown();
-
-        const auto tp = cctz_unix_epoch() + cctz::seconds(time_internal::GetRepHi(rep_));
-        const auto al = cctz::time_zone(tz).lookup(tp);
-        const auto cs = al.cs;
-        const auto cd = cctz::civil_day(cs);
-
-        turbo::Time::Breakdown bd;
-        bd.year = cs.year();
-        bd.month = cs.month();
-        bd.day = cs.day();
-        bd.hour = cs.hour();
-        bd.minute = cs.minute();
-        bd.second = cs.second();
-        bd.subsecond = time_internal::MakeDuration(0, time_internal::GetRepLo(rep_));
-        bd.weekday = MapWeekday(cctz::get_weekday(cd));
-        bd.yearday = cctz::get_yearday(cd);
-        bd.offset = al.offset;
-        bd.is_dst = al.is_dst;
-        bd.zone_abbr = al.abbr;
-        return bd;
-    }
 
     //
     // Conversions from/to other time types.
@@ -347,7 +284,7 @@ namespace turbo {
     // TimeZone
     //
 
-    turbo::TimeZone::CivilInfo TimeZone::At(Time t) const {
+    turbo::CivilInfo TimeZone::at(Time t) const {
         if (t == turbo::infinite_future()) return InfiniteFutureCivilInfo();
         if (t == turbo::infinite_past()) return InfinitePastCivilInfo();
 
@@ -355,7 +292,7 @@ namespace turbo {
         const auto tp = cctz_unix_epoch() + cctz::seconds(time_internal::GetRepHi(ud));
         const auto al = cz_.lookup(tp);
 
-        TimeZone::CivilInfo ci;
+        CivilInfo ci;
         ci.cs = CivilSecond(al.cs);
         ci.subsecond = time_internal::MakeDuration(0, time_internal::GetRepLo(ud));
         ci.offset = al.offset;
@@ -448,7 +385,7 @@ namespace turbo {
     struct tm to_tm(turbo::Time t, turbo::TimeZone tz) {
         struct tm tm = {};
 
-        const auto ci = tz.At(t);
+        const auto ci = tz.at(t);
         const auto &cs = ci.cs;
         tm.tm_sec = cs.second();
         tm.tm_min = cs.minute();

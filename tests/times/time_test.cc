@@ -81,25 +81,25 @@ namespace {
     }
 
     TEST_CASE("time, unix_epoch") {
-        const auto ci = turbo::utc_time_zone().At(turbo::unix_epoch());
+        const auto ci = turbo::utc_time_zone().at(turbo::unix_epoch());
         REQUIRE_EQ(turbo::CivilSecond(1970, 1, 1, 0, 0, 0), ci.cs);
         REQUIRE_EQ(turbo::zero_duration(), ci.subsecond);
         REQUIRE_EQ(turbo::Weekday::thursday, turbo::get_weekday(ci.cs));
     }
 
-    TEST_CASE("Time, Breakdown") {
+    TEST_CASE("Time, civiinfo") {
         turbo::TimeZone tz = turbo::time_internal::load_time_zone("America/New_York");
         turbo::Time t = turbo::unix_epoch();
 
         // The Unix epoch as seen in NYC.
-        auto ci = tz.At(t);
+        auto ci = tz.at(t);
         REQUIRE_CIVIL_INFO(ci, 1969, 12, 31, 19, 0, 0, -18000, false);
         REQUIRE_EQ(turbo::zero_duration(), ci.subsecond);
         REQUIRE_EQ(turbo::Weekday::wednesday, turbo::get_weekday(ci.cs));
 
         // Just before the epoch.
         t -= turbo::nanoseconds(1);
-        ci = tz.At(t);
+        ci = tz.at(t);
         REQUIRE_CIVIL_INFO(ci, 1969, 12, 31, 18, 59, 59, -18000, false);
         REQUIRE_EQ(turbo::nanoseconds(999999999), ci.subsecond);
         REQUIRE_EQ(turbo::Weekday::wednesday, turbo::get_weekday(ci.cs));
@@ -108,7 +108,7 @@ namespace {
         t += turbo::hours(24) * 2735;
         t += turbo::hours(18) + turbo::minutes(30) + turbo::seconds(15) +
              turbo::nanoseconds(9);
-        ci = tz.At(t);
+        ci = tz.at(t);
         REQUIRE_CIVIL_INFO(ci, 1977, 6, 28, 14, 30, 15, -14400, true);
         REQUIRE_EQ(8, ci.subsecond / turbo::nanoseconds(1));
         REQUIRE_EQ(turbo::Weekday::tuesday, turbo::get_weekday(ci.cs));
@@ -839,14 +839,14 @@ namespace {
         REQUIRE_EQ(0, ts.tv_nsec);
 
         // Checks how TimeZone::At() saturates on infinities.
-        auto ci = utc.At(turbo::infinite_future());
+        auto ci = utc.at(turbo::infinite_future());
         REQUIRE_CIVIL_INFO(ci, std::numeric_limits<int64_t>::max(), 12, 31, 23, 59, 59,
                           0, false);
         REQUIRE_EQ(turbo::infinite_duration(), ci.subsecond);
         REQUIRE_EQ(turbo::Weekday::thursday, turbo::get_weekday(ci.cs));
         REQUIRE_EQ(365, turbo::get_year_day(ci.cs));
         REQUIRE_EQ("-00", std::string(ci.zone_abbr));  // artifact of TimeZone::At()
-        ci = utc.At(turbo::infinite_past());
+        ci = utc.at(turbo::infinite_past());
         REQUIRE_CIVIL_INFO(ci, std::numeric_limits<int64_t>::min(), 1, 1, 0, 0, 0, 0,
                           false);
         REQUIRE_EQ(-turbo::infinite_duration(), ci.subsecond);
@@ -914,15 +914,15 @@ namespace {
                 turbo::time_internal::load_time_zone("America/New_York");
         const turbo::Time max =
                 turbo::from_unix_seconds(std::numeric_limits<int64_t>::max());
-        turbo::TimeZone::CivilInfo ci;
+        turbo::CivilInfo ci;
         turbo::Time t;
 
         // The maximal time converted in each zone.
-        ci = syd.At(max);
+        ci = syd.at(max);
         REQUIRE_CIVIL_INFO(ci, 292277026596, 12, 5, 2, 30, 7, 39600, true);
         t = turbo::from_civil(turbo::CivilSecond(292277026596, 12, 5, 2, 30, 7), syd);
         REQUIRE_EQ(max, t);
-        ci = nyc.At(max);
+        ci = nyc.at(max);
         REQUIRE_CIVIL_INFO(ci, 292277026596, 12, 4, 10, 30, 7, -18000, false);
         t = turbo::from_civil(turbo::CivilSecond(292277026596, 12, 4, 10, 30, 7), nyc);
         REQUIRE_EQ(max, t);
