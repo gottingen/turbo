@@ -83,7 +83,7 @@ namespace {
     TEST_CASE("time, unix_epoch") {
         const auto ci = turbo::utc_time_zone().at(turbo::unix_epoch());
         REQUIRE_EQ(turbo::CivilSecond(1970, 1, 1, 0, 0, 0), ci.cs);
-        REQUIRE_EQ(turbo::zero_duration(), ci.subsecond);
+        REQUIRE_EQ(turbo::Duration::zero(), ci.subsecond);
         REQUIRE_EQ(turbo::Weekday::thursday, turbo::get_weekday(ci.cs));
     }
 
@@ -94,7 +94,7 @@ namespace {
         // The Unix epoch as seen in NYC.
         auto ci = tz.at(t);
         REQUIRE_CIVIL_INFO(ci, 1969, 12, 31, 19, 0, 0, -18000, false);
-        REQUIRE_EQ(turbo::zero_duration(), ci.subsecond);
+        REQUIRE_EQ(turbo::Duration::zero(), ci.subsecond);
         REQUIRE_EQ(turbo::Weekday::wednesday, turbo::get_weekday(ci.cs));
 
         // Just before the epoch.
@@ -191,17 +191,17 @@ namespace {
         REQUIRE_EQ(ipast, ipast + turbo::seconds(1));
         REQUIRE_EQ(ipast, ipast - turbo::seconds(1));
 
-        REQUIRE_EQ(turbo::infinite_duration(), ifuture - ifuture);
-        REQUIRE_EQ(turbo::infinite_duration(), ifuture - ipast);
-        REQUIRE_EQ(-turbo::infinite_duration(), ipast - ifuture);
-        REQUIRE_EQ(-turbo::infinite_duration(), ipast - ipast);
+        REQUIRE_EQ(turbo::Duration::infinite(), ifuture - ifuture);
+        REQUIRE_EQ(turbo::Duration::infinite(), ifuture - ipast);
+        REQUIRE_EQ(-turbo::Duration::infinite(), ipast - ifuture);
+        REQUIRE_EQ(-turbo::Duration::infinite(), ipast - ipast);
 
         constexpr turbo::Time t = turbo::unix_epoch();  // Any finite time.
         static_assert(t < ifuture, "");
         static_assert(t > ipast, "");
 
-        REQUIRE_EQ(ifuture, t + turbo::infinite_duration());
-        REQUIRE_EQ(ipast, t - turbo::infinite_duration());
+        REQUIRE_EQ(ifuture, t + turbo::Duration::infinite());
+        REQUIRE_EQ(ipast, t - turbo::Duration::infinite());
     }
 
     TEST_CASE("Time, FloorConversion") {
@@ -713,7 +713,7 @@ namespace {
     }
 
     TEST_CASE("Time, Limits") {
-        // It is an implementation detail that Time().rep_ == zero_duration(),
+        // It is an implementation detail that Time().rep_ == Duration::zero(),
         // and that the resolution of a Duration is 1/4 of a nanosecond.
         const turbo::Time zero;
         const turbo::Time max =
@@ -731,8 +731,8 @@ namespace {
         REQUIRE_LT(turbo::unix_epoch(), max);
 
         // Check sign of Time differences.
-        REQUIRE_LT(turbo::zero_duration(), max - zero);
-        REQUIRE_LT(turbo::zero_duration(),
+        REQUIRE_LT(turbo::Duration::zero(), max - zero);
+        REQUIRE_LT(turbo::Duration::zero(),
                   zero - turbo::nanoseconds(1) / 4 - min);  // avoid zero - min
 
         // Arithmetic works at max - 0.25ns and min + 0.25ns.
@@ -842,14 +842,14 @@ namespace {
         auto ci = utc.at(turbo::infinite_future());
         REQUIRE_CIVIL_INFO(ci, std::numeric_limits<int64_t>::max(), 12, 31, 23, 59, 59,
                           0, false);
-        REQUIRE_EQ(turbo::infinite_duration(), ci.subsecond);
+        REQUIRE_EQ(turbo::Duration::infinite(), ci.subsecond);
         REQUIRE_EQ(turbo::Weekday::thursday, turbo::get_weekday(ci.cs));
         REQUIRE_EQ(365, turbo::get_year_day(ci.cs));
         REQUIRE_EQ("-00", std::string(ci.zone_abbr));  // artifact of TimeZone::At()
         ci = utc.at(turbo::infinite_past());
         REQUIRE_CIVIL_INFO(ci, std::numeric_limits<int64_t>::min(), 1, 1, 0, 0, 0, 0,
                           false);
-        REQUIRE_EQ(-turbo::infinite_duration(), ci.subsecond);
+        REQUIRE_EQ(-turbo::Duration::infinite(), ci.subsecond);
         REQUIRE_EQ(turbo::Weekday::sunday, turbo::get_weekday(ci.cs));
         REQUIRE_EQ(1, turbo::get_year_day(ci.cs));
         REQUIRE_EQ("-00", std::string(ci.zone_abbr));  // artifact of TimeZone::At()

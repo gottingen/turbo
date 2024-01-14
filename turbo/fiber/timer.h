@@ -53,7 +53,7 @@ namespace turbo {
 
         bool  triggered() const { return _triggered; }
 
-        bool is_repeated() const { return _duration != turbo::zero_duration(); }
+        bool is_repeated() const { return _duration != turbo::Duration::zero(); }
     private:
         turbo::Status check_duration_possible(const turbo::Duration &duration) const;
 

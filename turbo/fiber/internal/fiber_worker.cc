@@ -741,7 +741,7 @@ namespace turbo::fiber_internal {
     }
 
     turbo::Status FiberWorker::sleep(FiberWorker **pg, const turbo::Duration & span) {
-        if (turbo::zero_duration() == span) {
+        if (turbo::Duration::zero() == span) {
             yield(pg);
             return turbo::ok_status();
         }

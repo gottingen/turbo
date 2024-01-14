@@ -380,11 +380,11 @@ TEST(HashtablezSamplerTest, MultiThreaded) {
             break;
           }
           case 2: {
-            turbo::Duration oldest = turbo::zero_duration();
+            turbo::Duration oldest = turbo::Duration::zero();
             sampler.Iterate([&](const HashtablezInfo& info) {
               oldest = std::max(oldest, turbo::time_now() - info.create_time);
             });
-            ASSERT_GE(oldest, turbo::zero_duration());
+            ASSERT_GE(oldest, turbo::Duration::zero());
             break;
           }
         }

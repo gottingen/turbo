@@ -191,7 +191,7 @@ namespace turbo {
         }
 
         turbo::Status wait_for(int expected, const turbo::Duration& duration) {
-            if(duration <= turbo::zero_duration()) {
+            if(duration <= turbo::Duration::zero()) {
                 return deadline_exceeded_error("duration is negative");
             }
             auto spec = turbo::to_timespec(duration);

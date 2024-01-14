@@ -40,14 +40,14 @@ namespace {
 
 
     TEST_CASE("Duration, ConstExpr") {
-        constexpr turbo::Duration d0 = turbo::zero_duration();
-        static_assert(d0 == turbo::zero_duration(), "zero_duration()");
+        constexpr turbo::Duration d0 = turbo::Duration::zero();
+        static_assert(d0 == turbo::Duration::zero(), "Duration::zero()");
         constexpr turbo::Duration d1 = turbo::seconds(1);
         static_assert(d1 == turbo::seconds(1), "seconds(1)");
-        static_assert(d1 != turbo::zero_duration(), "seconds(1)");
-        constexpr turbo::Duration d2 = turbo::infinite_duration();
-        static_assert(d2 == turbo::infinite_duration(), "infinite_duration()");
-        static_assert(d2 != turbo::zero_duration(), "infinite_duration()");
+        static_assert(d1 != turbo::Duration::zero(), "seconds(1)");
+        constexpr turbo::Duration d2 = turbo::Duration::infinite();
+        static_assert(d2 == turbo::Duration::infinite(), "Duration::infinite()");
+        static_assert(d2 != turbo::Duration::zero(), "Duration::infinite()");
     }
 
     TEST_CASE("Duration, ValueSemantics") {
@@ -61,7 +61,7 @@ namespace {
     }
 
     TEST_CASE("Duration, Factories") {
-        constexpr turbo::Duration zero = turbo::zero_duration();
+        constexpr turbo::Duration zero = turbo::Duration::zero();
         constexpr turbo::Duration nano = turbo::nanoseconds(1);
         constexpr turbo::Duration micro = turbo::microseconds(1);
         constexpr turbo::Duration milli = turbo::milliseconds(1);
@@ -79,7 +79,7 @@ namespace {
         REQUIRE_EQ(hour, turbo::minutes(60));
 
         // Tests factory limits
-        const turbo::Duration inf = turbo::infinite_duration();
+        const turbo::Duration inf = turbo::Duration::infinite();
 
         REQUIRE_GT(inf, turbo::seconds(kint64max));
         REQUIRE_LT(-inf, turbo::seconds(kint64min));
@@ -104,8 +104,8 @@ namespace {
 #define TEST_DURATION_CONVERSION(UNIT)                                  \
   do {                                                                  \
     const turbo::Duration d = turbo::UNIT(1.5);                           \
-    constexpr turbo::Duration z = turbo::zero_duration();                  \
-    constexpr turbo::Duration inf = turbo::infinite_duration();            \
+    constexpr turbo::Duration z = turbo::Duration::zero();                  \
+    constexpr turbo::Duration inf = turbo::Duration::infinite();            \
     constexpr double dbl_inf = std::numeric_limits<double>::infinity(); \
     REQUIRE_EQ(kint64min, turbo::to_int64_##UNIT(-inf));                    \
     REQUIRE_EQ(-1, turbo::to_int64_##UNIT(-d));                             \
@@ -212,7 +212,7 @@ namespace {
         const auto minutes_max = turbo::from_chrono(chrono_minutes_max);
         const int64_t minutes_max_count = chrono_minutes_max.count();
         if (minutes_max_count > kint64max / 60) {
-            REQUIRE_EQ(turbo::infinite_duration(), minutes_max);
+            REQUIRE_EQ(turbo::Duration::infinite(), minutes_max);
         } else {
             REQUIRE_EQ(turbo::minutes(minutes_max_count), minutes_max);
         }
@@ -222,7 +222,7 @@ namespace {
         const auto minutes_min = turbo::from_chrono(chrono_minutes_min);
         const int64_t minutes_min_count = chrono_minutes_min.count();
         if (minutes_min_count < kint64min / 60) {
-            REQUIRE_EQ(-turbo::infinite_duration(), minutes_min);
+            REQUIRE_EQ(-turbo::Duration::infinite(), minutes_min);
         } else {
             REQUIRE_EQ(turbo::minutes(minutes_min_count), minutes_min);
         }
@@ -232,7 +232,7 @@ namespace {
         const auto hours_max = turbo::from_chrono(chrono_hours_max);
         const int64_t hours_max_count = chrono_hours_max.count();
         if (hours_max_count > kint64max / 3600) {
-            REQUIRE_EQ(turbo::infinite_duration(), hours_max);
+            REQUIRE_EQ(turbo::Duration::infinite(), hours_max);
         } else {
             REQUIRE_EQ(turbo::hours(hours_max_count), hours_max);
         }
@@ -242,7 +242,7 @@ namespace {
         const auto hours_min = turbo::from_chrono(chrono_hours_min);
         const int64_t hours_min_count = chrono_hours_min.count();
         if (hours_min_count < kint64min / 3600) {
-            REQUIRE_EQ(-turbo::infinite_duration(), hours_min);
+            REQUIRE_EQ(-turbo::Duration::infinite(), hours_min);
         } else {
             REQUIRE_EQ(turbo::hours(hours_min_count), hours_min);
         }
@@ -264,18 +264,18 @@ namespace {
 
         constexpr auto turbo_minutes = turbo::minutes(N);
         auto chrono_minutes = minutes(N);
-        if (turbo_minutes == -turbo::infinite_duration()) {
+        if (turbo_minutes == -turbo::Duration::infinite()) {
             chrono_minutes = minutes::min();
-        } else if (turbo_minutes == turbo::infinite_duration()) {
+        } else if (turbo_minutes == turbo::Duration::infinite()) {
             chrono_minutes = minutes::max();
         }
         REQUIRE_EQ(chrono_minutes, turbo::to_chrono_minutes(turbo_minutes));
 
         constexpr auto turbo_hours = turbo::hours(N);
         auto chrono_hours = hours(N);
-        if (turbo_hours == -turbo::infinite_duration()) {
+        if (turbo_hours == -turbo::Duration::infinite()) {
             chrono_hours = hours::min();
-        } else if (turbo_hours == turbo::infinite_duration()) {
+        } else if (turbo_hours == turbo::Duration::infinite()) {
             chrono_hours = hours::max();
         }
         REQUIRE_EQ(chrono_hours, turbo::to_chrono_hours(turbo_hours));
@@ -311,7 +311,7 @@ namespace {
         REQUIRE_EQ(hours(0), turbo::to_chrono_hours(-tick));
 
         // Verifies +/- infinity saturation at max/min.
-        constexpr auto inf = turbo::infinite_duration();
+        constexpr auto inf = turbo::Duration::infinite();
         REQUIRE_EQ(nanoseconds::min(), turbo::to_chrono_nanoseconds(-inf));
         REQUIRE_EQ(nanoseconds::max(), turbo::to_chrono_nanoseconds(inf));
         REQUIRE_EQ(microseconds::min(), turbo::to_chrono_microseconds(-inf));
@@ -360,42 +360,42 @@ namespace {
         REQUIRE_GT(turbo::nanoseconds(2), turbo::nanoseconds(1.5));
 
         const double dbl_inf = std::numeric_limits<double>::infinity();
-        REQUIRE_EQ(turbo::infinite_duration(), turbo::nanoseconds(dbl_inf));
-        REQUIRE_EQ(turbo::infinite_duration(), turbo::microseconds(dbl_inf));
-        REQUIRE_EQ(turbo::infinite_duration(), turbo::milliseconds(dbl_inf));
-        REQUIRE_EQ(turbo::infinite_duration(), turbo::seconds(dbl_inf));
-        REQUIRE_EQ(turbo::infinite_duration(), turbo::minutes(dbl_inf));
-        REQUIRE_EQ(turbo::infinite_duration(), turbo::hours(dbl_inf));
-        REQUIRE_EQ(-turbo::infinite_duration(), turbo::nanoseconds(-dbl_inf));
-        REQUIRE_EQ(-turbo::infinite_duration(), turbo::microseconds(-dbl_inf));
-        REQUIRE_EQ(-turbo::infinite_duration(), turbo::milliseconds(-dbl_inf));
-        REQUIRE_EQ(-turbo::infinite_duration(), turbo::seconds(-dbl_inf));
-        REQUIRE_EQ(-turbo::infinite_duration(), turbo::minutes(-dbl_inf));
-        REQUIRE_EQ(-turbo::infinite_duration(), turbo::hours(-dbl_inf));
+        REQUIRE_EQ(turbo::Duration::infinite(), turbo::nanoseconds(dbl_inf));
+        REQUIRE_EQ(turbo::Duration::infinite(), turbo::microseconds(dbl_inf));
+        REQUIRE_EQ(turbo::Duration::infinite(), turbo::milliseconds(dbl_inf));
+        REQUIRE_EQ(turbo::Duration::infinite(), turbo::seconds(dbl_inf));
+        REQUIRE_EQ(turbo::Duration::infinite(), turbo::minutes(dbl_inf));
+        REQUIRE_EQ(turbo::Duration::infinite(), turbo::hours(dbl_inf));
+        REQUIRE_EQ(-turbo::Duration::infinite(), turbo::nanoseconds(-dbl_inf));
+        REQUIRE_EQ(-turbo::Duration::infinite(), turbo::microseconds(-dbl_inf));
+        REQUIRE_EQ(-turbo::Duration::infinite(), turbo::milliseconds(-dbl_inf));
+        REQUIRE_EQ(-turbo::Duration::infinite(), turbo::seconds(-dbl_inf));
+        REQUIRE_EQ(-turbo::Duration::infinite(), turbo::minutes(-dbl_inf));
+        REQUIRE_EQ(-turbo::Duration::infinite(), turbo::hours(-dbl_inf));
     }
 
     TEST_CASE("Duration, InfinityExamples") {
         // These examples are used in the documentation in time.h. They are
         // written so that they can be copy-n-pasted easily.
 
-        constexpr turbo::Duration inf = turbo::infinite_duration();
+        constexpr turbo::Duration inf = turbo::Duration::infinite();
         constexpr turbo::Duration d = turbo::seconds(1);  // Any finite duration
 
-        REQUIRE(inf == inf + inf);
-        REQUIRE(inf == inf + d);
-        REQUIRE(inf == inf - inf);
-        REQUIRE(-inf == d - inf);
+        REQUIRE_EQ(inf , inf + inf);
+        REQUIRE_EQ(inf , inf + d);
+        REQUIRE_EQ(inf , inf - inf);
+        REQUIRE_EQ(-inf , d - inf);
 
-        REQUIRE(inf == d * 1e100);
-        REQUIRE(0 == d / inf);  // NOLINT(readability/check)
+        REQUIRE_EQ(inf , d * 1e100);
+        REQUIRE_EQ(0 , d / inf);  // NOLINT(readability/check)
 
         // Division by zero returns infinity, or kint64min/MAX where necessary.
-        REQUIRE(inf == d / 0);
-        REQUIRE(kint64max == d / turbo::zero_duration());
+        REQUIRE_EQ(inf , d / 0);
+        REQUIRE_EQ(kint64max , d / turbo::Duration::zero());
     }
 
     TEST_CASE("Duration, InfinityComparison") {
-        const turbo::Duration inf = turbo::infinite_duration();
+        const turbo::Duration inf = turbo::Duration::infinite();
         const turbo::Duration any_dur = turbo::seconds(1);
 
         // Equality
@@ -416,7 +416,7 @@ namespace {
         const turbo::Duration sec_max = turbo::seconds(kint64max);
         const turbo::Duration sec_min = turbo::seconds(kint64min);
         const turbo::Duration any_dur = turbo::seconds(1);
-        const turbo::Duration inf = turbo::infinite_duration();
+        const turbo::Duration inf = turbo::Duration::infinite();
 
         // Addition
         REQUIRE_EQ(inf, inf + inf);
@@ -453,7 +453,7 @@ namespace {
         const turbo::Duration sec_max = turbo::seconds(kint64max);
         const turbo::Duration sec_min = turbo::seconds(kint64min);
         const turbo::Duration any_dur = turbo::seconds(1);
-        const turbo::Duration inf = turbo::infinite_duration();
+        const turbo::Duration inf = turbo::Duration::infinite();
 
         // Subtraction
         REQUIRE_EQ(inf, inf - inf);
@@ -489,7 +489,7 @@ namespace {
     TEST_CASE("Duration, InfinityMultiplication") {
         const turbo::Duration sec_max = turbo::seconds(kint64max);
         const turbo::Duration sec_min = turbo::seconds(kint64min);
-        const turbo::Duration inf = turbo::infinite_duration();
+        const turbo::Duration inf = turbo::Duration::infinite();
 
 #define TEST_INF_MUL_WITH_TYPE(T)                                     \
   REQUIRE_EQ(inf, inf * static_cast<T>(2));                            \
@@ -524,9 +524,9 @@ namespace {
 
         // Fixed-point multiplication will produce a finite value, whereas floating
         // point fuzziness will overflow to inf.
-        REQUIRE_NE(turbo::infinite_duration(), turbo::seconds(1) * kint64max);
+        REQUIRE_NE(turbo::Duration::infinite(), turbo::seconds(1) * kint64max);
         REQUIRE_EQ(inf, turbo::seconds(1) * static_cast<double>(kint64max));
-        REQUIRE_NE(-turbo::infinite_duration(), turbo::seconds(1) * kint64min);
+        REQUIRE_NE(-turbo::Duration::infinite(), turbo::seconds(1) * kint64min);
         REQUIRE_EQ(-inf, turbo::seconds(1) * static_cast<double>(kint64min));
 
         // Note that sec_max * or / by 1.0 overflows to inf due to the 53-bit
@@ -541,7 +541,7 @@ namespace {
     TEST_CASE("Duration, InfinityDivision") {
         const turbo::Duration sec_max = turbo::seconds(kint64max);
         const turbo::Duration sec_min = turbo::seconds(kint64min);
-        const turbo::Duration inf = turbo::infinite_duration();
+        const turbo::Duration inf = turbo::Duration::infinite();
 
         // Division of Duration by a double
 #define TEST_INF_DIV_WITH_TYPE(T)            \
@@ -570,16 +570,16 @@ namespace {
         REQUIRE_EQ(inf, -inf / -dbl_inf);
 
         const turbo::Duration any_dur = turbo::seconds(1);
-        REQUIRE_EQ(turbo::zero_duration(), any_dur / dbl_inf);
-        REQUIRE_EQ(turbo::zero_duration(), any_dur / -dbl_inf);
-        REQUIRE_EQ(turbo::zero_duration(), -any_dur / dbl_inf);
-        REQUIRE_EQ(turbo::zero_duration(), -any_dur / -dbl_inf);
+        REQUIRE_EQ(turbo::Duration::zero(), any_dur / dbl_inf);
+        REQUIRE_EQ(turbo::Duration::zero(), any_dur / -dbl_inf);
+        REQUIRE_EQ(turbo::Duration::zero(), -any_dur / dbl_inf);
+        REQUIRE_EQ(turbo::Duration::zero(), -any_dur / -dbl_inf);
     }
 
     TEST_CASE("Duration, InfinityModulus") {
         const turbo::Duration sec_max = turbo::seconds(kint64max);
         const turbo::Duration any_dur = turbo::seconds(1);
-        const turbo::Duration inf = turbo::infinite_duration();
+        const turbo::Duration inf = turbo::Duration::infinite();
 
         REQUIRE_EQ(inf, inf % inf);
         REQUIRE_EQ(inf, inf % -inf);
@@ -597,65 +597,65 @@ namespace {
         REQUIRE_EQ(-inf, -inf % any_dur);
 
         // Remainder isn't affected by overflow.
-        REQUIRE_EQ(turbo::zero_duration(), sec_max % turbo::seconds(1));
-        REQUIRE_EQ(turbo::zero_duration(), sec_max % turbo::milliseconds(1));
-        REQUIRE_EQ(turbo::zero_duration(), sec_max % turbo::microseconds(1));
-        REQUIRE_EQ(turbo::zero_duration(), sec_max % turbo::nanoseconds(1));
-        REQUIRE_EQ(turbo::zero_duration(), sec_max % turbo::nanoseconds(1) / 4);
+        REQUIRE_EQ(turbo::Duration::zero(), sec_max % turbo::seconds(1));
+        REQUIRE_EQ(turbo::Duration::zero(), sec_max % turbo::milliseconds(1));
+        REQUIRE_EQ(turbo::Duration::zero(), sec_max % turbo::microseconds(1));
+        REQUIRE_EQ(turbo::Duration::zero(), sec_max % turbo::nanoseconds(1));
+        REQUIRE_EQ(turbo::Duration::zero(), sec_max % turbo::nanoseconds(1) / 4);
     }
 
     TEST_CASE("Duration, InfinityIDiv") {
         const turbo::Duration sec_max = turbo::seconds(kint64max);
         const turbo::Duration any_dur = turbo::seconds(1);
-        const turbo::Duration inf = turbo::infinite_duration();
+        const turbo::Duration inf = turbo::Duration::infinite();
         const double dbl_inf = std::numeric_limits<double>::infinity();
 
         // safe_int_mod (int64_t return value + a remainer)
-        turbo::Duration rem = turbo::zero_duration();
+        turbo::Duration rem = turbo::Duration::zero();
         REQUIRE_EQ(kint64max, turbo::safe_int_mod(inf, inf, &rem));
         REQUIRE_EQ(inf, rem);
 
-        rem = turbo::zero_duration();
+        rem = turbo::Duration::zero();
         REQUIRE_EQ(kint64max, turbo::safe_int_mod(-inf, -inf, &rem));
         REQUIRE_EQ(-inf, rem);
 
-        rem = turbo::zero_duration();
+        rem = turbo::Duration::zero();
         REQUIRE_EQ(kint64max, turbo::safe_int_mod(inf, any_dur, &rem));
         REQUIRE_EQ(inf, rem);
 
-        rem = turbo::zero_duration();
+        rem = turbo::Duration::zero();
         REQUIRE_EQ(0, turbo::safe_int_mod(any_dur, inf, &rem));
         REQUIRE_EQ(any_dur, rem);
 
-        rem = turbo::zero_duration();
+        rem = turbo::Duration::zero();
         REQUIRE_EQ(kint64max, turbo::safe_int_mod(-inf, -any_dur, &rem));
         REQUIRE_EQ(-inf, rem);
 
-        rem = turbo::zero_duration();
+        rem = turbo::Duration::zero();
         REQUIRE_EQ(0, turbo::safe_int_mod(-any_dur, -inf, &rem));
         REQUIRE_EQ(-any_dur, rem);
 
-        rem = turbo::zero_duration();
+        rem = turbo::Duration::zero();
         REQUIRE_EQ(kint64min, turbo::safe_int_mod(-inf, inf, &rem));
         REQUIRE_EQ(-inf, rem);
 
-        rem = turbo::zero_duration();
+        rem = turbo::Duration::zero();
         REQUIRE_EQ(kint64min, turbo::safe_int_mod(inf, -inf, &rem));
         REQUIRE_EQ(inf, rem);
 
-        rem = turbo::zero_duration();
+        rem = turbo::Duration::zero();
         REQUIRE_EQ(kint64min, turbo::safe_int_mod(-inf, any_dur, &rem));
         REQUIRE_EQ(-inf, rem);
 
-        rem = turbo::zero_duration();
+        rem = turbo::Duration::zero();
         REQUIRE_EQ(0, turbo::safe_int_mod(-any_dur, inf, &rem));
         REQUIRE_EQ(-any_dur, rem);
 
-        rem = turbo::zero_duration();
+        rem = turbo::Duration::zero();
         REQUIRE_EQ(kint64min, turbo::safe_int_mod(inf, -any_dur, &rem));
         REQUIRE_EQ(inf, rem);
 
-        rem = turbo::zero_duration();
+        rem = turbo::Duration::zero();
         REQUIRE_EQ(0, turbo::safe_int_mod(any_dur, -inf, &rem));
         REQUIRE_EQ(any_dur, rem);
 
@@ -708,7 +708,7 @@ namespace {
         REQUIRE_EQ(0, any_dur / -inf);
         REQUIRE_EQ(0, -any_dur / inf);
         REQUIRE_EQ(0, -any_dur / -inf);
-        REQUIRE_EQ(0, turbo::zero_duration() / inf);
+        REQUIRE_EQ(0, turbo::Duration::zero() / inf);
 
         // Division of Duration by a Duration overflow/underflow
         REQUIRE_EQ(kint64max, sec_max / turbo::milliseconds(1));
@@ -719,7 +719,7 @@ namespace {
 
     TEST_CASE("Duration, InfinityFDiv") {
         const turbo::Duration any_dur = turbo::seconds(1);
-        const turbo::Duration inf = turbo::infinite_duration();
+        const turbo::Duration inf = turbo::Duration::infinite();
         const double dbl_inf = std::numeric_limits<double>::infinity();
 
         REQUIRE_EQ(dbl_inf, turbo::safe_float_mod(inf, inf));
@@ -738,8 +738,8 @@ namespace {
     }
 
     TEST_CASE("Duration, DivisionByZero") {
-        const turbo::Duration zero = turbo::zero_duration();
-        const turbo::Duration inf = turbo::infinite_duration();
+        const turbo::Duration zero = turbo::Duration::zero();
+        const turbo::Duration inf = turbo::Duration::infinite();
         const turbo::Duration any_dur = turbo::seconds(1);
         const double dbl_inf = std::numeric_limits<double>::infinity();
         const double dbl_denorm = std::numeric_limits<double>::denorm_min();
@@ -784,7 +784,7 @@ namespace {
         REQUIRE_EQ(-dbl_inf, turbo::safe_float_mod(-any_dur, zero));
     }
     bool is_infinit(const turbo::Duration& d) {
-        return d == turbo::infinite_duration() || d == -turbo::infinite_duration();
+        return d == turbo::Duration::infinite() || d == -turbo::Duration::infinite();
     }
     TEST_CASE("Duration, NaN") {
         // Note that IEEE 754 does not define the behavior of a nan's sign when it is
@@ -824,16 +824,16 @@ namespace {
         const turbo::Duration range_future = range;
         const turbo::Duration range_past = -range;
 
-        REQUIRE_LT(range_future, turbo::infinite_duration());
-        REQUIRE_GT(range_past, -turbo::infinite_duration());
+        REQUIRE_LT(range_future, turbo::Duration::infinite());
+        REQUIRE_GT(range_past, -turbo::Duration::infinite());
 
         const turbo::Duration full_range = range_future - range_past;
-        REQUIRE_GT(full_range, turbo::zero_duration());
-        REQUIRE_LT(full_range, turbo::infinite_duration());
+        REQUIRE_GT(full_range, turbo::Duration::zero());
+        REQUIRE_LT(full_range, turbo::Duration::infinite());
 
         const turbo::Duration neg_full_range = range_past - range_future;
-        REQUIRE_LT(neg_full_range, turbo::zero_duration());
-        REQUIRE_GT(neg_full_range, -turbo::infinite_duration());
+        REQUIRE_LT(neg_full_range, turbo::Duration::zero());
+        REQUIRE_GT(neg_full_range, -turbo::Duration::infinite());
 
         REQUIRE_LT(neg_full_range, full_range);
         REQUIRE_EQ(neg_full_range, -full_range);
@@ -917,19 +917,18 @@ namespace {
     TEST_CASE("Duration, Negation") {
         // By storing negations of various values in constexpr variables we
         // verify that the initializers are constant expressions.
-        constexpr turbo::Duration negated_zero_duration = -turbo::zero_duration();
-        REQUIRE_EQ(negated_zero_duration, turbo::zero_duration());
+        constexpr turbo::Duration negated_zero_duration = -turbo::Duration::zero();
+        REQUIRE_EQ(negated_zero_duration, turbo::Duration::zero());
 
         constexpr turbo::Duration negated_infinite_duration =
-                -turbo::infinite_duration();
-        REQUIRE_NE(negated_infinite_duration, turbo::infinite_duration());
-        REQUIRE_EQ(-negated_infinite_duration, turbo::infinite_duration());
+                -turbo::Duration::infinite();
+        REQUIRE_NE(negated_infinite_duration, turbo::Duration::infinite());
+        REQUIRE_EQ(-negated_infinite_duration, turbo::Duration::infinite());
 
         // The public APIs to check if a duration is infinite depend on using
-        // -infinite_duration(), but we're trying to test operator- here, so we
-        // need to use the lower-level internal query IsInfiniteDuration.
-        REQUIRE(
-                turbo::time_internal::IsInfiniteDuration(negated_infinite_duration));
+        // -Duration::infinite(), but we're trying to test operator- here, so we
+        // need to use the lower-level internal query is_infinite.
+        REQUIRE(negated_infinite_duration.is_infinite());
 
         // The largest Duration is kint64max seconds and kTicksPerSecond - 1 ticks.
         // Using the turbo::time_internal::MakeDuration API is the cleanest way to
@@ -950,25 +949,25 @@ namespace {
         constexpr turbo::Duration min_duration =
                 turbo::time_internal::MakeDuration(kint64min);
         constexpr turbo::Duration negated_min_duration = -min_duration;
-        REQUIRE_EQ(negated_min_duration, turbo::infinite_duration());
+        REQUIRE_EQ(negated_min_duration, turbo::Duration::infinite());
     }
 
     TEST_CASE("Duration, AbsoluteValue") {
 
-        REQUIRE_EQ(turbo::zero_duration(), turbo::abs_duration(turbo::zero_duration()));
-        REQUIRE_EQ(turbo::seconds(1), abs_duration(turbo::seconds(1)));
-        REQUIRE_EQ(turbo::seconds(1), abs_duration(turbo::seconds(-1)));
+        REQUIRE_EQ(turbo::Duration::zero(), turbo::Duration::zero().abs());
+        REQUIRE_EQ(turbo::seconds(1), turbo::seconds(1).abs());
+        REQUIRE_EQ(turbo::seconds(1), (turbo::seconds(-1)).abs());
 
-        REQUIRE_EQ(turbo::infinite_duration(), abs_duration(turbo::infinite_duration()));
-        REQUIRE_EQ(turbo::infinite_duration(), abs_duration(-turbo::infinite_duration()));
+        REQUIRE_EQ(turbo::Duration::infinite(), turbo::Duration::infinite().abs());
+        REQUIRE_EQ(turbo::Duration::infinite(), (-turbo::Duration::infinite()).abs());
 
         turbo::Duration max_dur =
                 turbo::seconds(kint64max) + (turbo::seconds(1) - turbo::nanoseconds(1) / 4);
-        REQUIRE_EQ(max_dur, abs_duration(max_dur));
+        REQUIRE_EQ(max_dur, max_dur.abs());
 
         turbo::Duration min_dur = turbo::seconds(kint64min);
-        REQUIRE_EQ(turbo::infinite_duration(), abs_duration(min_dur));
-        REQUIRE_EQ(max_dur, abs_duration(min_dur + turbo::nanoseconds(1) / 4));
+        REQUIRE_EQ(turbo::Duration::infinite(), min_dur.abs());
+        REQUIRE_EQ(max_dur, (min_dur + turbo::nanoseconds(1) / 4).abs());
     }
 
     TEST_CASE("Duration, Multiplication") {
@@ -1111,7 +1110,7 @@ namespace {
 
     TEST_CASE("Duration, Truncation") {
         const turbo::Duration d = turbo::nanoseconds(1234567890);
-        const turbo::Duration inf = turbo::infinite_duration();
+        const turbo::Duration inf = turbo::Duration::infinite();
         for (int unit_sign: {1, -1}) {  // sign shouldn't matter
             REQUIRE_EQ(turbo::nanoseconds(1234567890),
                        trunc(d, unit_sign * turbo::nanoseconds(1)));
@@ -1135,7 +1134,7 @@ namespace {
 
     TEST_CASE("Duration, Flooring") {
         const turbo::Duration d = turbo::nanoseconds(1234567890);
-        const turbo::Duration inf = turbo::infinite_duration();
+        const turbo::Duration inf = turbo::Duration::infinite();
         for (int unit_sign: {1, -1}) {  // sign shouldn't matter
             REQUIRE_EQ(turbo::nanoseconds(1234567890),
                        turbo::floor(d, unit_sign * turbo::nanoseconds(1)));
@@ -1159,7 +1158,7 @@ namespace {
 
     TEST_CASE("Duration, Ceiling") {
         const turbo::Duration d = turbo::nanoseconds(1234567890);
-        const turbo::Duration inf = turbo::infinite_duration();
+        const turbo::Duration inf = turbo::Duration::infinite();
         for (int unit_sign: {1, -1}) {  // // sign shouldn't matter
             REQUIRE_EQ(turbo::nanoseconds(1234567890),
                        turbo::ceil(d, unit_sign * turbo::nanoseconds(1)));
@@ -1188,9 +1187,9 @@ namespace {
   do {                                         \
     for (int64_t i = LOW; i < HIGH; ++i) {     \
       turbo::Duration d = turbo::U(i);           \
-      if (d == turbo::infinite_duration())       \
+      if (d == turbo::Duration::infinite())       \
         REQUIRE_EQ(kint64max, d / turbo::U(1));  \
-      else if (d == -turbo::infinite_duration()) \
+      else if (d == -turbo::Duration::infinite()) \
         REQUIRE_EQ(kint64min, d / turbo::U(1));  \
       else                                     \
         REQUIRE_EQ(i, turbo::U(i) / turbo::U(1)); \
@@ -1266,9 +1265,9 @@ namespace {
     TEST_CASE("Duration, SmallConversions") {
         // Special tests for conversions of small durations.
 
-        REQUIRE_EQ(turbo::zero_duration(), turbo::seconds(0));
+        REQUIRE_EQ(turbo::Duration::zero(), turbo::seconds(0));
         // TODO(bww): Is the next one OK?
-        REQUIRE_EQ(turbo::zero_duration(), turbo::seconds(std::nextafter(0.125e-9, 0)));
+        REQUIRE_EQ(turbo::Duration::zero(), turbo::seconds(std::nextafter(0.125e-9, 0)));
         REQUIRE_EQ(turbo::nanoseconds(1) / 4, turbo::seconds(0.125e-9));
         REQUIRE_EQ(turbo::nanoseconds(1) / 4, turbo::seconds(0.250e-9));
         REQUIRE_EQ(turbo::nanoseconds(1) / 2, turbo::seconds(0.375e-9));
@@ -1278,7 +1277,7 @@ namespace {
         REQUIRE_EQ(turbo::nanoseconds(1), turbo::seconds(0.875e-9));
         REQUIRE_EQ(turbo::nanoseconds(1), turbo::seconds(1.000e-9));
 
-        REQUIRE_EQ(turbo::zero_duration(), turbo::seconds(std::nextafter(-0.125e-9, 0)));
+        REQUIRE_EQ(turbo::Duration::zero(), turbo::seconds(std::nextafter(-0.125e-9, 0)));
         REQUIRE_EQ(-turbo::nanoseconds(1) / 4, turbo::seconds(-0.125e-9));
         REQUIRE_EQ(-turbo::nanoseconds(1) / 4, turbo::seconds(-0.250e-9));
         REQUIRE_EQ(-turbo::nanoseconds(1) / 2, turbo::seconds(-0.375e-9));
@@ -1294,7 +1293,7 @@ namespace {
         auto mul_by_one_second = time_as_seconds * turbo::seconds(1);
         // These are expected to differ by up to one tick due to fused multiply/add
         // contraction.
-        if (turbo::abs_duration(direct_seconds - mul_by_one_second) >
+        if ((direct_seconds - mul_by_one_second).abs() >
             turbo::time_internal::MakeDuration(0, 1u)) {
             if (*misses > 10) return;
             REQUIRE_LE(++(*misses), 10);
@@ -1456,7 +1455,7 @@ namespace {
                    turbo::format_duration(turbo::hours(2540400) + turbo::minutes(10) +
                                           turbo::seconds(10)));
 
-        REQUIRE_EQ("0", turbo::format_duration(turbo::zero_duration()));
+        REQUIRE_EQ("0", turbo::format_duration(turbo::Duration::zero()));
         REQUIRE_EQ("0", turbo::format_duration(turbo::seconds(0)));
         REQUIRE_EQ("0", turbo::format_duration(turbo::nanoseconds(0)));
 
@@ -1551,8 +1550,8 @@ namespace {
         REQUIRE_EQ("55.25ns", turbo::format_duration(turbo::nanoseconds(55) + qns));
 
         // Formatting infinity
-        REQUIRE_EQ("inf", turbo::format_duration(turbo::infinite_duration()));
-        REQUIRE_EQ("-inf", turbo::format_duration(-turbo::infinite_duration()));
+        REQUIRE_EQ("inf", turbo::format_duration(turbo::Duration::infinite()));
+        REQUIRE_EQ("-inf", turbo::format_duration(-turbo::Duration::infinite()));
 
         // Formatting approximately +/- 100 billion years
         const turbo::Duration huge_range = ApproxYears(100000000000);
@@ -1586,18 +1585,18 @@ namespace {
 
         // No specified unit. Should only work for zero and infinity.
         REQUIRE(turbo::parse_duration("0", &d));
-        REQUIRE_EQ(turbo::zero_duration(), d);
+        REQUIRE_EQ(turbo::Duration::zero(), d);
         REQUIRE(turbo::parse_duration("+0", &d));
-        REQUIRE_EQ(turbo::zero_duration(), d);
+        REQUIRE_EQ(turbo::Duration::zero(), d);
         REQUIRE(turbo::parse_duration("-0", &d));
-        REQUIRE_EQ(turbo::zero_duration(), d);
+        REQUIRE_EQ(turbo::Duration::zero(), d);
 
         REQUIRE(turbo::parse_duration("inf", &d));
-        REQUIRE_EQ(turbo::infinite_duration(), d);
+        REQUIRE_EQ(turbo::Duration::infinite(), d);
         REQUIRE(turbo::parse_duration("+inf", &d));
-        REQUIRE_EQ(turbo::infinite_duration(), d);
+        REQUIRE_EQ(turbo::Duration::infinite(), d);
         REQUIRE(turbo::parse_duration("-inf", &d));
-        REQUIRE_EQ(-turbo::infinite_duration(), d);
+        REQUIRE_EQ(-turbo::Duration::infinite(), d);
         REQUIRE_FALSE(turbo::parse_duration("infBlah", &d));
 
         // Illegal input forms.

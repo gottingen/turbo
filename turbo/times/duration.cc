@@ -72,6 +72,7 @@
 #include "turbo/strings/string_view.h"
 #include "turbo/strings/str_strip.h"
 #include "turbo/times/time.h"
+#include "turbo/times/duration.h"
 
 namespace turbo {
 
@@ -161,7 +162,7 @@ namespace turbo {
                         // Avoid trying to represent -kint64min below.
                         return time_internal::MakeDuration(kint64min);
                     }
-                    return is_neg ? -infinite_duration() : infinite_duration();
+                    return is_neg ? -Duration::infinite() : Duration::infinite();
                 }
                 const uint128 kTicksPerSecond128 = static_cast<uint64_t>(kTicksPerSecond);
                 const uint128 hi = u128 / kTicksPerSecond128;
@@ -202,11 +203,11 @@ namespace turbo {
         inline bool SafeAddRepHi(double a_hi, double b_hi, Duration *d) {
             double c = a_hi + b_hi;
             if (c >= static_cast<double>(kint64max)) {
-                *d = infinite_duration();
+                *d = Duration::infinite();
                 return false;
             }
             if (c <= static_cast<double>(kint64min)) {
-                *d = -infinite_duration();
+                *d = -Duration::infinite();
                 return false;
             }
             *d = time_internal::MakeDuration(c, time_internal::GetRepLo(*d));
@@ -278,8 +279,8 @@ namespace turbo {
         inline bool IDivFastPath(const Duration num, const Duration den, int64_t *q,
                                  Duration *rem) {
             // Bail if num or den is an infinity.
-            if (time_internal::IsInfiniteDuration(num) ||
-                time_internal::IsInfiniteDuration(den))
+            if (num.is_infinite() ||
+                den.is_infinite())
                 return false;
 
             int64_t num_hi = time_internal::GetRepHi(num);
@@ -362,15 +363,15 @@ namespace turbo {
                 return q;
             }
 
-            const bool num_neg = num < zero_duration();
-            const bool den_neg = den < zero_duration();
+            const bool num_neg = num < Duration::zero();
+            const bool den_neg = den < Duration::zero();
             const bool quotient_neg = num_neg != den_neg;
 
-            if (time_internal::IsInfiniteDuration(num) || den == zero_duration()) {
-                *rem = num_neg ? -infinite_duration() : infinite_duration();
+            if (num.is_infinite() || den == Duration::zero()) {
+                *rem = num_neg ? -Duration::infinite() : Duration::infinite();
                 return quotient_neg ? kint64min : kint64max;
             }
-            if (time_internal::IsInfiniteDuration(den)) {
+            if (den.is_infinite()) {
                 *rem = num;
                 return 0;
             }
@@ -405,8 +406,8 @@ namespace turbo {
     //
 
     Duration &Duration::operator+=(Duration rhs) {
-        if (time_internal::IsInfiniteDuration(*this)) return *this;
-        if (time_internal::IsInfiniteDuration(rhs)) return *this = rhs;
+        if (this->is_infinite()) return *this;
+        if (rhs.is_infinite()) return *this = rhs;
         const int64_t orig_rep_hi = rep_hi_;
         rep_hi_ =
                 DecodeTwosComp(EncodeTwosComp(rep_hi_) + EncodeTwosComp(rhs.rep_hi_));
@@ -416,15 +417,15 @@ namespace turbo {
         }
         rep_lo_ += rhs.rep_lo_;
         if (rhs.rep_hi_ < 0 ? rep_hi_ > orig_rep_hi : rep_hi_ < orig_rep_hi) {
-            return *this = rhs.rep_hi_ < 0 ? -infinite_duration() : infinite_duration();
+            return *this = rhs.rep_hi_ < 0 ? -Duration::infinite() : Duration::infinite();
         }
         return *this;
     }
 
     Duration &Duration::operator-=(Duration rhs) {
-        if (time_internal::IsInfiniteDuration(*this)) return *this;
-        if (time_internal::IsInfiniteDuration(rhs)) {
-            return *this = rhs.rep_hi_ >= 0 ? -infinite_duration() : infinite_duration();
+        if (is_infinite()) return *this;
+        if (rhs.is_infinite()) {
+            return *this = rhs.rep_hi_ >= 0 ? -Duration::infinite() : Duration::infinite();
         }
         const int64_t orig_rep_hi = rep_hi_;
         rep_hi_ =
@@ -435,7 +436,7 @@ namespace turbo {
         }
         rep_lo_ -= rhs.rep_lo_;
         if (rhs.rep_hi_ < 0 ? rep_hi_ < orig_rep_hi : rep_hi_ > orig_rep_hi) {
-            return *this = rhs.rep_hi_ >= 0 ? -infinite_duration() : infinite_duration();
+            return *this = rhs.rep_hi_ >= 0 ? -Duration::infinite() : Duration::infinite();
         }
         return *this;
     }
@@ -445,33 +446,33 @@ namespace turbo {
     //
 
     Duration &Duration::operator*=(int64_t r) {
-        if (time_internal::IsInfiniteDuration(*this)) {
+        if (is_infinite()) {
             const bool is_neg = (r < 0) != (rep_hi_ < 0);
-            return *this = is_neg ? -infinite_duration() : infinite_duration();
+            return *this = is_neg ? -Duration::infinite() : Duration::infinite();
         }
         return *this = ScaleFixed<SafeMultiply>(*this, r);
     }
 
     Duration &Duration::operator*=(double r) {
-        if (time_internal::IsInfiniteDuration(*this) || !IsFinite(r)) {
+        if (is_infinite() || !IsFinite(r)) {
             const bool is_neg = (std::signbit(r) != 0) != (rep_hi_ < 0);
-            return *this = is_neg ? -infinite_duration() : infinite_duration();
+            return *this = is_neg ? -Duration::infinite() : Duration::infinite();
         }
         return *this = ScaleDouble<std::multiplies>(*this, r);
     }
 
     Duration &Duration::operator/=(int64_t r) {
-        if (time_internal::IsInfiniteDuration(*this) || r == 0) {
+        if (is_infinite() || r == 0) {
             const bool is_neg = (r < 0) != (rep_hi_ < 0);
-            return *this = is_neg ? -infinite_duration() : infinite_duration();
+            return *this = is_neg ? -Duration::infinite() : Duration::infinite();
         }
         return *this = ScaleFixed<std::divides>(*this, r);
     }
 
     Duration &Duration::operator/=(double r) {
-        if (time_internal::IsInfiniteDuration(*this) || !IsValidDivisor(r)) {
+        if (is_infinite() || !IsValidDivisor(r)) {
             const bool is_neg = (std::signbit(r) != 0) != (rep_hi_ < 0);
-            return *this = is_neg ? -infinite_duration() : infinite_duration();
+            return *this = is_neg ? -Duration::infinite() : Duration::infinite();
         }
         return *this = ScaleDouble<std::divides>(*this, r);
     }
@@ -483,12 +484,12 @@ namespace turbo {
 
     double safe_float_mod(Duration num, Duration den) {
         // Arithmetic with infinity is sticky.
-        if (time_internal::IsInfiniteDuration(num) || den == zero_duration()) {
-            return (num < zero_duration()) == (den < zero_duration())
+        if (num.is_infinite() || den == Duration::zero()) {
+            return (num < Duration::zero()) == (den < Duration::zero())
                    ? std::numeric_limits<double>::infinity()
                    : -std::numeric_limits<double>::infinity();
         }
-        if (time_internal::IsInfiniteDuration(den)) return 0.0;
+        if (den.is_infinite()) return 0.0;
 
         double a =
                 static_cast<double>(time_internal::GetRepHi(num)) * kTicksPerSecond +
@@ -509,12 +510,12 @@ namespace turbo {
 
     Duration floor(const Duration d, const Duration unit) {
         const turbo::Duration td = trunc(d, unit);
-        return td <= d ? td : td - abs_duration(unit);
+        return td <= d ? td : td - unit.abs();
     }
 
     Duration ceil(const Duration d, const Duration unit) {
         const turbo::Duration td = trunc(d, unit);
-        return td >= d ? td : td + abs_duration(unit);
+        return td >= d ? td : td + unit.abs();
     }
 
     //
@@ -570,21 +571,21 @@ namespace turbo {
 
     int64_t to_int64_seconds(Duration d) {
         int64_t hi = time_internal::GetRepHi(d);
-        if (time_internal::IsInfiniteDuration(d)) return hi;
+        if (d.is_infinite()) return hi;
         if (hi < 0 && time_internal::GetRepLo(d) != 0) ++hi;
         return hi;
     }
 
     int64_t to_int64_minutes(Duration d) {
         int64_t hi = time_internal::GetRepHi(d);
-        if (time_internal::IsInfiniteDuration(d)) return hi;
+        if (d.is_infinite()) return hi;
         if (hi < 0 && time_internal::GetRepLo(d) != 0) ++hi;
         return hi / 60;
     }
 
     int64_t to_int64_hours(Duration d) {
         int64_t hi = time_internal::GetRepHi(d);
-        if (time_internal::IsInfiniteDuration(d)) return hi;
+        if (d.is_infinite()) return hi;
         if (hi < 0 && time_internal::GetRepLo(d) != 0) ++hi;
         return hi / (60 * 60);
     }
@@ -615,7 +616,7 @@ namespace turbo {
 
     timespec to_timespec(Duration d) {
         timespec ts;
-        if (!time_internal::IsInfiniteDuration(d)) {
+        if (!d.is_infinite()) {
             int64_t rep_hi = time_internal::GetRepHi(d);
             uint32_t rep_lo = time_internal::GetRepLo(d);
             if (rep_hi < 0) {
@@ -633,7 +634,7 @@ namespace turbo {
                 return ts;
             }
         }
-        if (d >= zero_duration()) {
+        if (d >= Duration::zero()) {
             ts.tv_sec = std::numeric_limits<time_t>::max();
             ts.tv_nsec = 1000 * 1000 * 1000 - 1;
         } else {
@@ -789,11 +790,11 @@ namespace turbo {
             s = "-2562047788015215h30m8s";
             return s;
         }
-        if (d < zero_duration()) {
+        if (d < Duration::zero()) {
             s.append("-");
             d = -d;
         }
-        if (d == infinite_duration()) {
+        if (d == Duration::infinite()) {
             s.append("inf");
         } else if (d < seconds(1)) {
             // Special case for durations with a magnitude < 1 second.  The duration
@@ -925,12 +926,12 @@ namespace turbo {
 
         // Special case for a string of "0".
         if (dur_sv == "0") {
-            *d = zero_duration();
+            *d = Duration::zero();
             return true;
         }
 
         if (dur_sv == "inf") {
-            *d = sign * infinite_duration();
+            *d = sign * Duration::infinite();
             return true;
         }
 

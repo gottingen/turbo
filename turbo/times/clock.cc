@@ -577,7 +577,7 @@ extern "C" {
 
 TURBO_WEAK void turbo_internal_sleep_for(
         turbo::Duration duration) {
-    while (duration > turbo::zero_duration()) {
+    while (duration > turbo::Duration::zero()) {
         turbo::Duration to_sleep = std::min(duration, turbo::MaxSleep());
         turbo::SleepOnce(to_sleep);
         duration -= to_sleep;

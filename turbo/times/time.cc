@@ -59,7 +59,7 @@ namespace turbo {
         inline int64_t FloorToUnit(turbo::Duration d, turbo::Duration unit) {
             turbo::Duration rem;
             int64_t q = turbo::safe_int_mod(d, unit, &rem);
-            return (q > 0 || rem >= zero_duration() ||
+            return (q > 0 || rem >= Duration::zero() ||
                     q == std::numeric_limits<int64_t>::min())
                    ? q
                    : q - 1;
@@ -68,7 +68,7 @@ namespace turbo {
         inline turbo::CivilInfo InfiniteFutureCivilInfo() {
             CivilInfo ci;
             ci.cs = CivilSecond::max();
-            ci.subsecond = infinite_duration();
+            ci.subsecond = Duration::infinite();
             ci.offset = 0;
             ci.is_dst = false;
             ci.zone_abbr = "-00";
@@ -78,7 +78,7 @@ namespace turbo {
         inline turbo::CivilInfo InfinitePastCivilInfo() {
             CivilInfo ci;
             ci.cs = CivilSecond::min();
-            ci.subsecond = -infinite_duration();
+            ci.subsecond = -Duration::infinite();
             ci.offset = 0;
             ci.is_dst = false;
             ci.zone_abbr = "-00";
@@ -232,14 +232,14 @@ namespace turbo {
     timespec to_timespec(Time t) {
         timespec ts;
         turbo::Duration d = time_internal::ToUnixDuration(t);
-        if (!time_internal::IsInfiniteDuration(d)) {
+        if (!d.is_infinite()) {
             ts.tv_sec = static_cast<decltype(ts.tv_sec)>(time_internal::GetRepHi(d));
             if (ts.tv_sec == time_internal::GetRepHi(d)) {  // no time_t narrowing
                 ts.tv_nsec = time_internal::GetRepLo(d) / 4;  // floor
                 return ts;
             }
         }
-        if (d >= turbo::zero_duration()) {
+        if (d >= turbo::Duration::zero()) {
             ts.tv_sec = std::numeric_limits<time_t>::max();
             ts.tv_nsec = 1000 * 1000 * 1000 - 1;
         } else {
@@ -275,7 +275,7 @@ namespace turbo {
     std::chrono::system_clock::time_point to_chrono_time(turbo::Time t) {
         using D = std::chrono::system_clock::duration;
         auto d = time_internal::ToUnixDuration(t);
-        if (d < zero_duration()) d = floor(d, from_chrono(D{1}));
+        if (d < Duration::zero()) d = floor(d, from_chrono(D{1}));
         return std::chrono::system_clock::from_time_t(0) +
                time_internal::ToChronoDuration<D>(d);
     }
