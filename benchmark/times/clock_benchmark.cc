@@ -46,7 +46,7 @@ namespace {
 
     void BM_Clock_Now_TurboTime_ToUnixNanos(benchmark::State &state) {
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::to_unix_nanos(turbo::time_now()));
+            benchmark::DoNotOptimize(turbo::time_now().to_nanoseconds());
         }
     }
 

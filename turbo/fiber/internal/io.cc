@@ -424,8 +424,8 @@ namespace turbo::fiber_internal {
                         const timespec *abstime) {
         int diff_ms = -1;
         if (abstime) {
-            int64_t now_us = turbo::to_unix_micros(turbo::time_now());
-            int64_t abstime_us = turbo::to_unix_micros(turbo::time_from_timespec(*abstime));
+            int64_t now_us = turbo::get_current_time_micros();
+            int64_t abstime_us = turbo::Time::from_timespec(*abstime).to_microseconds();
             if (abstime_us <= now_us) {
                 errno = ETIMEDOUT;
                 return make_status();

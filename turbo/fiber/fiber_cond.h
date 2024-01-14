@@ -57,11 +57,11 @@ namespace turbo {
         // rather than std::timeout
         turbo::Status wait_for(std::unique_lock<FiberMutex> &lock,
                      long timeout_us) {
-            return wait_until(lock,  turbo::to_timespec(turbo::microseconds_from_now(timeout_us)));
+            return wait_until(lock,  turbo::microseconds_from_now(timeout_us).to_timespec());
         }
 
         turbo::Status wait_for(std::unique_lock<fiber_mutex_t> &lock, long timeout_us) {
-            return wait_until(lock,  turbo::to_timespec(turbo::microseconds_from_now(timeout_us)));
+            return wait_until(lock,  turbo::microseconds_from_now(timeout_us).to_timespec());
         }
 
         turbo::Status wait_until(std::unique_lock<FiberMutex> &lock,

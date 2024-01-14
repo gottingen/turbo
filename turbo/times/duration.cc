@@ -140,7 +140,7 @@ namespace turbo {
             return u128;
         }
 
-// Breaks a uint128 of ticks into a Duration.
+        // Breaks a uint128 of ticks into a Duration.
         inline Duration MakeDurationFromU128(uint128 u128, bool is_neg) {
             int64_t rep_hi;
             uint32_t rep_lo;

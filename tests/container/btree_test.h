@@ -90,7 +90,7 @@ namespace turbo::container_internal {
 
         explicit Generator(int m) : maxval(m) {}
 
-        turbo::Time operator()(int i) const { return turbo::from_unix_millis(i); }
+        turbo::Time operator()(int i) const { return turbo::Time::from_milliseconds(i); }
     };
 
     template<>

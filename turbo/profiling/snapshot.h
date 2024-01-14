@@ -53,7 +53,7 @@ namespace turbo {
         std::string description;
         std::map<std::string, std::string> labels;
         VariableType type;
-        int64_t timestamp_ms{turbo::to_unix_millis(turbo::time_now())};
+        int64_t timestamp_ms{turbo::get_current_time_millis()};
     };
 
     struct PlainStringSnapshot : public SnapshotFamily {

@@ -156,7 +156,7 @@ namespace turbo::fiber_internal {
         fiber_id_t th;
         REQUIRE(fiber_start_urgent(&th, nullptr, waiter, unmatched_arg).ok());
 
-        const timespec abstime = turbo::to_timespec(turbo::seconds_from_now(1));
+        const timespec abstime = turbo::seconds_from_now(1).to_timespec();
         for (size_t i = 0; i < 4 * N; ++i) {
             args[i].expected_value = *b1;
             args[i].event = b1;
@@ -193,7 +193,7 @@ namespace turbo::fiber_internal {
 
     void *wait_event(void *void_arg) {
         event_wait_arg *arg = static_cast<event_wait_arg *>(void_arg);
-        const timespec ts = turbo::to_timespec(turbo::milliseconds_from_now(arg->wait_msec));
+        const timespec ts = turbo::milliseconds_from_now(arg->wait_msec).to_timespec();
         auto rc = turbo::fiber_internal::waitable_event_wait(arg->event, arg->expected_val, &ts);
         if (!arg->error_code.ok()) {
             REQUIRE(!rc.ok());

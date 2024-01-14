@@ -211,7 +211,7 @@ namespace {
         constexpr int64_t constant = NegateIfConstantEvaluated(42);
         REQUIRE_EQ(constant, -42);
 
-        int64_t now = turbo::to_unix_seconds(turbo::time_now());
+        int64_t now = turbo::get_current_time_seconds();
         int64_t not_constant = NegateIfConstantEvaluated(now);
         REQUIRE_EQ(not_constant, now);
 

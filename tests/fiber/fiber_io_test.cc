@@ -489,7 +489,7 @@ namespace turbo::fiber_internal {
     }
 
     void *wait_for_the_fd(void *arg) {
-        timespec ts = turbo::to_timespec(turbo::microseconds_from_now(50));
+        timespec ts =turbo::microseconds_from_now(50).to_timespec();
 #if defined(TURBO_PLATFORM_LINUX)
         turbo::fiber_fd_timedwait(*(int*)arg, EPOLLIN, &ts);
 #elif defined(TURBO_PLATFORM_OSX)

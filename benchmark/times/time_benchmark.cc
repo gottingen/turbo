@@ -54,7 +54,7 @@ namespace {
     void BM_Time_Arithmetic(benchmark::State &state) {
         const turbo::Duration nano = turbo::Duration::nanoseconds(1);
         const turbo::Duration sec = turbo::Duration::seconds(1);
-        turbo::Time t = turbo::unix_epoch();
+        turbo::Time t = turbo::Time::unix_epoch();
         while (state.KeepRunning()) {
             benchmark::DoNotOptimize(t += nano);
             benchmark::DoNotOptimize(t -= sec);
@@ -91,8 +91,8 @@ namespace {
     void BM_Time_ToDateTime_Turbo(benchmark::State &state) {
         const turbo::TimeZone tz =
                 turbo::time_internal::load_time_zone("America/Los_Angeles");
-        turbo::Time t = turbo::from_unix_seconds(1384569027);
-        turbo::Time t2 = turbo::from_unix_seconds(1418962578);
+        turbo::Time t = turbo::Time::from_seconds(1384569027);
+        turbo::Time t2 = turbo::Time::from_seconds(1418962578);
         while (state.KeepRunning()) {
             std::swap(t, t2);
             t += turbo::Duration::seconds(1);
@@ -122,7 +122,7 @@ namespace {
 
     void BM_Time_ToDateTimeUTC_Turbo(benchmark::State &state) {
         const turbo::TimeZone tz = turbo::utc_time_zone();
-        turbo::Time t = turbo::from_unix_seconds(1384569027);
+        turbo::Time t = turbo::Time::from_seconds(1384569027);
         while (state.KeepRunning()) {
             t += turbo::Duration::seconds(1);
             benchmark::DoNotOptimize(tz.at(t));
@@ -153,7 +153,7 @@ namespace {
     void BM_Time_FromUnixMicros(benchmark::State &state) {
         int i = 0;
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::from_unix_micros(i));
+            benchmark::DoNotOptimize(turbo::Time::from_microseconds(i));
             ++i;
         }
     }
@@ -161,36 +161,36 @@ namespace {
     BENCHMARK(BM_Time_FromUnixMicros);
 
     void BM_Time_ToUnixNanos(benchmark::State &state) {
-        const turbo::Time t = turbo::unix_epoch() + turbo::Duration::seconds(123);
+        const turbo::Time t = turbo::Time::unix_epoch() + turbo::Duration::seconds(123);
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(to_unix_nanos(t));
+            benchmark::DoNotOptimize(t.to_nanoseconds());
         }
     }
 
     BENCHMARK(BM_Time_ToUnixNanos);
 
     void BM_Time_ToUnixMicros(benchmark::State &state) {
-        const turbo::Time t = turbo::unix_epoch() + turbo::Duration::seconds(123);
+        const turbo::Time t = turbo::Time::unix_epoch() + turbo::Duration::seconds(123);
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(to_unix_micros(t));
+            benchmark::DoNotOptimize(t.to_microseconds());
         }
     }
 
     BENCHMARK(BM_Time_ToUnixMicros);
 
     void BM_Time_ToUnixMillis(benchmark::State &state) {
-        const turbo::Time t = turbo::unix_epoch() + turbo::Duration::seconds(123);
+        const turbo::Time t = turbo::Time::unix_epoch() + turbo::Duration::seconds(123);
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(to_unix_millis(t));
+            benchmark::DoNotOptimize(t.to_milliseconds());
         }
     }
 
     BENCHMARK(BM_Time_ToUnixMillis);
 
     void BM_Time_ToUnixSeconds(benchmark::State &state) {
-        const turbo::Time t = turbo::unix_epoch() + turbo::Duration::seconds(123);
+        const turbo::Time t = turbo::Time::unix_epoch() + turbo::Duration::seconds(123);
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::to_unix_seconds(t));
+            benchmark::DoNotOptimize(t.to_seconds());
         }
     }
 
@@ -214,10 +214,10 @@ namespace {
         while (state.KeepRunning()) {
             if ((i & 1) == 0) {
                 benchmark::DoNotOptimize(
-                        turbo::from_civil(turbo::CivilSecond(2014, 12, 18, 20, 16, 18), tz));
+                        turbo::Time::from_civil(turbo::CivilSecond(2014, 12, 18, 20, 16, 18), tz));
             } else {
                 benchmark::DoNotOptimize(
-                        turbo::from_civil(turbo::CivilSecond(2013, 11, 15, 18, 30, 27), tz));
+                        turbo::Time::from_civil(turbo::CivilSecond(2013, 11, 15, 18, 30, 27), tz));
             }
             ++i;
         }
@@ -257,7 +257,7 @@ namespace {
         const turbo::TimeZone tz = turbo::utc_time_zone();
         while (state.KeepRunning()) {
             benchmark::DoNotOptimize(
-                    turbo::from_civil(turbo::CivilSecond(2014, 12, 18, 20, 16, 18), tz));
+                    turbo::Time::from_civil(turbo::CivilSecond(2014, 12, 18, 20, 16, 18), tz));
         }
     }
 
@@ -270,10 +270,10 @@ namespace {
         while (state.KeepRunning()) {
             if ((i & 1) == 0) {
                 benchmark::DoNotOptimize(
-                        turbo::from_civil(turbo::CivilSecond(2014, 12, 0, 20, 16, 18), tz));
+                        turbo::Time::from_civil(turbo::CivilSecond(2014, 12, 0, 20, 16, 18), tz));
             } else {
                 benchmark::DoNotOptimize(
-                        turbo::from_civil(turbo::CivilSecond(2013, 11, 0, 18, 30, 27), tz));
+                        turbo::Time::from_civil(turbo::CivilSecond(2013, 11, 0, 18, 30, 27), tz));
             }
             ++i;
         }
@@ -316,20 +316,20 @@ namespace {
     void BM_Time_ToTimespec(benchmark::State &state) {
         turbo::Time now = turbo::time_now();
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::to_timespec(now));
+            benchmark::DoNotOptimize(now.to_timespec());
         }
     }
 
     BENCHMARK(BM_Time_ToTimespec);
 
     void BM_Time_FromTimespec(benchmark::State &state) {
-        timespec ts = turbo::to_timespec(turbo::time_now());
+        timespec ts = turbo::time_now().to_timespec();
         while (state.KeepRunning()) {
             if (++ts.tv_nsec == 1000 * 1000 * 1000) {
                 ++ts.tv_sec;
                 ts.tv_nsec = 0;
             }
-            benchmark::DoNotOptimize(turbo::time_from_timespec(ts));
+            benchmark::DoNotOptimize(turbo::Time::from_timespec(ts));
         }
     }
 
@@ -341,7 +341,7 @@ namespace {
 
     void BM_Time_InfiniteFuture(benchmark::State &state) {
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::infinite_future());
+            benchmark::DoNotOptimize(turbo::Time::infinite_future());
         }
     }
 
@@ -349,7 +349,7 @@ namespace {
 
     void BM_Time_InfinitePast(benchmark::State &state) {
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::infinite_past());
+            benchmark::DoNotOptimize(turbo::Time::infinite_past());
         }
     }
 

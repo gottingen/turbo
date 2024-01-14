@@ -32,7 +32,7 @@
 
 namespace turbo {
 
-    Time time_now() {
+    Time Time::time_now() {
         // TODO(bww): Get a timespec instead so we don't have to divide.
         int64_t n = turbo::get_current_time_nanos();
         if (n >= 0) {

@@ -1132,6 +1132,19 @@ namespace {
         }
     }
 
+    TEST_CASE("Duration, Fraction") {
+        const turbo::Duration d = turbo::Duration::nanoseconds(1234567890);
+        const turbo::Duration inf = turbo::Duration::infinite();
+
+            REQUIRE_EQ(turbo::Duration::nanoseconds(0),
+                       d.fraction(turbo::Duration::nanoseconds(1)));
+            REQUIRE_EQ(turbo::Duration::nanoseconds(890),
+                       d.fraction(turbo::Duration::microseconds(1)));
+            REQUIRE_EQ(turbo::Duration::nanoseconds(567890),
+                       d.fraction(turbo::Duration::milliseconds(1)));
+            REQUIRE_EQ(turbo::Duration::nanoseconds(234567890), d.fraction(turbo::Duration::seconds(1)));
+    }
+
     TEST_CASE("Duration, Flooring") {
         const turbo::Duration d = turbo::Duration::nanoseconds(1234567890);
         const turbo::Duration inf = turbo::Duration::infinite();

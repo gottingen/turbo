@@ -525,7 +525,7 @@ namespace turbo::fiber_internal {
         timespec *ptimeout = nullptr;
         timespec timeout;
         if (abstime != nullptr) {
-            const auto timeout_duration = turbo::time_from_timespec(*abstime) - turbo::time_now();
+            const auto timeout_duration = turbo::Time::from_timespec(*abstime) - turbo::time_now();
             if (timeout_duration < MIN_SLEEP) {
                 return turbo::deadline_exceeded_error("");
             }
@@ -598,7 +598,7 @@ namespace turbo::fiber_internal {
         if (abstime != nullptr) {
             // Schedule timer before queueing. If the timer is triggered before
             // queueing, cancel queueing. This is a kind of optimistic locking.
-            auto abs_time = turbo::time_from_timespec(*abstime);
+            auto abs_time = turbo::Time::from_timespec(*abstime);
             if (abs_time < (turbo::time_now() + MIN_SLEEP)) {
                 return turbo::deadline_exceeded_error("");
             }

@@ -19,6 +19,18 @@
 #ifndef TURBO_TIMES_DURATION_H_
 #define TURBO_TIMES_DURATION_H_
 
+#include <chrono>  // NOLINT(build/c++11)
+#include <cmath>
+#include <cstdint>
+#include <ctime>
+#include <limits>
+#include <ostream>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <string_view>
+#include "turbo/platform/port.h"
+
 namespace turbo {
     class Duration;
     namespace time_internal {
@@ -304,6 +316,20 @@ namespace turbo {
          * @return
          */
         Duration ceil(Duration unit) const;
+        /**
+         * @ingroup turbo_times_duration
+         * @brief Returns the nearest integral mod of a duration using the passed duration
+         *       unit to its nearest value.
+         *       Example:
+         *       @code
+         *       turbo::Duration d = turbo::Duration::nanoseconds(123456789);
+         *       turbo::Duration e = d.fraction(turbo::Duration::microseconds(1));  // 789ns
+         *       @endcode
+         *       @see `turbo::safe_int_mod()` for a version that returns the quotient and remainder.
+         * @param unit
+         * @return
+         */
+        Duration fraction(Duration unit) const;
 
         // Returns an infinite Duration with the opposite sign.
         // REQUIRES: d.is_infinite()
@@ -1044,6 +1070,10 @@ namespace turbo {
             return time_internal::MakeDuration(tv.tv_sec, ticks);
         }
         return seconds(tv.tv_sec) + microseconds(tv.tv_usec);
+    }
+
+    inline Duration Duration::fraction(Duration unit) const {
+        return *this - trunc(unit);
     }
 
 }  // namespace turbo

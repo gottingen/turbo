@@ -46,7 +46,7 @@ namespace turbo {
         }
 
         bool WaitUntil(const turbo::Time &deadline) {
-            auto d = turbo::to_chrono_time(deadline);
+            auto d = deadline.to_chrono_time();
             std::unique_lock lk(_data->mutex);
             TLOG_CHECK_GE(_data->count, 0ul);
             return _data->cond.wait_until(lk, d, [this] { return _data->count == 0; });

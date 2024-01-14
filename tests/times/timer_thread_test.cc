@@ -192,7 +192,7 @@ private:
 TEST_CASE("TimerThreadTest, schedule_and_unschedule_in_task") {
     turbo::TimerThread timer_thread;
     turbo::Time past_time;
-    auto future_time = turbo::infinite_future();
+    auto future_time = turbo::Time::infinite_future();
     const auto _500ms_after = turbo::milliseconds_from_now(500);
 
     TimeKeeper keeper1(future_time, "keeper1");

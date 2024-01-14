@@ -66,7 +66,7 @@ namespace turbo {
     class TURBO_CACHE_LINE_ALIGNED TimerThread::Bucket {
     public:
         Bucket()
-                : _nearest_run_time(turbo::infinite_future()), _task_head(nullptr) {
+                : _nearest_run_time(turbo::Time::infinite_future()), _task_head(nullptr) {
         }
 
         ~Bucket() {}
@@ -116,7 +116,7 @@ namespace turbo {
     }
 
     TimerThread::TimerThread()
-            : _started(false), _stop(false), _buckets(nullptr), _nearest_run_time(turbo::infinite_future()),
+            : _started(false), _stop(false), _buckets(nullptr), _nearest_run_time(turbo::Time::infinite_future()),
               _nsignals(0), _thread(0) {
     }
 
@@ -164,7 +164,7 @@ namespace turbo {
             if (_task_head) {
                 head = _task_head;
                 _task_head = nullptr;
-                _nearest_run_time = turbo::infinite_future();
+                _nearest_run_time = turbo::Time::infinite_future();
             }
         }
         return head;
@@ -313,7 +313,7 @@ namespace turbo {
             // would run the consumed tasks.
             {
                 turbo::SpinLockHolder l(&_mutex);
-                _nearest_run_time = turbo::infinite_future();
+                _nearest_run_time = turbo::Time::infinite_future();
             }
 
             // Pull tasks from buckets.
@@ -366,7 +366,7 @@ namespace turbo {
             }
 
             // The realtime to wait for.
-            turbo::Time next_run_time = turbo::infinite_future();
+            turbo::Time next_run_time = turbo::Time::infinite_future();
             if (!tasks.empty()) {
                 next_run_time = tasks[0]->run_time;
             }
@@ -389,7 +389,7 @@ namespace turbo {
 
             turbo::Duration du;
             const auto now = turbo::time_now();
-            if (next_run_time != turbo::infinite_future()) {
+            if (next_run_time != turbo::Time::infinite_future()) {
                 du = next_run_time - now;
             }
             auto r = _nsignals.wait_for(expected_nsignals, du);

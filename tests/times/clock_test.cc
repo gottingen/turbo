@@ -35,9 +35,9 @@ typedef void (*sig_t)(int);
 namespace {
 
     TEST_CASE("Time, Now") {
-        const turbo::Time before = turbo::from_unix_nanos(turbo::get_current_time_nanos());
+        const turbo::Time before = turbo::Time::from_nanoseconds(turbo::get_current_time_nanos());
         const turbo::Time now = turbo::time_now();
-        const turbo::Time after = turbo::from_unix_nanos(turbo::get_current_time_nanos());
+        const turbo::Time after = turbo::Time::from_nanoseconds(turbo::get_current_time_nanos());
         REQUIRE_GE(now, before);
         REQUIRE_GE(after, now);
     }

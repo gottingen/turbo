@@ -40,12 +40,13 @@ struct timeval;
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <string_view>
 
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
 #include "turbo/times/civil_time.h"
 #include "turbo/times/cctz/time_zone.h"
 #include "turbo/times/duration.h"
+#include "turbo/base/assume.h"
 
 namespace turbo {
 
@@ -58,9 +59,70 @@ namespace turbo::time_internal {
 
     constexpr Duration ToUnixDuration(Time t);
 
+    // Floors d to the next unit boundary closer to negative infinity.
+    constexpr int64_t FloorToUnit(turbo::Duration d, turbo::Duration unit);
+
 }  // namespace turbo::time_internal
 
 namespace turbo {
+
+    // CivilInfo
+    //
+    // Information about the civil time corresponding to an absolute time.
+    // This struct is not intended to represent an instant in time. So, rather
+    // than passing a `TimeZone::CivilInfo` to a function, pass an `turbo::Time`
+    // and an `turbo::TimeZone`.
+    struct CivilInfo {
+        CivilSecond cs;
+        Duration subsecond;
+
+        constexpr civil_year_t year() const { return cs.year(); }
+
+        constexpr int month() const { return cs.month(); }
+
+        constexpr int mday() const { return cs.day(); }
+
+        constexpr int hour() const { return cs.hour(); }
+
+        constexpr int minute() const { return cs.minute(); }
+
+        constexpr int second() const { return cs.second(); }
+
+        inline Weekday week_day() const { return get_weekday(cs); }
+
+        inline int wday() const {
+            auto wd = get_weekday(cs);
+            switch (wd) {
+                case Weekday::sunday:
+                    return 0;
+                case Weekday::monday:
+                    return 1;
+                case Weekday::tuesday:
+                    return 2;
+                case Weekday::wednesday:
+                    return 3;
+                case Weekday::thursday:
+                    return 4;
+                case Weekday::friday:
+                    return 5;
+                case Weekday::saturday:
+                    return 6;
+            }
+            TURBO_UNREACHABLE();
+        }
+
+        inline int yday() const { return get_year_day(cs); }
+
+        // Note: The following fields exist for backward compatibility
+        // with older APIs.  Accessing these fields directly is a sign of
+        // imprudent logic in the calling code.  Modern time-related code
+        // should only access this data indirectly by way of format_time().
+        // These fields are undefined for infinite_future() and infinite_past().
+        int offset;             // seconds east of UTC
+        bool is_dst;            // is offset non-standard?
+        const char *zone_abbr;  // time-zone abbreviation (e.g., "PST")
+    };
+
 
     /**
      * @brief The `turbo::Time` class represents a specific instant in time. Arithmetic operators
@@ -114,10 +176,10 @@ namespace turbo {
         // readable by explicitly initializing all instances before use.
         //
         // Example:
-        //   turbo::Time t = turbo::unix_epoch();
+        //   turbo::Time t = turbo::Time::unix_epoch();
         //   turbo::Time t = turbo::time_now();
-        //   turbo::Time t = turbo::time_from_timeval(tv);
-        //   turbo::Time t = turbo::infinite_past();
+        //   turbo::Time t = turbo::Time::from_timeval(tv);
+        //   turbo::Time t = turbo::Time::infinite_past();
         constexpr Time() = default;
 
         // Copyable.
@@ -141,6 +203,202 @@ namespace turbo {
             return H::combine(std::move(h), t.rep_);
         }
 
+    public:
+        //////////////////////////// gettter ////////////////////////////
+        int64_t to_nanoseconds() const;
+
+        int64_t to_microseconds() const;
+
+        int64_t to_milliseconds() const;
+
+        int64_t to_seconds() const;
+
+        time_t to_time_t() const;
+
+        double to_udate() const;
+
+        int64_t to_universal() const;
+
+        timespec to_timespec() const;
+
+        timeval to_timeval() const;
+
+        Duration fraction(Duration unit) const;
+
+        struct tm to_tm(TimeZone tz) const;
+
+        struct tm to_local_tm() const;
+
+        struct tm to_utc_tm() const;
+
+        CivilInfo to_civil(TimeZone tz) const;
+
+        CivilInfo to_local_civil() const;
+
+        CivilInfo to_utc_civil() const;
+
+        std::chrono::system_clock::time_point to_chrono_time() const;
+
+
+        /**
+         * @ingroup turbo_times_time_zone
+         * @brief Formats the given `turbo::Time` in the `turbo::TimeZone` according to the
+         *        provided format string. Uses strftime()-like formatting options, with
+         *        the following extensions:
+         *        - %Ez  - RFC3339-compatible numeric UTC offset (+hh:mm or -hh:mm)
+         *        - %E*z - Full-resolution numeric UTC offset (+hh:mm:ss or -hh:mm:ss)
+         *        - %E#S - seconds with # digits of fractional precision
+         *        - %E*S - seconds with full fractional precision (a literal '*')
+         *        - %E#f - Fractional seconds with # digits of precision
+         *        - %E*f - Fractional seconds with full precision (a literal '*')
+         *        - %E4Y - Four-character years (-999 ... -001, 0000, 0001 ... 9999)
+         *        - %ET  - The RFC3339 "date-time" separator "T"
+         *        Note that %E0S behaves like %S, and %E0f produces no characters.  In
+         *        contrast %E*f always produces at least one digit, which may be '0'.
+         *        Note that %Y produces as many characters as it takes to fully render the
+         *        year.  A year outside of [-999:9999] when formatted with %E4Y will produce
+         *        more than four characters, just like %Y.
+         *        We recommend that format strings include the UTC offset (%z, %Ez, or %E*z)
+         *        so that the result uniquely identifies a time instant.
+         *        Example:
+         *        @code
+         *        turbo::CivilSecond cs(2013, 1, 2, 3, 4, 5);
+         *        turbo::Time t = turbo::Time::from_civil(cs, lax);
+         *        std::string f = turbo::format_time("%H:%M:%S", t, lax);  // "03:04:05"
+         *        f = turbo::format_time("%H:%M:%E3S", t, lax);  // "03:04:05.000"
+         *        @endcode
+         *        Note: If the given `turbo::Time` is `turbo::Time::infinite_future()`, the returned
+         *        string will be exactly "infinite-future". If the given `turbo::Time` is
+         *        `turbo::Time::infinite_past()`, the returned string will be exactly "infinite-past".
+         *        In both cases the given format string and `turbo::TimeZone` are ignored.
+         *        Example:
+         *        @code
+         *        turbo::Time t = turbo::Time::infinite_future();
+         *        std::string f = turbo::format_time("%H:%M:%S", t, lax);  // "infinite-future"
+         *        @endcode
+         * @param format
+         * @param t
+         * @param tz
+         * @return
+         */
+        std::string to_string(std::string_view format, TimeZone tz) const;
+
+        std::string to_string(TimeZone tz) const;
+
+        std::string to_string() const;
+
+        /**
+     * @ingroup turbo_times_time_zone
+     * @brief Parses an input string according to the provided format string and
+     *        returns the corresponding `turbo::Time`. Uses strftime()-like formatting
+     *        options, with the same extensions as format_time(), but with the
+     *        exceptions that %E#S is interpreted as %E*S, and %E#f as %E*f.  %Ez
+     *        and %E*z also accept the same inputs, which (along with %z) includes
+     *        'z' and 'Z' as synonyms for +00:00.  %ET accepts either 'T' or 't'.
+     *        %Y consumes as many numeric characters as it can, so the matching data
+     *        should always be terminated with a non-numeric.  %E4Y always consumes
+     *        exactly four characters, including any sign.
+     *        Unspecified fields are taken from the default date and time of ...
+     *        "1970-01-01 00:00:00.0 +0000"
+     *        For example, parsing a string of "15:45" (%H:%M) will return an turbo::Time
+     *        that represents "1970-01-01 15:45:00.0 +0000".
+     *        Note that since parse_time() returns time instants, it makes the most sense
+     *        to parse fully-specified date/time strings that include a UTC offset (%z,
+     *        %Ez, or %E*z).
+     *        Note also that `turbo::parse_time()` only heeds the fields year, month, day,
+     *        hour, minute, (fractional) second, and UTC offset.  Other fields, like
+     *        weekday (%a or %A), while parsed for syntactic validity, are ignored
+     *        in the conversion.
+     *        Date and time fields that are out-of-range will be treated as errors
+     *        rather than normalizing them like `turbo::CivilSecond` does.  For example,
+     *        it is an error to parse the date "Oct 32, 2013" because 32 is out of range.
+     *        A leap second of ":60" is normalized to ":00" of the following minute with
+     *        fractional seconds discarded.  The following table shows how the given
+     *        seconds and subseconds will be parsed:
+     *        "59.x" -> 59.x  // exact
+     *        "60.x" -> 00.0  // normalized
+     *        "00.x" -> 00.x  // exact
+     *        Errors are indicated by returning false and assigning an error message
+     *        to the "err" out param if it is non-null.
+     *        Note: If the input string is exactly "infinite-future", the returned
+     *        `turbo::Time` will be `turbo::Time::infinite_future()` and `true` will be returned.
+     *        If the input string is "infinite-past", the returned `turbo::Time` will be
+     *        `turbo::Time::infinite_past()` and `true` will be returned.
+     * @param format
+     * @param input
+     * @param time
+     * @param err
+     * @return
+     */
+        bool parse_time(std::string_view format, std::string_view input, std::string *err);
+
+        /**
+         * @ingroup turbo_times_time_zone
+         * @brief Like `parse_time()` above, but if the format string does not contain a UTC
+         *        offset specification (%z/%Ez/%E*z) then the input is interpreted in the
+         *        given TimeZone.  This means that the input, by itself, does not identify a
+         *        unique instant.  Being time-zone dependent, it also admits the possibility
+         *        of ambiguity or non-existence, in which case the "pre" time (as defined
+         *        by TimeZone::TimeInfo) is returned.  For these reasons we recommend that
+         *        all date/time strings include a UTC offset so they're context independent.
+         *        Example:
+         *        @code
+         *        turbo::Time t;
+         *        std::string err;
+         *        bool b = turbo::parse_time("%Y-%m-%d %H:%M:%S", "2013-10-19 12:34:56",
+         *                                   lax, &t, &err);
+         *        // b == true && err.empty() && t == 2013-10-19 12:34:56 -0700
+         *        @endcode
+         * @param format
+         * @param input
+         * @param tz
+         * @param time
+         * @param err
+         * @return
+         */
+        bool parse_time(std::string_view format, std::string_view input, TimeZone tz, std::string *err);
+
+    public:
+        //////////////////////////// creator ////////////////////////////
+
+        static turbo::Time time_now();
+
+        static constexpr Time from_nanoseconds(int64_t ns);
+
+        static constexpr Time from_microseconds(int64_t us);
+
+        static constexpr Time from_milliseconds(int64_t ms);
+
+        static constexpr Time from_seconds(int64_t s);
+
+        static constexpr Time from_time_t(time_t t);
+
+        static Time from_udate(double udate);
+
+        static Time from_universal(int64_t universal);
+
+
+        static Time from_timespec(timespec ts);
+
+        static Time from_timeval(timeval tv);
+
+        static Time from_chrono(const std::chrono::system_clock::time_point &tp);
+
+        static Time from_civil(CivilSecond ct, TimeZone tz);
+
+        static constexpr Time unix_epoch();
+
+        static constexpr Time universal_epoch();
+
+        static constexpr Time infinite_future();
+
+        static constexpr Time infinite_past();
+
+        static Time from_tm(const struct tm &tm, TimeZone tz);
+
+        static Time from_date_time(int64_t year, int mon, int day, int hour,
+                                   int min, int sec, TimeZone tz);
+
     private:
         friend constexpr Time time_internal::FromUnixDuration(Duration d);
 
@@ -151,12 +409,6 @@ namespace turbo {
         friend constexpr bool operator==(Time lhs, Time rhs);
 
         friend Duration operator-(Time lhs, Time rhs);
-
-        friend constexpr Time universal_epoch();
-
-        friend constexpr Time infinite_future();
-
-        friend constexpr Time infinite_past();
 
         constexpr explicit Time(Duration rep) : rep_(rep) {}
 
@@ -205,264 +457,23 @@ namespace turbo {
         return lhs.rep_ - rhs.rep_;
     }
 
-    /**
-     * @ingroup turbo_times_time_point_create
-     * @brief Returns the `turbo::Time` representing "1970-01-01 00:00:00.0 +0000".
-     * @return
-     */
-    constexpr Time unix_epoch() { return Time(); }
+    constexpr Time Time::unix_epoch() { return Time(); }
 
-    /**
-     * @ingroup turbo_times_time_point_create
-     * @brief Returns the `turbo::Time` representing "0001-01-01 00:00:00.0 +0000", the
-     *        epoch of the ICU Universal Time Scale.
-     * @return
-     */
-    constexpr Time universal_epoch() {
+    constexpr Time Time::universal_epoch() {
         // 719162 is the number of days from 0001-01-01 to 1970-01-01,
         // assuming the Gregorian calendar.
-        return Time(
-                time_internal::MakeDuration(-24 * 719162 * int64_t{3600}, uint32_t{0}));
+        return Time(time_internal::MakeDuration(-24 * 719162 * int64_t{3600}, uint32_t{0}));
     }
 
-    /**
-     * @ingroup turbo_times_time_point_create
-     * @brief Returns an `turbo::Time` that is infinitely far in the future.
-     * @return
-     */
-    constexpr Time infinite_future() {
+    constexpr Time Time::infinite_future() {
         return Time(time_internal::MakeDuration((std::numeric_limits<int64_t>::max)(),
                                                 ~uint32_t{0}));
     }
 
-    /**
-     * @ingroup turbo_times_time_point_create
-     * @brief Returns an `turbo::Time` that is infinitely far in the past.
-     * @return
-     */
-    constexpr Time infinite_past() {
+    constexpr Time Time::infinite_past() {
         return Time(time_internal::MakeDuration((std::numeric_limits<int64_t>::min)(),
                                                 ~uint32_t{0}));
     }
-
-    /**
-     * @ingroup turbo_times_time_point_create
-     * @brief Creates an `turbo::Time` from a variety of other representations.
-     * @param ns
-     * @return
-     */
-    constexpr Time from_unix_nanos(int64_t ns);
-
-    /**
-     * @ingroup turbo_times_time_point_create
-     * @brief  similar to `from_unix_nanos()`
-     * @see `from_unix_nanos()`
-     * @param us
-     * @return
-     */
-    constexpr Time from_unix_micros(int64_t us);
-
-    /**
-     * @ingroup turbo_times_time_point_create
-     * @brief  similar to `from_unix_nanos()`
-     * @see `from_unix_nanos()`
-     * @param ms
-     * @return
-     */
-    constexpr Time from_unix_millis(int64_t ms);
-
-    /**
-     * @ingroup turbo_times_time_point_create
-     * @brief  similar to `from_unix_nanos()`
-     * @see `from_unix_nanos()`
-     * @param s
-     * @return
-     */
-    constexpr Time from_unix_seconds(int64_t s);
-
-    /**
-     * @ingroup turbo_times_time_point_create
-     * @brief  similar to `from_unix_nanos()`
-     * @see `from_unix_nanos()`
-     * @param t
-     * @return
-     */
-    constexpr Time from_time_t(time_t t);
-
-    /**
-     * @ingroup turbo_times_time_point_create
-     * @brief  similar to `from_unix_nanos()`
-     * @see `from_unix_nanos()`
-     * @param udate
-     * @return
-     */
-    Time from_udate(double udate);
-
-    /**
-     * @ingroup turbo_times_time_point_create
-     * @brief  similar to `from_unix_nanos()`
-     * @see `from_unix_nanos()`
-     * @param universal
-     * @return
-     */
-    Time from_universal(int64_t universal);
-
-    /**
-     * @ingroup turbo_times_time_point
-     * @brief Converts an `turbo::Time` to a variety of other representations. Note that
-     *       these operations round down toward negative infinity where necessary to
-     *       adjust to the resolution of the result type.  Beware of possible time_t
-     *       over/underflow in ToTime{T,val,spec}() on 32-bit platforms.
-     *       Example:
-     *       @code
-     *       turbo::Time t = turbo::from_unix_seconds(123);
-     *       int64_t ns = turbo::to_unix_nanos(t);  // ns == 123000000000
-     *       @endcode
-     * @param t the time to convert
-     * @return the converted time
-     */
-    int64_t to_unix_nanos(Time t);
-
-    /**
-     * @ingroup turbo_times_time_point
-     * @brief  similar to `to_unix_nanos()`
-     * @see `to_unix_nanos()`
-     * @param t
-     * @return
-     */
-    int64_t to_unix_micros(Time t);
-
-    /**
-     * @ingroup turbo_times_time_point
-     * @brief  similar to `to_unix_nanos()`
-     * @see `to_unix_nanos()`
-     * @param t
-     * @return
-     */
-    int64_t to_unix_millis(Time t);
-
-    /**
-     * @ingroup turbo_times_time_point
-     * @brief  similar to `to_unix_nanos()`
-     * @see `to_unix_nanos()`
-     * @param t
-     * @return
-     */
-    int64_t to_unix_seconds(Time t);
-
-    /**
-     * @ingroup turbo_times_time_point
-     * @brief  similar to `to_unix_nanos()`
-     * @see `to_unix_nanos()`
-     * @param t
-     * @return
-     */
-    time_t to_time_t(Time t);
-
-    /**
-     * @ingroup turbo_times_time_point
-     * @brief  similar to `to_unix_nanos()`
-     * @see `to_unix_nanos()`
-     * @param t
-     * @return
-     */
-    double to_udate(Time t);
-
-    /**
-     * @ingroup turbo_times_time_point
-     * @brief  similar to `to_unix_nanos()`
-     * @see `to_unix_nanos()`
-     * @param t
-     * @return
-     */
-    int64_t to_universal(Time t);
-
-    /**
-     * @ingroup turbo_times_time_point
-     * @brief Converts a `std::chrono::system_clock::time_point` to an `turbo::Time`.
-     * @param tp
-     * @return
-     */
-    Time time_from_timespec(timespec ts);
-
-    /**
-     * @ingroup turbo_times_time_point
-     * @brief  similar to `time_from_timespec()`
-     * @see `time_from_timespec()`
-     * @param tv
-     * @return
-     */
-    Time time_from_timeval(timeval tv);
-
-    /**
-     * @ingroup turbo_times_time_point
-     * @brief  similar to `time_from_timespec()`
-     * @see `time_from_timespec()`
-     * @param t
-     * @return
-     */
-    timespec to_timespec(Time t);
-
-    /**
-     * @ingroup turbo_times_time_point
-     * @brief  similar to `time_from_timespec()`
-     * @see `time_from_timespec()`
-     * @param t
-     * @return
-     */
-    timeval to_timeval(Time t);
-
-    /**
-     * @ingroup turbo_times_time_point
-     * @brief  Converts a `std::chrono::system_clock::time_point` to an `turbo::Time`.
-     *         Example:
-     *         @code {.cpp}
-     *         auto tp = std::chrono::system_clock::from_time_t(123);
-     *         turbo::Time t = turbo::from_chrono(tp);
-     *         // t == turbo::from_time_t(123)
-     *         @endcode
-     * @param tp
-     * @return
-     */
-    Time
-    from_chrono(const std::chrono::system_clock::time_point &tp);
-
-    /**
-     * @ingroup turbo_times_time_point_create
-     * @brief Converts an `turbo::Time` to a `std::chrono::system_clock::time_point`.
-     *        If overflow would occur, the returned value will saturate at the min/max
-     *        time point value instead.
-     *        Example:
-     *        @code
-     *        turbo::Time t = turbo::from_time_t(123);
-     *        auto tp = turbo::to_chrono_time(t);
-     *        // tp == std::chrono::system_clock::from_time_t(123);
-     *        @endcode
-     * @param t
-     * @return
-     */
-    std::chrono::system_clock::time_point
-    to_chrono_time(Time);
-
-    // TimeZone::CivilInfo
-    //
-    // Information about the civil time corresponding to an absolute time.
-    // This struct is not intended to represent an instant in time. So, rather
-    // than passing a `TimeZone::CivilInfo` to a function, pass an `turbo::Time`
-    // and an `turbo::TimeZone`.
-    struct CivilInfo {
-        CivilSecond cs;
-        Duration subsecond;
-
-        // Note: The following fields exist for backward compatibility
-        // with older APIs.  Accessing these fields directly is a sign of
-        // imprudent logic in the calling code.  Modern time-related code
-        // should only access this data indirectly by way of format_time().
-        // These fields are undefined for infinite_future() and infinite_past().
-        int offset;             // seconds east of UTC
-        bool is_dst;            // is offset non-standard?
-        const char *zone_abbr;  // time-zone abbreviation (e.g., "PST")
-    };
 
     /**
      * @ingroup turbo_times_time_zone
@@ -515,7 +526,7 @@ namespace turbo {
          *
          *        Example:
          *        @code
-         *        const auto epoch = lax.At(turbo::unix_epoch());
+         *        const auto epoch = lax.At(turbo::Time::unix_epoch());
          *        // epoch.cs == 1969-12-31 16:00:00
          *        // epoch.subsecond == turbo::Duration::zero()
          *        // epoch.offset == -28800
@@ -583,7 +594,7 @@ namespace turbo {
          * @param cs the civil time to convert
          * @return the converted time
          */
-        TimeInfo At(CivilSecond ct) const;
+        TimeInfo at(CivilSecond ct) const;
 
         /**
          * @brief Finds the time of the next offset change in this time zone.
@@ -605,7 +616,7 @@ namespace turbo {
          *      turbo::TimeZone nyc;
          *      if (!turbo::load_time_zone("America/New_York", &nyc)) { ... }
          *      const auto now = turbo::time_now();
-         *      auto t = turbo::infinite_past();
+         *      auto t = turbo::Time::infinite_past();
          *      turbo::TimeZone::CivilTransition trans;
          *      while (t <= now && nyc.NextTransition(t, &trans)) {
          *          // transition: trans.from -> trans.to
@@ -695,7 +706,7 @@ namespace turbo {
     }
 
     inline CivilInfo to_civil_info(Time t,
-                                       TimeZone tz) {
+                                   TimeZone tz) {
         return tz.at(t);  // already a CivilSecond
     }
 
@@ -763,7 +774,7 @@ namespace turbo {
      * @return
      */
     inline CivilMonth to_civil_month(Time t,
-                                   TimeZone tz) {
+                                     TimeZone tz) {
         return CivilMonth(tz.at(t).cs);
     }
 
@@ -777,29 +788,6 @@ namespace turbo {
      */
     inline CivilYear to_civil_year(Time t, TimeZone tz) {
         return CivilYear(tz.at(t).cs);
-    }
-
-    /**
-     * @ingroup turbo_times_time_zone
-     * @brief Helper for TimeZone::At(CivilSecond) that provides "order-preserving
-     *       semantics." If the civil time maps to a unique time, that time is
-     *       returned. If the civil time is repeated in the given time zone, the
-     *       time using the pre-transition offset is returned. Otherwise, the
-     *       civil time is skipped in the given time zone, and the transition time
-     *       is returned. This means that for any two civil times, ct1 and ct2,
-     *       (ct1 < ct2) => (from_civil(ct1) <= from_civil(ct2)), the equal case
-     *       being when two non-existent civil times map to the same transition time.
-     *
-     *       Note: Accepts civil times of any alignment.
-     * @param ct
-     * @param tz
-     * @return
-     */
-    inline Time from_civil(CivilSecond ct,
-                           TimeZone tz) {
-        const auto ti = tz.At(ct);
-        if (ti.kind == TimeZone::TimeInfo::SKIPPED) return ti.trans;
-        return ti.pre;
     }
 
     // TimeConversion
@@ -846,7 +834,7 @@ namespace turbo {
     //
     // Deprecated. Use `turbo::TimeZone::At(CivilSecond)`.
     TimeConversion convert_date_time(int64_t year, int mon, int day, int hour,
-                                   int min, int sec, TimeZone tz);
+                                     int min, int sec, TimeZone tz);
 
     // from_date_time()
     //
@@ -860,7 +848,7 @@ namespace turbo {
     //   turbo::Time t = turbo::from_date_time(2017, 9, 26, 9, 30, 0, lax);
     //   // t = 2017-09-26 09:30:00 -0700
     //
-    // Deprecated. Use `turbo::from_civil(CivilSecond, TimeZone)`. Note that the
+    // Deprecated. Use `turbo::Time::from_civil(CivilSecond, TimeZone)`. Note that the
     // behavior of `from_civil()` differs from `from_date_time()` for skipped civil
     // times. If you care about that see `turbo::TimeZone::At(turbo::CivilSecond)`.
     /**
@@ -868,7 +856,7 @@ namespace turbo {
      * @brief  similar to `convert_date_time()` but returns the "pre" `turbo::Time`
      *         (the unique result, or the instant that is correct using the pre-transition
      *         offset (as if the transition never happened)).
-     *         Deprecated. Use `turbo::from_civil(CivilSecond, TimeZone)`. Note that the
+     *         Deprecated. Use `turbo::Time::from_civil(CivilSecond, TimeZone)`. Note that the
      *         behavior of `from_civil()` differs from `from_date_time()` for skipped civil
      *         times. If you care about that see `turbo::TimeZone::At(turbo::CivilSecond)`.
      *         Example:
@@ -887,52 +875,10 @@ namespace turbo {
      * @param tz
      * @return
      */
-    inline Time from_date_time(int64_t year, int mon, int day, int hour,
-                             int min, int sec, TimeZone tz) {
+    inline Time Time::from_date_time(int64_t year, int mon, int day, int hour,
+                                     int min, int sec, TimeZone tz) {
         return convert_date_time(year, mon, day, hour, min, sec, tz).pre;
     }
-
-    /**
-     * @ingroup turbo_times_time_zone
-     * @brief Converts the given `tm_year`, `tm_mon`, `tm_mday`, `tm_hour`, `tm_min`, and
-     *        `tm_sec` fields to an `turbo::Time` using the given time zone. See ctime(3)
-     *        for a description of the expected values of the tm fields. If the civil time
-     *        is unique (see `turbo::TimeZone::At(turbo::CivilSecond)` above), the matching
-     *        time instant is returned.  Otherwise, the `tm_isdst` field is consulted to
-     *        choose between the possible results.  For a repeated civil time, `tm_isdst !=
-     *        0` returns the matching DST instant, while `tm_isdst == 0` returns the
-     *        matching non-DST instant.  For a skipped civil time there is no matching
-     *        instant, so `tm_isdst != 0` returns the DST instant, and `tm_isdst == 0`
-     *        returns the non-DST instant, that would have matched if the transition never
-     *        happened.
-     *        Example:
-     *        @code
-     *        struct tm tm;
-     *        tm.tm_year = 2017 - 1900;
-     *        tm.tm_mon = 9 - 1;
-     *        tm.tm_mday = 26;
-     *        tm.tm_hour = 9;
-     *        tm.tm_min = 30;
-     *        tm.tm_sec = 0;
-     *        tm.tm_isdst = -1;
-     *        turbo::Time t = turbo::from_tm(tm, lax);
-     *        // t == 2017-09-26 09:30:00 -0700
-     *        @endcode
-     * @param tm
-     * @param tz
-     * @return
-     */
-    Time from_tm(const struct tm &tm, TimeZone tz);
-
-    /**
-     * @ingroup turbo_times_time_zone
-     * @brief Converts the given `turbo::Time` to a struct tm using the given time zone.
-     *        See ctime(3) for a description of the values of the tm fields.
-     * @param t
-     * @param tz
-     * @return
-     */
-    struct tm to_tm(Time t, TimeZone tz);
 
     // RFC3339_full
     // RFC3339_sec
@@ -954,134 +900,17 @@ namespace turbo {
     TURBO_DLL extern const char RFC1123_full[];     // %a, %d %b %E4Y %H:%M:%S %z
     TURBO_DLL extern const char RFC1123_no_wday[];  // %d %b %E4Y %H:%M:%S %z
 
-    /**
-     * @ingroup turbo_times_time_zone
-     * @brief Formats the given `turbo::Time` in the `turbo::TimeZone` according to the
-     *        provided format string. Uses strftime()-like formatting options, with
-     *        the following extensions:
-     *        - %Ez  - RFC3339-compatible numeric UTC offset (+hh:mm or -hh:mm)
-     *        - %E*z - Full-resolution numeric UTC offset (+hh:mm:ss or -hh:mm:ss)
-     *        - %E#S - seconds with # digits of fractional precision
-     *        - %E*S - seconds with full fractional precision (a literal '*')
-     *        - %E#f - Fractional seconds with # digits of precision
-     *        - %E*f - Fractional seconds with full precision (a literal '*')
-     *        - %E4Y - Four-character years (-999 ... -001, 0000, 0001 ... 9999)
-     *        - %ET  - The RFC3339 "date-time" separator "T"
-     *        Note that %E0S behaves like %S, and %E0f produces no characters.  In
-     *        contrast %E*f always produces at least one digit, which may be '0'.
-     *        Note that %Y produces as many characters as it takes to fully render the
-     *        year.  A year outside of [-999:9999] when formatted with %E4Y will produce
-     *        more than four characters, just like %Y.
-     *        We recommend that format strings include the UTC offset (%z, %Ez, or %E*z)
-     *        so that the result uniquely identifies a time instant.
-     *        Example:
-     *        @code
-     *        turbo::CivilSecond cs(2013, 1, 2, 3, 4, 5);
-     *        turbo::Time t = turbo::from_civil(cs, lax);
-     *        std::string f = turbo::format_time("%H:%M:%S", t, lax);  // "03:04:05"
-     *        f = turbo::format_time("%H:%M:%E3S", t, lax);  // "03:04:05.000"
-     *        @endcode
-     *        Note: If the given `turbo::Time` is `turbo::infinite_future()`, the returned
-     *        string will be exactly "infinite-future". If the given `turbo::Time` is
-     *        `turbo::infinite_past()`, the returned string will be exactly "infinite-past".
-     *        In both cases the given format string and `turbo::TimeZone` are ignored.
-     *        Example:
-     *        @code
-     *        turbo::Time t = turbo::infinite_future();
-     *        std::string f = turbo::format_time("%H:%M:%S", t, lax);  // "infinite-future"
-     *        @endcode
-     * @param format
-     * @param t
-     * @param tz
-     * @return
-     */
-    std::string format_time(std::string_view format,
-                            Time t, TimeZone tz);
+
 
     // Convenience functions that format the given time using the RFC3339_full
     // format.  The first overload uses the provided TimeZone, while the second
     // uses local_time_zone().
-    std::string format_time(Time t, TimeZone tz);
 
-    std::string format_time(Time t);
 
     // Output stream operator.
     inline std::ostream &operator<<(std::ostream &os, Time t) {
-        return os << format_time(t);
+        return os << t.to_string();
     }
-
-    /**
-     * @ingroup turbo_times_time_zone
-     * @brief Parses an input string according to the provided format string and
-     *        returns the corresponding `turbo::Time`. Uses strftime()-like formatting
-     *        options, with the same extensions as format_time(), but with the
-     *        exceptions that %E#S is interpreted as %E*S, and %E#f as %E*f.  %Ez
-     *        and %E*z also accept the same inputs, which (along with %z) includes
-     *        'z' and 'Z' as synonyms for +00:00.  %ET accepts either 'T' or 't'.
-     *        %Y consumes as many numeric characters as it can, so the matching data
-     *        should always be terminated with a non-numeric.  %E4Y always consumes
-     *        exactly four characters, including any sign.
-     *        Unspecified fields are taken from the default date and time of ...
-     *        "1970-01-01 00:00:00.0 +0000"
-     *        For example, parsing a string of "15:45" (%H:%M) will return an turbo::Time
-     *        that represents "1970-01-01 15:45:00.0 +0000".
-     *        Note that since parse_time() returns time instants, it makes the most sense
-     *        to parse fully-specified date/time strings that include a UTC offset (%z,
-     *        %Ez, or %E*z).
-     *        Note also that `turbo::parse_time()` only heeds the fields year, month, day,
-     *        hour, minute, (fractional) second, and UTC offset.  Other fields, like
-     *        weekday (%a or %A), while parsed for syntactic validity, are ignored
-     *        in the conversion.
-     *        Date and time fields that are out-of-range will be treated as errors
-     *        rather than normalizing them like `turbo::CivilSecond` does.  For example,
-     *        it is an error to parse the date "Oct 32, 2013" because 32 is out of range.
-     *        A leap second of ":60" is normalized to ":00" of the following minute with
-     *        fractional seconds discarded.  The following table shows how the given
-     *        seconds and subseconds will be parsed:
-     *        "59.x" -> 59.x  // exact
-     *        "60.x" -> 00.0  // normalized
-     *        "00.x" -> 00.x  // exact
-     *        Errors are indicated by returning false and assigning an error message
-     *        to the "err" out param if it is non-null.
-     *        Note: If the input string is exactly "infinite-future", the returned
-     *        `turbo::Time` will be `turbo::infinite_future()` and `true` will be returned.
-     *        If the input string is "infinite-past", the returned `turbo::Time` will be
-     *        `turbo::infinite_past()` and `true` will be returned.
-     * @param format
-     * @param input
-     * @param time
-     * @param err
-     * @return
-     */
-    bool parse_time(std::string_view format, std::string_view input, Time *time,
-                    std::string *err);
-
-    /**
-     * @ingroup turbo_times_time_zone
-     * @brief Like `parse_time()` above, but if the format string does not contain a UTC
-     *        offset specification (%z/%Ez/%E*z) then the input is interpreted in the
-     *        given TimeZone.  This means that the input, by itself, does not identify a
-     *        unique instant.  Being time-zone dependent, it also admits the possibility
-     *        of ambiguity or non-existence, in which case the "pre" time (as defined
-     *        by TimeZone::TimeInfo) is returned.  For these reasons we recommend that
-     *        all date/time strings include a UTC offset so they're context independent.
-     *        Example:
-     *        @code
-     *        turbo::Time t;
-     *        std::string err;
-     *        bool b = turbo::parse_time("%Y-%m-%d %H:%M:%S", "2013-10-19 12:34:56",
-     *                                   lax, &t, &err);
-     *        // b == true && err.empty() && t == 2013-10-19 12:34:56 -0700
-     *        @endcode
-     * @param format
-     * @param input
-     * @param tz
-     * @param time
-     * @param err
-     * @return
-     */
-    bool parse_time(std::string_view format, std::string_view input, TimeZone tz,
-                    Time *time, std::string *err);
 
     // ============================================================================
     // Implementation Details Follow
@@ -1104,26 +933,36 @@ namespace turbo {
 
     }  // namespace time_internal
 
-    constexpr Time from_unix_nanos(int64_t ns) {
+    constexpr Time Time::from_nanoseconds(int64_t ns) {
         return time_internal::FromUnixDuration(Duration::nanoseconds(ns));
     }
 
-    constexpr Time from_unix_micros(int64_t us) {
+    constexpr Time Time::from_microseconds(int64_t us) {
         return time_internal::FromUnixDuration(Duration::microseconds(us));
     }
 
-    constexpr Time from_unix_millis(int64_t ms) {
+    constexpr Time Time::from_milliseconds(int64_t ms) {
         return time_internal::FromUnixDuration(Duration::milliseconds(ms));
     }
 
-    constexpr Time from_unix_seconds(int64_t s) {
+    constexpr Time Time::from_seconds(int64_t s) {
         return time_internal::FromUnixDuration(Duration::seconds(s));
     }
 
-    constexpr Time from_time_t(time_t t) {
+    constexpr Time Time::from_time_t(time_t t) {
         return time_internal::FromUnixDuration(Duration::seconds(t));
     }
 
+    inline Time Time::from_civil(CivilSecond ct,
+                                 TimeZone tz) {
+        const auto ti = tz.at(ct);
+        if (ti.kind == TimeZone::TimeInfo::SKIPPED) return ti.trans;
+        return ti.pre;
+    }
+
+    inline Duration Time::fraction(Duration unit) const {
+        return rep_.fraction(unit);
+    }
 }  // namespace turbo
 
 #endif  // TURBO_TIME_TIME_H_
