@@ -78,11 +78,11 @@ namespace turbo {
 
         /// This prints out a time string from a time
         std::string make_time_str(turbo::Duration span) const {  // NOLINT(modernize-use-nodiscard)
-            if (span < turbo::microseconds(1))
+            if (span < turbo::Duration::microseconds(1))
                 return turbo::format("{}ns", span.to_nanoseconds<double>());
-            if (span < turbo::milliseconds(1))
+            if (span < turbo::Duration::milliseconds(1))
                 return turbo::format("{}us", span.to_microseconds<double>());
-            if (span < turbo::seconds(1))
+            if (span < turbo::Duration::seconds(1))
                 return turbo::format("{}ms", span.to_milliseconds<double>());
             return turbo::format("{}s", span.to_seconds<double>());
         }
@@ -92,7 +92,7 @@ namespace turbo {
         }
 
     private:
-        static constexpr turbo::Duration kZero = turbo::nanoseconds(0);
+        static constexpr turbo::Duration kZero = turbo::Duration::nanoseconds(0);
         turbo::Time _start;
         std::string _title;
         time_print_t _time_print;

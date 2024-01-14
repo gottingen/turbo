@@ -104,35 +104,35 @@ namespace turbo {
     }
 
     inline turbo::Time seconds_from_now(int64_t secs) {
-        return time_now() + turbo::seconds(secs);
+        return time_now() + turbo::Duration::seconds(secs);
     }
 
     inline turbo::Time milliseconds_from_now(int64_t ms) {
-        return time_now() + turbo::milliseconds(ms);
+        return time_now() + turbo::Duration::milliseconds(ms);
     }
 
     inline turbo::Time microseconds_from_now(int64_t us) {
-        return time_now() + turbo::microseconds(us);
+        return time_now() + turbo::Duration::microseconds(us);
     }
 
     inline turbo::Time nanoseconds_from_now(int64_t ns) {
-        return time_now() + turbo::nanoseconds(ns);
+        return time_now() + turbo::Duration::nanoseconds(ns);
     }
 
     inline turbo::Time double_seconds_from_now(double secs) {
-        return time_now() + turbo::seconds(secs);
+        return time_now() + turbo::Duration::seconds(secs);
     }
 
     inline turbo::Time double_milliseconds_from_now(double ms) {
-        return time_now() + turbo::milliseconds(ms);
+        return time_now() + turbo::Duration::milliseconds(ms);
     }
 
     inline turbo::Time double_microseconds_from_now(double us) {
-        return time_now() + turbo::microseconds(us);
+        return time_now() + turbo::Duration::microseconds(us);
     }
 
     inline turbo::Time double_nanoseconds_from_now(double ns) {
-        return time_now() + turbo::nanoseconds(ns);
+        return time_now() + turbo::Duration::nanoseconds(ns);
     }
 
 

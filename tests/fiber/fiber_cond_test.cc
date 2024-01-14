@@ -47,7 +47,7 @@ namespace turbo::fiber_internal {
         Arg *a = (Arg *) void_arg;
         signal_start_time = turbo::get_current_time_micros();
         while (!stop) {
-            turbo::fiber_sleep_for(turbo::microseconds(SIGNAL_INTERVAL_US));
+            turbo::fiber_sleep_for(turbo::Duration::microseconds(SIGNAL_INTERVAL_US));
             fiber_cond_signal(&a->c);
         }
         return nullptr;
@@ -89,7 +89,7 @@ namespace turbo::fiber_internal {
         fiber_id_t sth;
         REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&sth, nullptr, signaler, &a));
 
-        turbo::fiber_sleep_for(turbo::microseconds(SIGNAL_INTERVAL_US * 200));
+        turbo::fiber_sleep_for(turbo::Duration::microseconds(SIGNAL_INTERVAL_US * 200));
 
         wake_mutex.lock();
         const size_t nbeforestop = wake_time.size();
@@ -154,7 +154,7 @@ namespace turbo::fiber_internal {
         WrapperArg1 *a = (WrapperArg1 *) void_arg;
         signal_start_time = turbo::get_current_time_micros();
         while (!stop) {
-            turbo::fiber_sleep_for(turbo::microseconds(SIGNAL_INTERVAL_US));
+            turbo::fiber_sleep_for(turbo::Duration::microseconds(SIGNAL_INTERVAL_US));
             turbo::fiber_internal::fiber_cond_signal(&a->cond);
         }
         return nullptr;
@@ -194,7 +194,7 @@ namespace turbo::fiber_internal {
         }
         TLOG_INFO("start 2");
         REQUIRE_EQ(0, pthread_create(&signal_thread, nullptr, cv_signaler1, &a));
-        turbo::fiber_sleep_for(turbo::microseconds(100L * 1000));
+        turbo::fiber_sleep_for(turbo::Duration::microseconds(100L * 1000));
         {
             std::unique_lock l(a.mutex);
             stop = true;
@@ -220,7 +220,7 @@ namespace turbo::fiber_internal {
         WrapperArg *a = (WrapperArg *) void_arg;
         signal_start_time = turbo::get_current_time_micros();
         while (!stop) {
-            turbo::fiber_sleep_for(turbo::microseconds(SIGNAL_INTERVAL_US));
+            turbo::fiber_sleep_for(turbo::Duration::microseconds(SIGNAL_INTERVAL_US));
             a->cond.notify_one();
         }
         return nullptr;
@@ -261,7 +261,7 @@ namespace turbo::fiber_internal {
         }
         TLOG_INFO("start 2");
         REQUIRE_EQ(0, pthread_create(&signal_thread, nullptr, cv_signaler, &a));
-        turbo::fiber_sleep_for(turbo::microseconds(100L * 1000));
+        turbo::fiber_sleep_for(turbo::Duration::microseconds(100L * 1000));
         {
             std::unique_lock l(a.mutex);
             stop = true;
@@ -479,7 +479,7 @@ namespace turbo::fiber_internal {
 
     void *usleep_thread(void *) {
         while (!g_stop) {
-            turbo::fiber_sleep_for(turbo::microseconds(1000L * 1000L));
+            turbo::fiber_sleep_for(turbo::Duration::microseconds(1000L * 1000L));
         }
         return nullptr;
     }

@@ -34,7 +34,7 @@ int main() {
         while (!stop) {
             std::this_thread::yield();
             turbo::Println("{}", tl1.get());
-            turbo::sleep_for(turbo::milliseconds(5));
+            turbo::sleep_for(turbo::Duration::milliseconds(5));
         }
     };
 
@@ -46,13 +46,13 @@ int main() {
     while (i < 5) {
         turbo::Println("{}", tl1.get());
         ++i;
-        turbo::sleep_for(turbo::milliseconds(100));
+        turbo::sleep_for(turbo::Duration::milliseconds(100));
     }
     tl1.merge_global(18);
     while (i < 10) {
         turbo::Println("{}", tl1.get());
         ++i;
-        turbo::sleep_for(turbo::milliseconds(100));
+        turbo::sleep_for(turbo::Duration::milliseconds(100));
     }
     values.clear();
     tl1.list(values);

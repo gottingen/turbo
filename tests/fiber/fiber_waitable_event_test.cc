@@ -46,7 +46,7 @@ namespace turbo::fiber_internal {
     }
 
     void *sleeper(void *arg) {
-        TURBO_UNUSED(turbo::fiber_sleep_for(turbo::microseconds((uint64_t)arg)));
+        TURBO_UNUSED(turbo::fiber_sleep_for(turbo::Duration::microseconds((uint64_t)arg)));
         return nullptr;
     }
 
@@ -230,7 +230,7 @@ namespace turbo::fiber_internal {
         *event = 7;
         turbo::StopWatcher tm;
         const long WAIT_MSEC = 500;
-        turbo::Duration SleepDuration = turbo::milliseconds(10);
+        turbo::Duration SleepDuration = turbo::Duration::milliseconds(10);
         for (int i = 0; i < 2; ++i) {
             const FiberAttribute attr =
                     (i == 0 ? FIBER_ATTR_PTHREAD : FIBER_ATTR_NORMAL);
@@ -286,7 +286,7 @@ namespace turbo::fiber_internal {
 
     TEST_CASE("WaitableEventTest, join_cant_be_wakeup") {
         const long WAIT_MSEC = 100;
-        turbo::Duration WaitDuration = turbo::milliseconds(WAIT_MSEC);
+        turbo::Duration WaitDuration = turbo::Duration::milliseconds(WAIT_MSEC);
         int *event = turbo::fiber_internal::waitable_event_create_checked<int>();
         *event = 7;
         turbo::StopWatcher tm;
@@ -319,7 +319,7 @@ namespace turbo::fiber_internal {
         turbo::StopWatcher tm;
         const long SLEEP_MSEC = 100;
         const long WAIT_MSEC = 10;
-        turbo::Duration WaitDuration = turbo::milliseconds(WAIT_MSEC);
+        turbo::Duration WaitDuration = turbo::Duration::milliseconds(WAIT_MSEC);
 
         for (int i = 0; i < 2; ++i) {
             const FiberAttribute attr =

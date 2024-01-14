@@ -92,12 +92,12 @@ namespace turbo {
      *
      *        Examples:
      *        @code
-     *        constexpr turbo::Duration ten_ns = turbo::nanoseconds(10);
-     *        constexpr turbo::Duration min = turbo::minutes(1);
-     *        constexpr turbo::Duration hour = turbo::hours(1);
+     *        constexpr turbo::Duration ten_ns = turbo::Duration::nanoseconds(10);
+     *        constexpr turbo::Duration min = turbo::Duration::minutes(1);
+     *        constexpr turbo::Duration hour = turbo::Duration::hours(1);
      *        turbo::Duration dur = 60 * min;  // dur == hour
-     *        turbo::Duration half_sec = turbo::milliseconds(500);
-     *        turbo::Duration quarter_sec = 0.25 * turbo::seconds(1);
+     *        turbo::Duration half_sec = turbo::Duration::milliseconds(500);
+     *        turbo::Duration quarter_sec = 0.25 * turbo::Duration::seconds(1);
      *        @endcode
      *
      *        `Duration` values can be easily converted to an integral number of units
@@ -105,11 +105,11 @@ namespace turbo {
      *
      *        Example:
      *        @code
-     *        constexpr turbo::Duration dur = turbo::milliseconds(1500);
-     *        int64_t ns = dur / turbo::nanoseconds(1);   // ns == 1500000000
-     *        int64_t ms = dur / turbo::milliseconds(1);  // ms == 1500
-     *        int64_t sec = dur / turbo::seconds(1);    // sec == 1 (subseconds truncated)
-     *        int64_t min = dur / turbo::minutes(1);    // min == 0
+     *        constexpr turbo::Duration dur = turbo::Duration::milliseconds(1500);
+     *        int64_t ns = dur / turbo::Duration::nanoseconds(1);   // ns == 1500000000
+     *        int64_t ms = dur / turbo::Duration::milliseconds(1);  // ms == 1500
+     *        int64_t sec = dur / turbo::Duration::seconds(1);    // sec == 1 (subseconds truncated)
+     *        int64_t min = dur / turbo::Duration::minutes(1);    // min == 0
      *        @endcode
      *
      *        See the `safe_int_mod()` and `safe_float_mod()` functions below for details on
@@ -254,7 +254,7 @@ namespace turbo {
          *        @see `turbo::safe_int_mod()` for a version that returns the quotient and remainder.
          *        Example:
          *        @code
-         *        double d = turbo::milliseconds(1500).safe_float_mod(turbo::seconds(1));
+         *        double d = turbo::Duration::milliseconds(1500).safe_float_mod(turbo::Duration::seconds(1));
          *        // d == 1.5
          *        @endcode
          * @param den the denominator
@@ -266,8 +266,8 @@ namespace turbo {
          * @brief Truncates a duration (toward zero) to a multiple of a non-zero unit.
          *        Example:
          *        @code
-         *        turbo::Duration d = turbo::nanoseconds(123456789);
-         *        turbo::Duration a = turbo::trunc(d, turbo::microseconds(1));  // 123456us
+         *        turbo::Duration d = turbo::Duration::nanoseconds(123456789);
+         *        turbo::Duration a = turbo::trunc(d, turbo::Duration::microseconds(1));  // 123456us
          *        @endcode
          * @param d
          * @param unit
@@ -281,8 +281,8 @@ namespace turbo {
          *        greater than the duration.
          *        Example:
          *        @code
-         *        turbo::Duration d = turbo::nanoseconds(123456789);
-         *        turbo::Duration b = turbo::floor(d, turbo::microseconds(1));  // 123456us
+         *        turbo::Duration d = turbo::Duration::nanoseconds(123456789);
+         *        turbo::Duration b = turbo::floor(d, turbo::Duration::microseconds(1));  // 123456us
          *        @endcode
          * @param d
          * @param unit
@@ -296,8 +296,8 @@ namespace turbo {
          *        smallest value not less than the duration.
          *        Example:
          *        @code
-         *        turbo::Duration d = turbo::nanoseconds(123456789);
-         *        turbo::Duration c = turbo::ceil(d, turbo::microseconds(1));   // 123457us
+         *        turbo::Duration d = turbo::Duration::nanoseconds(123456789);
+         *        turbo::Duration c = turbo::ceil(d, turbo::Duration::microseconds(1));   // 123457us
          *        @endcode
          * @param d
          * @param unit
@@ -550,8 +550,8 @@ namespace turbo {
      *        division involving zero and infinite durations.
      *        Example:
      *        @code
-     *        constexpr turbo::Duration a = turbo::seconds(std::numeric_limits<int64_t>::max());  // big
-     *        constexpr turbo::Duration b = turbo::nanoseconds(1);       // small
+     *        constexpr turbo::Duration a = turbo::Duration::seconds(std::numeric_limits<int64_t>::max());  // big
+     *        constexpr turbo::Duration b = turbo::Duration::nanoseconds(1);       // small
      *        turbo::Duration rem = a % b;
      *        // rem == turbo::Duration::zero()
      *        // Here, q would overflow int64_t, so rem accounts for the difference.
@@ -567,100 +567,6 @@ namespace turbo {
         return time_internal::safe_int_mod(true, num, den,
                                            rem);  // trunc towards zero
     }
-
-
-    /**
-     * @ingroup turbo_times_duration
-     * @brief Factory overloads for constructing `Duration` values from an integral
-     *        number of the unit indicated by the factory function's name. These
-     *        functions exist for convenience, but they are not as efficient as the
-     *        integral factories, which should be preferred.
-     *        Example:
-     *        @code
-     *        turbo::Duration a = turbo::seconds(60);
-     *        turbo::Duration b = turbo::minutes(1);  // b == a
-     *        auto a = turbo::seconds(1.5);        // OK
-     *        auto b = turbo::milliseconds(1500);  // BETTER
-     *        @endcode
-     * @note no "Days()" factory function exists because "a day" is ambiguous.
-     *          Civil days are not always 24 hours long, and a 24-hour duration often does
-     *          not correspond with a civil day. If a 24-hour duration is needed, use
-     *          `turbo::hours(24)`. If you actually want a civil day, use turbo::CivilDay
-     *          from civil_time.h.
-     * @param n
-     * @return
-     */
-    template<typename T, time_internal::EnableIfIntegral<T> = 0>
-    constexpr Duration nanoseconds(T n) {
-        return time_internal::from_int64(n, std::nano{});
-    }
-
-    template<typename T, time_internal::EnableIfIntegral<T> = 0>
-    constexpr Duration microseconds(T n) {
-        return time_internal::from_int64(n, std::micro{});
-    }
-
-    template<typename T, time_internal::EnableIfIntegral<T> = 0>
-    constexpr Duration milliseconds(T n) {
-        return time_internal::from_int64(n, std::milli{});
-    }
-
-    template<typename T, time_internal::EnableIfIntegral<T> = 0>
-    constexpr Duration seconds(T n) {
-        return time_internal::from_int64(n, std::ratio<1>{});
-    }
-
-    template<typename T, time_internal::EnableIfIntegral<T> = 0>
-    constexpr Duration minutes(T n) {
-        return time_internal::from_int64(n, std::ratio<60>{});
-    }
-
-    template<typename T, time_internal::EnableIfIntegral<T> = 0>
-    constexpr Duration hours(T n) {
-        return time_internal::from_int64(n, std::ratio<3600>{});
-    }
-
-    template<typename T, time_internal::EnableIfFloat<T> = 0>
-    Duration nanoseconds(T n) {
-        return n * nanoseconds(1);
-    }
-
-    template<typename T, time_internal::EnableIfFloat<T> = 0>
-    Duration microseconds(T n) {
-        return n * microseconds(1);
-    }
-
-    template<typename T, time_internal::EnableIfFloat<T> = 0>
-    Duration milliseconds(T n) {
-        return n * milliseconds(1);
-    }
-
-    template<typename T, time_internal::EnableIfFloat<T> = 0>
-    Duration seconds(T n) {
-        if (n >= 0) {  // Note: `NaN >= 0` is false.
-            if (n >= static_cast<T>((std::numeric_limits<int64_t>::max)())) {
-                return Duration::infinite();
-            }
-            return time_internal::make_pos_double_duration(n);
-        } else {
-            if (std::isnan(n))
-                return std::signbit(n) ? -Duration::infinite() : Duration::infinite();
-            if (n <= (std::numeric_limits<int64_t>::min)()) return -Duration::infinite();
-            return -time_internal::make_pos_double_duration(-n);
-        }
-    }
-
-    template<typename T, time_internal::EnableIfFloat<T> = 0>
-    Duration minutes(T n) {
-        return n * minutes(1);
-    }
-
-    template<typename T, time_internal::EnableIfFloat<T> = 0>
-    Duration hours(T n) {
-        return n * hours(1);
-    }
-
-
 
     // Output stream operator.
     inline std::ostream &operator<<(std::ostream &os, Duration d) {

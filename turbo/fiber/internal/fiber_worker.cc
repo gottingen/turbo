@@ -598,7 +598,7 @@ namespace turbo::fiber_internal {
         while (!_remote_rq.push_locked(tid)) {
             flush_nosignal_tasks_remote_locked(_remote_rq._mutex);
             TLOG_ERROR_EVERY_SEC("_remote_rq is full, capacity={}", _remote_rq.capacity());
-            turbo::sleep_for(turbo::milliseconds(1));
+            turbo::sleep_for(turbo::Duration::milliseconds(1));
             _remote_rq._mutex.lock();
         }
         if (nosignal) {

@@ -109,7 +109,7 @@ namespace turbo {
                 info.hashes_bitwise_and.store(1, std::memory_order_relaxed);
                 info.hashes_bitwise_xor.store(1, std::memory_order_relaxed);
                 info.max_reserve.store(1, std::memory_order_relaxed);
-                info.create_time = test_start - turbo::hours(20);
+                info.create_time = test_start - turbo::Duration::hours(20);
 
                 info.PrepareForSampling(test_stride * 2, test_element_size);
                 EXPECT_EQ(info.capacity.load(), 0);
@@ -393,7 +393,7 @@ TEST(HashtablezSamplerTest, MultiThreaded) {
   }
   // The threads will hammer away.  Give it a little bit of time for tsan to
   // spot errors.
-  turbo::sleep_for(turbo::seconds(3));
+  turbo::sleep_for(turbo::Duration::seconds(3));
   stop.Notify();
 }
  */

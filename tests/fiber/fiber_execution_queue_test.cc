@@ -225,7 +225,7 @@ namespace {
                 if (iter->value == -100) {
                     g_suspending = true;
                     while (g_suspending) {
-                        turbo::fiber_sleep_for(turbo::microseconds(100));
+                        turbo::fiber_sleep_for(turbo::Duration::microseconds(100));
                     }
                     g_should_be_urgent = true;
                     if (iter->event) { iter->event->signal(); }

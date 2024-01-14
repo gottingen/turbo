@@ -53,7 +53,7 @@ void BM_Format_FormatTime(benchmark::State& state) {
       turbo::time_internal::load_time_zone("America/Los_Angeles");
   const turbo::Time t =
       turbo::from_civil(turbo::CivilSecond(1977, 6, 28, 9, 8, 7), lax) +
-      turbo::nanoseconds(1);
+      turbo::Duration::nanoseconds(1);
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(turbo::format_time(fmt, t, lax).length());
   }
@@ -66,7 +66,7 @@ void BM_Format_ParseTime(benchmark::State& state) {
   const turbo::TimeZone lax =
       turbo::time_internal::load_time_zone("America/Los_Angeles");
   turbo::Time t = turbo::from_civil(turbo::CivilSecond(1977, 6, 28, 9, 8, 7), lax) +
-                 turbo::nanoseconds(1);
+                 turbo::Duration::nanoseconds(1);
   const std::string when = turbo::format_time(fmt, t, lax);
   std::string err;
   while (state.KeepRunning()) {

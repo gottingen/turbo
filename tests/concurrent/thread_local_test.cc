@@ -33,7 +33,7 @@ TEST_CASE("thread local") {
         while (!stop) {
             std::this_thread::yield();
             CHECK_EQ(*tl, 3);
-            turbo::sleep_for(turbo::milliseconds(1));
+            turbo::sleep_for(turbo::Duration::milliseconds(1));
         }
     };
 
@@ -42,7 +42,7 @@ TEST_CASE("thread local") {
         while (!stop) {
             std::this_thread::yield();
             CHECK_EQ(*tl, 4);
-            turbo::sleep_for(turbo::milliseconds(1));
+            turbo::sleep_for(turbo::Duration::milliseconds(1));
         }
     };
 
@@ -53,7 +53,7 @@ TEST_CASE("thread local") {
     while (i < 100) {
         CHECK_EQ(*tl,  2);
         ++i;
-        turbo::sleep_for(turbo::milliseconds(100));
+        turbo::sleep_for(turbo::Duration::milliseconds(100));
     }
     stop = true;
     t1.join();
@@ -71,7 +71,7 @@ TEST_CASE("linkd_thread_local") {
         while (!stop) {
             std::this_thread::yield();
             CHECK_EQ(tl.get(), 3);
-            turbo::sleep_for(turbo::milliseconds(1));
+            turbo::sleep_for(turbo::Duration::milliseconds(1));
         }
     };
 
@@ -80,13 +80,13 @@ TEST_CASE("linkd_thread_local") {
         while (!stop) {
             std::this_thread::yield();
             CHECK_EQ(tl.get(), 4);
-            turbo::sleep_for(turbo::milliseconds(1));
+            turbo::sleep_for(turbo::Duration::milliseconds(1));
         }
     };
 
     auto t1 = std::thread(t1_func);
     auto t2 = std::thread(t2_func);
-    turbo::sleep_for(turbo::milliseconds(100));
+    turbo::sleep_for(turbo::Duration::milliseconds(100));
     std::vector<int> values;
     tl.list(values);
     turbo::println("values:{}", values);
@@ -94,7 +94,7 @@ TEST_CASE("linkd_thread_local") {
     while (i < 20) {
         CHECK_EQ(tl.get(),  2);
         ++i;
-        turbo::sleep_for(turbo::milliseconds(100));
+        turbo::sleep_for(turbo::Duration::milliseconds(100));
     }
     values.clear();
     tl.list(values);
@@ -108,7 +108,7 @@ TEST_CASE("linkd_thread_local") {
         while (!stop) {
             std::this_thread::yield();
             turbo::Println("{}", tl1.get());
-            turbo::sleep_for(turbo::milliseconds(100));
+            turbo::sleep_for(turbo::Duration::milliseconds(100));
         }
     };
 
@@ -120,13 +120,13 @@ TEST_CASE("linkd_thread_local") {
     while (i < 5) {
         turbo::Println("{}", tl1.get());
         ++i;
-        turbo::sleep_for(turbo::milliseconds(100));
+        turbo::sleep_for(turbo::Duration::milliseconds(100));
     }
     tl1.merge_global(18);
     while (i < 10) {
         turbo::Println("{}", tl1.get());
         ++i;
-        turbo::sleep_for(turbo::milliseconds(100));
+        turbo::sleep_for(turbo::Duration::milliseconds(100));
     }
     values.clear();
     tl1.list(values);

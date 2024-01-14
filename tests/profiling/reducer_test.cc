@@ -35,18 +35,18 @@ TEST_CASE("reducer") {
         while (!stop) {
             adder.add(1);
             adder<<1;
-            turbo::sleep_for(turbo::milliseconds(20));
+            turbo::sleep_for(turbo::Duration::milliseconds(20));
         }
     };
 
     auto t1 = std::thread(thread_func);
     auto t2 = std::thread(thread_func);
 
-    turbo::sleep_for(turbo::seconds(1));
+    turbo::sleep_for(turbo::Duration::seconds(1));
     size_t count = 0;
     turbo::println("counter: {}", adder.describe());
     while (count < 100) {
-        turbo::sleep_for(turbo::milliseconds(50));
+        turbo::sleep_for(turbo::Duration::milliseconds(50));
         turbo::println("{}", adder.dump_prometheus());
         count++;
     }
@@ -79,17 +79,17 @@ TEST_CASE("gauges") {
             gauge<<v;
             max_gauge<<v;
             min_gauge<<v;
-            turbo::sleep_for(turbo::milliseconds(20));
+            turbo::sleep_for(turbo::Duration::milliseconds(20));
         }
     };
 
     auto t1 = std::thread(thread_func);
     auto t2 = std::thread(thread_func);
 
-    turbo::sleep_for(turbo::seconds(1));
+    turbo::sleep_for(turbo::Duration::seconds(1));
     size_t count = 0;
     while (count < 100) {
-        turbo::sleep_for(turbo::milliseconds(50));
+        turbo::sleep_for(turbo::Duration::milliseconds(50));
         turbo::println("{}{}{}", gauge.dump_prometheus(), max_gauge.dump_prometheus(), min_gauge.dump_prometheus());
         count++;
     }
@@ -105,7 +105,7 @@ TEST_CASE("funciotn") {
     gauge.set([]() { return turbo::uniform<uint32_t>(0, 200); });
     int i = 0;
     while (i < 10) {
-        turbo::sleep_for(turbo::milliseconds(50));
+        turbo::sleep_for(turbo::Duration::milliseconds(50));
         turbo::println("{}", gauge.dump_prometheus());
         i++;
     }
@@ -123,7 +123,7 @@ TEST_CASE("histogram") {
     auto func = [&histogram, &stop, &count]() {
         while (!stop) {
             auto s = histogram.scope_latency_double_milliseconds();
-            turbo::sleep_for(turbo::milliseconds(turbo::uniform<uint32_t>(0, 49)));
+            turbo::sleep_for(turbo::Duration::milliseconds(turbo::uniform<uint32_t>(0, 49)));
             ++count;
         }
     };
@@ -133,7 +133,7 @@ TEST_CASE("histogram") {
     int i = 0;
     turbo::PrometheusDumper dumper;
     while (i < 1000) {
-        turbo::sleep_for(turbo::milliseconds(50));
+        turbo::sleep_for(turbo::Duration::milliseconds(50));
         turbo::println("{}\n{}", count.load(), dumper.dump(histogram.get_snapshot()));
         i++;
     }

@@ -48,7 +48,7 @@ public:
         _run_times.push_back(current_time);
         const int saved_sleep_ms = _sleep_ms;
         if (saved_sleep_ms > 0) {
-            _sleep_ms.wait_for(saved_sleep_ms, turbo::milliseconds(saved_sleep_ms));
+            _sleep_ms.wait_for(saved_sleep_ms, turbo::Duration::milliseconds(saved_sleep_ms));
         }
     }
 
@@ -69,7 +69,7 @@ public:
 
     void expect_first_run(turbo::Time expect_run_time) {
         REQUIRE(!_run_times.empty());
-        REQUIRE_LE((_run_times[0] - expect_run_time), turbo::microseconds(50000));
+        REQUIRE_LE((_run_times[0] - expect_run_time), turbo::Duration::microseconds(50000));
     }
 
     void expect_not_run() {

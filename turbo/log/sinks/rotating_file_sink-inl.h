@@ -135,7 +135,7 @@ namespace turbo::tlog {
                     // if failed try again after a small delay.
                     // this is a workaround to a windows issue, where very high rotation
                     // rates can cause the rename to fail with permission denied (because of antivirus?).
-                    turbo::sleep_for(turbo::milliseconds(100));
+                    turbo::sleep_for(turbo::Duration::milliseconds(100));
                     if (!rename_file_(src, target)) {
                         auto r = file_writer_.reopen(
                                 true); // truncate the log file anyway to prevent it to grow beyond its limit!

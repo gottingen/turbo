@@ -204,19 +204,19 @@ namespace turbo {
 
     /// inlined functions
     inline turbo::Status fiber_usleep(uint64_t usec) {
-        return fiber_sleep_for(turbo::microseconds(usec));
+        return fiber_sleep_for(turbo::Duration::microseconds(usec));
     }
 
     inline turbo::Status fiber_msleep(uint64_t msec) {
-        return fiber_sleep_for(turbo::milliseconds(msec));
+        return fiber_sleep_for(turbo::Duration::milliseconds(msec));
     }
 
     inline turbo::Status fiber_nsleep(uint64_t nsec) {
-        return fiber_sleep_for(turbo::nanoseconds(nsec));
+        return fiber_sleep_for(turbo::Duration::nanoseconds(nsec));
     }
 
     inline turbo::Status fiber_sleep(uint64_t sec) {
-        return fiber_sleep_for(turbo::seconds(sec));
+        return fiber_sleep_for(turbo::Duration::seconds(sec));
     }
 }  // namespace turbo
 #endif // TURBO_FIBER_FIBER_H_

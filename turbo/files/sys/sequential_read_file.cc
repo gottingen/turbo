@@ -52,7 +52,7 @@ namespace turbo {
                 return turbo::ok_status();
             }
             if (_option.open_interval > 0) {
-                turbo::sleep_for(turbo::milliseconds(_option.open_interval));
+                turbo::sleep_for(turbo::Duration::milliseconds(_option.open_interval));
             }
         }
         return turbo::make_status(errno, turbo::format("Failed opening file {} for reading", _file_path.c_str()));

@@ -169,11 +169,11 @@ namespace turbo {
     //
 
     turbo::Time from_udate(double udate) {
-        return time_internal::FromUnixDuration(turbo::milliseconds(udate));
+        return time_internal::FromUnixDuration(turbo::Duration::milliseconds(udate));
     }
 
     turbo::Time from_universal(int64_t universal) {
-        return turbo::universal_epoch() + 100 * turbo::nanoseconds(universal);
+        return turbo::universal_epoch() + 100 * turbo::Duration::nanoseconds(universal);
     }
 
     int64_t to_unix_nanos(Time t) {
@@ -183,7 +183,7 @@ namespace turbo {
                     1000 * 1000 * 1000) +
                    (time_internal::GetRepLo(time_internal::ToUnixDuration(t)) / 4);
         }
-        return FloorToUnit(time_internal::ToUnixDuration(t), turbo::nanoseconds(1));
+        return FloorToUnit(time_internal::ToUnixDuration(t), turbo::Duration::nanoseconds(1));
     }
 
     int64_t to_unix_micros(Time t) {
@@ -193,7 +193,7 @@ namespace turbo {
                     1000 * 1000) +
                    (time_internal::GetRepLo(time_internal::ToUnixDuration(t)) / 4000);
         }
-        return FloorToUnit(time_internal::ToUnixDuration(t), turbo::microseconds(1));
+        return FloorToUnit(time_internal::ToUnixDuration(t), turbo::Duration::microseconds(1));
     }
 
     int64_t to_unix_millis(Time t) {
@@ -203,7 +203,7 @@ namespace turbo {
                    (time_internal::GetRepLo(time_internal::ToUnixDuration(t)) /
                     (4000 * 1000));
         }
-        return FloorToUnit(time_internal::ToUnixDuration(t), turbo::milliseconds(1));
+        return FloorToUnit(time_internal::ToUnixDuration(t), turbo::Duration::milliseconds(1));
     }
 
     int64_t to_unix_seconds(Time t) {
@@ -213,11 +213,11 @@ namespace turbo {
     time_t to_time_t(Time t) { return turbo::to_timespec(t).tv_sec; }
 
     double to_udate(Time t) {
-        return time_internal::ToUnixDuration(t).safe_float_mod(turbo::milliseconds(1));
+        return time_internal::ToUnixDuration(t).safe_float_mod(turbo::Duration::milliseconds(1));
     }
 
     int64_t to_universal(turbo::Time t) {
-        return turbo::FloorToUnit(t - turbo::universal_epoch(), turbo::nanoseconds(100));
+        return turbo::FloorToUnit(t - turbo::universal_epoch(), turbo::Duration::nanoseconds(100));
     }
 
     turbo::Time time_from_timespec(timespec ts) {

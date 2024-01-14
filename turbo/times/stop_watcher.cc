@@ -21,7 +21,7 @@ namespace turbo {
     StopWatcher::StopWatcher(const std::string &title, time_print_t time_print)
     : _start(turbo::time_now()), _title(title),
     _time_print(std::move(time_print)),
-    _duration(turbo::nanoseconds(0)) {
+    _duration(turbo::Duration::nanoseconds(0)) {
     }
 
     void StopWatcher::reset() {

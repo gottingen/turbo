@@ -52,7 +52,7 @@ namespace turbo::fiber_internal {
     // If a thread would suspend for less than so many microseconds, return
     // ETIMEDOUT directly.
     // Use 1: sleeping for less than 2 microsecond is inefficient and useless.
-    static const turbo::Duration MIN_SLEEP = turbo::microseconds(2);
+    static const turbo::Duration MIN_SLEEP = turbo::Duration::microseconds(2);
 
 
     enum WaiterState {

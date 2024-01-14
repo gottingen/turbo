@@ -52,8 +52,8 @@ namespace {
         std::string bigger(100000, 'x');
         REQUIRE_EQ(bigger, turbo::format_time(bigger, t, tz));
 
-        t += turbo::hours(13) + turbo::minutes(4) + turbo::seconds(5);
-        t += turbo::milliseconds(6) + turbo::microseconds(7) + turbo::nanoseconds(8);
+        t += turbo::Duration::hours(13) + turbo::Duration::minutes(4) + turbo::Duration::seconds(5);
+        t += turbo::Duration::milliseconds(6) + turbo::Duration::microseconds(7) + turbo::Duration::nanoseconds(8);
         REQUIRE_EQ("1970-01-01", turbo::format_time("%Y-%m-%d", t, tz));
         REQUIRE_EQ("13:04:05", turbo::format_time("%H:%M:%S", t, tz));
         REQUIRE_EQ("13:04:05.006", turbo::format_time("%H:%M:%E3S", t, tz));
@@ -85,12 +85,12 @@ namespace {
         const turbo::TimeZone tz = turbo::utc_time_zone();
 
         // No subseconds.
-        turbo::Time t = turbo::from_time_t(0) + turbo::seconds(5);
+        turbo::Time t = turbo::from_time_t(0) + turbo::Duration::seconds(5);
         REQUIRE_EQ("05", turbo::format_time("%E*S", t, tz));
         REQUIRE_EQ("05.000000000000000", turbo::format_time("%E15S", t, tz));
 
         // With subseconds.
-        t += turbo::milliseconds(6) + turbo::microseconds(7) + turbo::nanoseconds(8);
+        t += turbo::Duration::milliseconds(6) + turbo::Duration::microseconds(7) + turbo::Duration::nanoseconds(8);
         REQUIRE_EQ("05.006007008", turbo::format_time("%E*S", t, tz));
         REQUIRE_EQ("05", turbo::format_time("%E0S", t, tz));
         REQUIRE_EQ("05.006007008000000", turbo::format_time("%E15S", t, tz));
@@ -106,7 +106,7 @@ namespace {
         t = turbo::from_unix_micros(1395024427333304);
         REQUIRE_EQ("2014-03-17 02:47:07.333304",
                   turbo::format_time("%Y-%m-%d %H:%M:%E*S", t, tz));
-        t += turbo::microseconds(1);
+        t += turbo::Duration::microseconds(1);
         REQUIRE_EQ("2014-03-17 02:47:07.333305",
                   turbo::format_time("%Y-%m-%d %H:%M:%E*S", t, tz));
     }
@@ -252,13 +252,13 @@ namespace {
         // parsed, while the second (and any subsecond field >=2^31) failed.
         t = turbo::unix_epoch();
         REQUIRE(turbo::parse_time("%E*S", "0.2147483647", &t, &err)) ;
-        REQUIRE_EQ(turbo::unix_epoch() + turbo::nanoseconds(214748364) +
-                  turbo::nanoseconds(1) / 2,
+        REQUIRE_EQ(turbo::unix_epoch() + turbo::Duration::nanoseconds(214748364) +
+                  turbo::Duration::nanoseconds(1) / 2,
                   t);
         t = turbo::unix_epoch();
         REQUIRE(turbo::parse_time("%E*S", "0.2147483648", &t, &err)) ;
-        REQUIRE_EQ(turbo::unix_epoch() + turbo::nanoseconds(214748364) +
-                  turbo::nanoseconds(3) / 4,
+        REQUIRE_EQ(turbo::unix_epoch() + turbo::Duration::nanoseconds(214748364) +
+                  turbo::Duration::nanoseconds(3) / 4,
                   t);
 
         // We should also be able to specify long strings of digits far
@@ -268,8 +268,8 @@ namespace {
                 "%E*S", "0.214748364801234567890123456789012345678901234567890123456789",
                 &t, &err))
                             ;
-        REQUIRE_EQ(turbo::unix_epoch() + turbo::nanoseconds(214748364) +
-                  turbo::nanoseconds(3) / 4,
+        REQUIRE_EQ(turbo::unix_epoch() + turbo::Duration::nanoseconds(214748364) +
+                  turbo::Duration::nanoseconds(3) / 4,
                   t);
     }
 
@@ -365,7 +365,7 @@ namespace {
                 turbo::time_internal::load_time_zone("America/Los_Angeles");
         const turbo::Time in =
                 turbo::from_civil(turbo::CivilSecond(1977, 6, 28, 9, 8, 7), lax);
-        const turbo::Duration subseconds = turbo::nanoseconds(654321);
+        const turbo::Duration subseconds = turbo::Duration::nanoseconds(654321);
         std::string err;
 
         // RFC3339, which renders subseconds.

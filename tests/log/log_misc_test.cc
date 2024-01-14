@@ -148,7 +148,7 @@ TEST_CASE("clone async [clone]")
     logger->info("Some message 1");
     cloned->info("Some message 2");
 
-    turbo::sleep_for(turbo::milliseconds(100));
+    turbo::sleep_for(turbo::Duration::milliseconds(100));
 
     REQUIRE(test_sink->lines().size() == 2);
     REQUIRE(test_sink->lines()[0] == "Some message 1");

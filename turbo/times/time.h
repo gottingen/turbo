@@ -101,8 +101,8 @@ namespace turbo {
      *        Examples:
      *        @code
      *        turbo::Time t1 = ...;
-     *        turbo::Time t2 = t1 + turbo::minutes(2);
-     *        turbo::Duration d = t2 - t1;  // == turbo::minutes(2)
+     *        turbo::Time t2 = t1 + turbo::Duration::minutes(2);
+     *        turbo::Duration d = t2 - t1;  // == turbo::Duration::minutes(2)
      *        @endcode
      */
     class Time {
@@ -1105,23 +1105,23 @@ namespace turbo {
     }  // namespace time_internal
 
     constexpr Time from_unix_nanos(int64_t ns) {
-        return time_internal::FromUnixDuration(nanoseconds(ns));
+        return time_internal::FromUnixDuration(Duration::nanoseconds(ns));
     }
 
     constexpr Time from_unix_micros(int64_t us) {
-        return time_internal::FromUnixDuration(microseconds(us));
+        return time_internal::FromUnixDuration(Duration::microseconds(us));
     }
 
     constexpr Time from_unix_millis(int64_t ms) {
-        return time_internal::FromUnixDuration(milliseconds(ms));
+        return time_internal::FromUnixDuration(Duration::milliseconds(ms));
     }
 
     constexpr Time from_unix_seconds(int64_t s) {
-        return time_internal::FromUnixDuration(seconds(s));
+        return time_internal::FromUnixDuration(Duration::seconds(s));
     }
 
     constexpr Time from_time_t(time_t t) {
-        return time_internal::FromUnixDuration(seconds(t));
+        return time_internal::FromUnixDuration(Duration::seconds(t));
     }
 
 }  // namespace turbo

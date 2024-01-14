@@ -119,7 +119,7 @@ namespace turbo::fiber_internal {
     }
 
     void *epoll_thread(void *arg) {
-        turbo::fiber_sleep_for(turbo::microseconds(1));
+        turbo::fiber_sleep_for(turbo::Duration::microseconds(1));
         EpollMeta *m = (EpollMeta *) arg;
         const int epfd = m->epfd;
 #if defined(TURBO_PLATFORM_LINUX)
@@ -435,10 +435,10 @@ namespace turbo::fiber_internal {
         pthread_t th, th2;
         REQUIRE_EQ(0, pthread_create(&th, nullptr, epoll_waiter, (void *) (intptr_t) epfd));
         REQUIRE_EQ(0, pthread_create(&th2, nullptr, epoll_waiter, (void *) (intptr_t) epfd));
-        turbo::fiber_sleep_for(turbo::microseconds(100000L));
+        turbo::fiber_sleep_for(turbo::Duration::microseconds(100000L));
         std::cout << "wake up " << th << std::endl;
         turbo::PlatformThread::kill_thread(th);
-        turbo::fiber_sleep_for(turbo::microseconds(100000L));
+        turbo::fiber_sleep_for(turbo::Duration::microseconds(100000L));
         std::cout << "wake up " << th2 << std::endl;
         turbo::PlatformThread::kill_thread(th2);
         pthread_join(th, nullptr);
@@ -446,7 +446,7 @@ namespace turbo::fiber_internal {
     }
 
     void *close_the_fd(void *arg) {
-        turbo::fiber_sleep_for(turbo::milliseconds(10));
+        turbo::fiber_sleep_for(turbo::Duration::milliseconds(10));
         REQUIRE(turbo::fiber_fd_close(*(int *) arg).ok());
         return nullptr;
     }

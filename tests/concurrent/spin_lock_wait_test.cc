@@ -42,7 +42,7 @@ namespace plain_test {
                     while ((x = m->fetch_sub(1)) > 0) {
                         ++njob;
                         const auto start = turbo::time_now();
-                        while (turbo::time_now() < start + turbo::microseconds(10)) {
+                        while (turbo::time_now() < start + turbo::Duration::microseconds(10)) {
                         }
                         if (stop) {
                             return new int(njob);
@@ -83,7 +83,7 @@ namespace plain_test {
         }
         const auto t2 = turbo::time_now();
 
-        turbo::sleep_for(turbo::seconds(3));
+        turbo::sleep_for(turbo::Duration::seconds(3));
         stop = true;
         for (int i = 0; i < 10; ++i) {
             turbo::concurrent_internal::futex_wake_private(&lock1, INT_MAX);
@@ -149,7 +149,7 @@ namespace plain_test {
     std::atomic<int> nevent(0);
 
     void* waker(void* lock) {
-        turbo::sleep_for(turbo::microseconds(10000));
+        turbo::sleep_for(turbo::Duration::microseconds(10000));
         const size_t REP = 100000;
         int nwakeup = 0;
         turbo::StopWatcher tm;
@@ -164,7 +164,7 @@ namespace plain_test {
     }
 
     void* batch_waker(void* lock) {
-        turbo::sleep_for(turbo::microseconds(10000));
+        turbo::sleep_for(turbo::Duration::microseconds(10000));
         const size_t REP = 100000;
         int nwakeup = 0;
         turbo::StopWatcher tm;
@@ -223,7 +223,7 @@ namespace spin_waiter_test {
                     while ((x = m->fetch_sub(1)) > 0) {
                         ++njob;
                         const auto start = turbo::time_now();
-                        while (turbo::time_now() < start + turbo::microseconds(10)) {
+                        while (turbo::time_now() < start + turbo::Duration::microseconds(10)) {
                         }
                         if (stop_waiter) {
                             return new int(njob);
@@ -264,7 +264,7 @@ namespace spin_waiter_test {
         }
         const auto t2 = turbo::time_now();
 
-        turbo::sleep_for(turbo::seconds(3));
+        turbo::sleep_for(turbo::Duration::seconds(3));
         stop_waiter = true;
         for (int i = 0; i < 10; ++i) {
             lock1.wake_all();
@@ -287,7 +287,7 @@ namespace spin_waiter_test {
     TEST_CASE("FutexTest, futex_wake_before_wait") {
         turbo::SpinWaiter lock1;
         lock1.wake_all();
-        auto rs = lock1.wait_for(0, turbo::seconds(1));
+        auto rs = lock1.wait_for(0, turbo::Duration::seconds(1));
         REQUIRE(turbo::is_deadline_exceeded(rs));
     }
 
@@ -330,7 +330,7 @@ namespace spin_waiter_test {
     std::atomic<int> nevent(0);
 
     void* waker(void* lock_ptr) {
-        turbo::sleep_for(turbo::microseconds(10000));
+        turbo::sleep_for(turbo::Duration::microseconds(10000));
         auto lock = (turbo::SpinWaiter*)lock_ptr;
         const size_t REP = 100000;
         int nwakeup = 0;
@@ -346,7 +346,7 @@ namespace spin_waiter_test {
     }
 
     void* batch_waker(void* lock_ptr) {
-        turbo::sleep_for(turbo::microseconds(10000));
+        turbo::sleep_for(turbo::Duration::microseconds(10000));
         auto lock = (turbo::SpinWaiter*)lock_ptr;
         const size_t REP = 100000;
         int nwakeup = 0;

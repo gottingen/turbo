@@ -178,7 +178,7 @@ namespace turbo {
                 break;
             }
             TDLOG_CHECK(false, "Fail to create task_node_t, {}", terror(errno));
-            TURBO_UNUSED(turbo::fiber_sleep_for(turbo::milliseconds(1)));
+            TURBO_UNUSED(turbo::fiber_sleep_for(turbo::Duration::milliseconds(1)));
         }
     }
 

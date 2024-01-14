@@ -45,7 +45,7 @@ namespace turbo::fiber_internal {
         TURBO_UNUSED(fiber_mutex_lock(m));
         turbo::println("{} I'm here, {}, {}ms",
                        turbo::thread_numeric_id(), ++c, (turbo::time_now() - start_time).to_milliseconds());
-        turbo::fiber_sleep_for(turbo::microseconds(10000));
+        turbo::fiber_sleep_for(turbo::Duration::microseconds(10000));
         fiber_mutex_unlock(m);
         return nullptr;
     }
@@ -165,7 +165,7 @@ namespace turbo::fiber_internal {
             if (g_started) {
                 break;
             }
-            turbo::fiber_sleep_for(turbo::microseconds(1000));
+            turbo::fiber_sleep_for(turbo::Duration::microseconds(1000));
         }
         t.reset();
         while (!g_stopped) {
@@ -246,7 +246,7 @@ namespace turbo::fiber_internal {
         turbo::FiberMutex *m = (turbo::FiberMutex *) arg;
         while (!g_stopped) {
             std::unique_lock l(*m);
-            turbo::fiber_sleep_for(turbo::microseconds(20));
+            turbo::fiber_sleep_for(turbo::Duration::microseconds(20));
         }
         return nullptr;
     }
@@ -270,7 +270,7 @@ namespace turbo::fiber_internal {
             const FiberAttribute *attr = i % 2 ? nullptr : &FIBER_ATTR_PTHREAD;
             REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&fibers[i], attr, loop_until_stopped, &m));
         }
-        turbo::fiber_sleep_for(turbo::microseconds(1000L * 1000));
+        turbo::fiber_sleep_for(turbo::Duration::microseconds(1000L * 1000));
         g_stopped = true;
         for (int i = 0; i < M; ++i) {
             TURBO_UNUSED(fiber_join(fibers[i], nullptr));

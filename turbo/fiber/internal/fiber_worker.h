@@ -346,7 +346,7 @@ namespace turbo::fiber_internal {
             // A better solution is to pop and run existing fibers, however which
             // make set_remained()-callbacks do context switches and need extensive
             // reviews on related code.
-            turbo::sleep_for(turbo::milliseconds(1));
+            turbo::sleep_for(turbo::Duration::milliseconds(1));
         }
     }
 

@@ -98,24 +98,24 @@ namespace {
         REQUIRE_EQ(turbo::Weekday::wednesday, turbo::get_weekday(ci.cs));
 
         // Just before the epoch.
-        t -= turbo::nanoseconds(1);
+        t -= turbo::Duration::nanoseconds(1);
         ci = tz.at(t);
         REQUIRE_CIVIL_INFO(ci, 1969, 12, 31, 18, 59, 59, -18000, false);
-        REQUIRE_EQ(turbo::nanoseconds(999999999), ci.subsecond);
+        REQUIRE_EQ(turbo::Duration::nanoseconds(999999999), ci.subsecond);
         REQUIRE_EQ(turbo::Weekday::wednesday, turbo::get_weekday(ci.cs));
 
         // Some time later.
-        t += turbo::hours(24) * 2735;
-        t += turbo::hours(18) + turbo::minutes(30) + turbo::seconds(15) +
-             turbo::nanoseconds(9);
+        t += turbo::Duration::hours(24) * 2735;
+        t += turbo::Duration::hours(18) + turbo::Duration::minutes(30) + turbo::Duration::seconds(15) +
+             turbo::Duration::nanoseconds(9);
         ci = tz.at(t);
         REQUIRE_CIVIL_INFO(ci, 1977, 6, 28, 14, 30, 15, -14400, true);
-        REQUIRE_EQ(8, ci.subsecond / turbo::nanoseconds(1));
+        REQUIRE_EQ(8, ci.subsecond / turbo::Duration::nanoseconds(1));
         REQUIRE_EQ(turbo::Weekday::tuesday, turbo::get_weekday(ci.cs));
     }
 
     TEST_CASE("Time, AdditiveOperators") {
-        const turbo::Duration d = turbo::nanoseconds(1);
+        const turbo::Duration d = turbo::Duration::nanoseconds(1);
         const turbo::Time t0;
         const turbo::Time t1 = t0 + d;
 
@@ -133,13 +133,13 @@ namespace {
 
         // Tests overflow between subseconds and seconds.
         t = turbo::unix_epoch();
-        t += turbo::milliseconds(500);
-        REQUIRE_EQ(turbo::unix_epoch() + turbo::milliseconds(500), t);
-        t += turbo::milliseconds(600);
-        REQUIRE_EQ(turbo::unix_epoch() + turbo::milliseconds(1100), t);
-        t -= turbo::milliseconds(600);
-        REQUIRE_EQ(turbo::unix_epoch() + turbo::milliseconds(500), t);
-        t -= turbo::milliseconds(500);
+        t += turbo::Duration::milliseconds(500);
+        REQUIRE_EQ(turbo::unix_epoch() + turbo::Duration::milliseconds(500), t);
+        t += turbo::Duration::milliseconds(600);
+        REQUIRE_EQ(turbo::unix_epoch() + turbo::Duration::milliseconds(1100), t);
+        t -= turbo::Duration::milliseconds(600);
+        REQUIRE_EQ(turbo::unix_epoch() + turbo::Duration::milliseconds(500), t);
+        t -= turbo::Duration::milliseconds(500);
         REQUIRE_EQ(turbo::unix_epoch(), t);
     }
 
@@ -186,10 +186,10 @@ namespace {
         static_assert(ifuture > ipast, "");
 
         // Arithmetic saturates
-        REQUIRE_EQ(ifuture, ifuture + turbo::seconds(1));
-        REQUIRE_EQ(ifuture, ifuture - turbo::seconds(1));
-        REQUIRE_EQ(ipast, ipast + turbo::seconds(1));
-        REQUIRE_EQ(ipast, ipast - turbo::seconds(1));
+        REQUIRE_EQ(ifuture, ifuture + turbo::Duration::seconds(1));
+        REQUIRE_EQ(ifuture, ifuture - turbo::Duration::seconds(1));
+        REQUIRE_EQ(ipast, ipast + turbo::Duration::seconds(1));
+        REQUIRE_EQ(ipast, ipast - turbo::Duration::seconds(1));
 
         REQUIRE_EQ(turbo::Duration::infinite(), ifuture - ifuture);
         REQUIRE_EQ(turbo::Duration::infinite(), ifuture - ipast);
@@ -224,49 +224,49 @@ namespace {
 #undef TEST_FLOOR_CONVERSION
 
         // Tests to_unix_nanos.
-        REQUIRE_EQ(1, turbo::to_unix_nanos(turbo::unix_epoch() + turbo::nanoseconds(3) / 2));
-        REQUIRE_EQ(1, turbo::to_unix_nanos(turbo::unix_epoch() + turbo::nanoseconds(1)));
-        REQUIRE_EQ(0, turbo::to_unix_nanos(turbo::unix_epoch() + turbo::nanoseconds(1) / 2));
-        REQUIRE_EQ(0, turbo::to_unix_nanos(turbo::unix_epoch() + turbo::nanoseconds(0)));
+        REQUIRE_EQ(1, turbo::to_unix_nanos(turbo::unix_epoch() + turbo::Duration::nanoseconds(3) / 2));
+        REQUIRE_EQ(1, turbo::to_unix_nanos(turbo::unix_epoch() + turbo::Duration::nanoseconds(1)));
+        REQUIRE_EQ(0, turbo::to_unix_nanos(turbo::unix_epoch() + turbo::Duration::nanoseconds(1) / 2));
+        REQUIRE_EQ(0, turbo::to_unix_nanos(turbo::unix_epoch() + turbo::Duration::nanoseconds(0)));
         REQUIRE_EQ(-1,
-                  turbo::to_unix_nanos(turbo::unix_epoch() - turbo::nanoseconds(1) / 2));
-        REQUIRE_EQ(-1, turbo::to_unix_nanos(turbo::unix_epoch() - turbo::nanoseconds(1)));
+                  turbo::to_unix_nanos(turbo::unix_epoch() - turbo::Duration::nanoseconds(1) / 2));
+        REQUIRE_EQ(-1, turbo::to_unix_nanos(turbo::unix_epoch() - turbo::Duration::nanoseconds(1)));
         REQUIRE_EQ(-2,
-                  turbo::to_unix_nanos(turbo::unix_epoch() - turbo::nanoseconds(3) / 2));
+                  turbo::to_unix_nanos(turbo::unix_epoch() - turbo::Duration::nanoseconds(3) / 2));
 
         // Tests to_universal, which uses a different epoch than the tests above.
         REQUIRE_EQ(1,
-                  turbo::to_universal(turbo::universal_epoch() + turbo::nanoseconds(101)));
+                  turbo::to_universal(turbo::universal_epoch() + turbo::Duration::nanoseconds(101)));
         REQUIRE_EQ(1,
-                  turbo::to_universal(turbo::universal_epoch() + turbo::nanoseconds(100)));
+                  turbo::to_universal(turbo::universal_epoch() + turbo::Duration::nanoseconds(100)));
         REQUIRE_EQ(0,
-                  turbo::to_universal(turbo::universal_epoch() + turbo::nanoseconds(99)));
+                  turbo::to_universal(turbo::universal_epoch() + turbo::Duration::nanoseconds(99)));
         REQUIRE_EQ(0,
-                  turbo::to_universal(turbo::universal_epoch() + turbo::nanoseconds(1)));
+                  turbo::to_universal(turbo::universal_epoch() + turbo::Duration::nanoseconds(1)));
         REQUIRE_EQ(0,
-                  turbo::to_universal(turbo::universal_epoch() + turbo::nanoseconds(0)));
+                  turbo::to_universal(turbo::universal_epoch() + turbo::Duration::nanoseconds(0)));
         REQUIRE_EQ(-1,
-                  turbo::to_universal(turbo::universal_epoch() + turbo::nanoseconds(-1)));
+                  turbo::to_universal(turbo::universal_epoch() + turbo::Duration::nanoseconds(-1)));
         REQUIRE_EQ(-1,
-                  turbo::to_universal(turbo::universal_epoch() + turbo::nanoseconds(-99)));
+                  turbo::to_universal(turbo::universal_epoch() + turbo::Duration::nanoseconds(-99)));
         REQUIRE_EQ(
-                -1, turbo::to_universal(turbo::universal_epoch() + turbo::nanoseconds(-100)));
+                -1, turbo::to_universal(turbo::universal_epoch() + turbo::Duration::nanoseconds(-100)));
         REQUIRE_EQ(
-                -2, turbo::to_universal(turbo::universal_epoch() + turbo::nanoseconds(-101)));
+                -2, turbo::to_universal(turbo::universal_epoch() + turbo::Duration::nanoseconds(-101)));
 
         const struct {
             timespec ts;
             turbo::Time t;
         } from_ts[] = {
-                {{1,  1},         turbo::from_unix_seconds(1) + turbo::nanoseconds(1)},
-                {{1,  0},         turbo::from_unix_seconds(1) + turbo::nanoseconds(0)},
-                {{0,  0},         turbo::from_unix_seconds(0) + turbo::nanoseconds(0)},
-                {{0,  -1},        turbo::from_unix_seconds(0) - turbo::nanoseconds(1)},
-                {{-1, 999999999}, turbo::from_unix_seconds(0) - turbo::nanoseconds(1)},
-                {{-1, 1},         turbo::from_unix_seconds(-1) + turbo::nanoseconds(1)},
-                {{-1, 0},         turbo::from_unix_seconds(-1) + turbo::nanoseconds(0)},
-                {{-1, -1},        turbo::from_unix_seconds(-1) - turbo::nanoseconds(1)},
-                {{-2, 999999999}, turbo::from_unix_seconds(-1) - turbo::nanoseconds(1)},
+                {{1,  1},         turbo::from_unix_seconds(1) + turbo::Duration::nanoseconds(1)},
+                {{1,  0},         turbo::from_unix_seconds(1) + turbo::Duration::nanoseconds(0)},
+                {{0,  0},         turbo::from_unix_seconds(0) + turbo::Duration::nanoseconds(0)},
+                {{0,  -1},        turbo::from_unix_seconds(0) - turbo::Duration::nanoseconds(1)},
+                {{-1, 999999999}, turbo::from_unix_seconds(0) - turbo::Duration::nanoseconds(1)},
+                {{-1, 1},         turbo::from_unix_seconds(-1) + turbo::Duration::nanoseconds(1)},
+                {{-1, 0},         turbo::from_unix_seconds(-1) + turbo::Duration::nanoseconds(0)},
+                {{-1, -1},        turbo::from_unix_seconds(-1) - turbo::Duration::nanoseconds(1)},
+                {{-2, 999999999}, turbo::from_unix_seconds(-1) - turbo::Duration::nanoseconds(1)},
         };
         for (const auto &test: from_ts) {
             REQUIRE_EQ(test.t, turbo::time_from_timespec(test.ts));
@@ -276,15 +276,15 @@ namespace {
             timeval tv;
             turbo::Time t;
         } from_tv[] = {
-                {{1,  1},      turbo::from_unix_seconds(1) + turbo::microseconds(1)},
-                {{1,  0},      turbo::from_unix_seconds(1) + turbo::microseconds(0)},
-                {{0,  0},      turbo::from_unix_seconds(0) + turbo::microseconds(0)},
-                {{0,  -1},     turbo::from_unix_seconds(0) - turbo::microseconds(1)},
-                {{-1, 999999}, turbo::from_unix_seconds(0) - turbo::microseconds(1)},
-                {{-1, 1},      turbo::from_unix_seconds(-1) + turbo::microseconds(1)},
-                {{-1, 0},      turbo::from_unix_seconds(-1) + turbo::microseconds(0)},
-                {{-1, -1},     turbo::from_unix_seconds(-1) - turbo::microseconds(1)},
-                {{-2, 999999}, turbo::from_unix_seconds(-1) - turbo::microseconds(1)},
+                {{1,  1},      turbo::from_unix_seconds(1) + turbo::Duration::microseconds(1)},
+                {{1,  0},      turbo::from_unix_seconds(1) + turbo::Duration::microseconds(0)},
+                {{0,  0},      turbo::from_unix_seconds(0) + turbo::Duration::microseconds(0)},
+                {{0,  -1},     turbo::from_unix_seconds(0) - turbo::Duration::microseconds(1)},
+                {{-1, 999999}, turbo::from_unix_seconds(0) - turbo::Duration::microseconds(1)},
+                {{-1, 1},      turbo::from_unix_seconds(-1) + turbo::Duration::microseconds(1)},
+                {{-1, 0},      turbo::from_unix_seconds(-1) + turbo::Duration::microseconds(0)},
+                {{-1, -1},     turbo::from_unix_seconds(-1) - turbo::Duration::microseconds(1)},
+                {{-2, 999999}, turbo::from_unix_seconds(-1) - turbo::Duration::microseconds(1)},
         };
         for (const auto &test: from_tv) {
             REQUIRE_EQ(test.t, turbo::time_from_timeval(test.tv));
@@ -295,20 +295,20 @@ namespace {
         REQUIRE_EQ(min_plus_1, turbo::to_unix_seconds(turbo::from_unix_seconds(min_plus_1)));
         REQUIRE_EQ(std::numeric_limits<int64_t>::min(),
                   turbo::to_unix_seconds(turbo::from_unix_seconds(min_plus_1) -
-                                       turbo::nanoseconds(1) / 2));
+                                       turbo::Duration::nanoseconds(1) / 2));
 
         // Tests flooring near positive infinity.
         REQUIRE_EQ(std::numeric_limits<int64_t>::max(),
                   turbo::to_unix_seconds(
                           turbo::from_unix_seconds(std::numeric_limits<int64_t>::max()) +
-                          turbo::nanoseconds(1) / 2));
+                          turbo::Duration::nanoseconds(1) / 2));
         REQUIRE_EQ(std::numeric_limits<int64_t>::max(),
                   turbo::to_unix_seconds(
                           turbo::from_unix_seconds(std::numeric_limits<int64_t>::max())));
         REQUIRE_EQ(std::numeric_limits<int64_t>::max() - 1,
                   turbo::to_unix_seconds(
                           turbo::from_unix_seconds(std::numeric_limits<int64_t>::max()) -
-                          turbo::nanoseconds(1) / 2));
+                          turbo::Duration::nanoseconds(1) / 2));
     }
 
     template<typename Duration>
@@ -366,7 +366,7 @@ namespace {
                   turbo::to_chrono_time(turbo::from_unix_millis(1)));
 
         // Time before the Unix epoch should floor, not trunc.
-        const auto tick = turbo::nanoseconds(1) / 4;
+        const auto tick = turbo::Duration::nanoseconds(1) / 4;
         REQUIRE_EQ(std::chrono::system_clock::from_time_t(0) -
                   std::chrono::system_clock::duration(1),
                   turbo::to_chrono_time(turbo::unix_epoch() - tick));
@@ -521,7 +521,7 @@ namespace {
                 turbo::from_civil(turbo::CivilSecond(2014, 1, 2, 3, 4, 5), utc);
         const turbo::Time end =
                 turbo::from_civil(turbo::CivilSecond(2014, 1, 5, 3, 4, 5), utc);
-        for (turbo::Time t = start; t < end; t += turbo::seconds(30)) {
+        for (turbo::Time t = start; t < end; t += turbo::Duration::seconds(30)) {
             const struct tm tm_bt = to_tm(t, utc);
             const time_t tt = turbo::to_time_t(t);
             struct tm tm_lc;
@@ -668,7 +668,7 @@ namespace {
         // Test round-tripping across a skipped transition
         turbo::Time start = turbo::from_civil(turbo::CivilHour(2014, 3, 9, 0), nyc);
         turbo::Time end = turbo::from_civil(turbo::CivilHour(2014, 3, 9, 4), nyc);
-        for (turbo::Time t = start; t < end; t += turbo::minutes(1)) {
+        for (turbo::Time t = start; t < end; t += turbo::Duration::minutes(1)) {
             struct tm tm = to_tm(t, nyc);
             turbo::Time rt = from_tm(tm, nyc);
             REQUIRE_EQ(rt, t);
@@ -677,7 +677,7 @@ namespace {
         // Test round-tripping across an ambiguous transition
         start = turbo::from_civil(turbo::CivilHour(2014, 11, 2, 0), nyc);
         end = turbo::from_civil(turbo::CivilHour(2014, 11, 2, 4), nyc);
-        for (turbo::Time t = start; t < end; t += turbo::minutes(1)) {
+        for (turbo::Time t = start; t < end; t += turbo::Duration::minutes(1)) {
             struct tm tm = to_tm(t, nyc);
             turbo::Time rt = from_tm(tm, nyc);
             REQUIRE_EQ(rt, t);
@@ -686,7 +686,7 @@ namespace {
         // Test round-tripping of unique instants crossing a day boundary
         start = turbo::from_civil(turbo::CivilHour(2014, 6, 27, 22), nyc);
         end = turbo::from_civil(turbo::CivilHour(2014, 6, 28, 4), nyc);
-        for (turbo::Time t = start; t < end; t += turbo::minutes(1)) {
+        for (turbo::Time t = start; t < end; t += turbo::Duration::minutes(1)) {
             struct tm tm = to_tm(t, nyc);
             turbo::Time rt = from_tm(tm, nyc);
             REQUIRE_EQ(rt, t);
@@ -695,17 +695,17 @@ namespace {
 
     TEST_CASE("Time, Range") {
         // The API's documented range is +/- 100 billion years.
-        const turbo::Duration range = turbo::hours(24) * 365.2425 * 100000000000;
+        const turbo::Duration range = turbo::Duration::hours(24) * 365.2425 * 100000000000;
 
         // Arithmetic and comparison still works at +/-range around base values.
         turbo::Time bases[2] = {turbo::unix_epoch(), turbo::time_now()};
         for (const auto base: bases) {
             turbo::Time bottom = base - range;
-            REQUIRE_GT(bottom, bottom - turbo::nanoseconds(1));
-            REQUIRE_LT(bottom, bottom + turbo::nanoseconds(1));
+            REQUIRE_GT(bottom, bottom - turbo::Duration::nanoseconds(1));
+            REQUIRE_LT(bottom, bottom + turbo::Duration::nanoseconds(1));
             turbo::Time top = base + range;
-            REQUIRE_GT(top, top - turbo::nanoseconds(1));
-            REQUIRE_LT(top, top + turbo::nanoseconds(1));
+            REQUIRE_GT(top, top - turbo::Duration::nanoseconds(1));
+            REQUIRE_LT(top, top + turbo::Duration::nanoseconds(1));
             turbo::Duration full_range = 2 * range;
             REQUIRE_EQ(full_range, top - bottom);
             REQUIRE_EQ(-full_range, bottom - top);
@@ -717,10 +717,10 @@ namespace {
         // and that the resolution of a Duration is 1/4 of a nanosecond.
         const turbo::Time zero;
         const turbo::Time max =
-                zero + turbo::seconds(std::numeric_limits<int64_t>::max()) +
-                turbo::nanoseconds(999999999) + turbo::nanoseconds(3) / 4;
+                zero + turbo::Duration::seconds(std::numeric_limits<int64_t>::max()) +
+                turbo::Duration::nanoseconds(999999999) + turbo::Duration::nanoseconds(3) / 4;
         const turbo::Time min =
-                zero + turbo::seconds(std::numeric_limits<int64_t>::min());
+                zero + turbo::Duration::seconds(std::numeric_limits<int64_t>::min());
 
         // Some simple max/min bounds checks.
         REQUIRE_LT(max, turbo::infinite_future());
@@ -733,11 +733,11 @@ namespace {
         // Check sign of Time differences.
         REQUIRE_LT(turbo::Duration::zero(), max - zero);
         REQUIRE_LT(turbo::Duration::zero(),
-                  zero - turbo::nanoseconds(1) / 4 - min);  // avoid zero - min
+                  zero - turbo::Duration::nanoseconds(1) / 4 - min);  // avoid zero - min
 
         // Arithmetic works at max - 0.25ns and min + 0.25ns.
-        REQUIRE_GT(max, max - turbo::nanoseconds(1) / 4);
-        REQUIRE_LT(min, min + turbo::nanoseconds(1) / 4);
+        REQUIRE_GT(max, max - turbo::Duration::nanoseconds(1) / 4);
+        REQUIRE_LT(min, min + turbo::Duration::nanoseconds(1) / 4);
     }
 
     TEST_CASE("Time, ConversionSaturation") {
@@ -750,10 +750,10 @@ namespace {
         t = turbo::from_time_t(tt);
         tt = turbo::to_time_t(t);
         REQUIRE_EQ(max_time_t - 1, tt);
-        t += turbo::seconds(1);
+        t += turbo::Duration::seconds(1);
         tt = turbo::to_time_t(t);
         REQUIRE_EQ(max_time_t, tt);
-        t += turbo::seconds(1);  // no effect
+        t += turbo::Duration::seconds(1);  // no effect
         tt = turbo::to_time_t(t);
         REQUIRE_EQ(max_time_t, tt);
 
@@ -761,10 +761,10 @@ namespace {
         t = turbo::from_time_t(tt);
         tt = turbo::to_time_t(t);
         REQUIRE_EQ(min_time_t + 1, tt);
-        t -= turbo::seconds(1);
+        t -= turbo::Duration::seconds(1);
         tt = turbo::to_time_t(t);
         REQUIRE_EQ(min_time_t, tt);
-        t -= turbo::seconds(1);  // no effect
+        t -= turbo::Duration::seconds(1);  // no effect
         tt = turbo::to_time_t(t);
         REQUIRE_EQ(min_time_t, tt);
 
@@ -779,11 +779,11 @@ namespace {
         tv = to_timeval(t);
         REQUIRE_EQ(max_timeval_sec, tv.tv_sec);
         REQUIRE_EQ(999998, tv.tv_usec);
-        t += turbo::microseconds(1);
+        t += turbo::Duration::microseconds(1);
         tv = to_timeval(t);
         REQUIRE_EQ(max_timeval_sec, tv.tv_sec);
         REQUIRE_EQ(999999, tv.tv_usec);
-        t += turbo::microseconds(1);  // no effect
+        t += turbo::Duration::microseconds(1);  // no effect
         tv = to_timeval(t);
         REQUIRE_EQ(max_timeval_sec, tv.tv_sec);
         REQUIRE_EQ(999999, tv.tv_usec);
@@ -794,11 +794,11 @@ namespace {
         tv = to_timeval(t);
         REQUIRE_EQ(min_timeval_sec, tv.tv_sec);
         REQUIRE_EQ(1, tv.tv_usec);
-        t -= turbo::microseconds(1);
+        t -= turbo::Duration::microseconds(1);
         tv = to_timeval(t);
         REQUIRE_EQ(min_timeval_sec, tv.tv_sec);
         REQUIRE_EQ(0, tv.tv_usec);
-        t -= turbo::microseconds(1);  // no effect
+        t -= turbo::Duration::microseconds(1);  // no effect
         tv = to_timeval(t);
         REQUIRE_EQ(min_timeval_sec, tv.tv_sec);
         REQUIRE_EQ(0, tv.tv_usec);
@@ -814,11 +814,11 @@ namespace {
         ts = turbo::to_timespec(t);
         REQUIRE_EQ(max_timespec_sec, ts.tv_sec);
         REQUIRE_EQ(999999998, ts.tv_nsec);
-        t += turbo::nanoseconds(1);
+        t += turbo::Duration::nanoseconds(1);
         ts = turbo::to_timespec(t);
         REQUIRE_EQ(max_timespec_sec, ts.tv_sec);
         REQUIRE_EQ(999999999, ts.tv_nsec);
-        t += turbo::nanoseconds(1);  // no effect
+        t += turbo::Duration::nanoseconds(1);  // no effect
         ts = turbo::to_timespec(t);
         REQUIRE_EQ(max_timespec_sec, ts.tv_sec);
         REQUIRE_EQ(999999999, ts.tv_nsec);
@@ -829,11 +829,11 @@ namespace {
         ts = turbo::to_timespec(t);
         REQUIRE_EQ(min_timespec_sec, ts.tv_sec);
         REQUIRE_EQ(1, ts.tv_nsec);
-        t -= turbo::nanoseconds(1);
+        t -= turbo::Duration::nanoseconds(1);
         ts = turbo::to_timespec(t);
         REQUIRE_EQ(min_timespec_sec, ts.tv_sec);
         REQUIRE_EQ(0, ts.tv_nsec);
-        t -= turbo::nanoseconds(1);  // no effect
+        t -= turbo::Duration::nanoseconds(1);  // no effect
         ts = turbo::to_timespec(t);
         REQUIRE_EQ(min_timespec_sec, ts.tv_sec);
         REQUIRE_EQ(0, ts.tv_nsec);
@@ -862,7 +862,7 @@ namespace {
         REQUIRE_EQ("292277026596-12-04T15:30:07+00:00",
                   turbo::format_time(turbo::RFC3339_full, t, utc));
         REQUIRE_EQ(
-                turbo::unix_epoch() + turbo::seconds(std::numeric_limits<int64_t>::max()),
+                turbo::unix_epoch() + turbo::Duration::seconds(std::numeric_limits<int64_t>::max()),
                 t);
 
         // Checks that we can also get the maximal Time value for a far-east zone.
@@ -871,7 +871,7 @@ namespace {
         REQUIRE_EQ("292277026596-12-05T05:30:07+14:00",
                   turbo::format_time(turbo::RFC3339_full, t, plus14));
         REQUIRE_EQ(
-                turbo::unix_epoch() + turbo::seconds(std::numeric_limits<int64_t>::max()),
+                turbo::unix_epoch() + turbo::Duration::seconds(std::numeric_limits<int64_t>::max()),
                 t);
 
         // One second later should push us to infinity.
@@ -886,7 +886,7 @@ namespace {
         REQUIRE_EQ("-292277022657-01-27T08:29:52+00:00",
                   turbo::format_time(turbo::RFC3339_full, t, utc));
         REQUIRE_EQ(
-                turbo::unix_epoch() + turbo::seconds(std::numeric_limits<int64_t>::min()),
+                turbo::unix_epoch() + turbo::Duration::seconds(std::numeric_limits<int64_t>::min()),
                 t);
 
         // Checks that we can also get the minimal Time value for a far-west zone.
@@ -896,7 +896,7 @@ namespace {
         REQUIRE_EQ("-292277022657-01-26T20:29:52-12:00",
                   turbo::format_time(turbo::RFC3339_full, t, minus12));
         REQUIRE_EQ(
-                turbo::unix_epoch() + turbo::seconds(std::numeric_limits<int64_t>::min()),
+                turbo::unix_epoch() + turbo::Duration::seconds(std::numeric_limits<int64_t>::min()),
                 t);
 
         // One second before should push us to -infinity.

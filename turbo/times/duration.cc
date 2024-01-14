@@ -501,59 +501,6 @@ namespace turbo {
         return td >= *this ? td : td + unit.abs();
     }
 
-
-    //
-    // Conversion to other duration types.
-    //
-
-    int64_t to_int64_nanoseconds(Duration d) {
-        if (time_internal::GetRepHi(d) >= 0 &&
-            time_internal::GetRepHi(d) >> 33 == 0) {
-            return (time_internal::GetRepHi(d) * 1000 * 1000 * 1000) +
-                   (time_internal::GetRepLo(d) / kTicksPerNanosecond);
-        }
-        return d / nanoseconds(1);
-    }
-
-    int64_t to_int64_microseconds(Duration d) {
-        if (time_internal::GetRepHi(d) >= 0 &&
-            time_internal::GetRepHi(d) >> 43 == 0) {
-            return (time_internal::GetRepHi(d) * 1000 * 1000) +
-                   (time_internal::GetRepLo(d) / (kTicksPerNanosecond * 1000));
-        }
-        return d / microseconds(1);
-    }
-
-    int64_t to_int64_milliseconds(Duration d) {
-        if (time_internal::GetRepHi(d) >= 0 &&
-            time_internal::GetRepHi(d) >> 53 == 0) {
-            return (time_internal::GetRepHi(d) * 1000) +
-                   (time_internal::GetRepLo(d) / (kTicksPerNanosecond * 1000 * 1000));
-        }
-        return d / milliseconds(1);
-    }
-
-    int64_t to_int64_seconds(Duration d) {
-        int64_t hi = time_internal::GetRepHi(d);
-        if (d.is_infinite()) return hi;
-        if (hi < 0 && time_internal::GetRepLo(d) != 0) ++hi;
-        return hi;
-    }
-
-    int64_t to_int64_minutes(Duration d) {
-        int64_t hi = time_internal::GetRepHi(d);
-        if (d.is_infinite()) return hi;
-        if (hi < 0 && time_internal::GetRepLo(d) != 0) ++hi;
-        return hi / 60;
-    }
-
-    int64_t to_int64_hours(Duration d) {
-        int64_t hi = time_internal::GetRepHi(d);
-        if (d.is_infinite()) return hi;
-        if (hi < 0 && time_internal::GetRepLo(d) != 0) ++hi;
-        return hi / (60 * 60);
-    }
-
     //
     // To/From string formatting.
     //
@@ -726,21 +673,21 @@ namespace turbo {
                         case 'n':
                             if (*(*start + 1) == 's') {
                                 *start += 2;
-                                *unit = nanoseconds(1);
+                                *unit = Duration::nanoseconds(1);
                                 return true;
                             }
                             break;
                         case 'u':
                             if (*(*start + 1) == 's') {
                                 *start += 2;
-                                *unit = microseconds(1);
+                                *unit = Duration::microseconds(1);
                                 return true;
                             }
                             break;
                         case 'm':
                             if (*(*start + 1) == 's') {
                                 *start += 2;
-                                *unit = milliseconds(1);
+                                *unit = Duration::milliseconds(1);
                                 return true;
                             }
                             break;
@@ -751,15 +698,15 @@ namespace turbo {
                 case 1:
                     switch (**start) {
                         case 's':
-                            *unit = seconds(1);
+                            *unit = Duration::seconds(1);
                             *start += 1;
                             return true;
                         case 'm':
-                            *unit = minutes(1);
+                            *unit = Duration::minutes(1);
                             *start += 1;
                             return true;
                         case 'h':
-                            *unit = hours(1);
+                            *unit = Duration::hours(1);
                             *start += 1;
                             return true;
                         default:

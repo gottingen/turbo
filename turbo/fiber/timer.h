@@ -28,7 +28,7 @@ namespace turbo {
         using fiber_timer_id = turbo::fiber_internal::fiber_timer_id;
         static constexpr fiber_timer_id INVALID_FIBER_TIMER_ID = turbo::fiber_internal::INVALID_FIBER_TIMER_ID;
 
-        static constexpr turbo::Duration MIN_DURATION = turbo::microseconds(2);
+        static constexpr turbo::Duration MIN_DURATION = turbo::Duration::microseconds(2);
 
         FiberTimer() = default;
 
