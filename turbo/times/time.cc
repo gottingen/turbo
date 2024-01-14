@@ -221,11 +221,11 @@ namespace turbo {
     }
 
     turbo::Time time_from_timespec(timespec ts) {
-        return time_internal::FromUnixDuration(turbo::duration_from_timespec(ts));
+        return time_internal::FromUnixDuration(turbo::Duration::from_timespec(ts));
     }
 
     turbo::Time time_from_timeval(timeval tv) {
-        return time_internal::FromUnixDuration(turbo::duration_from_timeval(tv));
+        return time_internal::FromUnixDuration(turbo::Duration::from_timeval(tv));
     }
 
     timespec to_timespec(Time t) {
@@ -267,7 +267,7 @@ namespace turbo {
     }
 
     Time from_chrono(const std::chrono::system_clock::time_point &tp) {
-        return time_internal::FromUnixDuration(time_internal::from_chrono(
+        return time_internal::FromUnixDuration(Duration::from_chrono(
                 tp - std::chrono::system_clock::from_time_t(0)));
     }
 
@@ -275,7 +275,7 @@ namespace turbo {
         using D = std::chrono::system_clock::duration;
         auto d = time_internal::ToUnixDuration(t);
         if (d < Duration::zero()) {
-            d = d.floor(from_chrono(D{1}));
+            d = d.floor(Duration::from_chrono(D{1}));
         }
         return std::chrono::system_clock::from_time_t(0) + d.to_chrono_duration<D>();
     }

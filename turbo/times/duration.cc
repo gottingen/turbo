@@ -503,26 +503,6 @@ namespace turbo {
 
 
     //
-    // Factory functions.
-    //
-
-    Duration duration_from_timespec(timespec ts) {
-        if (static_cast<uint64_t>(ts.tv_nsec) < 1000 * 1000 * 1000) {
-            int64_t ticks = ts.tv_nsec * kTicksPerNanosecond;
-            return time_internal::MakeDuration(ts.tv_sec, ticks);
-        }
-        return seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec);
-    }
-
-    Duration duration_from_timeval(timeval tv) {
-        if (static_cast<uint64_t>(tv.tv_usec) < 1000 * 1000) {
-            int64_t ticks = tv.tv_usec * 1000 * kTicksPerNanosecond;
-            return time_internal::MakeDuration(tv.tv_sec, ticks);
-        }
-        return seconds(tv.tv_sec) + microseconds(tv.tv_usec);
-    }
-
-    //
     // Conversion to other duration types.
     //
 
@@ -572,63 +552,6 @@ namespace turbo {
         if (d.is_infinite()) return hi;
         if (hi < 0 && time_internal::GetRepLo(d) != 0) ++hi;
         return hi / (60 * 60);
-    }
-
-    timespec to_timespec(Duration d) {
-        timespec ts;
-        if (!d.is_infinite()) {
-            int64_t rep_hi = time_internal::GetRepHi(d);
-            uint32_t rep_lo = time_internal::GetRepLo(d);
-            if (rep_hi < 0) {
-                // Tweak the fields so that unsigned division of rep_lo
-                // maps to truncation (towards zero) for the timespec.
-                rep_lo += kTicksPerNanosecond - 1;
-                if (rep_lo >= kTicksPerSecond) {
-                    rep_hi += 1;
-                    rep_lo -= kTicksPerSecond;
-                }
-            }
-            ts.tv_sec = static_cast<decltype(ts.tv_sec)>(rep_hi);
-            if (ts.tv_sec == rep_hi) {  // no time_t narrowing
-                ts.tv_nsec = rep_lo / kTicksPerNanosecond;
-                return ts;
-            }
-        }
-        if (d >= Duration::zero()) {
-            ts.tv_sec = std::numeric_limits<time_t>::max();
-            ts.tv_nsec = 1000 * 1000 * 1000 - 1;
-        } else {
-            ts.tv_sec = std::numeric_limits<time_t>::min();
-            ts.tv_nsec = 0;
-        }
-        return ts;
-    }
-
-    timeval to_timeval(Duration d) {
-        timeval tv;
-        timespec ts = to_timespec(d);
-        if (ts.tv_sec < 0) {
-            // Tweak the fields so that positive division of tv_nsec
-            // maps to truncation (towards zero) for the timeval.
-            ts.tv_nsec += 1000 - 1;
-            if (ts.tv_nsec >= 1000 * 1000 * 1000) {
-                ts.tv_sec += 1;
-                ts.tv_nsec -= 1000 * 1000 * 1000;
-            }
-        }
-        tv.tv_sec = static_cast<decltype(tv.tv_sec)>(ts.tv_sec);
-        if (tv.tv_sec != ts.tv_sec) {  // narrowing
-            if (ts.tv_sec < 0) {
-                tv.tv_sec = std::numeric_limits<decltype(tv.tv_sec)>::min();
-                tv.tv_usec = 0;
-            } else {
-                tv.tv_sec = std::numeric_limits<decltype(tv.tv_sec)>::max();
-                tv.tv_usec = 1000 * 1000 - 1;
-            }
-            return tv;
-        }
-        tv.tv_usec = static_cast<int>(ts.tv_nsec / 1000);  // suseconds_t
-        return tv;
     }
 
     //
@@ -717,7 +640,8 @@ namespace turbo {
     //   (milli-, micro-, or nanoseconds) to ensure that the leading digit
     //   is non-zero.
     // Unlike Go, we format the zero duration as 0, with no unit.
-    std::string format_duration(Duration d) {
+    std::string Duration::to_string() const {
+        Duration d = *this;
         constexpr Duration kMinDuration = seconds(kint64min);
         std::string s;
         if (d == kMinDuration) {
@@ -726,7 +650,7 @@ namespace turbo {
             s = "-2562047788015215h30m8s";
             return s;
         }
-        if (d < Duration::zero()) {
+        if (d< Duration::zero()) {
             s.append("-");
             d = -d;
         }
@@ -851,7 +775,7 @@ namespace turbo {
     //   a possibly signed sequence of decimal numbers, each with optional
     //   fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
     //   Valid time units are "ns", "us" "ms", "s", "m", "h".
-    bool parse_duration(std::string_view dur_sv, Duration *d) {
+    bool Duration::parse_duration(std::string_view dur_sv) {
         int sign = 1;
         if (turbo::consume_prefix(&dur_sv, "-")) {
             sign = -1;
@@ -862,12 +786,12 @@ namespace turbo {
 
         // Special case for a string of "0".
         if (dur_sv == "0") {
-            *d = Duration::zero();
+            *this = Duration::zero();
             return true;
         }
 
         if (dur_sv == "inf") {
-            *d = sign * Duration::infinite();
+            *this = sign * Duration::infinite();
             return true;
         }
 
@@ -888,7 +812,7 @@ namespace turbo {
             if (int_part != 0) dur += sign * int_part * unit;
             if (frac_part != 0) dur += sign * frac_part * unit / frac_scale;
         }
-        *d = dur;
+        *this = dur;
         return true;
     }
 

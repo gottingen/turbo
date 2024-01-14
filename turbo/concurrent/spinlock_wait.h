@@ -182,7 +182,7 @@ namespace turbo {
             if(deadline <= time_now()) {
                 return deadline_exceeded_error("duration is negative");
             }
-            auto spec = turbo::to_timespec(deadline - time_now());
+            auto spec = (deadline - time_now()).to_timespec();
             auto ret = turbo::concurrent_internal::futex_wait_private(&_waiter, expected, &spec);
             if(ret != 0) {
                 return deadline_exceeded_error("wait_until timeout");
@@ -194,7 +194,7 @@ namespace turbo {
             if(duration <= turbo::Duration::zero()) {
                 return deadline_exceeded_error("duration is negative");
             }
-            auto spec = turbo::to_timespec(duration);
+            auto spec = duration.to_timespec();
             auto ret =turbo::concurrent_internal::futex_wait_private(&_waiter, expected, &spec);
             if(ret != 0) {
                 return deadline_exceeded_error("wait_for timeout");

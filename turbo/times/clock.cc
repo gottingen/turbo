@@ -562,7 +562,7 @@ namespace turbo {
 #ifdef _WIN32
             Sleep(static_cast<DWORD>(to_sleep / turbo::milliseconds(1)));
 #else
-            struct timespec sleep_time = turbo::to_timespec(to_sleep);
+            struct timespec sleep_time = to_sleep.to_timespec();
             while (nanosleep(&sleep_time, &sleep_time) != 0 && errno == EINTR) {
                 // Ignore signals and wait for the full interval to elapse.
             }

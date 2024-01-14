@@ -192,12 +192,12 @@ namespace {
         using std::chrono::minutes;
         using std::chrono::hours;
 
-        static_assert(turbo::nanoseconds(N) == turbo::from_chrono(nanoseconds(N)), "");
-        static_assert(turbo::microseconds(N) == turbo::from_chrono(microseconds(N)), "");
-        static_assert(turbo::milliseconds(N) == turbo::from_chrono(milliseconds(N)), "");
-        static_assert(turbo::seconds(N) == turbo::from_chrono(seconds(N)), "");
-        static_assert(turbo::minutes(N) == turbo::from_chrono(minutes(N)), "");
-        static_assert(turbo::hours(N) == turbo::from_chrono(hours(N)), "");
+        static_assert(turbo::nanoseconds(N) == turbo::Duration::from_chrono(nanoseconds(N)), "");
+        static_assert(turbo::microseconds(N) == turbo::Duration::from_chrono(microseconds(N)), "");
+        static_assert(turbo::milliseconds(N) == turbo::Duration::from_chrono(milliseconds(N)), "");
+        static_assert(turbo::seconds(N) == turbo::Duration::from_chrono(seconds(N)), "");
+        static_assert(turbo::minutes(N) == turbo::Duration::from_chrono(minutes(N)), "");
+        static_assert(turbo::hours(N) == turbo::Duration::from_chrono(hours(N)), "");
     }
 
     TEST_CASE("Duration, from_chrono") {
@@ -209,7 +209,7 @@ namespace {
 
         // minutes (might, depending on the platform) saturate at +inf.
         const auto chrono_minutes_max = std::chrono::minutes::max();
-        const auto minutes_max = turbo::from_chrono(chrono_minutes_max);
+        const auto minutes_max = turbo::Duration::from_chrono(chrono_minutes_max);
         const int64_t minutes_max_count = chrono_minutes_max.count();
         if (minutes_max_count > kint64max / 60) {
             REQUIRE_EQ(turbo::Duration::infinite(), minutes_max);
@@ -219,7 +219,7 @@ namespace {
 
         // minutes (might, depending on the platform) saturate at -inf.
         const auto chrono_minutes_min = std::chrono::minutes::min();
-        const auto minutes_min = turbo::from_chrono(chrono_minutes_min);
+        const auto minutes_min = turbo::Duration::from_chrono(chrono_minutes_min);
         const int64_t minutes_min_count = chrono_minutes_min.count();
         if (minutes_min_count < kint64min / 60) {
             REQUIRE_EQ(-turbo::Duration::infinite(), minutes_min);
@@ -229,7 +229,7 @@ namespace {
 
         // hours (might, depending on the platform) saturate at +inf.
         const auto chrono_hours_max = std::chrono::hours::max();
-        const auto hours_max = turbo::from_chrono(chrono_hours_max);
+        const auto hours_max = turbo::Duration::from_chrono(chrono_hours_max);
         const int64_t hours_max_count = chrono_hours_max.count();
         if (hours_max_count > kint64max / 3600) {
             REQUIRE_EQ(turbo::Duration::infinite(), hours_max);
@@ -239,7 +239,7 @@ namespace {
 
         // hours (might, depending on the platform) saturate at -inf.
         const auto chrono_hours_min = std::chrono::hours::min();
-        const auto hours_min = turbo::from_chrono(chrono_hours_min);
+        const auto hours_min = turbo::Duration::from_chrono(chrono_hours_min);
         const int64_t hours_min_count = chrono_hours_min.count();
         if (hours_min_count < kint64min / 3600) {
             REQUIRE_EQ(-turbo::Duration::infinite(), hours_min);
@@ -1240,7 +1240,7 @@ namespace {
                 {{-2, 999999999}, turbo::seconds(-1) - turbo::nanoseconds(1)},
         };
         for (const auto &test: from_ts) {
-            REQUIRE_EQ(test.d, turbo::duration_from_timespec(test.ts));
+            REQUIRE_EQ(test.d, turbo::Duration::from_timespec(test.ts));
         }
 
         const struct {
@@ -1258,7 +1258,7 @@ namespace {
                 {{-2, 999999}, turbo::seconds(-1) - turbo::microseconds(1)},
         };
         for (const auto &test: from_tv) {
-            REQUIRE_EQ(test.d, turbo::duration_from_timeval(test.tv));
+            REQUIRE_EQ(test.d, turbo::Duration::from_timeval(test.tv));
         }
     }
 
@@ -1381,31 +1381,31 @@ namespace {
         timeval tv;
         tv.tv_sec = max_timeval_sec;
         tv.tv_usec = 999998;
-        d = turbo::duration_from_timeval(tv);
-        tv = to_timeval(d);
+        d = turbo::Duration::from_timeval(tv);
+        tv = d.to_timeval();
         REQUIRE_EQ(max_timeval_sec, tv.tv_sec);
         REQUIRE_EQ(999998, tv.tv_usec);
         d += turbo::microseconds(1);
-        tv = to_timeval(d);
+        tv = d.to_timeval();
         REQUIRE_EQ(max_timeval_sec, tv.tv_sec);
         REQUIRE_EQ(999999, tv.tv_usec);
         d += turbo::microseconds(1);  // no effect
-        tv = to_timeval(d);
+        tv = d.to_timeval();
         REQUIRE_EQ(max_timeval_sec, tv.tv_sec);
         REQUIRE_EQ(999999, tv.tv_usec);
 
         tv.tv_sec = min_timeval_sec;
         tv.tv_usec = 1;
-        d = turbo::duration_from_timeval(tv);
-        tv = to_timeval(d);
+        d = turbo::Duration::from_timeval(tv);
+        tv = d.to_timeval();
         REQUIRE_EQ(min_timeval_sec, tv.tv_sec);
         REQUIRE_EQ(1, tv.tv_usec);
         d -= turbo::microseconds(1);
-        tv = to_timeval(d);
+        tv = d.to_timeval();
         REQUIRE_EQ(min_timeval_sec, tv.tv_sec);
         REQUIRE_EQ(0, tv.tv_usec);
         d -= turbo::microseconds(1);  // no effect
-        tv = to_timeval(d);
+        tv = d.to_timeval();
         REQUIRE_EQ(min_timeval_sec, tv.tv_sec);
         REQUIRE_EQ(0, tv.tv_usec);
 
@@ -1416,31 +1416,31 @@ namespace {
         timespec ts;
         ts.tv_sec = max_timespec_sec;
         ts.tv_nsec = 999999998;
-        d = turbo::duration_from_timespec(ts);
-        ts = turbo::to_timespec(d);
+        d = turbo::Duration::from_timespec(ts);
+        ts = d.to_timespec();
         REQUIRE_EQ(max_timespec_sec, ts.tv_sec);
         REQUIRE_EQ(999999998, ts.tv_nsec);
         d += turbo::nanoseconds(1);
-        ts = turbo::to_timespec(d);
+        ts = d.to_timespec();
         REQUIRE_EQ(max_timespec_sec, ts.tv_sec);
         REQUIRE_EQ(999999999, ts.tv_nsec);
         d += turbo::nanoseconds(1);  // no effect
-        ts = turbo::to_timespec(d);
+        ts = d.to_timespec();
         REQUIRE_EQ(max_timespec_sec, ts.tv_sec);
         REQUIRE_EQ(999999999, ts.tv_nsec);
 
         ts.tv_sec = min_timespec_sec;
         ts.tv_nsec = 1;
-        d = turbo::duration_from_timespec(ts);
-        ts = turbo::to_timespec(d);
+        d = turbo::Duration::from_timespec(ts);
+        ts = d.to_timespec();
         REQUIRE_EQ(min_timespec_sec, ts.tv_sec);
         REQUIRE_EQ(1, ts.tv_nsec);
         d -= turbo::nanoseconds(1);
-        ts = turbo::to_timespec(d);
+        ts = d.to_timespec();
         REQUIRE_EQ(min_timespec_sec, ts.tv_sec);
         REQUIRE_EQ(0, ts.tv_nsec);
         d -= turbo::nanoseconds(1);  // no effect
-        ts = turbo::to_timespec(d);
+        ts = d.to_timespec();
         REQUIRE_EQ(min_timespec_sec, ts.tv_sec);
         REQUIRE_EQ(0, ts.tv_nsec);
     }
@@ -1448,84 +1448,84 @@ namespace {
     TEST_CASE("Duration, format_duration") {
         // Example from Go's docs.
         REQUIRE_EQ("72h3m0.5s",
-                   turbo::format_duration(turbo::hours(72) + turbo::minutes(3) +
-                                          turbo::milliseconds(500)));
+                   (turbo::hours(72) + turbo::minutes(3) +
+                                          turbo::milliseconds(500)).to_string());
         // Go's largest time: 2540400h10m10.000000000s
         REQUIRE_EQ("2540400h10m10s",
-                   turbo::format_duration(turbo::hours(2540400) + turbo::minutes(10) +
-                                          turbo::seconds(10)));
+                   (turbo::hours(2540400) + turbo::minutes(10) +
+                                          turbo::seconds(10)).to_string());
 
-        REQUIRE_EQ("0", turbo::format_duration(turbo::Duration::zero()));
-        REQUIRE_EQ("0", turbo::format_duration(turbo::seconds(0)));
-        REQUIRE_EQ("0", turbo::format_duration(turbo::nanoseconds(0)));
+        REQUIRE_EQ("0", (turbo::Duration::zero()).to_string());
+        REQUIRE_EQ("0", (turbo::seconds(0)).to_string());
+        REQUIRE_EQ("0", (turbo::nanoseconds(0)).to_string());
 
-        REQUIRE_EQ("1ns", turbo::format_duration(turbo::nanoseconds(1)));
-        REQUIRE_EQ("1us", turbo::format_duration(turbo::microseconds(1)));
-        REQUIRE_EQ("1ms", turbo::format_duration(turbo::milliseconds(1)));
-        REQUIRE_EQ("1s", turbo::format_duration(turbo::seconds(1)));
-        REQUIRE_EQ("1m", turbo::format_duration(turbo::minutes(1)));
-        REQUIRE_EQ("1h", turbo::format_duration(turbo::hours(1)));
+        REQUIRE_EQ("1ns", (turbo::nanoseconds(1)).to_string());
+        REQUIRE_EQ("1us", (turbo::microseconds(1)).to_string());
+        REQUIRE_EQ("1ms", (turbo::milliseconds(1)).to_string());
+        REQUIRE_EQ("1s", (turbo::seconds(1)).to_string());
+        REQUIRE_EQ("1m", (turbo::minutes(1)).to_string());
+        REQUIRE_EQ("1h", (turbo::hours(1)).to_string());
 
-        REQUIRE_EQ("1h1m", turbo::format_duration(turbo::hours(1) + turbo::minutes(1)));
-        REQUIRE_EQ("1h1s", turbo::format_duration(turbo::hours(1) + turbo::seconds(1)));
-        REQUIRE_EQ("1m1s", turbo::format_duration(turbo::minutes(1) + turbo::seconds(1)));
+        REQUIRE_EQ("1h1m", (turbo::hours(1) + turbo::minutes(1)).to_string());
+        REQUIRE_EQ("1h1s", (turbo::hours(1) + turbo::seconds(1)).to_string());
+        REQUIRE_EQ("1m1s", (turbo::minutes(1) + turbo::seconds(1)).to_string());
 
         REQUIRE_EQ("1h0.25s",
-                   turbo::format_duration(turbo::hours(1) + turbo::milliseconds(250)));
+                   (turbo::hours(1) + turbo::milliseconds(250)).to_string());
         REQUIRE_EQ("1m0.25s",
-                   turbo::format_duration(turbo::minutes(1) + turbo::milliseconds(250)));
+                   (turbo::minutes(1) + turbo::milliseconds(250)).to_string());
         REQUIRE_EQ("1h1m0.25s",
-                   turbo::format_duration(turbo::hours(1) + turbo::minutes(1) +
-                                          turbo::milliseconds(250)));
+                   (turbo::hours(1) + turbo::minutes(1) +
+                                          turbo::milliseconds(250)).to_string());
         REQUIRE_EQ("1h0.0005s",
-                   turbo::format_duration(turbo::hours(1) + turbo::microseconds(500)));
+                   (turbo::hours(1) + turbo::microseconds(500)).to_string());
         REQUIRE_EQ("1h0.0000005s",
-                   turbo::format_duration(turbo::hours(1) + turbo::nanoseconds(500)));
+                   (turbo::hours(1) + turbo::nanoseconds(500)).to_string());
 
         // Subsecond special case.
-        REQUIRE_EQ("1.5ns", turbo::format_duration(turbo::nanoseconds(1) +
-                                                   turbo::nanoseconds(1) / 2));
-        REQUIRE_EQ("1.25ns", turbo::format_duration(turbo::nanoseconds(1) +
-                                                    turbo::nanoseconds(1) / 4));
-        REQUIRE_EQ("1ns", turbo::format_duration(turbo::nanoseconds(1) +
-                                                 turbo::nanoseconds(1) / 9));
-        REQUIRE_EQ("1.2us", turbo::format_duration(turbo::microseconds(1) +
-                                                   turbo::nanoseconds(200)));
-        REQUIRE_EQ("1.2ms", turbo::format_duration(turbo::milliseconds(1) +
-                                                   turbo::microseconds(200)));
-        REQUIRE_EQ("1.0002ms", turbo::format_duration(turbo::milliseconds(1) +
-                                                      turbo::nanoseconds(200)));
-        REQUIRE_EQ("1.00001ms", turbo::format_duration(turbo::milliseconds(1) +
-                                                       turbo::nanoseconds(10)));
+        REQUIRE_EQ("1.5ns", (turbo::nanoseconds(1) +
+                                                   turbo::nanoseconds(1) / 2).to_string());
+        REQUIRE_EQ("1.25ns", (turbo::nanoseconds(1) +
+                                                    turbo::nanoseconds(1) / 4).to_string());
+        REQUIRE_EQ("1ns", (turbo::nanoseconds(1) +
+                                                 turbo::nanoseconds(1) / 9).to_string());
+        REQUIRE_EQ("1.2us", (turbo::microseconds(1) +
+                                                   turbo::nanoseconds(200)).to_string());
+        REQUIRE_EQ("1.2ms", (turbo::milliseconds(1) +
+                                                   turbo::microseconds(200)).to_string());
+        REQUIRE_EQ("1.0002ms", (turbo::milliseconds(1) +
+                                                      turbo::nanoseconds(200)).to_string());
+        REQUIRE_EQ("1.00001ms", (turbo::milliseconds(1) +
+                                                       turbo::nanoseconds(10)).to_string());
         REQUIRE_EQ("1.000001ms",
-                   turbo::format_duration(turbo::milliseconds(1) + turbo::nanoseconds(1)));
+                   (turbo::milliseconds(1) + turbo::nanoseconds(1)).to_string());
 
         // Negative durations.
-        REQUIRE_EQ("-1ns", turbo::format_duration(turbo::nanoseconds(-1)));
-        REQUIRE_EQ("-1us", turbo::format_duration(turbo::microseconds(-1)));
-        REQUIRE_EQ("-1ms", turbo::format_duration(turbo::milliseconds(-1)));
-        REQUIRE_EQ("-1s", turbo::format_duration(turbo::seconds(-1)));
-        REQUIRE_EQ("-1m", turbo::format_duration(turbo::minutes(-1)));
-        REQUIRE_EQ("-1h", turbo::format_duration(turbo::hours(-1)));
+        REQUIRE_EQ("-1ns", (turbo::nanoseconds(-1)).to_string());
+        REQUIRE_EQ("-1us", (turbo::microseconds(-1)).to_string());
+        REQUIRE_EQ("-1ms", (turbo::milliseconds(-1)).to_string());
+        REQUIRE_EQ("-1s", (turbo::seconds(-1)).to_string());
+        REQUIRE_EQ("-1m", (turbo::minutes(-1)).to_string());
+        REQUIRE_EQ("-1h", (turbo::hours(-1)).to_string());
 
         REQUIRE_EQ("-1h1m",
-                   turbo::format_duration(-(turbo::hours(1) + turbo::minutes(1))));
+                   (-(turbo::hours(1) + turbo::minutes(1))).to_string());
         REQUIRE_EQ("-1h1s",
-                   turbo::format_duration(-(turbo::hours(1) + turbo::seconds(1))));
+                   (-(turbo::hours(1) + turbo::seconds(1))).to_string());
         REQUIRE_EQ("-1m1s",
-                   turbo::format_duration(-(turbo::minutes(1) + turbo::seconds(1))));
+                   (-(turbo::minutes(1) + turbo::seconds(1))).to_string());
 
-        REQUIRE_EQ("-1ns", turbo::format_duration(turbo::nanoseconds(-1)));
-        REQUIRE_EQ("-1.2us", turbo::format_duration(
-                -(turbo::microseconds(1) + turbo::nanoseconds(200))));
-        REQUIRE_EQ("-1.2ms", turbo::format_duration(
-                -(turbo::milliseconds(1) + turbo::microseconds(200))));
-        REQUIRE_EQ("-1.0002ms", turbo::format_duration(-(turbo::milliseconds(1) +
-                                                         turbo::nanoseconds(200))));
-        REQUIRE_EQ("-1.00001ms", turbo::format_duration(-(turbo::milliseconds(1) +
-                                                          turbo::nanoseconds(10))));
-        REQUIRE_EQ("-1.000001ms", turbo::format_duration(-(turbo::milliseconds(1) +
-                                                           turbo::nanoseconds(1))));
+        REQUIRE_EQ("-1ns", (turbo::nanoseconds(-1)).to_string());
+        REQUIRE_EQ("-1.2us", (
+                -(turbo::microseconds(1) + turbo::nanoseconds(200))).to_string());
+        REQUIRE_EQ("-1.2ms", (
+                -(turbo::milliseconds(1) + turbo::microseconds(200))).to_string());
+        REQUIRE_EQ("-1.0002ms", (-(turbo::milliseconds(1) +
+                                                         turbo::nanoseconds(200))).to_string());
+        REQUIRE_EQ("-1.00001ms", (-(turbo::milliseconds(1) +
+                                                          turbo::nanoseconds(10))).to_string());
+        REQUIRE_EQ("-1.000001ms", (-(turbo::milliseconds(1) +
+                                                           turbo::nanoseconds(1))).to_string());
 
         //
         // Interesting corner cases.
@@ -1536,47 +1536,47 @@ namespace {
                 turbo::seconds(kint64max) + (turbo::seconds(1) - qns);
         const turbo::Duration min_dur = turbo::seconds(kint64min);
 
-        REQUIRE_EQ("0.25ns", turbo::format_duration(qns));
-        REQUIRE_EQ("-0.25ns", turbo::format_duration(-qns));
+        REQUIRE_EQ("0.25ns", (qns).to_string());
+        REQUIRE_EQ("-0.25ns", (-qns).to_string());
         REQUIRE_EQ("2562047788015215h30m7.99999999975s",
-                   turbo::format_duration(max_dur));
-        REQUIRE_EQ("-2562047788015215h30m8s", turbo::format_duration(min_dur));
+                   (max_dur).to_string());
+        REQUIRE_EQ("-2562047788015215h30m8s", (min_dur).to_string());
 
         // Tests printing full precision from units that print using safe_float_mod
-        REQUIRE_EQ("55.00000000025s", turbo::format_duration(turbo::seconds(55) + qns));
+        REQUIRE_EQ("55.00000000025s", (turbo::seconds(55) + qns).to_string());
         REQUIRE_EQ("55.00000025ms",
-                   turbo::format_duration(turbo::milliseconds(55) + qns));
-        REQUIRE_EQ("55.00025us", turbo::format_duration(turbo::microseconds(55) + qns));
-        REQUIRE_EQ("55.25ns", turbo::format_duration(turbo::nanoseconds(55) + qns));
+                   (turbo::milliseconds(55) + qns).to_string());
+        REQUIRE_EQ("55.00025us", (turbo::microseconds(55) + qns).to_string());
+        REQUIRE_EQ("55.25ns", (turbo::nanoseconds(55) + qns).to_string());
 
         // Formatting infinity
-        REQUIRE_EQ("inf", turbo::format_duration(turbo::Duration::infinite()));
-        REQUIRE_EQ("-inf", turbo::format_duration(-turbo::Duration::infinite()));
+        REQUIRE_EQ("inf", (turbo::Duration::infinite()).to_string());
+        REQUIRE_EQ("-inf", (-turbo::Duration::infinite()).to_string());
 
         // Formatting approximately +/- 100 billion years
         const turbo::Duration huge_range = ApproxYears(100000000000);
-        REQUIRE_EQ("876000000000000h", turbo::format_duration(huge_range));
-        REQUIRE_EQ("-876000000000000h", turbo::format_duration(-huge_range));
+        REQUIRE_EQ("876000000000000h", (huge_range).to_string());
+        REQUIRE_EQ("-876000000000000h", (-huge_range).to_string());
 
         REQUIRE_EQ("876000000000000h0.999999999s",
-                   turbo::format_duration(huge_range +
-                                          (turbo::seconds(1) - turbo::nanoseconds(1))));
+                   (huge_range +
+                                          (turbo::seconds(1) - turbo::nanoseconds(1))).to_string());
         REQUIRE_EQ("876000000000000h0.9999999995s",
-                   turbo::format_duration(
-                           huge_range + (turbo::seconds(1) - turbo::nanoseconds(1) / 2)));
+                   (
+                           huge_range + (turbo::seconds(1) - turbo::nanoseconds(1) / 2)).to_string());
         REQUIRE_EQ("876000000000000h0.99999999975s",
-                   turbo::format_duration(
-                           huge_range + (turbo::seconds(1) - turbo::nanoseconds(1) / 4)));
+                   (
+                           huge_range + (turbo::seconds(1) - turbo::nanoseconds(1) / 4)).to_string());
 
         REQUIRE_EQ("-876000000000000h0.999999999s",
-                   turbo::format_duration(-huge_range -
-                                          (turbo::seconds(1) - turbo::nanoseconds(1))));
+                   (-huge_range -
+                                          (turbo::seconds(1) - turbo::nanoseconds(1))).to_string());
         REQUIRE_EQ("-876000000000000h0.9999999995s",
-                   turbo::format_duration(
-                           -huge_range - (turbo::seconds(1) - turbo::nanoseconds(1) / 2)));
+                   (
+                           -huge_range - (turbo::seconds(1) - turbo::nanoseconds(1) / 2)).to_string());
         REQUIRE_EQ("-876000000000000h0.99999999975s",
-                   turbo::format_duration(
-                           -huge_range - (turbo::seconds(1) - turbo::nanoseconds(1) / 4)));
+                   (
+                           -huge_range - (turbo::seconds(1) - turbo::nanoseconds(1) / 4)).to_string());
     }
 
     TEST_CASE("Duration, parse_duration") {
@@ -1584,118 +1584,118 @@ namespace {
         turbo::Duration d;
 
         // No specified unit. Should only work for zero and infinity.
-        REQUIRE(turbo::parse_duration("0", &d));
+        REQUIRE(d.parse_duration("0"));
         REQUIRE_EQ(turbo::Duration::zero(), d);
-        REQUIRE(turbo::parse_duration("+0", &d));
+        REQUIRE(d.parse_duration("+0"));
         REQUIRE_EQ(turbo::Duration::zero(), d);
-        REQUIRE(turbo::parse_duration("-0", &d));
+        REQUIRE(d.parse_duration("-0"));
         REQUIRE_EQ(turbo::Duration::zero(), d);
 
-        REQUIRE(turbo::parse_duration("inf", &d));
+        REQUIRE(d.parse_duration("inf"));
         REQUIRE_EQ(turbo::Duration::infinite(), d);
-        REQUIRE(turbo::parse_duration("+inf", &d));
+        REQUIRE(d.parse_duration("+inf"));
         REQUIRE_EQ(turbo::Duration::infinite(), d);
-        REQUIRE(turbo::parse_duration("-inf", &d));
+        REQUIRE(d.parse_duration("-inf"));
         REQUIRE_EQ(-turbo::Duration::infinite(), d);
-        REQUIRE_FALSE(turbo::parse_duration("infBlah", &d));
+        REQUIRE_FALSE(d.parse_duration("infBlah"));
 
         // Illegal input forms.
-        REQUIRE_FALSE(turbo::parse_duration("", &d));
-        REQUIRE_FALSE(turbo::parse_duration("0.0", &d));
-        REQUIRE_FALSE(turbo::parse_duration(".0", &d));
-        REQUIRE_FALSE(turbo::parse_duration(".", &d));
-        REQUIRE_FALSE(turbo::parse_duration("01", &d));
-        REQUIRE_FALSE(turbo::parse_duration("1", &d));
-        REQUIRE_FALSE(turbo::parse_duration("-1", &d));
-        REQUIRE_FALSE(turbo::parse_duration("2", &d));
-        REQUIRE_FALSE(turbo::parse_duration("2 s", &d));
-        REQUIRE_FALSE(turbo::parse_duration(".s", &d));
-        REQUIRE_FALSE(turbo::parse_duration("-.s", &d));
-        REQUIRE_FALSE(turbo::parse_duration("s", &d));
-        REQUIRE_FALSE(turbo::parse_duration(" 2s", &d));
-        REQUIRE_FALSE(turbo::parse_duration("2s ", &d));
-        REQUIRE_FALSE(turbo::parse_duration(" 2s ", &d));
-        REQUIRE_FALSE(turbo::parse_duration("2mt", &d));
-        REQUIRE_FALSE(turbo::parse_duration("1e3s", &d));
+        REQUIRE_FALSE(d.parse_duration(""));
+        REQUIRE_FALSE(d.parse_duration("0.0"));
+        REQUIRE_FALSE(d.parse_duration(".0"));
+        REQUIRE_FALSE(d.parse_duration("."));
+        REQUIRE_FALSE(d.parse_duration("01"));
+        REQUIRE_FALSE(d.parse_duration("1"));
+        REQUIRE_FALSE(d.parse_duration("-1"));
+        REQUIRE_FALSE(d.parse_duration("2"));
+        REQUIRE_FALSE(d.parse_duration("2 s"));
+        REQUIRE_FALSE(d.parse_duration(".s"));
+        REQUIRE_FALSE(d.parse_duration("-.s"));
+        REQUIRE_FALSE(d.parse_duration("s"));
+        REQUIRE_FALSE(d.parse_duration(" 2s"));
+        REQUIRE_FALSE(d.parse_duration("2s "));
+        REQUIRE_FALSE(d.parse_duration(" 2s "));
+        REQUIRE_FALSE(d.parse_duration("2mt"));
+        REQUIRE_FALSE(d.parse_duration("1e3s"));
 
         // One unit type.
-        REQUIRE(turbo::parse_duration("1ns", &d));
+        REQUIRE(d.parse_duration("1ns"));
         REQUIRE_EQ(turbo::nanoseconds(1), d);
-        REQUIRE(turbo::parse_duration("1us", &d));
+        REQUIRE(d.parse_duration("1us"));
         REQUIRE_EQ(turbo::microseconds(1), d);
-        REQUIRE(turbo::parse_duration("1ms", &d));
+        REQUIRE(d.parse_duration("1ms"));
         REQUIRE_EQ(turbo::milliseconds(1), d);
-        REQUIRE(turbo::parse_duration("1s", &d));
+        REQUIRE(d.parse_duration("1s"));
         REQUIRE_EQ(turbo::seconds(1), d);
-        REQUIRE(turbo::parse_duration("2m", &d));
+        REQUIRE(d.parse_duration("2m"));
         REQUIRE_EQ(turbo::minutes(2), d);
-        REQUIRE(turbo::parse_duration("2h", &d));
+        REQUIRE(d.parse_duration("2h"));
         REQUIRE_EQ(turbo::hours(2), d);
 
         // Huge counts of a unit.
-        REQUIRE(turbo::parse_duration("9223372036854775807us", &d));
+        REQUIRE(d.parse_duration("9223372036854775807us"));
         REQUIRE_EQ(turbo::microseconds(9223372036854775807), d);
-        REQUIRE(turbo::parse_duration("-9223372036854775807us", &d));
+        REQUIRE(d.parse_duration("-9223372036854775807us"));
         REQUIRE_EQ(turbo::microseconds(-9223372036854775807), d);
 
         // Multiple units.
-        REQUIRE(turbo::parse_duration("2h3m4s", &d));
+        REQUIRE(d.parse_duration("2h3m4s"));
         REQUIRE_EQ(turbo::hours(2) + turbo::minutes(3) + turbo::seconds(4), d);
-        REQUIRE(turbo::parse_duration("3m4s5us", &d));
+        REQUIRE(d.parse_duration("3m4s5us"));
         REQUIRE_EQ(turbo::minutes(3) + turbo::seconds(4) + turbo::microseconds(5), d);
-        REQUIRE(turbo::parse_duration("2h3m4s5ms6us7ns", &d));
+        REQUIRE(d.parse_duration("2h3m4s5ms6us7ns"));
         REQUIRE_EQ(turbo::hours(2) + turbo::minutes(3) + turbo::seconds(4) +
                    turbo::milliseconds(5) + turbo::microseconds(6) +
                    turbo::nanoseconds(7),
                    d);
 
         // Multiple units out of order.
-        REQUIRE(turbo::parse_duration("2us3m4s5h", &d));
+        REQUIRE(d.parse_duration("2us3m4s5h"));
         REQUIRE_EQ(turbo::hours(5) + turbo::minutes(3) + turbo::seconds(4) +
                    turbo::microseconds(2),
                    d);
 
         // Fractional values of units.
-        REQUIRE(turbo::parse_duration("1.5ns", &d));
+        REQUIRE(d.parse_duration("1.5ns"));
         REQUIRE_EQ(1.5 * turbo::nanoseconds(1), d);
-        REQUIRE(turbo::parse_duration("1.5us", &d));
+        REQUIRE(d.parse_duration("1.5us"));
         REQUIRE_EQ(1.5 * turbo::microseconds(1), d);
-        REQUIRE(turbo::parse_duration("1.5ms", &d));
+        REQUIRE(d.parse_duration("1.5ms"));
         REQUIRE_EQ(1.5 * turbo::milliseconds(1), d);
-        REQUIRE(turbo::parse_duration("1.5s", &d));
+        REQUIRE(d.parse_duration("1.5s"));
         REQUIRE_EQ(1.5 * turbo::seconds(1), d);
-        REQUIRE(turbo::parse_duration("1.5m", &d));
+        REQUIRE(d.parse_duration("1.5m"));
         REQUIRE_EQ(1.5 * turbo::minutes(1), d);
-        REQUIRE(turbo::parse_duration("1.5h", &d));
+        REQUIRE(d.parse_duration("1.5h"));
         REQUIRE_EQ(1.5 * turbo::hours(1), d);
 
         // Huge fractional counts of a unit.
-        REQUIRE(turbo::parse_duration("0.4294967295s", &d));
+        REQUIRE(d.parse_duration("0.4294967295s"));
         REQUIRE_EQ(turbo::nanoseconds(429496729) + turbo::nanoseconds(1) / 2, d);
-        REQUIRE(turbo::parse_duration("0.429496729501234567890123456789s", &d));
+        REQUIRE(d.parse_duration("0.429496729501234567890123456789s"));
         REQUIRE_EQ(turbo::nanoseconds(429496729) + turbo::nanoseconds(1) / 2, d);
 
         // Negative durations.
-        REQUIRE(turbo::parse_duration("-1s", &d));
+        REQUIRE(d.parse_duration("-1s"));
         REQUIRE_EQ(turbo::seconds(-1), d);
-        REQUIRE(turbo::parse_duration("-1m", &d));
+        REQUIRE(d.parse_duration("-1m"));
         REQUIRE_EQ(turbo::minutes(-1), d);
-        REQUIRE(turbo::parse_duration("-1h", &d));
+        REQUIRE(d.parse_duration("-1h"));
         REQUIRE_EQ(turbo::hours(-1), d);
 
-        REQUIRE(turbo::parse_duration("-1h2s", &d));
+        REQUIRE(d.parse_duration("-1h2s"));
         REQUIRE_EQ(-(turbo::hours(1) + turbo::seconds(2)), d);
-        REQUIRE_FALSE(turbo::parse_duration("1h-2s", &d));
-        REQUIRE_FALSE(turbo::parse_duration("-1h-2s", &d));
-        REQUIRE_FALSE(turbo::parse_duration("-1h -2s", &d));
+        REQUIRE_FALSE(d.parse_duration("1h-2s"));
+        REQUIRE_FALSE(d.parse_duration("-1h-2s"));
+        REQUIRE_FALSE(d.parse_duration("-1h -2s"));
     }
 
     TEST_CASE("Duration, FormatParseRoundTrip") {
 #define TEST_PARSE_ROUNDTRIP(d)                \
   do {                                         \
-    std::string s = turbo::format_duration(d);   \
+    std::string s = (d).to_string();   \
     turbo::Duration dur;                        \
-    REQUIRE(turbo::parse_duration(s, &dur)); \
+    REQUIRE(dur.parse_duration(s)); \
     REQUIRE_EQ(d, dur);                         \
   } while (0)
 
@@ -1718,8 +1718,7 @@ namespace {
         TEST_PARSE_ROUNDTRIP(turbo::hours(1) + turbo::nanoseconds(-2));
         TEST_PARSE_ROUNDTRIP(turbo::hours(-1) + turbo::nanoseconds(-2));
 
-        TEST_PARSE_ROUNDTRIP(turbo::nanoseconds(1) +
-                             turbo::nanoseconds(1) / 4);  // 1.25ns
+        TEST_PARSE_ROUNDTRIP(turbo::nanoseconds(1) +turbo::nanoseconds(1) / 4);  // 1.25ns
 
         const turbo::Duration huge_range = ApproxYears(100000000000);
         TEST_PARSE_ROUNDTRIP(huge_range);

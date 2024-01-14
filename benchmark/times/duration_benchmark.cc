@@ -365,14 +365,14 @@ namespace {
 
     BENCHMARK(BM_Duration_ToInt64Hours);
 
-//
-// To/FromTimespec
-//
+    //
+    // To/FromTimespec
+    //
 
     void BM_Duration_ToTimespec_TurboTime(benchmark::State &state) {
         turbo::Duration d = turbo::seconds(1);
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::to_timespec(d));
+            benchmark::DoNotOptimize(d.to_timespec());
         }
     }
 
@@ -402,7 +402,7 @@ namespace {
                 ++ts.tv_sec;
                 ts.tv_nsec = 0;
             }
-            benchmark::DoNotOptimize(turbo::duration_from_timespec(ts));
+            benchmark::DoNotOptimize(turbo::Duration::from_timespec(ts));
         }
     }
 
@@ -444,9 +444,9 @@ namespace {
         const std::string s = kDurations[state.range(0)];
         state.SetLabel(s);
         turbo::Duration d;
-        turbo::parse_duration(kDurations[state.range(0)], &d);
+        d.parse_duration(kDurations[state.range(0)]);
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::format_duration(d));
+            benchmark::DoNotOptimize(d.to_string());
         }
     }
 
@@ -457,7 +457,7 @@ namespace {
         state.SetLabel(s);
         turbo::Duration d;
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::parse_duration(s, &d));
+            benchmark::DoNotOptimize(d.parse_duration(s));
         }
     }
 

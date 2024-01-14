@@ -529,7 +529,7 @@ namespace turbo::fiber_internal {
             if (timeout_duration < MIN_SLEEP) {
                 return turbo::deadline_exceeded_error("");
             }
-            timeout = turbo::to_timespec(timeout_duration);
+            timeout = timeout_duration.to_timespec();
             ptimeout = &timeout;
         }
 
