@@ -42,55 +42,55 @@ namespace turbo {
 
     struct ToMilliseconds {
         int64_t operator()(const turbo::Duration &d) const {
-            return turbo::to_int64_milliseconds(d);
+            return d.to_milliseconds();
         }
     };
 
     struct ToMicroseconds {
         int64_t operator()(const turbo::Duration &d) const {
-            return turbo::to_int64_microseconds(d);
+            return d.to_microseconds();
         }
     };
 
     struct ToNanoseconds {
         int64_t operator()(const turbo::Duration &d) const {
-            return turbo::to_int64_nanoseconds(d);
+            return d.to_nanoseconds();
         }
     };
 
     struct ToSeconds {
         int64_t operator()(const turbo::Duration &d) const {
-            return turbo::to_int64_seconds(d);
+            return d.to_seconds();
         }
     };
 
     struct ToDoubleSeconds {
         double operator()(const turbo::Duration &d) const {
-            return turbo::to_double_seconds(d);
+            return d.to_seconds<double>();
         }
     };
 
     struct ToDoubleMilliseconds {
         double operator()(const turbo::Duration &d) const {
-            return turbo::to_double_milliseconds(d);
+            return d.to_milliseconds<double>();
         }
     };
 
     struct ToDoubleMicroseconds {
         double operator()(const turbo::Duration &d) const {
-            return turbo::to_double_microseconds(d);
+            return d.to_microseconds<double>();
         }
     };
 
     struct ToDoubleNanoseconds {
         double operator()(const turbo::Duration &d) const {
-            return turbo::to_double_nanoseconds(d);
+            return d.to_nanoseconds<double>();
         }
     };
 
     struct ToDoubleMinutes {
         double operator()(const turbo::Duration &d) const {
-            return turbo::to_double_minutes(d);
+            return d.to_minutes<double>();
         }
     };
 

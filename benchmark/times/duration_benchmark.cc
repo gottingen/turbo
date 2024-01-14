@@ -223,7 +223,7 @@ namespace {
         int i = 0;
         while (state.KeepRunning()) {
             benchmark::DoNotOptimize(
-                    d += turbo::safe_float_mod(turbo::milliseconds(i), turbo::nanoseconds(1)));
+                    d += turbo::milliseconds(i).safe_float_mod(turbo::nanoseconds(1)));
             ++i;
         }
     }
@@ -314,7 +314,7 @@ namespace {
     void BM_Duration_ToInt64Nanoseconds(benchmark::State &state) {
         turbo::Duration d = turbo::seconds(100000);
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::to_int64_nanoseconds(d));
+            benchmark::DoNotOptimize(d.to_nanoseconds());
         }
     }
 
@@ -323,7 +323,7 @@ namespace {
     void BM_Duration_ToInt64Microseconds(benchmark::State &state) {
         turbo::Duration d = turbo::seconds(100000);
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::to_int64_microseconds(d));
+            benchmark::DoNotOptimize(d.to_microseconds());
         }
     }
 
@@ -332,7 +332,7 @@ namespace {
     void BM_Duration_ToInt64Milliseconds(benchmark::State &state) {
         turbo::Duration d = turbo::seconds(100000);
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::to_int64_milliseconds(d));
+            benchmark::DoNotOptimize(d.to_milliseconds());
         }
     }
 
@@ -341,7 +341,7 @@ namespace {
     void BM_Duration_ToInt64Seconds(benchmark::State &state) {
         turbo::Duration d = turbo::seconds(100000);
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::to_int64_seconds(d));
+            benchmark::DoNotOptimize(d.to_seconds());
         }
     }
 
@@ -350,7 +350,7 @@ namespace {
     void BM_Duration_ToInt64Minutes(benchmark::State &state) {
         turbo::Duration d = turbo::seconds(100000);
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::to_int64_minutes(d));
+            benchmark::DoNotOptimize(d.to_minutes());
         }
     }
 
@@ -359,7 +359,7 @@ namespace {
     void BM_Duration_ToInt64Hours(benchmark::State &state) {
         turbo::Duration d = turbo::seconds(100000);
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::to_int64_hours(d));
+            benchmark::DoNotOptimize(d.to_hours());
         }
     }
 

@@ -329,17 +329,17 @@ namespace turbo::fiber_internal {
             g->ready_to_run(m->tid, is_nosignal(using_attr));
         } else {
             // NOSIGNAL affects current task, not the new task.
-            RemainedFn fn = nullptr;
+            RemainedFn functor = nullptr;
             if (g->current_task()->about_to_quit) {
-                fn = ready_to_run_in_worker_ignoresignal;
+                functor = ready_to_run_in_worker_ignoresignal;
             } else {
-                fn = ready_to_run_in_worker;
+                functor = ready_to_run_in_worker;
             }
             ReadyToRunArgs args = {
                     g->current_fid(),
                     is_nosignal(using_attr)
             };
-            g->set_remained(fn, &args);
+            g->set_remained(functor, &args);
             FiberWorker::sched_to(pg, m->tid);
         }
         return turbo::ok_status();
@@ -748,7 +748,7 @@ namespace turbo::fiber_internal {
         FiberWorker *g = *pg;
         // We have to schedule timer after we switched to next fiber otherwise
         // the timer may wake up(jump to) current still-running context.
-        SleepArgs e = {static_cast<uint64_t>(turbo::to_int64_microseconds(span)), g->current_fid(), g->current_task(), g};
+        SleepArgs e = {static_cast<uint64_t>(span.to_microseconds()), g->current_fid(), g->current_task(), g};
         g->set_remained(_add_sleep_event, &e);
         sched(pg);
         g = *pg;

@@ -56,7 +56,7 @@ namespace turbo {
         // may occur immediately) or the timeout has elapsed, returning the value of
         // its "notified" state in either case.
         bool WaitForNotificationWithTimeout(const turbo::Duration &d) const {
-            std::chrono::microseconds timeout = turbo::to_chrono_microseconds(d);
+            std::chrono::microseconds timeout = d.to_chrono_microseconds();
             std::unique_lock lk(_data->mutex);
             TLOG_CHECK_GE(_data->count, 0ul);
             return _data->cond.wait_for(lk, timeout, [this] { return _data->count == 0; });

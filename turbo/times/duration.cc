@@ -482,24 +482,6 @@ namespace turbo {
         return *this;
     }
 
-    double safe_float_mod(Duration num, Duration den) {
-        // Arithmetic with infinity is sticky.
-        if (num.is_infinite() || den == Duration::zero()) {
-            return (num < Duration::zero()) == (den < Duration::zero())
-                   ? std::numeric_limits<double>::infinity()
-                   : -std::numeric_limits<double>::infinity();
-        }
-        if (den.is_infinite()) return 0.0;
-
-        double a =
-                static_cast<double>(time_internal::GetRepHi(num)) * kTicksPerSecond +
-                time_internal::GetRepLo(num);
-        double b =
-                static_cast<double>(time_internal::GetRepHi(den)) * kTicksPerSecond +
-                time_internal::GetRepLo(den);
-        return a / b;
-    }
-
     //
     // trunc/floor/ceil.
     //
@@ -590,30 +572,6 @@ namespace turbo {
         return hi / (60 * 60);
     }
 
-    double to_double_nanoseconds(Duration d) {
-        return safe_float_mod(d, nanoseconds(1));
-    }
-
-    double to_double_microseconds(Duration d) {
-        return safe_float_mod(d, microseconds(1));
-    }
-
-    double to_double_milliseconds(Duration d) {
-        return safe_float_mod(d, milliseconds(1));
-    }
-
-    double to_double_seconds(Duration d) {
-        return safe_float_mod(d, seconds(1));
-    }
-
-    double to_double_minutes(Duration d) {
-        return safe_float_mod(d, minutes(1));
-    }
-
-    double to_double_hours(Duration d) {
-        return safe_float_mod(d, hours(1));
-    }
-
     timespec to_timespec(Duration d) {
         timespec ts;
         if (!d.is_infinite()) {
@@ -669,30 +627,6 @@ namespace turbo {
         }
         tv.tv_usec = static_cast<int>(ts.tv_nsec / 1000);  // suseconds_t
         return tv;
-    }
-
-    std::chrono::nanoseconds to_chrono_nanoseconds(Duration d) {
-        return time_internal::ToChronoDuration<std::chrono::nanoseconds>(d);
-    }
-
-    std::chrono::microseconds to_chrono_microseconds(Duration d) {
-        return time_internal::ToChronoDuration<std::chrono::microseconds>(d);
-    }
-
-    std::chrono::milliseconds to_chrono_milliseconds(Duration d) {
-        return time_internal::ToChronoDuration<std::chrono::milliseconds>(d);
-    }
-
-    std::chrono::seconds to_chrono_seconds(Duration d) {
-        return time_internal::ToChronoDuration<std::chrono::seconds>(d);
-    }
-
-    std::chrono::minutes to_chrono_minutes(Duration d) {
-        return time_internal::ToChronoDuration<std::chrono::minutes>(d);
-    }
-
-    std::chrono::hours to_chrono_hours(Duration d) {
-        return time_internal::ToChronoDuration<std::chrono::hours>(d);
     }
 
     //
@@ -800,16 +734,16 @@ namespace turbo {
             // Special case for durations with a magnitude < 1 second.  The duration
             // is printed as a fraction of a single unit, e.g., "1.2ms".
             if (d < microseconds(1)) {
-                AppendNumberUnit(&s, safe_float_mod(d, nanoseconds(1)), kDisplayNano);
+                AppendNumberUnit(&s, d.safe_float_mod(nanoseconds(1)), kDisplayNano);
             } else if (d < milliseconds(1)) {
-                AppendNumberUnit(&s, safe_float_mod(d, microseconds(1)), kDisplayMicro);
+                AppendNumberUnit(&s, d.safe_float_mod( microseconds(1)), kDisplayMicro);
             } else {
-                AppendNumberUnit(&s, safe_float_mod(d, milliseconds(1)), kDisplayMilli);
+                AppendNumberUnit(&s, d.safe_float_mod(milliseconds(1)), kDisplayMilli);
             }
         } else {
             AppendNumberUnit(&s, safe_int_mod(d, hours(1), &d), kDisplayHour);
             AppendNumberUnit(&s, safe_int_mod(d, minutes(1), &d), kDisplayMin);
-            AppendNumberUnit(&s, safe_float_mod(d, seconds(1)), kDisplaySec);
+            AppendNumberUnit(&s, d.safe_float_mod(seconds(1)), kDisplaySec);
         }
         if (s.empty() || s == "-") {
             s = "0";

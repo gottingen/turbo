@@ -63,6 +63,19 @@ namespace turbo {
         template<typename T>
         using EnableIfFoundation = typename std::enable_if_t<
                 std::is_integral_v<T> || std::is_enum_v<T> || std::is_floating_point_v<T>, int>;
+
+        // IsValidRep64<T>(0) is true if the expression `int64_t{std::declval<T>()}` is
+        // valid. That is, if a T can be assigned to an int64_t without narrowing.
+        template<typename T>
+        constexpr auto IsValidRep64(int) -> decltype(int64_t{std::declval<T>()} == 0) {
+            return true;
+        }
+
+        template<typename T>
+        constexpr auto IsValidRep64(char) -> bool {
+            return false;
+        }
+
     }  // namespace time_internal
     /**
      * @ingroup turbo_times_duration
@@ -182,22 +195,54 @@ namespace turbo {
     public:
         ////// getters //////
         template<typename T = int64_t>
-        time_internal::SelectInt64Double<T> to_nanoseconds();
+        constexpr time_internal::SelectInt64Double<T> to_nanoseconds() const;
 
         template<typename T = int64_t>
-        time_internal::SelectInt64Double<T> to_microseconds();
+        constexpr time_internal::SelectInt64Double<T> to_microseconds() const;
 
         template<typename T = int64_t>
-        time_internal::SelectInt64Double<T> to_milliseconds();
+        constexpr time_internal::SelectInt64Double<T> to_milliseconds() const;
 
         template<typename T = int64_t>
-        time_internal::SelectInt64Double<T> to_seconds();
+        constexpr time_internal::SelectInt64Double<T> to_seconds() const;
 
         template<typename T = int64_t>
-        time_internal::SelectInt64Double<T> to_minutes();
+        constexpr time_internal::SelectInt64Double<T> to_minutes() const;
 
         template<typename T = int64_t>
-        time_internal::SelectInt64Double<T> to_hours();
+        constexpr time_internal::SelectInt64Double<T> to_hours() const;
+
+        template<typename T>
+        constexpr T ToChronoDuration() const;
+
+        constexpr std::chrono::nanoseconds to_chrono_nanoseconds() const;
+
+        constexpr std::chrono::microseconds to_chrono_microseconds() const;
+
+        constexpr std::chrono::milliseconds to_chrono_milliseconds() const;
+
+        constexpr std::chrono::seconds to_chrono_seconds() const;
+
+        constexpr std::chrono::minutes to_chrono_minutes() const;
+
+        constexpr std::chrono::hours to_chrono_hours() const;
+
+        /////// transform ///////
+        /**
+         * @brief Divides a `Duration` numerator into a fractional number of units of a
+         *        `Duration` denominator.
+         *        See also the notes on `infinite()` below regarding the behavior of
+         *        division involving zero and infinite durations.
+         *        @see `turbo::safe_int_mod()` for a version that returns the quotient and remainder.
+         *        Example:
+         *        @code
+         *        double d = turbo::milliseconds(1500).safe_float_mod(turbo::seconds(1));
+         *        // d == 1.5
+         *        @endcode
+         * @param den the denominator
+         * @return the quotient
+         */
+        constexpr double safe_float_mod(Duration den) const;
 
     public:
         /////// creators ///////
@@ -258,6 +303,23 @@ namespace turbo {
         static constexpr Duration zero();
 
         constexpr Duration abs() const;
+    private:
+        template<typename Ratio>
+        constexpr int64_t ToInt64(Ratio) const;
+
+        // Fastpath implementations for the 6 common duration units.
+        constexpr int64_t ToInt64(std::nano) const;
+
+        constexpr int64_t ToInt64(std::micro) const;
+
+        constexpr int64_t ToInt64(std::milli) const;
+
+        constexpr int64_t ToInt64(std::ratio<1>) const;
+
+        constexpr int64_t ToInt64(std::ratio<60>) const;
+
+        constexpr int64_t ToInt64(std::ratio<3600>) const;
+
 
     private:
         friend constexpr int64_t time_internal::GetRepHi(Duration d);
@@ -275,9 +337,9 @@ namespace turbo {
 
 
     // Relational Operators
-    constexpr bool operator<(Duration lhs,Duration rhs);
+    constexpr bool operator<(Duration lhs, Duration rhs);
 
-    constexpr bool operator>(Duration lhs,Duration rhs) {
+    constexpr bool operator>(Duration lhs, Duration rhs) {
         return rhs < lhs;
     }
 
@@ -323,14 +385,12 @@ namespace turbo {
         return lhs /= rhs;
     }
 
-    inline int64_t operator/(Duration lhs,
-                             Duration rhs) {
+    inline int64_t operator/(Duration lhs, Duration rhs) {
         return time_internal::safe_int_mod(true, lhs, rhs,
                                            &lhs);  // trunc towards zero
     }
 
-    inline Duration operator%(Duration lhs,
-                              Duration rhs) {
+    inline Duration operator%(Duration lhs, Duration rhs) {
         return lhs %= rhs;
     }
 
@@ -381,24 +441,6 @@ namespace turbo {
         return time_internal::safe_int_mod(true, num, den,
                                            rem);  // trunc towards zero
     }
-
-    /**
-     * @ingroup turbo_times_duration
-     * @brief Divides a `Duration` numerator into a fractional number of units of a
-     *        `Duration` denominator.
-     *        See also the notes on `infinite()` below regarding the behavior of
-     *        division involving zero and infinite durations.
-     *        @see `turbo::safe_int_mod()` for a version that returns the quotient and remainder.
-     *        Example:
-     *        @code
-     *        double d = turbo::safe_float_mod(turbo::milliseconds(1500), turbo::seconds(1));
-     *        // d == 1.5
-     *        @endcode
-     * @param num the numerator
-     * @param den the denominator
-     * @return the quotient
-     */
-    double safe_float_mod(Duration num, Duration den);
 
     /**
      * @ingroup turbo_times_duration
@@ -535,79 +577,6 @@ namespace turbo {
         return n * hours(1);
     }
 
-    int64_t to_int64_nanoseconds(Duration d);
-
-    int64_t to_int64_microseconds(Duration d);
-
-    int64_t to_int64_milliseconds(Duration d);
-
-    int64_t to_int64_seconds(Duration d);
-
-    int64_t to_int64_minutes(Duration d);
-
-    int64_t to_int64_hours(Duration d);
-
-    /**
-     * @ingroup turbo_times_duration
-     * @brief Helper functions that convert a Duration to a floating point count of the
-     *       indicated unit. These functions are shorthand for the `safe_float_mod()`
-     *       function above; see its documentation for details about overflow, etc.
-     *
-     *       Example:
-     *       @code
-     *       turbo::Duration d = turbo::milliseconds(1500);
-     *       double dsec = turbo::to_double_seconds(d);  // dsec == 1.5
-     *       @endcode
-     * @param d
-     * @return
-     */
-    double to_double_nanoseconds(Duration d);
-
-    /**
-     * @ingroup turbo_times_duration
-     * @brief  similar to `to_double_nanoseconds()`
-     * @see `to_double_nanoseconds()`
-     * @param d
-     * @return
-     */
-    double to_double_microseconds(Duration d);
-
-    /**
-     * @ingroup turbo_times_duration
-     * @brief  similar to `to_double_nanoseconds()`
-     * @see `to_double_nanoseconds()`
-     * @param d
-     * @return
-     */
-    double to_double_milliseconds(Duration d);
-
-    /**
-     * @ingroup turbo_times_duration
-     * @brief  similar to `to_double_nanoseconds()`
-     * @see `to_double_nanoseconds()`
-     * @param d
-     * @return
-     */
-    double to_double_seconds(Duration d);
-
-    /**
-     * @ingroup turbo_times_duration
-     * @brief  similar to `to_double_nanoseconds()`
-     * @see `to_double_nanoseconds()`
-     * @param d
-     * @return
-     */
-    double to_double_minutes(Duration d);
-
-    /**
-     * @ingroup turbo_times_duration
-     * @brief  similar to `to_double_nanoseconds()`
-     * @see `to_double_nanoseconds()`
-     * @param d
-     * @return
-     */
-    double to_double_hours(Duration d);
-
     /**
      * @ingroup turbo_times_duration
      * @brief Converts any of the pre-defined std::chrono durations to an turbo::Duration.
@@ -672,71 +641,6 @@ namespace turbo {
     constexpr Duration from_chrono(
             const std::chrono::hours &d);
 
-    /**
-     * @ingroup turbo_times_duration
-     * @brief Converts an turbo::Duration to any of the pre-defined std::chrono durations.
-     *        If overflow would occur, the returned value will saturate at the min/max
-     *        chrono duration value instead.
-     *        Example:
-     *        @code
-     *        turbo::Duration d = turbo::microseconds(123);
-     *        auto x = turbo::to_chrono_microseconds(d);
-     *        auto y = turbo::to_chrono_nanoseconds(d);  // x == y
-     *        auto z = turbo::to_chrono_seconds(turbo::Duration::infinite());
-     *        // z == std::chrono::seconds::max()
-     *        @endcode
-     * @param d
-     * @return
-     */
-    std::chrono::nanoseconds to_chrono_nanoseconds(
-            Duration d);
-
-    /**
-     * @ingroup turbo_times_duration
-     * @brief  similar to `to_chrono_nanoseconds()`
-     * @see `to_chrono_nanoseconds()`
-     * @param d
-     * @return
-     */
-    std::chrono::microseconds to_chrono_microseconds(
-            Duration d);
-
-    /**
-     * @ingroup turbo_times_duration
-     * @brief  similar to `to_chrono_nanoseconds()`
-     * @see `to_chrono_nanoseconds()`
-     * @param d
-     * @return
-     */
-    std::chrono::milliseconds to_chrono_milliseconds(
-            Duration d);
-
-    /**
-     * @ingroup turbo_times_duration
-     * @brief  similar to `to_chrono_nanoseconds()`
-     * @see `to_chrono_nanoseconds()`
-     * @param d
-     * @return
-     */
-    std::chrono::seconds to_chrono_seconds(Duration d);
-
-    /**
-     * @ingroup turbo_times_duration
-     * @brief  similar to `to_chrono_seconds()`
-     * @see `to_chrono_seconds()`
-     * @param d
-     * @return
-     */
-    std::chrono::minutes to_chrono_minutes(Duration d);
-
-    /**
-     * @ingroup turbo_times_duration
-     * @brief  similar to `to_chrono_nanoseconds()`
-     * @see `to_chrono_nanoseconds()`
-     * @param d
-     * @return
-     */
-    std::chrono::hours to_chrono_hours(Duration d);
 
     /**
      * @ingroup turbo_times_duration
@@ -801,56 +705,80 @@ namespace turbo {
     timeval to_timeval(Duration d);
 
     template<typename T>
-    time_internal::SelectInt64Double<T> Duration::to_nanoseconds() {
+    constexpr time_internal::SelectInt64Double<T> Duration::to_nanoseconds() const {
         if constexpr (std::is_same_v<T, int64_t>) {
-            return to_int64_nanoseconds(*this);
+            if (rep_hi_ >= 0 &&
+                rep_hi_ >> 33 == 0) {
+                return (rep_hi_ * 1000 * 1000 * 1000) +
+                       (rep_lo_ / time_internal::kTicksPerNanosecond);
+            }
+            return *this / nanoseconds(1);
         } else {
-            return to_double_nanoseconds(*this);
+            return safe_float_mod(nanoseconds(1));
         }
     }
 
     template<typename T>
-    time_internal::SelectInt64Double<T> Duration::to_microseconds() {
+    constexpr time_internal::SelectInt64Double<T> Duration::to_microseconds() const {
         if constexpr (std::is_same_v<T, int64_t>) {
-            return to_int64_microseconds(*this);
+            if (rep_hi_ >= 0 &&
+                rep_hi_ >> 43 == 0) {
+                return (rep_hi_ * 1000 * 1000) +
+                       (rep_lo_ / (time_internal::kTicksPerNanosecond * 1000));
+            }
+            return *this / microseconds(1);
         } else {
-            return to_double_microseconds(*this);
+            return safe_float_mod(microseconds(1));
         }
     }
 
     template<typename T>
-    time_internal::SelectInt64Double<T> Duration::to_milliseconds() {
+    constexpr time_internal::SelectInt64Double<T> Duration::to_milliseconds() const {
         if constexpr (std::is_same_v<T, int64_t>) {
-            return to_int64_milliseconds(*this);
+            if (rep_hi_ >= 0 &&
+                rep_hi_ >> 53 == 0) {
+                return (rep_hi_ * 1000) +
+                       (rep_lo_ / (time_internal::kTicksPerNanosecond * 1000 * 1000));
+            }
+            return *this / milliseconds(1);
         } else {
-            return to_double_milliseconds(*this);
+            return safe_float_mod(milliseconds(1));
         }
     }
 
     template<typename T>
-    time_internal::SelectInt64Double<T> Duration::to_seconds() {
+    constexpr time_internal::SelectInt64Double<T> Duration::to_seconds() const {
         if constexpr (std::is_same_v<T, int64_t>) {
-            return to_int64_seconds(*this);
+            int64_t hi = rep_hi_;
+            if (is_infinite()) return hi;
+            if (hi < 0 && rep_lo_ != 0) ++hi;
+            return hi;
         } else {
-            return to_double_seconds(*this);
+            return safe_float_mod(seconds(1));
         }
     }
 
     template<typename T>
-    time_internal::SelectInt64Double<T> Duration::to_minutes() {
+    constexpr time_internal::SelectInt64Double<T> Duration::to_minutes() const {
         if constexpr (std::is_same_v<T, int64_t>) {
-            return to_int64_minutes(*this);
+            int64_t hi = rep_hi_;
+            if (is_infinite()) return hi;
+            if (hi < 0 && rep_lo_ != 0) ++hi;
+            return hi / 60;
         } else {
-            return to_double_minutes(*this);
+            return safe_float_mod(minutes(1));
         }
     }
 
     template<typename T>
-    time_internal::SelectInt64Double<T> Duration::to_hours() {
+    constexpr time_internal::SelectInt64Double<T> Duration::to_hours() const {
         if constexpr (std::is_same_v<T, int64_t>) {
-            return to_int64_hours(*this);
+            int64_t hi = rep_hi_;
+            if (is_infinite()) return hi;
+            if (hi < 0 && rep_lo_ != 0) ++hi;
+            return hi / (60 * 60);
         } else {
-            return to_double_hours(*this);
+            return safe_float_mod(hours(1));
         }
     }
 
@@ -924,6 +852,92 @@ namespace turbo {
     constexpr Duration Duration::abs() const {
         return is_negative() ? -*this : *this;
     }
+
+    constexpr double Duration::safe_float_mod(Duration den) const {
+        // Arithmetic with infinity is sticky.
+        if (is_infinite() || den == Duration::zero()) {
+            return (is_negative()) == (den < Duration::zero())
+                   ? std::numeric_limits<double>::infinity()
+                   : -std::numeric_limits<double>::infinity();
+        }
+        if (den.is_infinite()) return 0.0;
+
+        double a = static_cast<double>(rep_hi_) * time_internal::kTicksPerSecond + rep_lo_;
+        double b = static_cast<double>(time_internal::GetRepHi(den)) * time_internal::kTicksPerSecond +
+                   time_internal::GetRepLo(den);
+        return a / b;
+    }
+
+    template<typename Ratio>
+    constexpr int64_t Duration::ToInt64(Ratio) const {
+        // Note: This may be used on MSVC, which may have a system_clock period of
+        // std::ratio<1, 10 * 1000 * 1000>
+        return (*this * Ratio::den / Ratio::num).to_seconds();
+    }
+
+    // Fastpath implementations for the 6 common duration units.
+    constexpr int64_t Duration::ToInt64(std::nano) const{
+        return to_nanoseconds();
+    }
+
+    constexpr int64_t Duration::ToInt64(std::micro) const{
+        return to_microseconds();
+    }
+
+    constexpr int64_t Duration::ToInt64(std::milli) const{
+        return to_milliseconds();
+    }
+
+    constexpr int64_t Duration::ToInt64(std::ratio<1>) const {
+        return to_seconds();
+    }
+
+    constexpr int64_t Duration::ToInt64(std::ratio<60>) const {
+        return to_minutes();
+    }
+
+    constexpr int64_t Duration::ToInt64(std::ratio<3600>) const {
+        return to_hours();
+    }
+
+    // Converts an turbo::Duration to a chrono duration of type T.
+    template<typename T>
+    constexpr T Duration::ToChronoDuration() const {
+        using Rep = typename T::rep;
+        using Period = typename T::period;
+        static_assert(time_internal::IsValidRep64<Rep>(0), "duration::rep is invalid");
+        if (is_infinite())
+            return *this < Duration::zero() ? (T::min)() : (T::max)();
+        const auto v = ToInt64(Period{});
+        if (v > (std::numeric_limits<Rep>::max)()) return (T::max)();
+        if (v < (std::numeric_limits<Rep>::min)()) return (T::min)();
+        return T{v};
+    }
+
+    constexpr std::chrono::nanoseconds Duration::to_chrono_nanoseconds() const {
+        return ToChronoDuration<std::chrono::nanoseconds>();
+    }
+
+    constexpr std::chrono::microseconds Duration::to_chrono_microseconds() const {
+        return ToChronoDuration<std::chrono::microseconds>();
+    }
+
+    constexpr std::chrono::milliseconds Duration::to_chrono_milliseconds() const {
+        return ToChronoDuration<std::chrono::milliseconds>();
+    }
+
+    constexpr std::chrono::seconds Duration::to_chrono_seconds() const {
+        return ToChronoDuration<std::chrono::seconds>();
+    }
+
+    constexpr std::chrono::minutes Duration::to_chrono_minutes() const {
+        return ToChronoDuration<std::chrono::minutes>();
+    }
+
+    constexpr std::chrono::hours Duration::to_chrono_hours() const {
+        return ToChronoDuration<std::chrono::hours>();
+    }
+
 
     namespace time_internal {
         // Creates a Duration with a given representation.
@@ -1012,18 +1026,6 @@ namespace turbo {
                    : v > 0 ? Duration::infinite() : -Duration::infinite();
         }
 
-        // IsValidRep64<T>(0) is true if the expression `int64_t{std::declval<T>()}` is
-        // valid. That is, if a T can be assigned to an int64_t without narrowing.
-        template<typename T>
-        constexpr auto IsValidRep64(int) -> decltype(int64_t{std::declval<T>()} == 0) {
-            return true;
-        }
-
-        template<typename T>
-        constexpr auto IsValidRep64(char) -> bool {
-            return false;
-        }
-
         // Converts a std::chrono::duration to an turbo::Duration.
         template<typename Rep, typename Period>
         constexpr Duration from_chrono(
@@ -1032,54 +1034,6 @@ namespace turbo {
             return FromInt64(int64_t{d.count()}, Period{});
         }
 
-        template<typename Ratio>
-        int64_t ToInt64(Duration d, Ratio) {
-            // Note: This may be used on MSVC, which may have a system_clock period of
-            // std::ratio<1, 10 * 1000 * 1000>
-            return to_int64_seconds(d * Ratio::den / Ratio::num);
-        }
-
-        // Fastpath implementations for the 6 common duration units.
-        inline int64_t ToInt64(Duration d, std::nano) {
-            return to_int64_nanoseconds(d);
-        }
-
-        inline int64_t ToInt64(Duration d, std::micro) {
-            return to_int64_microseconds(d);
-        }
-
-        inline int64_t ToInt64(Duration d, std::milli) {
-            return to_int64_milliseconds(d);
-        }
-
-        inline int64_t ToInt64(Duration d,
-                               std::ratio<1>) {
-            return to_int64_seconds(d);
-        }
-
-        inline int64_t ToInt64(Duration d,
-                               std::ratio<60>) {
-            return to_int64_minutes(d);
-        }
-
-        inline int64_t ToInt64(Duration d,
-                               std::ratio<3600>) {
-            return to_int64_hours(d);
-        }
-
-        // Converts an turbo::Duration to a chrono duration of type T.
-        template<typename T>
-        T ToChronoDuration(Duration d) {
-            using Rep = typename T::rep;
-            using Period = typename T::period;
-            static_assert(IsValidRep64<Rep>(0), "duration::rep is invalid");
-            if (d.is_infinite())
-                return d < Duration::zero() ? (T::min)() : (T::max)();
-            const auto v = ToInt64(d, Period{});
-            if (v > (std::numeric_limits<Rep>::max)()) return (T::max)();
-            if (v < (std::numeric_limits<Rep>::min)()) return (T::min)();
-            return T{v};
-        }
     }  // namespace time_internal
     constexpr bool operator<(Duration lhs,
                              Duration rhs) {

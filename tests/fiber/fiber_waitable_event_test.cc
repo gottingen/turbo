@@ -244,7 +244,7 @@ namespace turbo::fiber_internal {
             fiber_join(th, nullptr);
             tm.stop();
 
-            REQUIRE_LT(labs(to_int64_milliseconds(tm.elapsed() - SleepDuration)), 25);
+            REQUIRE_LT((tm.elapsed() - SleepDuration).abs().to_milliseconds(), 25);
             // REQUIRE(turbo::fiber_internal::get_task_control()->
             //             timer_thread()._idset.empty());
             REQUIRE_EQ(true, turbo::is_invalid_argument(fiber_stop(th)));

@@ -213,8 +213,7 @@ namespace turbo {
     time_t to_time_t(Time t) { return turbo::to_timespec(t).tv_sec; }
 
     double to_udate(Time t) {
-        return turbo::safe_float_mod(time_internal::ToUnixDuration(t),
-                                   turbo::milliseconds(1));
+        return time_internal::ToUnixDuration(t).safe_float_mod(turbo::milliseconds(1));
     }
 
     int64_t to_universal(turbo::Time t) {
@@ -276,8 +275,7 @@ namespace turbo {
         using D = std::chrono::system_clock::duration;
         auto d = time_internal::ToUnixDuration(t);
         if (d < Duration::zero()) d = floor(d, from_chrono(D{1}));
-        return std::chrono::system_clock::from_time_t(0) +
-               time_internal::ToChronoDuration<D>(d);
+        return std::chrono::system_clock::from_time_t(0) + d.ToChronoDuration<D>();
     }
 
     //

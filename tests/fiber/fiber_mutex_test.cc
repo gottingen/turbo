@@ -44,7 +44,7 @@ namespace turbo::fiber_internal {
         fiber_mutex_t *m = (fiber_mutex_t *) arg;
         TURBO_UNUSED(fiber_mutex_lock(m));
         turbo::println("{} I'm here, {}, {}ms",
-                       turbo::thread_numeric_id(), ++c, turbo::to_int64_milliseconds(turbo::time_now() - start_time));
+                       turbo::thread_numeric_id(), ++c, (turbo::time_now() - start_time).to_milliseconds());
         turbo::fiber_sleep_for(turbo::microseconds(10000));
         fiber_mutex_unlock(m);
         return nullptr;
@@ -90,10 +90,10 @@ namespace turbo::fiber_internal {
     }
 
     TEST_CASE("MutexTest, timedlock") {
-        fiber_cond_t c;
+        fiber_cond_t cond;
         fiber_mutex_t m1;
         fiber_mutex_t m2;
-        REQUIRE(fiber_cond_init(&c, nullptr).ok());
+        REQUIRE(fiber_cond_init(&cond, nullptr).ok());
         REQUIRE(fiber_mutex_init(&m1, nullptr).ok());
         REQUIRE(fiber_mutex_init(&m2, nullptr).ok());
 
@@ -103,7 +103,7 @@ namespace turbo::fiber_internal {
         TURBO_UNUSED(fiber_mutex_lock(&m2));
         fiber_id_t pth;
         REQUIRE(fiber_start_urgent(&pth, nullptr, do_locks, &m1).ok());
-        REQUIRE(turbo::is_deadline_exceeded(fiber_cond_timedwait(&c, &m2, &t)));
+        REQUIRE(turbo::is_deadline_exceeded(fiber_cond_timedwait(&cond, &m2, &t)));
         REQUIRE(fiber_join(pth, nullptr).ok());
         fiber_mutex_unlock(&m1);
         fiber_mutex_unlock(&m2);

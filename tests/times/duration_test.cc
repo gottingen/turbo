@@ -107,16 +107,16 @@ namespace {
     constexpr turbo::Duration z = turbo::Duration::zero();                  \
     constexpr turbo::Duration inf = turbo::Duration::infinite();            \
     constexpr double dbl_inf = std::numeric_limits<double>::infinity(); \
-    REQUIRE_EQ(kint64min, turbo::to_int64_##UNIT(-inf));                    \
-    REQUIRE_EQ(-1, turbo::to_int64_##UNIT(-d));                             \
-    REQUIRE_EQ(0, turbo::to_int64_##UNIT(z));                               \
-    REQUIRE_EQ(1, turbo::to_int64_##UNIT(d));                               \
-    REQUIRE_EQ(kint64max, turbo::to_int64_##UNIT(inf));                     \
-    REQUIRE_EQ(-dbl_inf, turbo::to_double_##UNIT(-inf));                    \
-    REQUIRE_EQ(-1.5, turbo::to_double_##UNIT(-d));                          \
-    REQUIRE_EQ(0, turbo::to_double_##UNIT(z));                              \
-    REQUIRE_EQ(1.5, turbo::to_double_##UNIT(d));                            \
-    REQUIRE_EQ(dbl_inf, turbo::to_double_##UNIT(inf));                      \
+    REQUIRE_EQ(kint64min, (-inf).to_##UNIT());                    \
+    REQUIRE_EQ(-1, (-d).to_##UNIT());                             \
+    REQUIRE_EQ(0, (z).to_##UNIT());                               \
+    REQUIRE_EQ(1, (d).to_##UNIT());                               \
+    REQUIRE_EQ(kint64max, (inf).to_##UNIT());                     \
+    REQUIRE_EQ(-dbl_inf, (-inf).to_##UNIT<double>());                    \
+    REQUIRE_EQ(-1.5, (-d).to_##UNIT<double>());                          \
+    REQUIRE_EQ(0, (z).to_##UNIT<double>());                              \
+    REQUIRE_EQ(1.5, (d).to_##UNIT<double>());                            \
+    REQUIRE_EQ(dbl_inf, (inf).to_##UNIT<double>());                      \
   } while (0)
 
         TEST_DURATION_CONVERSION(nanoseconds);
@@ -132,47 +132,47 @@ namespace {
     template<int64_t N>
     void TestToConversion() {
         constexpr turbo::Duration nano = turbo::nanoseconds(N);
-        REQUIRE_EQ(N, turbo::to_int64_nanoseconds(nano));
-        REQUIRE_EQ(0, turbo::to_int64_microseconds(nano));
-        REQUIRE_EQ(0, turbo::to_int64_milliseconds(nano));
-        REQUIRE_EQ(0, turbo::to_int64_seconds(nano));
-        REQUIRE_EQ(0, turbo::to_int64_minutes(nano));
-        REQUIRE_EQ(0, turbo::to_int64_hours(nano));
+        REQUIRE_EQ(N, (nano).to_nanoseconds());
+        REQUIRE_EQ(0, (nano).to_microseconds());
+        REQUIRE_EQ(0, (nano).to_milliseconds());
+        REQUIRE_EQ(0, (nano).to_seconds());
+        REQUIRE_EQ(0, (nano).to_minutes());
+        REQUIRE_EQ(0, (nano).to_hours());
         const turbo::Duration micro = turbo::microseconds(N);
-        REQUIRE_EQ(N * 1000, turbo::to_int64_nanoseconds(micro));
-        REQUIRE_EQ(N, turbo::to_int64_microseconds(micro));
-        REQUIRE_EQ(0, turbo::to_int64_milliseconds(micro));
-        REQUIRE_EQ(0, turbo::to_int64_seconds(micro));
-        REQUIRE_EQ(0, turbo::to_int64_minutes(micro));
-        REQUIRE_EQ(0, turbo::to_int64_hours(micro));
+        REQUIRE_EQ(N * 1000, (micro).to_nanoseconds());
+        REQUIRE_EQ(N, (micro).to_microseconds());
+        REQUIRE_EQ(0, (micro).to_milliseconds());
+        REQUIRE_EQ(0, (micro).to_seconds());
+        REQUIRE_EQ(0, (micro).to_minutes());
+        REQUIRE_EQ(0, (micro).to_hours());
         const turbo::Duration milli = turbo::milliseconds(N);
-        REQUIRE_EQ(N * 1000 * 1000, turbo::to_int64_nanoseconds(milli));
-        REQUIRE_EQ(N * 1000, turbo::to_int64_microseconds(milli));
-        REQUIRE_EQ(N, turbo::to_int64_milliseconds(milli));
-        REQUIRE_EQ(0, turbo::to_int64_seconds(milli));
-        REQUIRE_EQ(0, turbo::to_int64_minutes(milli));
-        REQUIRE_EQ(0, turbo::to_int64_hours(milli));
+        REQUIRE_EQ(N * 1000 * 1000, (milli).to_nanoseconds());
+        REQUIRE_EQ(N * 1000, (milli).to_microseconds());
+        REQUIRE_EQ(N, (milli).to_milliseconds());
+        REQUIRE_EQ(0, (milli).to_seconds());
+        REQUIRE_EQ(0, (milli).to_minutes());
+        REQUIRE_EQ(0, (milli).to_hours());
         const turbo::Duration sec = turbo::seconds(N);
-        REQUIRE_EQ(N * 1000 * 1000 * 1000, turbo::to_int64_nanoseconds(sec));
-        REQUIRE_EQ(N * 1000 * 1000, turbo::to_int64_microseconds(sec));
-        REQUIRE_EQ(N * 1000, turbo::to_int64_milliseconds(sec));
-        REQUIRE_EQ(N, turbo::to_int64_seconds(sec));
-        REQUIRE_EQ(0, turbo::to_int64_minutes(sec));
-        REQUIRE_EQ(0, turbo::to_int64_hours(sec));
+        REQUIRE_EQ(N * 1000 * 1000 * 1000, (sec).to_nanoseconds());
+        REQUIRE_EQ(N * 1000 * 1000, (sec).to_microseconds());
+        REQUIRE_EQ(N * 1000,(sec).to_milliseconds());
+        REQUIRE_EQ(N, (sec).to_seconds());
+        REQUIRE_EQ(0, (sec).to_minutes());
+        REQUIRE_EQ(0, (sec).to_hours());
         const turbo::Duration min = turbo::minutes(N);
-        REQUIRE_EQ(N * 60 * 1000 * 1000 * 1000, turbo::to_int64_nanoseconds(min));
-        REQUIRE_EQ(N * 60 * 1000 * 1000, turbo::to_int64_microseconds(min));
-        REQUIRE_EQ(N * 60 * 1000, turbo::to_int64_milliseconds(min));
-        REQUIRE_EQ(N * 60, turbo::to_int64_seconds(min));
-        REQUIRE_EQ(N, turbo::to_int64_minutes(min));
-        REQUIRE_EQ(0, turbo::to_int64_hours(min));
+        REQUIRE_EQ(N * 60 * 1000 * 1000 * 1000, (min).to_nanoseconds());
+        REQUIRE_EQ(N * 60 * 1000 * 1000, (min).to_microseconds());
+        REQUIRE_EQ(N * 60 * 1000, (min).to_milliseconds());
+        REQUIRE_EQ(N * 60, (min).to_seconds());
+        REQUIRE_EQ(N, (min).to_minutes());
+        REQUIRE_EQ(0, (min).to_hours());
         const turbo::Duration hour = turbo::hours(N);
-        REQUIRE_EQ(N * 60 * 60 * 1000 * 1000 * 1000, turbo::to_int64_nanoseconds(hour));
-        REQUIRE_EQ(N * 60 * 60 * 1000 * 1000, turbo::to_int64_microseconds(hour));
-        REQUIRE_EQ(N * 60 * 60 * 1000, turbo::to_int64_milliseconds(hour));
-        REQUIRE_EQ(N * 60 * 60, turbo::to_int64_seconds(hour));
-        REQUIRE_EQ(N * 60, turbo::to_int64_minutes(hour));
-        REQUIRE_EQ(N, turbo::to_int64_hours(hour));
+        REQUIRE_EQ(N * 60 * 60 * 1000 * 1000 * 1000, (hour).to_nanoseconds());
+        REQUIRE_EQ(N * 60 * 60 * 1000 * 1000, (hour).to_microseconds());
+        REQUIRE_EQ(N * 60 * 60 * 1000, (hour).to_milliseconds());
+        REQUIRE_EQ(N * 60 * 60, (hour).to_seconds());
+        REQUIRE_EQ(N * 60, (hour).to_minutes());
+        REQUIRE_EQ(N, (hour).to_hours());
     }
 
     TEST_CASE("Duration, ToConversionDeprecated") {
@@ -257,10 +257,10 @@ namespace {
         using std::chrono::minutes;
         using std::chrono::hours;
 
-        REQUIRE_EQ(nanoseconds(N), turbo::to_chrono_nanoseconds(turbo::nanoseconds(N)));
-        REQUIRE_EQ(microseconds(N), turbo::to_chrono_microseconds(turbo::microseconds(N)));
-        REQUIRE_EQ(milliseconds(N), turbo::to_chrono_milliseconds(turbo::milliseconds(N)));
-        REQUIRE_EQ(seconds(N), turbo::to_chrono_seconds(turbo::seconds(N)));
+        REQUIRE_EQ(nanoseconds(N), (turbo::nanoseconds(N)).to_chrono_nanoseconds());
+        REQUIRE_EQ(microseconds(N), (turbo::microseconds(N)).to_chrono_microseconds());
+        REQUIRE_EQ(milliseconds(N),(turbo::milliseconds(N)).to_chrono_milliseconds());
+        REQUIRE_EQ(seconds(N), (turbo::seconds(N)).to_chrono_seconds());
 
         constexpr auto turbo_minutes = turbo::minutes(N);
         auto chrono_minutes = minutes(N);
@@ -269,7 +269,7 @@ namespace {
         } else if (turbo_minutes == turbo::Duration::infinite()) {
             chrono_minutes = minutes::max();
         }
-        REQUIRE_EQ(chrono_minutes, turbo::to_chrono_minutes(turbo_minutes));
+        REQUIRE_EQ(chrono_minutes, (turbo_minutes).to_chrono_minutes());
 
         constexpr auto turbo_hours = turbo::hours(N);
         auto chrono_hours = hours(N);
@@ -278,7 +278,7 @@ namespace {
         } else if (turbo_hours == turbo::Duration::infinite()) {
             chrono_hours = hours::max();
         }
-        REQUIRE_EQ(chrono_hours, turbo::to_chrono_hours(turbo_hours));
+        REQUIRE_EQ(chrono_hours, (turbo_hours).to_chrono_hours());
     }
 
     TEST_CASE("Duration, ToChrono") {
@@ -297,33 +297,33 @@ namespace {
 
         // Verify truncation toward zero.
         const auto tick = turbo::nanoseconds(1) / 4;
-        REQUIRE_EQ(nanoseconds(0), turbo::to_chrono_nanoseconds(tick));
-        REQUIRE_EQ(nanoseconds(0), turbo::to_chrono_nanoseconds(-tick));
-        REQUIRE_EQ(microseconds(0), turbo::to_chrono_microseconds(tick));
-        REQUIRE_EQ(microseconds(0), turbo::to_chrono_microseconds(-tick));
-        REQUIRE_EQ(milliseconds(0), turbo::to_chrono_milliseconds(tick));
-        REQUIRE_EQ(milliseconds(0), turbo::to_chrono_milliseconds(-tick));
-        REQUIRE_EQ(seconds(0), turbo::to_chrono_seconds(tick));
-        REQUIRE_EQ(seconds(0), turbo::to_chrono_seconds(-tick));
-        REQUIRE_EQ(minutes(0), turbo::to_chrono_minutes(tick));
-        REQUIRE_EQ(minutes(0), turbo::to_chrono_minutes(-tick));
-        REQUIRE_EQ(hours(0), turbo::to_chrono_hours(tick));
-        REQUIRE_EQ(hours(0), turbo::to_chrono_hours(-tick));
+        REQUIRE_EQ(nanoseconds(0), (tick).to_chrono_nanoseconds());
+        REQUIRE_EQ(nanoseconds(0), (-tick).to_chrono_nanoseconds());
+        REQUIRE_EQ(microseconds(0), (tick).to_chrono_microseconds());
+        REQUIRE_EQ(microseconds(0), (-tick).to_chrono_microseconds());
+        REQUIRE_EQ(milliseconds(0), (tick).to_chrono_milliseconds());
+        REQUIRE_EQ(milliseconds(0), (-tick).to_chrono_milliseconds());
+        REQUIRE_EQ(seconds(0), (tick).to_chrono_seconds());
+        REQUIRE_EQ(seconds(0), (-tick).to_chrono_seconds());
+        REQUIRE_EQ(minutes(0), (tick).to_chrono_minutes());
+        REQUIRE_EQ(minutes(0),(-tick).to_chrono_minutes());
+        REQUIRE_EQ(hours(0), (tick).to_chrono_hours());
+        REQUIRE_EQ(hours(0),(-tick).to_chrono_hours());
 
         // Verifies +/- infinity saturation at max/min.
         constexpr auto inf = turbo::Duration::infinite();
-        REQUIRE_EQ(nanoseconds::min(), turbo::to_chrono_nanoseconds(-inf));
-        REQUIRE_EQ(nanoseconds::max(), turbo::to_chrono_nanoseconds(inf));
-        REQUIRE_EQ(microseconds::min(), turbo::to_chrono_microseconds(-inf));
-        REQUIRE_EQ(microseconds::max(), turbo::to_chrono_microseconds(inf));
-        REQUIRE_EQ(milliseconds::min(), turbo::to_chrono_milliseconds(-inf));
-        REQUIRE_EQ(milliseconds::max(), turbo::to_chrono_milliseconds(inf));
-        REQUIRE_EQ(seconds::min(), turbo::to_chrono_seconds(-inf));
-        REQUIRE_EQ(seconds::max(), turbo::to_chrono_seconds(inf));
-        REQUIRE_EQ(minutes::min(), turbo::to_chrono_minutes(-inf));
-        REQUIRE_EQ(minutes::max(), turbo::to_chrono_minutes(inf));
-        REQUIRE_EQ(hours::min(), turbo::to_chrono_hours(-inf));
-        REQUIRE_EQ(hours::max(), turbo::to_chrono_hours(inf));
+        REQUIRE_EQ(nanoseconds::min(),(-inf).to_chrono_nanoseconds());
+        REQUIRE_EQ(nanoseconds::max(), (inf).to_chrono_nanoseconds());
+        REQUIRE_EQ(microseconds::min(), (-inf).to_chrono_microseconds());
+        REQUIRE_EQ(microseconds::max(), (inf).to_chrono_microseconds());
+        REQUIRE_EQ(milliseconds::min(), (-inf).to_chrono_milliseconds());
+        REQUIRE_EQ(milliseconds::max(), (inf).to_chrono_milliseconds());
+        REQUIRE_EQ(seconds::min(), (-inf).to_chrono_seconds());
+        REQUIRE_EQ(seconds::max(), (inf).to_chrono_seconds());
+        REQUIRE_EQ(minutes::min(),(-inf).to_chrono_minutes());
+        REQUIRE_EQ(minutes::max(), (inf).to_chrono_minutes());
+        REQUIRE_EQ(hours::min(), (-inf).to_chrono_hours());
+        REQUIRE_EQ(hours::max(), (inf).to_chrono_hours());
     }
 
     TEST_CASE("Duration, FactoryOverloads") {
@@ -343,8 +343,8 @@ namespace {
   REQUIRE_EQ(1, NAME(static_cast<uint64_t>(1)) / NAME(1));                     \
   REQUIRE_EQ(NAME(1) / 2, NAME(static_cast<float>(0.5)));                      \
   REQUIRE_EQ(NAME(1) / 2, NAME(static_cast<double>(0.5)));                     \
-  REQUIRE_EQ(1.5, turbo::safe_float_mod(NAME(static_cast<float>(1.5)), NAME(1))); \
-  REQUIRE_EQ(1.5, turbo::safe_float_mod(NAME(static_cast<double>(1.5)), NAME(1)));
+  REQUIRE_EQ(1.5, (NAME(static_cast<float>(1.5))).safe_float_mod(NAME(1))); \
+  REQUIRE_EQ(1.5, (NAME(static_cast<double>(1.5))).safe_float_mod( NAME(1)));
 
         TEST_FACTORY_OVERLOADS(turbo::nanoseconds);
         TEST_FACTORY_OVERLOADS(turbo::microseconds);
@@ -722,19 +722,19 @@ namespace {
         const turbo::Duration inf = turbo::Duration::infinite();
         const double dbl_inf = std::numeric_limits<double>::infinity();
 
-        REQUIRE_EQ(dbl_inf, turbo::safe_float_mod(inf, inf));
-        REQUIRE_EQ(dbl_inf, turbo::safe_float_mod(-inf, -inf));
-        REQUIRE_EQ(dbl_inf, turbo::safe_float_mod(inf, any_dur));
-        REQUIRE_EQ(0.0, turbo::safe_float_mod(any_dur, inf));
-        REQUIRE_EQ(dbl_inf, turbo::safe_float_mod(-inf, -any_dur));
-        REQUIRE_EQ(0.0, turbo::safe_float_mod(-any_dur, -inf));
+        REQUIRE_EQ(dbl_inf, inf.safe_float_mod(inf));
+        REQUIRE_EQ(dbl_inf, (-inf).safe_float_mod( -inf));
+        REQUIRE_EQ(dbl_inf, (inf).safe_float_mod(any_dur));
+        REQUIRE_EQ(0.0, (any_dur).safe_float_mod(inf));
+        REQUIRE_EQ(dbl_inf, (-inf).safe_float_mod(-any_dur));
+        REQUIRE_EQ(0.0, (-any_dur).safe_float_mod(-inf));
 
-        REQUIRE_EQ(-dbl_inf, turbo::safe_float_mod(-inf, inf));
-        REQUIRE_EQ(-dbl_inf, turbo::safe_float_mod(inf, -inf));
-        REQUIRE_EQ(-dbl_inf, turbo::safe_float_mod(-inf, any_dur));
-        REQUIRE_EQ(0.0, turbo::safe_float_mod(-any_dur, inf));
-        REQUIRE_EQ(-dbl_inf, turbo::safe_float_mod(inf, -any_dur));
-        REQUIRE_EQ(0.0, turbo::safe_float_mod(any_dur, -inf));
+        REQUIRE_EQ(-dbl_inf, (-inf).safe_float_mod(inf));
+        REQUIRE_EQ(-dbl_inf, (inf).safe_float_mod(-inf));
+        REQUIRE_EQ(-dbl_inf, (-inf).safe_float_mod(any_dur));
+        REQUIRE_EQ(0.0, (-any_dur).safe_float_mod(inf));
+        REQUIRE_EQ(-dbl_inf, (inf).safe_float_mod(-any_dur));
+        REQUIRE_EQ(0.0, (any_dur).safe_float_mod(-inf));
     }
 
     TEST_CASE("Duration, DivisionByZero") {
@@ -779,9 +779,9 @@ namespace {
         REQUIRE_EQ(kint64min, -any_dur / zero);
 
         // FDiv
-        REQUIRE_EQ(dbl_inf, turbo::safe_float_mod(zero, zero));
-        REQUIRE_EQ(dbl_inf, turbo::safe_float_mod(any_dur, zero));
-        REQUIRE_EQ(-dbl_inf, turbo::safe_float_mod(-any_dur, zero));
+        REQUIRE_EQ(dbl_inf, (zero).safe_float_mod( zero));
+        REQUIRE_EQ(dbl_inf, (any_dur).safe_float_mod(zero));
+        REQUIRE_EQ(-dbl_inf, (-any_dur).safe_float_mod( zero));
     }
     bool is_infinit(const turbo::Duration& d) {
         return d == turbo::Duration::infinite() || d == -turbo::Duration::infinite();
@@ -1001,7 +1001,7 @@ namespace {
     REQUIRE_EQ(2, UNIT(2) / UNIT(1));                          \
     turbo::Duration rem;                                       \
     REQUIRE_EQ(2, turbo::safe_int_mod(UNIT(2), UNIT(1), &rem)); \
-    REQUIRE_EQ(2.0, turbo::safe_float_mod(UNIT(2), UNIT(1)));     \
+    REQUIRE_EQ(2.0, UNIT(2).safe_float_mod(UNIT(1)));     \
   } while (0)
 
         TEST_MUL_OPS(turbo::nanoseconds);
@@ -1326,10 +1326,10 @@ namespace {
                     REQUIRE_NE(d, after_d);
                     REQUIRE_EQ(after_d - d, duration_tick);
 
-                    double low_edge = to_double_seconds(d);
+                    double low_edge = d.to_seconds<double>();
                     REQUIRE_EQ(d, turbo::seconds(low_edge));
 
-                    double high_edge = to_double_seconds(after_d);
+                    double high_edge = after_d.to_seconds<double>();
                     REQUIRE_EQ(after_d, turbo::seconds(high_edge));
 
                     for (;;) {

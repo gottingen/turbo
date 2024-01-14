@@ -69,7 +69,7 @@ namespace {
             if (alarm_policy == AlarmPolicy::kWithAlarm) {
                 alarm_handler_invoked = false;
                 old_alarm = signal(SIGALRM, AlarmHandler);
-                alarm(turbo::to_int64_seconds(d / 2));
+                alarm((d / 2).to_seconds());
             }
 #else
             REQUIRE_EQ(alarm_policy, AlarmPolicy::kWithoutAlarm);

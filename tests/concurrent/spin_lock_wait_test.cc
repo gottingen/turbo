@@ -99,7 +99,7 @@ namespace plain_test {
         }
 
         turbo::println("wake {} times, {}ns each, lock1={} njob={}",
-                N, turbo::to_int64_nanoseconds((t2-t1)/N), lock1.load(), njob);
+                N, ((t2-t1)/N).to_nanoseconds(), lock1.load(), njob);
         REQUIRE_EQ(N, (size_t)(lock1.load() + njob));
     }
 
@@ -280,7 +280,7 @@ namespace spin_waiter_test {
         }
 
         turbo::println("wake {} times, {}ns each, lock1={} njob={}",
-                       N, turbo::to_int64_nanoseconds((t2-t1)/N), lock1.load(), njob);
+                       N, ((t2-t1)/N).to_nanoseconds(), lock1.load(), njob);
         REQUIRE_EQ(N, (size_t)(lock1.load() + njob));
     }
 
