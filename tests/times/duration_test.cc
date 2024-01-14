@@ -1113,22 +1113,22 @@ namespace {
         const turbo::Duration inf = turbo::Duration::infinite();
         for (int unit_sign: {1, -1}) {  // sign shouldn't matter
             REQUIRE_EQ(turbo::nanoseconds(1234567890),
-                       trunc(d, unit_sign * turbo::nanoseconds(1)));
+                       d.trunc( unit_sign * turbo::nanoseconds(1)));
             REQUIRE_EQ(turbo::microseconds(1234567),
-                       trunc(d, unit_sign * turbo::microseconds(1)));
+                       d.trunc( unit_sign * turbo::microseconds(1)));
             REQUIRE_EQ(turbo::milliseconds(1234),
-                       trunc(d, unit_sign * turbo::milliseconds(1)));
-            REQUIRE_EQ(turbo::seconds(1), trunc(d, unit_sign * turbo::seconds(1)));
-            REQUIRE_EQ(inf, trunc(inf, unit_sign * turbo::seconds(1)));
+                       d.trunc( unit_sign * turbo::milliseconds(1)));
+            REQUIRE_EQ(turbo::seconds(1), d.trunc(unit_sign * turbo::seconds(1)));
+            REQUIRE_EQ(inf, inf.trunc(unit_sign * turbo::seconds(1)));
 
             REQUIRE_EQ(turbo::nanoseconds(-1234567890),
-                       trunc(-d, unit_sign * turbo::nanoseconds(1)));
+                       (-d).trunc( unit_sign * turbo::nanoseconds(1)));
             REQUIRE_EQ(turbo::microseconds(-1234567),
-                       trunc(-d, unit_sign * turbo::microseconds(1)));
+                       (-d).trunc( unit_sign * turbo::microseconds(1)));
             REQUIRE_EQ(turbo::milliseconds(-1234),
-                       trunc(-d, unit_sign * turbo::milliseconds(1)));
-            REQUIRE_EQ(turbo::seconds(-1), trunc(-d, unit_sign * turbo::seconds(1)));
-            REQUIRE_EQ(-inf, trunc(-inf, unit_sign * turbo::seconds(1)));
+                       (-d).trunc( unit_sign * turbo::milliseconds(1)));
+            REQUIRE_EQ(turbo::seconds(-1), (-d).trunc( unit_sign * turbo::seconds(1)));
+            REQUIRE_EQ(-inf, (-inf).trunc( unit_sign * turbo::seconds(1)));
         }
     }
 
@@ -1137,22 +1137,22 @@ namespace {
         const turbo::Duration inf = turbo::Duration::infinite();
         for (int unit_sign: {1, -1}) {  // sign shouldn't matter
             REQUIRE_EQ(turbo::nanoseconds(1234567890),
-                       turbo::floor(d, unit_sign * turbo::nanoseconds(1)));
+                       d.floor(unit_sign * turbo::nanoseconds(1)));
             REQUIRE_EQ(turbo::microseconds(1234567),
-                       turbo::floor(d, unit_sign * turbo::microseconds(1)));
+                       d.floor(unit_sign * turbo::microseconds(1)));
             REQUIRE_EQ(turbo::milliseconds(1234),
-                       turbo::floor(d, unit_sign * turbo::milliseconds(1)));
-            REQUIRE_EQ(turbo::seconds(1), turbo::floor(d, unit_sign * turbo::seconds(1)));
-            REQUIRE_EQ(inf, turbo::floor(inf, unit_sign * turbo::seconds(1)));
+                       d.floor(unit_sign * turbo::milliseconds(1)));
+            REQUIRE_EQ(turbo::seconds(1), d.floor( unit_sign * turbo::seconds(1)));
+            REQUIRE_EQ(inf, inf.floor(unit_sign * turbo::seconds(1)));
 
             REQUIRE_EQ(turbo::nanoseconds(-1234567890),
-                       turbo::floor(-d, unit_sign * turbo::nanoseconds(1)));
+                       (-d).floor( unit_sign * turbo::nanoseconds(1)));
             REQUIRE_EQ(turbo::microseconds(-1234568),
-                       turbo::floor(-d, unit_sign * turbo::microseconds(1)));
+                       (-d).floor(unit_sign * turbo::microseconds(1)));
             REQUIRE_EQ(turbo::milliseconds(-1235),
-                       turbo::floor(-d, unit_sign * turbo::milliseconds(1)));
-            REQUIRE_EQ(turbo::seconds(-2), turbo::floor(-d, unit_sign * turbo::seconds(1)));
-            REQUIRE_EQ(-inf, turbo::floor(-inf, unit_sign * turbo::seconds(1)));
+                       (-d).floor( unit_sign * turbo::milliseconds(1)));
+            REQUIRE_EQ(turbo::seconds(-2), (-d).floor( unit_sign * turbo::seconds(1)));
+            REQUIRE_EQ(-inf, (-inf).floor( unit_sign * turbo::seconds(1)));
         }
     }
 
@@ -1161,22 +1161,22 @@ namespace {
         const turbo::Duration inf = turbo::Duration::infinite();
         for (int unit_sign: {1, -1}) {  // // sign shouldn't matter
             REQUIRE_EQ(turbo::nanoseconds(1234567890),
-                       turbo::ceil(d, unit_sign * turbo::nanoseconds(1)));
+                       d.ceil(unit_sign * turbo::nanoseconds(1)));
             REQUIRE_EQ(turbo::microseconds(1234568),
-                       turbo::ceil(d, unit_sign * turbo::microseconds(1)));
+                       d.ceil( unit_sign * turbo::microseconds(1)));
             REQUIRE_EQ(turbo::milliseconds(1235),
-                       turbo::ceil(d, unit_sign * turbo::milliseconds(1)));
-            REQUIRE_EQ(turbo::seconds(2), turbo::ceil(d, unit_sign * turbo::seconds(1)));
-            REQUIRE_EQ(inf, turbo::ceil(inf, unit_sign * turbo::seconds(1)));
+                       d.ceil( unit_sign * turbo::milliseconds(1)));
+            REQUIRE_EQ(turbo::seconds(2), d.ceil( unit_sign * turbo::seconds(1)));
+            REQUIRE_EQ(inf, inf.ceil( unit_sign * turbo::seconds(1)));
 
             REQUIRE_EQ(turbo::nanoseconds(-1234567890),
-                       turbo::ceil(-d, unit_sign * turbo::nanoseconds(1)));
+                       (-d).ceil( unit_sign * turbo::nanoseconds(1)));
             REQUIRE_EQ(turbo::microseconds(-1234567),
-                       turbo::ceil(-d, unit_sign * turbo::microseconds(1)));
+                       (-d).ceil( unit_sign * turbo::microseconds(1)));
             REQUIRE_EQ(turbo::milliseconds(-1234),
-                       turbo::ceil(-d, unit_sign * turbo::milliseconds(1)));
-            REQUIRE_EQ(turbo::seconds(-1), turbo::ceil(-d, unit_sign * turbo::seconds(1)));
-            REQUIRE_EQ(-inf, turbo::ceil(-inf, unit_sign * turbo::seconds(1)));
+                       (-d).ceil( unit_sign * turbo::milliseconds(1)));
+            REQUIRE_EQ(turbo::seconds(-1), (-d).ceil( unit_sign * turbo::seconds(1)));
+            REQUIRE_EQ(-inf, (-inf).ceil( unit_sign * turbo::seconds(1)));
         }
     }
 

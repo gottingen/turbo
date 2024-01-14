@@ -274,8 +274,10 @@ namespace turbo {
     std::chrono::system_clock::time_point to_chrono_time(turbo::Time t) {
         using D = std::chrono::system_clock::duration;
         auto d = time_internal::ToUnixDuration(t);
-        if (d < Duration::zero()) d = floor(d, from_chrono(D{1}));
-        return std::chrono::system_clock::from_time_t(0) + d.ToChronoDuration<D>();
+        if (d < Duration::zero()) {
+            d = d.floor(from_chrono(D{1}));
+        }
+        return std::chrono::system_clock::from_time_t(0) + d.to_chrono_duration<D>();
     }
 
     //
@@ -334,7 +336,7 @@ namespace turbo {
 //
 
     turbo::TimeConversion convert_date_time(int64_t year, int mon, int day, int hour,
-                                          int min, int sec, TimeZone tz) {
+                                            int min, int sec, TimeZone tz) {
         // Avoids years that are too extreme for CivilSecond to normalize.
         if (year > 300000000000) return InfiniteFutureTimeConversion();
         if (year < -300000000000) return InfinitePastTimeConversion();

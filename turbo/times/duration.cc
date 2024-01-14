@@ -486,19 +486,21 @@ namespace turbo {
     // trunc/floor/ceil.
     //
 
-    Duration trunc(Duration d, Duration unit) {
-        return d - (d % unit);
+    Duration Duration::trunc(Duration unit) const {
+        return *this - (*this % unit);
     }
 
-    Duration floor(const Duration d, const Duration unit) {
-        const turbo::Duration td = trunc(d, unit);
-        return td <= d ? td : td - unit.abs();
+    Duration Duration::floor(const Duration unit) const {
+        const turbo::Duration td = trunc(unit);
+        return td <= *this ? td : td - unit.abs();
     }
 
-    Duration ceil(const Duration d, const Duration unit) {
-        const turbo::Duration td = trunc(d, unit);
-        return td >= d ? td : td + unit.abs();
+
+    Duration Duration::ceil(const Duration unit) const {
+        const turbo::Duration td = trunc(unit);
+        return td >= *this ? td : td + unit.abs();
     }
+
 
     //
     // Factory functions.
