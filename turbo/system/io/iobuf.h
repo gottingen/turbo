@@ -666,7 +666,7 @@ namespace turbo::files_internal {
             target = IOBuf::Movable(buf());
         }
 
-    private:
+    protected:
         void shrink();
 
         int add_block();
