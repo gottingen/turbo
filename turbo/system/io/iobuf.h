@@ -478,7 +478,7 @@ namespace turbo::files_internal {
         // performance. Read comments on field `_block' below.
         void return_cached_blocks();
 
-    private:
+    protected:
         static void return_cached_blocks_impl(Block *);
 
         // Cached blocks for appending. Notice that the blocks are released
