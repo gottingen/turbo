@@ -872,17 +872,15 @@ namespace turbo::tlog {
 
     pattern_formatter::pattern_formatter(
             std::string pattern, pattern_time_type time_type, std::string eol, custom_flags custom_user_flags)
-            : pattern_(std::move(pattern)), eol_(std::move(eol)), pattern_time_type_(time_type), need_localtime_(false),
+            : pattern_(std::move(pattern)), eol_(std::move(eol)), pattern_time_type_(time_type), need_localtime_(false),cached_tm_(),
               last_log_secs_(0), custom_handlers_(std::move(custom_user_flags)) {
-        std::memset(&cached_tm_, 0, sizeof(cached_tm_));
         compile_pattern_(pattern_);
     }
 
 // use by default full formatter for if pattern is not given
     pattern_formatter::pattern_formatter(pattern_time_type time_type, std::string eol)
-            : pattern_("%+"), eol_(std::move(eol)), pattern_time_type_(time_type), need_localtime_(true),
+            : pattern_("%+"), eol_(std::move(eol)), pattern_time_type_(time_type), need_localtime_(true),cached_tm_(),
               last_log_secs_(0) {
-        std::memset(&cached_tm_, 0, sizeof(cached_tm_));
         formatters_.push_back(details::make_unique<details::full_formatter>(details::padding_info{}));
     }
 

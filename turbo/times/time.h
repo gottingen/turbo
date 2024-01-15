@@ -73,6 +73,8 @@ namespace turbo {
     // than passing a `TimeZone::CivilInfo` to a function, pass an `turbo::Time`
     // and an `turbo::TimeZone`.
     struct CivilInfo {
+        CivilInfo() = default;
+
         CivilSecond cs;
         Duration subsecond;
 
@@ -130,9 +132,9 @@ namespace turbo {
         // imprudent logic in the calling code.  Modern time-related code
         // should only access this data indirectly by way of format_time().
         // These fields are undefined for infinite_future() and infinite_past().
-        int offset;             // seconds east of UTC
-        bool is_dst;            // is offset non-standard?
-        const char *zone_abbr;  // time-zone abbreviation (e.g., "PST")
+        int offset{0};             // seconds east of UTC
+        bool is_dst{0};            // is offset non-standard?
+        const char *zone_abbr{nullptr};  // time-zone abbreviation (e.g., "PST")
     };
 
 

@@ -430,6 +430,64 @@ namespace turbo::files_internal {
         };
     };
 
+    typedef void (*UserDataDeleter)(void *);
+
+    struct UserDataExtension {
+        UserDataDeleter deleter;
+    };
+
+    struct IOBuf::Block {
+        std::atomic<int> nshared;
+        uint16_t flags;
+        uint16_t abi_check;  // original cap, never be zero.
+        uint32_t size;
+        uint32_t cap;
+        // When flag is 0, portal_next is valid.
+        // When flag & IOBUF_BLOCK_FLAGS_USER_DATA is non-0, data_meta is valid.
+        union {
+            Block *portal_next;
+            uint64_t data_meta;
+        } u;
+        // When flag is 0, data points to `size` bytes starting at `(char*)this+sizeof(Block)'
+        // When flag & IOBUF_BLOCK_FLAGS_USER_DATA is non-0, data points to the user data and
+        // the deleter is put in UserDataExtension at `(char*)this+sizeof(Block)'
+        char *data;
+
+        Block(char *data_in, uint32_t data_size);
+
+        Block(char *data_in, uint32_t data_size, UserDataDeleter deleter);
+
+        // Undefined behavior when (flags & IOBUF_BLOCK_FLAGS_USER_DATA) is 0.
+        UserDataExtension *get_user_data_extension() {
+            char *p = (char *) this;
+            return (UserDataExtension *) (p + sizeof(Block));
+        }
+
+        inline void check_abi() {
+#ifndef NDEBUG
+            if (abi_check != 0) {
+                TURBO_ASSERT(false&&"Your program seems to wrongly contain two "
+                              "ABI-incompatible implementations of IOBuf");
+            }
+#endif
+        }
+
+        void inc_ref() {
+            check_abi();
+            nshared.fetch_add(1, std::memory_order_relaxed);
+        }
+
+        void dec_ref();
+
+        int ref_count() const {
+            return nshared.load(std::memory_order_relaxed);
+        }
+
+        bool full() const { return size >= cap; }
+
+        size_t left_space() const { return cap - size; }
+    };
+
     std::ostream &operator<<(std::ostream &, const IOBuf &buf);
 
     inline bool operator==(const turbo::files_internal::IOBuf &b, const std::string_view &s) { return b.equals(s); }
