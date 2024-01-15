@@ -113,7 +113,7 @@ namespace turbo::tlog {
             log(loc, lvl, "{}", msg);
         }
 
-        void log(log_clock::time_point log_time, source_loc loc, level::level_enum lvl, std::string_view msg) {
+        void log(turbo::Time log_time, source_loc loc, level::level_enum lvl, std::string_view msg) {
             bool log_enabled = should_log(lvl);
             bool traceback_enabled = tracer_.enabled();
             if (!log_enabled && !traceback_enabled) {

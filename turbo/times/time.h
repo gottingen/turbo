@@ -84,6 +84,18 @@ namespace turbo {
 
         constexpr int hour() const { return cs.hour(); }
 
+        constexpr int hour12() const {
+            int h = cs.hour();
+            if (h > 12) {
+                h -= 12;
+            }
+            return h;
+        }
+
+        constexpr const char *ampm() const {
+            return cs.hour() < 12 ? "am" : "pm";
+        }
+
         constexpr int minute() const { return cs.minute(); }
 
         constexpr int second() const { return cs.second(); }

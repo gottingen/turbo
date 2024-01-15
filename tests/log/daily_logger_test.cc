@@ -46,7 +46,7 @@ TEST_CASE("daily_logger with dateonly calculator [daily_logger]")
 
     // calculate filename (time based)
     turbo::tlog::filename_t basename = TLOG_FILENAME_T("test_logs/daily_dateonly");
-    std::tm tm = turbo::tlog::details::os::localtime();
+    std::tm tm = turbo::Time::time_now().to_local_tm();
     filename_memory_buf_t w;
     turbo::format_to(
             std::back_inserter(w), TLOG_FILENAME_T("{}_{:04d}-{:02d}-{:02d}"), basename, tm.tm_year + 1900,
@@ -81,7 +81,7 @@ TEST_CASE("daily_logger with custom calculator [daily_logger]")
 
     // calculate filename (time based)
     turbo::tlog::filename_t basename = TLOG_FILENAME_T("test_logs/daily_dateonly");
-    std::tm tm = turbo::tlog::details::os::localtime();
+    std::tm tm = turbo::Time::time_now().to_local_tm();
     filename_memory_buf_t w;
     turbo::format_to(
             std::back_inserter(w), TLOG_FILENAME_T("{}{:04d}{:02d}{:02d}"), basename, tm.tm_year + 1900, tm.tm_mon + 1,
@@ -104,19 +104,19 @@ TEST_CASE("daily_logger with custom calculator [daily_logger]")
 TEST_CASE("rotating_file_sink::calc_filename1 [rotating_file_sink]]")
 {
     auto filename = turbo::tlog::sinks::rotating_file_sink_st::calc_filename(TLOG_FILENAME_T("rotated.txt"), 3);
-    REQUIRE(filename == TLOG_FILENAME_T("rotated.3.txt"));
+    REQUIRE_EQ(filename , TLOG_FILENAME_T("rotated.3.txt"));
 }
 
 TEST_CASE("rotating_file_sink::calc_filename2 [rotating_file_sink]]")
 {
     auto filename = turbo::tlog::sinks::rotating_file_sink_st::calc_filename(TLOG_FILENAME_T("rotated"), 3);
-    REQUIRE(filename == TLOG_FILENAME_T("rotated.3"));
+    REQUIRE_EQ(filename , TLOG_FILENAME_T("rotated.3"));
 }
 
 TEST_CASE("rotating_file_sink::calc_filename3 [rotating_file_sink]]")
 {
     auto filename = turbo::tlog::sinks::rotating_file_sink_st::calc_filename(TLOG_FILENAME_T("rotated.txt"), 0);
-    REQUIRE(filename == TLOG_FILENAME_T("rotated.txt"));
+    REQUIRE_EQ(filename , TLOG_FILENAME_T("rotated.txt"));
 }
 
 // regex supported only from gcc 4.9 and above
@@ -129,7 +129,7 @@ TEST_CASE("daily_file_sink::daily_filename_calculator [daily_file_sink]]")
     // daily_YYYY-MM-DD_hh-mm.txt
     auto filename =
             turbo::tlog::sinks::daily_filename_calculator::calc_filename(TLOG_FILENAME_T("daily.txt"),
-                                                                         turbo::tlog::details::os::localtime());
+                                                                         turbo::Time::time_now().to_local_tm());
     // date regex based on https://www.regular-expressions.info/dates.html
     std::basic_regex<turbo::tlog::filename_t::value_type> re(
             TLOG_FILENAME_T(R"(^daily_(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])\.txt$)"));
@@ -151,15 +151,13 @@ TEST_CASE("daily_file_sink::daily_filename_format_calculator [daily_file_sink]]"
 }*/
 
 /* Test removal of old files */
-static turbo::tlog::details::log_msg create_msg(std::chrono::seconds offset) {
-    using turbo::tlog::log_clock;
+static turbo::tlog::details::log_msg create_msg(turbo::Duration offset) {
     turbo::tlog::details::log_msg msg{"test", turbo::tlog::level::info, "Hello Message"};
-    msg.time = log_clock::now() + offset;
+    msg.time = turbo::Time::time_now() + offset;
     return msg;
 }
 
 static void test_rotate(int days_to_run, uint16_t max_days, uint16_t expected_n_files) {
-    using turbo::tlog::log_clock;
     using turbo::tlog::details::log_msg;
     using turbo::tlog::sinks::daily_file_sink_st;
 
@@ -171,11 +169,11 @@ static void test_rotate(int days_to_run, uint16_t max_days, uint16_t expected_n_
     // simulate messages with 24 intervals
 
     for (int i = 0; i < days_to_run; i++) {
-        auto offset = std::chrono::seconds{24 * 3600 * i};
+        auto offset = turbo::Duration::seconds(24 * 3600 * i);
         sink.log(create_msg(offset));
     }
 
-    REQUIRE(count_files("test_logs") == static_cast<size_t>(expected_n_files));
+    REQUIRE_EQ(count_files("test_logs") , static_cast<size_t>(expected_n_files));
 }
 
 TEST_CASE("daily_logger rotate [daily_file_sink]")

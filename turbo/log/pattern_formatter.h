@@ -63,7 +63,7 @@ namespace turbo::tlog {
 
             virtual ~flag_formatter() = default;
 
-            virtual void format(const details::log_msg &msg, const std::tm &tm_time, memory_buf_t &dest) = 0;
+            virtual void format(const details::log_msg &msg, const turbo::CivilInfo &cl_time, memory_buf_t &dest) = 0;
 
         protected:
             padding_info padinfo_;
@@ -115,12 +115,12 @@ namespace turbo::tlog {
         std::string eol_;
         pattern_time_type pattern_time_type_;
         bool need_localtime_;
-        std::tm cached_tm_;
-        std::chrono::seconds last_log_secs_;
+        turbo::CivilInfo cached_tm_;
+        int64_t last_log_secs_;
         std::vector<std::unique_ptr<details::flag_formatter>> formatters_;
         custom_flags custom_handlers_;
 
-        std::tm get_time_(const details::log_msg &msg);
+        turbo::CivilInfo get_time_(const details::log_msg &msg);
 
         template<typename Padder>
         void handle_flag_(char flag, details::padding_info padding);

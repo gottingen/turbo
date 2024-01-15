@@ -379,7 +379,7 @@ void android_example()
 
 class my_formatter_flag : public turbo::tlog::custom_flag_formatter {
 public:
-    void format(const turbo::tlog::details::log_msg &, const std::tm &, turbo::tlog::memory_buf_t &dest) override {
+    void format(const turbo::tlog::details::log_msg &, const turbo::CivilInfo &, turbo::tlog::memory_buf_t &dest) override {
         std::string some_txt = "custom-flag";
         dest.append(some_txt.data(), some_txt.data() + some_txt.size());
     }

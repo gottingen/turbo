@@ -24,6 +24,11 @@ feature improvement
 * tidy file descriptor operation to file io module.
 * promote the sequential write file io, avoid c-style file cache.
 * add ignore case hash set/map
+* promote inline function for turbo time module to constexpr function.
+* Function semantic enhancement for turbo time module. make global  function to member function as
+    possible as it can to avoid namespace pollution and make the semantics clear.
+* promote performance of log module by using zero copy iobuf io and turbo times.
+* improve poll api for fiber io operation.
 
 bug fix
 --------------------------------
@@ -32,6 +37,7 @@ bug fix
 * fix gcc12 compile error for <string> not directly included in hash engine
 * fix gcc12 compile error for <cstddef> not directly included in compress tuple
 * fix global operator `%` `+` `-` `*` `/` for Duration will modify rhs or lhs value.
+* fix bug for turbo::fiber io, when the process is killed, the fiber io will not exit hang by epoll_wait.
 
 v0.9.39 - v0.9.43
 ================================

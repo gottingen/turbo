@@ -114,18 +114,6 @@ namespace turbo::tlog {
                 pad_uint(n, 9, dest);
             }
 
-        // return fraction of a second of the given time_point.
-        // e.g.
-        // fraction<std::milliseconds>(tp) -> will return the millis part of the second
-            template<typename ToDuration>
-            inline ToDuration time_fraction(log_clock::time_point tp) {
-                using std::chrono::duration_cast;
-                using std::chrono::seconds;
-                auto duration = tp.time_since_epoch();
-                auto secs = duration_cast<seconds>(duration);
-                return duration_cast<ToDuration>(duration) - duration_cast<ToDuration>(secs);
-            }
-
         } // namespace fmt_helper
     } // namespace details
 } // namespace turbo::tlog

@@ -22,7 +22,7 @@ namespace turbo::tlog::details {
     struct TURBO_DLL log_msg {
         log_msg() = default;
 
-        log_msg(log_clock::time_point log_time, source_loc loc, std::string_view logger_name, level::level_enum lvl,
+        log_msg(turbo::Time log_time, source_loc loc, std::string_view logger_name, level::level_enum lvl,
                 std::string_view msg);
 
         log_msg(source_loc loc, std::string_view logger_name, level::level_enum lvl, std::string_view msg);
@@ -35,7 +35,7 @@ namespace turbo::tlog::details {
 
         std::string_view logger_name;
         level::level_enum level{level::off};
-        log_clock::time_point time;
+        turbo::Time time;
         size_t thread_id{0};
 
         // wrapping the formatted text with color (updated by pattern_formatter).

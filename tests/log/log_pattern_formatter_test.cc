@@ -73,7 +73,7 @@ TEST_CASE("name [pattern_formatter]")
 
 TEST_CASE("date MM/DD/YY  [pattern_formatter]")
 {
-    auto now_tm = turbo::tlog::details::os::localtime();
+    auto now_tm = turbo::Time::time_now().to_local_tm();
     std::stringstream oss;
     oss << std::setfill('0') << std::setw(2) << now_tm.tm_mon + 1 << "/" << std::setw(2) << now_tm.tm_mday << "/"
         << std::setw(2)
@@ -376,12 +376,12 @@ public:
     explicit custom_test_flag(std::string txt)
             : some_txt{std::move(txt)} {}
 
-    void format(const turbo::tlog::details::log_msg &, const std::tm &tm, turbo::tlog::memory_buf_t &dest) override {
+    void format(const turbo::tlog::details::log_msg &, const turbo::CivilInfo &tm, turbo::tlog::memory_buf_t &dest) override {
         if (some_txt == "throw_me") {
             throw turbo::tlog::tlog_ex("custom_flag_exception_test");
         } else if (some_txt == "time") {
-            auto formatted = turbo::format("{:d}:{:02d}{:s}", tm.tm_hour % 12, tm.tm_min,
-                                                          tm.tm_hour / 12 ? "PM" : "AM");
+            auto formatted = turbo::format("{:d}:{:02d}{:s}", tm.hour() % 12, tm.minute(),
+                                                          tm.hour() / 12 ? "PM" : "AM");
             dest.append(formatted.data(), formatted.data() + formatted.size());
             return;
         }
@@ -540,7 +540,7 @@ TEST_CASE("override need_localtime [pattern_formatter]")
     {
         formatter->need_localtime();
 
-        auto now_tm = turbo::tlog::details::os::localtime();
+        auto now_tm = turbo::time_now().to_local_tm();
         std::stringstream oss;
         oss << (now_tm.tm_hour % 12) << ":" << std::setfill('0') << std::setw(2) << now_tm.tm_min
             << (now_tm.tm_hour / 12 ? "PM" : "AM")

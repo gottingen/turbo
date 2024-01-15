@@ -78,7 +78,7 @@
 namespace turbo::tlog {
     namespace details {
         namespace os {
-
+            /*
             turbo::tlog::log_clock::time_point now() noexcept {
 
 #if defined __linux__ && defined TLOG_CLOCK_COARSE
@@ -90,7 +90,7 @@ namespace turbo::tlog {
 #else
                 return log_clock::now();
 #endif
-            }
+            }*/
 
             std::tm localtime(const std::time_t &time_tt) noexcept {
 

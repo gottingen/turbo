@@ -18,6 +18,7 @@
 #include <turbo/log/tweakme.h>
 #include "turbo/log/details/null_mutex.h"
 #include "turbo/files/filesystem.h"
+#include "turbo/times/clock.h"
 
 #include <atomic>
 #include <chrono>
@@ -76,7 +77,6 @@ namespace turbo::tlog {
 #    define TLOG_FILENAME_T(s) s
 #endif
 
-    using log_clock = std::chrono::system_clock;
     using sink_ptr = std::shared_ptr<sinks::sink>;
     using sinks_init_list = std::initializer_list<sink_ptr>;
     using err_handler = std::function<void(const std::string &err_msg)>;

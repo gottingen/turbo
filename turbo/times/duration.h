@@ -1076,6 +1076,60 @@ namespace turbo {
         return *this - trunc(unit);
     }
 
+    struct ToMilliseconds {
+        int64_t operator()(const turbo::Duration &d) const {
+            return d.to_milliseconds();
+        }
+    };
+
+    struct ToMicroseconds {
+        int64_t operator()(const turbo::Duration &d) const {
+            return d.to_microseconds();
+        }
+    };
+
+    struct ToNanoseconds {
+        int64_t operator()(const turbo::Duration &d) const {
+            return d.to_nanoseconds();
+        }
+    };
+
+    struct ToSeconds {
+        int64_t operator()(const turbo::Duration &d) const {
+            return d.to_seconds();
+        }
+    };
+
+    struct ToDoubleSeconds {
+        double operator()(const turbo::Duration &d) const {
+            return d.to_seconds<double>();
+        }
+    };
+
+    struct ToDoubleMilliseconds {
+        double operator()(const turbo::Duration &d) const {
+            return d.to_milliseconds<double>();
+        }
+    };
+
+    struct ToDoubleMicroseconds {
+        double operator()(const turbo::Duration &d) const {
+            return d.to_microseconds<double>();
+        }
+    };
+
+    struct ToDoubleNanoseconds {
+        double operator()(const turbo::Duration &d) const {
+            return d.to_nanoseconds<double>();
+        }
+    };
+
+    struct ToDoubleMinutes {
+        double operator()(const turbo::Duration &d) const {
+            return d.to_minutes<double>();
+        }
+    };
+
 }  // namespace turbo
 
 #endif  // TURBO_TIMES_DURATION_H_

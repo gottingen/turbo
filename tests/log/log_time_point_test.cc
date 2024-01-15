@@ -26,7 +26,7 @@ TEST_CASE("time_point1 [time_point log_msg]")
     turbo::tlog::logger logger("test-time_point", test_sink);
 
     turbo::tlog::source_loc source{};
-    std::chrono::system_clock::time_point tp{std::chrono::system_clock::now()};
+    turbo::Time tp = turbo::Time::time_now();
     test_sink->set_pattern("%T.%F"); // interested in the time_point
 
     // all the following should have the same time
@@ -45,10 +45,10 @@ TEST_CASE("time_point1 [time_point log_msg]")
 
     // now the real test... that the times are the same.
     std::vector<std::string> lines = test_sink->lines();
-    REQUIRE(lines[0] == lines[1]);
-    REQUIRE(lines[2] == lines[3]);
-    REQUIRE(lines[4] == lines[5]);
-    REQUIRE(lines[6] == lines[7]);
-    REQUIRE(lines[8] != lines[9]);
+    REQUIRE_EQ(lines[0] , lines[1]);
+    REQUIRE_EQ(lines[2] , lines[3]);
+    REQUIRE_EQ(lines[4] , lines[5]);
+    REQUIRE_EQ(lines[6] , lines[7]);
+    REQUIRE_NE(lines[8] , lines[9]);
     turbo::tlog::drop_all();
 }
