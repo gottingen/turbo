@@ -309,13 +309,14 @@ namespace turbo {
     TURBO_DECLARE_ERRNO(kERFKILL, ERFKILL);
     // 133
     TURBO_DECLARE_ERRNO(kEHWPOISON, EHWPOISON);
+    // 134
+    static constexpr StatusCode ESTOP = 134;
+    TURBO_DECLARE_ERRNO(kESTOP, ESTOP);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    static constexpr StatusCode kMaxSystemErrno = EHWPOISON;
+    static constexpr StatusCode kMaxSystemErrno = ESTOP;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// placeholder for system errno
-    // 134
-    TURBO_DECLARE_ERRNO(kEPLACEHOLDER1, 134);
     // 135
     TURBO_DECLARE_ERRNO(kEPLACEHOLDER2, 135);
     // 136
@@ -370,7 +371,7 @@ namespace turbo {
     TURBO_DECLARE_ERRNO(kEPLACEHOLDER27, 160);
     ////////////////////////////////////////////////////////////////////////////
     /// turbo error code
-
+    static constexpr int kMinMapStatus = 161;
     // 161
     // StatusCode::kCancelled
     //
@@ -557,6 +558,8 @@ namespace turbo {
 
     // 179
     TURBO_DECLARE_ERRNO(kResourceBusy, 179);
+
+    static constexpr int kMaxMapStatus = kResourceBusy;
 
     /**
      * @ingroup turbo_base_status

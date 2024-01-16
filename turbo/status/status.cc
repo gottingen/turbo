@@ -216,8 +216,8 @@ namespace turbo {
     }
 
     turbo::StatusCode Status::code() const {
-        //return status_internal::MapToLocalCode(raw_code());
-        return raw_code();
+        return errno_to_status_code(raw_code());
+        //return raw_code();
     }
 
     void Status::PrepareToModify() {
@@ -285,9 +285,9 @@ namespace turbo {
                                  StatusToStringMode::kWithModule;
 
         if (with_module) {
-            turbo::format_append(&text, "{}::{}: {}", TurboModule(index()), status_code_to_string(code()), message());
+            turbo::format_append(&text, "{}::{}: {}", TurboModule(index()), status_code_to_string(raw_code()), message());
         } else {
-            turbo::format_append(&text, "{}: {}", status_code_to_string(code()), message());
+            turbo::format_append(&text, "{}: {}", status_code_to_string(raw_code()), message());
         }
 
         const bool with_payload = (mode & StatusToStringMode::kWithPayload) ==

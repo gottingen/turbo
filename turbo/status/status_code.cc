@@ -284,7 +284,7 @@ TURBO_REGISTER_ERRNO(turbo::kERFKILL, "Operation not possible due to RF-kill");
 //133
 TURBO_REGISTER_ERRNO(turbo::kEHWPOISON, "Memory page has hardware error");
 //134
-TURBO_REGISTER_ERRNO(turbo::kEPLACEHOLDER1, "PLACEHOLDER1");
+TURBO_REGISTER_ERRNO(turbo::kESTOP, "already stop");
 //135
 TURBO_REGISTER_ERRNO(turbo::kEPLACEHOLDER2, "PLACEHOLDER2");
 //136
@@ -380,6 +380,10 @@ TURBO_REGISTER_ERRNO(turbo::kResourceBusy, "RESOURCE_BUSY");
 namespace turbo {
 
     StatusCode errno_to_status_code(int error_number) {
+        if(error_number >= kMinMapStatus && error_number <= kMaxMapStatus){
+            return static_cast<StatusCode>(error_number);
+        }
+
         switch (error_number) {
             case 0:
                 return kOk;

@@ -33,10 +33,7 @@
 #include "turbo/memory/resource_pool.h"
 #include "turbo/strings/str_trim.h"
 
-namespace turbo::base_internal {
-    static_assert(sizeof(EndPoint) == sizeof(EndPoint::ip) + sizeof(EndPoint::port),
-                  "EndPoint size mismatch with the one in POD-style, may cause ABI problem");
-
+namespace turbo::system_internal {
 
     // For ipv6/unix socket address.
     //
@@ -212,15 +209,15 @@ namespace turbo::base_internal {
                 return nullptr;
             }
             turbo::ResourceId<ExtendedEndPoint> id;
-            id.value = ep.ip.s_addr;
+            id.value = ep._ip.num();
             ExtendedEndPoint* eep = turbo::address_resource<ExtendedEndPoint>(id);
             TLOG_CHECK(eep, "fail to address ExtendedEndPoint from EndPoint");
             return eep;
         }
 
         // Check if an EndPoint has embedded ExtendedEndPoint
-        static bool is_extended(const turbo::EndPoint& ep) {
-            return ep.port == EXTENDED_ENDPOINT_PORT;
+        static constexpr bool is_extended(const turbo::EndPoint& ep) {
+            return ep._port == EXTENDED_ENDPOINT_PORT;
         }
 
     private:
@@ -247,8 +244,8 @@ namespace turbo::base_internal {
         void embed_to(EndPoint* ep) const {
             TLOG_CHECK(0 == _id.value >> 32,  "ResourceId beyond index");
             ep->reset();
-            ep->ip = ip_t{static_cast<uint32_t>(_id.value)};
-            ep->port = EXTENDED_ENDPOINT_PORT;
+            ep->_ip = ip_t{static_cast<uint32_t>(_id.value)};
+            ep->_port = EXTENDED_ENDPOINT_PORT;
         }
 
         static ExtendedEndPoint* dedup(ExtendedEndPoint* eep) {
@@ -375,6 +372,6 @@ namespace turbo::base_internal {
                && memcmp(&p1->_u, &p2->_u, p1->_socklen) == 0;
     }
 
-}  // namespace turbo::base_internal
+}  // namespace turbo::system_internal
 
 #endif  // TURBO_SYSTEM_INTERNAL_ENDPOINT_H_

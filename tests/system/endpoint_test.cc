@@ -25,18 +25,17 @@
 
 namespace {
 
-    using turbo::base_internal::ExtendedEndPoint;
+    using turbo::system_internal::ExtendedEndPoint;
 
     TEST_CASE("EndPointTest, comparisons") {
-        turbo::EndPoint p1(turbo::int2ip(1234), 5678);
+        turbo::EndPoint p1(1234, 5678);
         turbo::EndPoint p2 = p1;
         REQUIRE((p1 == p2 && !(p1 != p2)));
         REQUIRE((p1 <= p2 && p1 >= p2 && !(p1 < p2 || p1 > p2)));
-        ++p2.port;
+        p2.set(p1.ip(), p1.port()+1);
         REQUIRE((p1 != p2 && !(p1 == p2)));
         REQUIRE((p1 < p2 && p2 > p1 && !(p2 <= p1 || p1 >= p2)));
-        --p2.port;
-        p2.ip = turbo::int2ip(turbo::ip2int(p2.ip)-1);
+        p2.set(p2.ip().num()-1, p1.port());
         REQUIRE((p1 != p2 && !(p1 == p2)));
         REQUIRE((p1 > p2 && p2 < p1 && !(p1 <= p2 || p2 >= p1)));
     }
@@ -44,17 +43,17 @@ namespace {
     TEST_CASE("EndPointTest, ip_t") {
         TLOG_INFO("INET6_ADDRSTRLEN = {}", INET6_ADDRSTRLEN);
 
-        turbo::ip_t ip0;
-        REQUIRE_EQ(0, turbo::str2ip("1.1.1.1", &ip0));
-        REQUIRE_EQ("1.1.1.1", std::string(turbo::ip2str(ip0).c_str()));
-        REQUIRE_EQ(-1, turbo::str2ip("301.1.1.1", &ip0));
-        REQUIRE_EQ(-1, turbo::str2ip("1.-1.1.1", &ip0));
-        REQUIRE_EQ(-1, turbo::str2ip("1.1.-101.1", &ip0));
-        REQUIRE_EQ("1.0.0.0", std::string(turbo::ip2str(turbo::int2ip(1)).c_str()));
+        turbo::IPAddr ip0;
+        REQUIRE_EQ(true, ip0.parse("1.1.1.1"));
+        REQUIRE_EQ("1.1.1.1", ip0.to_string());
+        REQUIRE_EQ(false, ip0.parse("301.1.1.1"));
+        REQUIRE_EQ(false, ip0.parse("1.-1.1.1"));
+        REQUIRE_EQ(false, ip0.parse("1.1.-101.1"));
+        REQUIRE_EQ("1.0.0.0", turbo::IPAddr(1).to_string());
 
-        turbo::ip_t ip1, ip2, ip3;
-        REQUIRE_EQ(0, turbo::str2ip("192.168.0.1", &ip1));
-        REQUIRE_EQ(0, turbo::str2ip("192.168.0.2", &ip2));
+        turbo::IPAddr ip1, ip2, ip3;
+        REQUIRE_EQ(true, ip1.parse("192.168.0.1"));
+        REQUIRE_EQ(true, ip2.parse("192.168.0.2"));
         ip3 = ip1;
         REQUIRE_LT(ip1, ip2);
         REQUIRE_LE(ip1, ip2);
@@ -73,36 +72,36 @@ namespace {
 
     TEST_CASE("EndPointTest, endpoint") {
         turbo::EndPoint p1;
-        REQUIRE_EQ(turbo::IP_ANY, p1.ip);
-        REQUIRE_EQ(0, p1.port);
+        REQUIRE_EQ(turbo::IPAddr::any(), p1.ip());
+        REQUIRE_EQ(0, p1.port());
 
-        turbo::EndPoint p2(turbo::IP_NONE, -1);
-        REQUIRE_EQ(turbo::IP_NONE, p2.ip);
-        REQUIRE_EQ(-1, p2.port);
+        turbo::EndPoint p2(turbo::IPAddr::none(), -1);
+        REQUIRE_EQ(turbo::IPAddr::none(), p2.ip());
+        REQUIRE_EQ(-1, p2.port());
 
         turbo::EndPoint p3;
-        REQUIRE_EQ(-1, turbo::str2endpoint(" 127.0.0.1:-1", &p3));
-        REQUIRE_EQ(-1, turbo::str2endpoint(" 127.0.0.1:65536", &p3));
-        REQUIRE_EQ(0, turbo::str2endpoint(" 127.0.0.1:65535", &p3));
-        REQUIRE_EQ(0, turbo::str2endpoint(" 127.0.0.1:0", &p3));
+        REQUIRE_EQ(false, p3.parse(" 127.0.0.1:-1"));
+        REQUIRE_EQ(false, p3.parse(" 127.0.0.1:65536"));
+        REQUIRE_EQ(true, p3.parse(" 127.0.0.1:65535"));
+        REQUIRE_EQ(true, p3.parse(" 127.0.0.1:0"));
 
         turbo::EndPoint p4;
-        REQUIRE_EQ(0, turbo::str2endpoint(" 127.0.0.1: 289 ", &p4));
-        REQUIRE_EQ("127.0.0.1", std::string(turbo::ip2str(p4.ip).c_str()));
-        REQUIRE_EQ(289, p4.port);
+        REQUIRE_EQ(true, p4.parse(" 127.0.0.1: 289 "));
+        REQUIRE_EQ("127.0.0.1", p4.ip().to_string());
+        REQUIRE_EQ(289, p4.port());
 
         turbo::EndPoint p5;
-        REQUIRE_EQ(-1, hostname2endpoint("localhost:-1", &p5));
-        REQUIRE_EQ(-1, hostname2endpoint("localhost:65536", &p5));
-        REQUIRE_EQ(0, hostname2endpoint("localhost:65535", &p5));
-        REQUIRE_EQ(0, hostname2endpoint("localhost:0", &p5));
+        REQUIRE_EQ(false, p5.parse_hostname("localhost:-1"));
+        REQUIRE_EQ(false, p5.parse_hostname("localhost:65536"));
+        REQUIRE_EQ(true, p5.parse_hostname("localhost:65535"));
+        REQUIRE_EQ(true, p5.parse_hostname("localhost:0"));
 
     }
 
     TEST_CASE("EndPointTest, hash_table") {
         turbo::flat_hash_map<turbo::EndPoint, int> m;
-        turbo::EndPoint ep1(turbo::IP_ANY, 123);
-        turbo::EndPoint ep2(turbo::IP_ANY, 456);
+        turbo::EndPoint ep1(123);
+        turbo::EndPoint ep2(turbo::IPAddr::any(), 456);
         ++m[ep1];
         REQUIRE(m.find(ep1) != m.end());
         REQUIRE_EQ(1, m.find(ep1)->second);
@@ -123,18 +122,18 @@ namespace {
         turbo::flat_hash_map<turbo::EndPoint, int> m;
         uint32_t port = 8088;
 
-        turbo::EndPoint ep1(turbo::IP_ANY, port);
-        turbo::EndPoint ep2(turbo::IP_ANY, port);
+        turbo::EndPoint ep1( port);
+        turbo::EndPoint ep2( port);
         ++m[ep1];
         ++m[ep2];
         REQUIRE_EQ(1u, m.size());
 
-        turbo::ip_t ip_addr;
-        turbo::str2ip("10.10.10.10", &ip_addr);
-        int ip = turbo::ip2int(ip_addr);
+        turbo::IPAddr ip_addr;
+        ip_addr.parse("10.10.10.10");
+        int ip = ip_addr.num();
 
         for (int i = 0; i < 1023; ++i) {
-            turbo::EndPoint ep(turbo::int2ip(++ip), port);
+            turbo::EndPoint ep(turbo::IPAddr(++ip), port);
             ++m[ep];
         }
     }
@@ -149,42 +148,45 @@ namespace {
 
     static void test_listen_connect(const std::string& server_addr, const std::string& exp_client_addr) {
         turbo::EndPoint point;
-        REQUIRE_EQ(0, turbo::str2endpoint(server_addr.c_str(), &point));
-        REQUIRE_EQ(server_addr, turbo::endpoint2str(point).c_str());
+        REQUIRE_EQ(true, point.parse(server_addr.c_str()));
+        REQUIRE_EQ(server_addr, point.to_string());
 
-        int listen_fd = turbo::tcp_listen(point);
-        REQUIRE_GT(listen_fd, 0);
+        auto listen_fd = point.tcp_listen();
+        turbo::println("listen_fd = {}", listen_fd.status().to_string());
+        REQUIRE(listen_fd.ok());
+        REQUIRE_GT(listen_fd.value(), 0);
         pthread_t pid;
-        pthread_create(&pid, nullptr, server_proc, (void*)(int64_t)listen_fd);
+        pthread_create(&pid, nullptr, server_proc, (void*)(int64_t)listen_fd.value());
 
-        int fd = turbo::tcp_connect(point, nullptr);
-        REQUIRE_GT(fd, 0);
+        auto fd = point.tcp_connect(nullptr);
+        REQUIRE(fd.ok());
+        REQUIRE_GT(fd.value(), 0);
 
         turbo::EndPoint point2;
-        REQUIRE_EQ(0, turbo::get_local_side(fd, &point2));
+        REQUIRE_EQ(true, point2.local_side(fd.value()));
 
-        std::string s = turbo::endpoint2str(point2).c_str();
-        if (turbo::get_endpoint_type(point2) == AF_UNIX) {
+        std::string s = point2.to_string();
+        if (point2.get_endpoint_type() == AF_UNIX) {
             REQUIRE_EQ(exp_client_addr, s);
         } else {
             REQUIRE_EQ(exp_client_addr, s.substr(0, exp_client_addr.size()));
         }
-        REQUIRE_EQ(0, turbo::get_remote_side(fd, &point2));
-        REQUIRE_EQ(server_addr, turbo::endpoint2str(point2).c_str());
-        close(fd);
+        REQUIRE_EQ(true, point2.remote_side(fd.value()));
+        REQUIRE_EQ(server_addr, point2.to_string());
+        close(fd.value());
 
         void* ret = nullptr;
         pthread_join(pid, &ret);
         int server_fd = (int)(int64_t)ret;
         REQUIRE_GT(server_fd, 0);
         close(server_fd);
-        close(listen_fd);
+        close(listen_fd.value());
     }
 
     static void test_parse_and_serialize(const std::string& instr, const std::string& outstr) {
         turbo::EndPoint ep;
-        REQUIRE_EQ(0, turbo::str2endpoint(instr.c_str(), &ep));
-        turbo::EndPointStr s = turbo::endpoint2str(ep);
+        REQUIRE(ep.parse(instr.c_str()));
+        turbo::EndPointStr s = ep.to_str();
         REQUIRE_EQ(outstr, std::string(s.c_str()));
     }
 
@@ -202,14 +204,14 @@ namespace {
                                  "[2001:db8:a001:2:3:ab9:c0a8:102]:65535");
 
         turbo::EndPoint ep;
-        REQUIRE_EQ(-1, turbo::str2endpoint("[2001:db8:1:2:3:ab9:c0a8:102]", &ep));
-        REQUIRE_EQ(-1, turbo::str2endpoint("[2001:db8:1:2:3:ab9:c0a8:102]#654321", &ep));
-        REQUIRE_EQ(-1, turbo::str2endpoint("ipv6:2001:db8:1:2:3:ab9:c0a8:102", &ep));
-        REQUIRE_EQ(-1, turbo::str2endpoint("[", &ep));
-        REQUIRE_EQ(-1, turbo::str2endpoint("[::1", &ep));
-        REQUIRE_EQ(-1, turbo::str2endpoint("[]:80", &ep));
-        REQUIRE_EQ(-1, turbo::str2endpoint("[]", &ep));
-        REQUIRE_EQ(-1, turbo::str2endpoint("[]:", &ep));
+        REQUIRE_EQ(false, ep.parse("[2001:db8:1:2:3:ab9:c0a8:102]"));
+        REQUIRE_EQ(false, ep.parse("[2001:db8:1:2:3:ab9:c0a8:102]#654321"));
+        REQUIRE_EQ(false, ep.parse("ipv6:2001:db8:1:2:3:ab9:c0a8:102"));
+        REQUIRE_EQ(false, ep.parse("["));
+        REQUIRE_EQ(false, ep.parse("[::1"));
+        REQUIRE_EQ(false, ep.parse("[]:80"));
+        REQUIRE_EQ(false, ep.parse("[]"));
+        REQUIRE_EQ(false, ep.parse("[]:"));
     }
 
     TEST_CASE("EndPointTest, unix_socket") {
@@ -218,21 +220,21 @@ namespace {
         ::unlink("test.sock");
 
         turbo::EndPoint point;
-        REQUIRE_EQ(-1, turbo::str2endpoint("", &point));
-        REQUIRE_EQ(-1, turbo::str2endpoint("a.sock", &point));
-        REQUIRE_EQ(-1, turbo::str2endpoint("unix:", &point));
-        REQUIRE_EQ(-1, turbo::str2endpoint(" unix: ", &point));
-        REQUIRE_EQ(0, turbo::str2endpoint("unix://a.sock", 123, &point));
-        REQUIRE_EQ(std::string("unix://a.sock"), turbo::endpoint2str(point).c_str());
+        REQUIRE_EQ(false, point.parse(""));
+        REQUIRE_EQ(false, point.parse("a.sock"));
+        REQUIRE_EQ(false, point.parse("unix:"));
+        REQUIRE_EQ(false, point.parse(" unix: "));
+        REQUIRE_EQ(true, point.parse("unix://a.sock", 123));
+        REQUIRE_EQ(std::string("unix://a.sock"), point.to_string());
 
         std::string long_path = "unix:";
         long_path.append(sizeof(sockaddr_un::sun_path) - 1, 'a');
-        REQUIRE_EQ(0, turbo::str2endpoint(long_path.c_str(), &point));
-        REQUIRE_EQ(long_path, turbo::endpoint2str(point).c_str());
+        REQUIRE_EQ(true, point.parse(long_path.c_str()));
+        REQUIRE_EQ(long_path, point.to_string());
         long_path.push_back('a');
-        REQUIRE_EQ(-1, turbo::str2endpoint(long_path.c_str(), &point));
+        REQUIRE_EQ(false, point.parse(long_path.c_str()));
         char buf[128] = {0}; // braft use this size of buffer
-        size_t ret = snprintf(buf, sizeof(buf), "%s:%d", turbo::endpoint2str(point).c_str(), INT_MAX);
+        size_t ret = snprintf(buf, sizeof(buf), "%s:%d", point.to_str().c_str(), INT_MAX);
         REQUIRE_LT(ret, sizeof(buf) - 1);
     }
 
@@ -241,7 +243,7 @@ namespace {
         REQUIRE_FALSE(ExtendedEndPoint::is_extended(ep));
         REQUIRE_EQ(nullptr, ExtendedEndPoint::address(ep));
 
-        REQUIRE_EQ(0, turbo::str2endpoint("1.2.3.4:5678", &ep));
+        REQUIRE_EQ(true, ep.parse("1.2.3.4:5678"));
         REQUIRE_FALSE(ExtendedEndPoint::is_extended(ep));
         REQUIRE_EQ(nullptr, ExtendedEndPoint::address(ep));
 
@@ -249,20 +251,20 @@ namespace {
         {
             turbo::EndPoint ep2(ep);
             REQUIRE_FALSE(ExtendedEndPoint::is_extended(ep));
-            REQUIRE_EQ(ep.ip, ep2.ip);
-            REQUIRE_EQ(ep.port, ep2.port);
+            REQUIRE_EQ(ep.ip(), ep2.ip());
+            REQUIRE_EQ(ep.port(), ep2.port());
         }
 
         // assign
         turbo::EndPoint ep2;
         ep2 = ep;
-        REQUIRE_EQ(ep.ip, ep2.ip);
-        REQUIRE_EQ(ep.port, ep2.port);
+        REQUIRE_EQ(ep.ip(), ep2.ip());
+        REQUIRE_EQ(ep.port(), ep2.port());
     }
 
     TEST_CASE("EndPointTest, extended_endpoint") {
         turbo::EndPoint ep;
-        REQUIRE_EQ(0, turbo::str2endpoint("unix:sock.file", &ep));
+        REQUIRE_EQ(true, ep.parse("unix:sock.file"));
         REQUIRE(ExtendedEndPoint::is_extended(ep));
         ExtendedEndPoint* eep = ExtendedEndPoint::address(ep);
         REQUIRE(eep);
@@ -291,7 +293,7 @@ namespace {
         REQUIRE_FALSE(ExtendedEndPoint::is_extended(ep2));
 
         // extended endpoint assigns to extended endpoint
-        REQUIRE_EQ(0, turbo::str2endpoint("[::1]:2233", &ep2));
+        REQUIRE_EQ(true, ep2.parse("[::1]:2233"));
         ExtendedEndPoint* eep2 = ExtendedEndPoint::address(ep2);
         REQUIRE(eep2);
         ep2 = ep;
@@ -302,7 +304,7 @@ namespace {
         REQUIRE_EQ(eep, ExtendedEndPoint::address(ep));
         REQUIRE_EQ(eep, ExtendedEndPoint::address(ep2));
 
-        REQUIRE_EQ(0, str2endpoint("[::1]:2233", &ep2));
+        REQUIRE_EQ(true, ep2.parse("[::1]:2233"));
         REQUIRE_EQ(1, eep->_ref_count.load());
         eep2 = ExtendedEndPoint::address(ep2);
         REQUIRE_NE(eep, eep2);
@@ -312,28 +314,28 @@ namespace {
     TEST_CASE("EndPointTest, endpoint_compare") {
         turbo::EndPoint ep1, ep2, ep3;
 
-        REQUIRE_EQ(0, turbo::str2endpoint("127.0.0.1:8080", &ep1));
-        REQUIRE_EQ(0, turbo::str2endpoint("127.0.0.1:8080", &ep2));
-        REQUIRE_EQ(0, turbo::str2endpoint("127.0.0.3:8080", &ep3));
+        REQUIRE_EQ(true, ep1.parse("127.0.0.1:8080"));
+        REQUIRE_EQ(true, ep2.parse("127.0.0.1:8080"));
+        REQUIRE_EQ(true, ep3.parse("127.0.0.3:8080"));
         REQUIRE_EQ(ep1, ep2);
         REQUIRE_NE(ep1, ep3);
 
-        REQUIRE_EQ(0, turbo::str2endpoint("unix:sock1.file", &ep1));
-        REQUIRE_EQ(0, turbo::str2endpoint("unix:sock1.file", &ep2));
-        REQUIRE_EQ(0, turbo::str2endpoint("unix:sock3.file", &ep3));
+        REQUIRE_EQ(true, ep1.parse("unix:sock1.file"));
+        REQUIRE_EQ(true, ep2.parse("unix:sock1.file"));
+        REQUIRE_EQ(true, ep3.parse("unix:sock3.file"));
         REQUIRE_EQ(ep1, ep2);
         REQUIRE_NE(ep1, ep3);
 
-        REQUIRE_EQ(0, turbo::str2endpoint("[::1]:2233", &ep1));
-        REQUIRE_EQ(0, turbo::str2endpoint("[::1]:2233", &ep2));
-        REQUIRE_EQ(0, turbo::str2endpoint("[::3]:2233", &ep3));
+        REQUIRE_EQ(true, ep1.parse("[::1]:2233"));
+        REQUIRE_EQ(true, ep2.parse("[::1]:2233"));
+        REQUIRE_EQ(true, ep3.parse("[::3]:2233"));
         REQUIRE_EQ(ep1, ep2);
         REQUIRE_NE(ep1, ep3);
     }
 
     TEST_CASE("EndPointTest, endpoint_sockaddr_conv_ipv4") {
         turbo::EndPoint ep;
-        REQUIRE_EQ(0, turbo::str2endpoint("1.2.3.4:8086", &ep));
+        REQUIRE_EQ(true, ep.parse("1.2.3.4:8086"));
 
         in_addr expected_in_addr;
         bzero(&expected_in_addr, sizeof(expected_in_addr));
@@ -343,7 +345,7 @@ namespace {
         sockaddr_in* in4 = (sockaddr_in*) &ss;
 
         memset(&ss, 'a', sizeof(ss));
-        REQUIRE_EQ(0, turbo::endpoint2sockaddr(ep, &ss));
+        REQUIRE_EQ(true, ep.to_sockaddr(&ss));
         REQUIRE_EQ(AF_INET, ss.ss_family);
         REQUIRE_EQ(AF_INET, in4->sin_family);
         in_port_t port = htons(8086);
@@ -353,20 +355,20 @@ namespace {
         sockaddr_storage ss2;
         socklen_t ss2_size = 0;
         memset(&ss2, 'b', sizeof(ss2));
-        REQUIRE_EQ(0, turbo::endpoint2sockaddr(ep, &ss2, &ss2_size));
+        REQUIRE_EQ(true, ep.to_sockaddr(&ss2, &ss2_size));
         REQUIRE_EQ(ss2_size, sizeof(*in4));
         REQUIRE_EQ(0, memcmp(&ss2, &ss, sizeof(ss)));
 
         turbo::EndPoint ep2;
-        REQUIRE_EQ(0, turbo::sockaddr2endpoint(&ss, sizeof(*in4), &ep2));
+        REQUIRE_EQ(true, ep2.parse_sockaddr(&ss, sizeof(*in4)));
         REQUIRE_EQ(ep2, ep);
 
-        REQUIRE_EQ(AF_INET, turbo::get_endpoint_type(ep));
+        REQUIRE_EQ(AF_INET,ep.get_endpoint_type());
     }
 
     TEST_CASE("EndPointTest, endpoint_sockaddr_conv_ipv6") {
         turbo::EndPoint ep;
-        REQUIRE_EQ(0, turbo::str2endpoint("[::1]:8086", &ep));
+        REQUIRE_EQ(true, ep.parse("[::1]:8086"));
 
         in6_addr expect_in6_addr;
         bzero(&expect_in6_addr, sizeof(expect_in6_addr));
@@ -376,7 +378,7 @@ namespace {
         const sockaddr_in6* sa6 = (sockaddr_in6*) &ss;
 
         memset(&ss, 'a', sizeof(ss));
-        REQUIRE_EQ(0, turbo::endpoint2sockaddr(ep, &ss));
+        REQUIRE_EQ(true, ep.to_sockaddr(&ss));
         REQUIRE_EQ(AF_INET6, ss.ss_family);
         REQUIRE_EQ(AF_INET6, sa6->sin6_family);
         in_port_t port = htons(8086);
@@ -388,26 +390,26 @@ namespace {
         sockaddr_storage ss2;
         socklen_t ss2_size = 0;
         memset(&ss2, 'b', sizeof(ss2));
-        REQUIRE_EQ(0, turbo::endpoint2sockaddr(ep, &ss2, &ss2_size));
+        REQUIRE_EQ(true, ep.to_sockaddr(&ss2, &ss2_size));
         REQUIRE_EQ(ss2_size, sizeof(*sa6));
         REQUIRE_EQ(0, memcmp(&ss2, &ss, sizeof(ss)));
 
         turbo::EndPoint ep2;
-        REQUIRE_EQ(0, turbo::sockaddr2endpoint(&ss, sizeof(*sa6), &ep2));
-        REQUIRE_EQ("[::1]:8086", std::string(turbo::endpoint2str(ep2).c_str()));
+        REQUIRE_EQ(true, ep2.parse_sockaddr(&ss, sizeof(*sa6)));
+        REQUIRE_EQ("[::1]:8086", ep2.to_string());
 
-        REQUIRE_EQ(AF_INET6, turbo::get_endpoint_type(ep));
+        REQUIRE_EQ(AF_INET6, ep.get_endpoint_type());
     }
 
     TEST_CASE("EndPointTest, endpoint_sockaddr_conv_unix") {
         turbo::EndPoint ep;
-        REQUIRE_EQ(0, turbo::str2endpoint("unix:sock.file", &ep));
+        REQUIRE_EQ(true, ep.parse("unix:sock.file"));
 
         sockaddr_storage ss;
         const sockaddr_un* un = (sockaddr_un*) &ss;
 
         memset(&ss, 'a', sizeof(ss));
-        REQUIRE_EQ(0, turbo::endpoint2sockaddr(ep, &ss));
+        REQUIRE_EQ(true, ep.to_sockaddr( &ss));
         REQUIRE_EQ(AF_UNIX, ss.ss_family);
         REQUIRE_EQ(AF_UNIX, un->sun_family);
         REQUIRE_EQ(0, memcmp("sock.file", un->sun_path, 10));
@@ -415,31 +417,31 @@ namespace {
         sockaddr_storage ss2;
         socklen_t ss2_size = 0;
         memset(&ss2, 'b', sizeof(ss2));
-        REQUIRE_EQ(0, turbo::endpoint2sockaddr(ep, &ss2, &ss2_size));
+        REQUIRE_EQ(true, ep.to_sockaddr(&ss2, &ss2_size));
         REQUIRE_EQ(offsetof(struct sockaddr_un, sun_path) + strlen("sock.file") + 1, ss2_size);
         REQUIRE_EQ(0, memcmp(&ss2, &ss, sizeof(ss)));
 
         turbo::EndPoint ep2;
-        REQUIRE_EQ(0, turbo::sockaddr2endpoint(&ss, sizeof(sa_family_t) + strlen(un->sun_path) + 1, &ep2));
-        REQUIRE_EQ("unix:sock.file", std::string(turbo::endpoint2str(ep2).c_str()));
+        REQUIRE_EQ(true, ep2.parse_sockaddr(&ss, sizeof(sa_family_t) + strlen(un->sun_path) + 1));
+        REQUIRE_EQ("unix:sock.file", ep2.to_string());
 
-        REQUIRE_EQ(AF_UNIX, turbo::get_endpoint_type(ep));
+        REQUIRE_EQ(AF_UNIX, ep.get_endpoint_type());
     }
 
     void concurrent_proc(void* p) {
         for (int i = 0; i < 10000; ++i) {
             turbo::EndPoint ep;
             std::string str("127.0.0.1:8080");
-            REQUIRE_EQ(0, turbo::str2endpoint(str.c_str(), &ep));
-            REQUIRE_EQ(str, turbo::endpoint2str(ep).c_str());
+            REQUIRE_EQ(true, ep.parse(str.c_str()));
+            REQUIRE_EQ(str, ep.to_string());
 
             str.assign("[::1]:8080");
-            REQUIRE_EQ(0, turbo::str2endpoint(str.c_str(), &ep));
-            REQUIRE_EQ(str, turbo::endpoint2str(ep).c_str());
+            REQUIRE_EQ(true, ep.parse(str.c_str()));
+            REQUIRE_EQ(str, ep.to_string());
 
             str.assign("unix:test.sock");
-            REQUIRE_EQ(0, turbo::str2endpoint(str.c_str(), &ep));
-            REQUIRE_EQ(str, turbo::endpoint2str(ep).c_str());
+            REQUIRE_EQ(true, ep.parse(str.c_str()));
+            REQUIRE_EQ(str, ep.to_string());
         }
         *(int*)p = 1;
     }

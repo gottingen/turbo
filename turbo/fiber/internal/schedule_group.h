@@ -100,7 +100,6 @@ namespace turbo::fiber_internal {
         bool _stop;
         std::atomic<int> _concurrency;
         std::vector<pthread_t> _workers;
-        std::mutex _pending_time_mutex;
 
         static constexpr int PARKING_LOT_NUM = 4;
         ParkingLot _pl[PARKING_LOT_NUM];

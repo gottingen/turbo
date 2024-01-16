@@ -36,7 +36,7 @@ namespace {
             const turbo::StatusCode code = turbo::TEST_ERROR;
             REQUIRE_EQ(turbo::status_code_to_string(code), "TEST_ERROR");
             turbo::Status s(code, "");
-            REQUIRE_EQ(s.code(), code);
+            REQUIRE_EQ(s.code(), turbo::kUnknown);
             REQUIRE_EQ(s.raw_code(), code);
             REQUIRE_EQ(s.index(), 0);
 
@@ -175,7 +175,7 @@ namespace {
         SUBCASE(" make_status") {
             turbo::Status status = turbo::make_status(100, "this is {} error", 100);
             REQUIRE_FALSE(status.ok());
-            REQUIRE_EQ(100, status.code());
+            REQUIRE_EQ(100, status.raw_code());
             REQUIRE_EQ("this is 100 error", status.message());
         }
 
@@ -183,13 +183,14 @@ namespace {
             {
                 turbo::Status status(turbo::kCancelled, "");
                 REQUIRE_FALSE(status.ok());
+                REQUIRE_EQ(turbo::kCancelled, status.raw_code());
                 REQUIRE_EQ(turbo::kCancelled, status.code());
                 REQUIRE_EQ("", status.message());
             }
             {
                 turbo::Status status(turbo::kInternal, "message");
                 REQUIRE_FALSE(status.ok());
-                REQUIRE_EQ(turbo::kInternal, status.code());
+                REQUIRE_EQ(turbo::kInternal, status.raw_code());
                 REQUIRE_EQ("message", status.message());
             }
         }
@@ -197,7 +198,7 @@ namespace {
         SUBCASE(" ConstructOutOfRangeCode") {
             const int kRawCode = 9999;
             turbo::Status status(static_cast<turbo::StatusCode>(kRawCode), "");
-            //REQUIRE_EQ(turbo::kUnknown, status.code());
+            REQUIRE_EQ(turbo::kUnknown, status.code());
             REQUIRE_EQ(kRawCode, status.raw_code());
         }
 
