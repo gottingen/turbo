@@ -127,7 +127,7 @@ namespace turbo::fiber_internal {
         if (rc.ok()) {
             REQUIRE_EQ(wa->expected_result, 0);
         } else {
-            REQUIRE_EQ(wa->expected_result, rc.code());
+            REQUIRE_EQ(wa->expected_result, rc.raw_code());
         }
 
         TLOG_INFO("after wait, time={0}us", (t2 - t1));
