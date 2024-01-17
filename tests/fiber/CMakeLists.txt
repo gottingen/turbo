@@ -27,6 +27,17 @@ carbin_cc_test(
 
 carbin_cc_test(
         NAME
+        fiber_wait_event_test
+        SOURCES
+        "fiber_wait_event_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_test(
+        NAME
         fiber_test
         SOURCES
         "fiber_test.cc"

@@ -23,45 +23,54 @@
 #include "turbo/times/time.h"
 #include "turbo/times/stop_watcher.h"
 #include "turbo/log/logging.h"
-#include "turbo/fiber/internal/waitable_event.h"
+#include "turbo/fiber/wait_event.h"
 #include "turbo/fiber/internal/schedule_group.h"
 #include "turbo/fiber/internal/fiber_worker.h"
 #include "turbo/fiber/fiber.h"
+#include "turbo/system/threading.h"
 
 
-namespace turbo::fiber_internal {
+namespace turbo {
+    /*
     extern std::atomic<ScheduleGroup *> g_task_control;
 
     inline ScheduleGroup *get_task_control() {
         return g_task_control.load(std::memory_order_consume);
-    }
+    }*/
 
     TEST_CASE("WaitableEventTest, wait_on_already_timedout_event") {
-        uint32_t *event = turbo::fiber_internal::waitable_event_create_checked<uint32_t>();
+        WaitEvent<uint32_t> event;
+        event.initialize();
         REQUIRE(event);
         auto now = turbo::Time::time_now();
-        *event = 1;
-        REQUIRE(turbo::is_deadline_exceeded(turbo::fiber_internal::waitable_event_wait(event, 1, now)));
+        event = 1;
+        auto rs = event.wait_until(now, 1);
+        turbo::println("{}", rs.to_string());
+        REQUIRE_EQ(rs.code(), kETIMEDOUT);
     }
 
     void *sleeper(void *arg) {
-        TURBO_UNUSED(turbo::fiber_sleep_for(turbo::Duration::microseconds((uint64_t)arg)));
+        TURBO_UNUSED(turbo::fiber_sleep_for(turbo::Duration::microseconds((uint64_t) arg)));
         return nullptr;
     }
 
     void *joiner(void *arg) {
         const long t1 = turbo::get_current_time_micros();
-        for (fiber_id_t *th = (fiber_id_t *) arg; *th; ++th) {
-            if (!fiber_join(*th, nullptr).ok()) {
-                TLOG_CRITICAL("fail to join thread_{0}", th - (fiber_id_t *) arg);
+        auto fs = (std::vector<Fiber> *) arg;
+        for (size_t i = 0; i < fs->size(); ++i) {
+            auto fid = (*fs)[i].self();
+            auto rs = (*fs)[i].join(nullptr);
+            if (!rs.ok()) {
+                TLOG_CRITICAL("fail to join thread_{} reason: {}", i, rs.to_string());
             }
             long elp = turbo::get_current_time_micros() - t1;
-            REQUIRE_LE(labs(elp - (th - (fiber_id_t *) arg + 1) * 100000L), 15000L);
+            turbo::println("{}", i);
+            REQUIRE_LE(labs(elp - (i + 1) * 100000L), 15000L);
             TLOG_INFO("Joined thread {0} at {1}us [{2}]",
-                      *th, elp, fiber_self());
+                      fid, elp, fiber_self());
         }
-        for (fiber_id_t *th = (fiber_id_t *) arg; *th; ++th) {
-            REQUIRE(fiber_join(*th, nullptr).ok());
+        for (size_t i = 0; i < fs->size(); ++i) {
+            REQUIRE((*fs)[i].join(nullptr).ok());
         }
         return nullptr;
     }
@@ -84,27 +93,23 @@ namespace turbo::fiber_internal {
     TEST_CASE("WaitableEventTest, join") {
         const size_t N = 6;
         const size_t M = 6;
-        fiber_id_t th[N + 1];
-        fiber_id_t jth[M];
+        std::vector<Fiber> th(N);
+        std::vector<Fiber> jth(M);
         pthread_t pth[M];
         for (size_t i = 0; i < N; ++i) {
             FiberAttribute attr = (i == 0 ? FIBER_ATTR_PTHREAD : FIBER_ATTR_NORMAL);
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(
-                    &th[i], &attr, sleeper,
-                    (void *) (100000L * (i + 1))));
-        }
-        th[N] = 0;  // joiner will join tids in `th' until seeing 0.
-        for (size_t i = 0; i < M; ++i) {
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&jth[i], nullptr, joiner, th));
-        }
-        for (size_t i = 0; i < M; ++i) {
-            REQUIRE_EQ(0, pthread_create(&pth[i], nullptr, joiner, th));
+            REQUIRE_EQ(turbo::ok_status(), th[i].start(attr, sleeper, (void *) (100000L * (i + 1))));
         }
 
         for (size_t i = 0; i < M; ++i) {
-            auto rc = fiber_join(jth[i], nullptr);
-            TLOG_INFO("join {} {}", i, rc.to_string());
-            REQUIRE(rc.ok());
+            REQUIRE_EQ(turbo::ok_status(), jth[i].start(joiner, &th));
+        }
+        for (size_t i = 0; i < M; ++i) {
+            REQUIRE_EQ(0, pthread_create(&pth[i], nullptr, joiner, &th));
+        }
+
+        for (size_t i = 0; i < M; ++i) {
+            REQUIRE(jth[i].join(nullptr).ok());
         }
         for (size_t i = 0; i < M; ++i) {
             REQUIRE_EQ(0, pthread_join(pth[i], nullptr));
@@ -115,15 +120,22 @@ namespace turbo::fiber_internal {
     struct WaiterArg {
         turbo::StatusCode expected_result;
         int expected_value;
-        std::atomic<int> *event;
-        turbo::Time ptimeout;
+        WaitEvent<std::atomic<int>> *event;
+        turbo::Time timeout;
     };
 
     void *waiter(void *arg) {
         WaiterArg *wa = (WaiterArg *) arg;
         const long t1 = turbo::get_current_time_micros();
-        const auto rc = turbo::fiber_internal::waitable_event_wait(
-                wa->event, wa->expected_value, wa->ptimeout);
+        turbo::Status rc;
+        if (wa->timeout != turbo::Time::infinite_future()) {
+            TLOG_INFO("before wait_until, time={}", (wa->timeout - turbo::Time::time_now()).to_string());
+            rc = wa->event->wait_until(wa->timeout, wa->expected_value);
+            TLOG_INFO("before wait_until, time={}", (wa->timeout - turbo::Time::time_now()).to_string());
+        } else {
+            rc = wa->event->wait(wa->expected_value);
+        }
+
         const long t2 = turbo::get_current_time_micros();
         if (rc.ok()) {
             REQUIRE_EQ(wa->expected_result, 0);
@@ -139,54 +151,57 @@ namespace turbo::fiber_internal {
         const size_t N = 5;
         WaiterArg args[N * 4];
         pthread_t t1, t2;
-        std::atomic<int> *b1 =
-                turbo::fiber_internal::waitable_event_create_checked<std::atomic<int> >();
+        WaitEvent<std::atomic<int>> b1;
+        b1.initialize();
         REQUIRE(b1);
-        turbo::fiber_internal::waitable_event_destroy(b1);
+        b1.destroy();
 
-        b1 = turbo::fiber_internal::waitable_event_create_checked<std::atomic<int> >();
-        *b1 = 1;
-        REQUIRE_EQ(0, turbo::fiber_internal::waitable_event_wake(b1));
+        b1.initialize();
+        b1 = 1;
+        REQUIRE_EQ(0, b1.notify_one());
 
         WaiterArg *unmatched_arg = new WaiterArg;
-        unmatched_arg->expected_value = *b1 + 1;
-        unmatched_arg->expected_result = EWOULDBLOCK;
-        unmatched_arg->event = b1;
-        unmatched_arg->ptimeout = turbo::Time::infinite_future();
+        unmatched_arg->expected_value = b1 + 1;
+        unmatched_arg->expected_result = EWOULDBLOCK;;
+        unmatched_arg->event = &b1;
+        unmatched_arg->timeout = turbo::Time::infinite_future();
         pthread_create(&t2, nullptr, waiter, unmatched_arg);
-        fiber_id_t th;
-        REQUIRE(fiber_start_urgent(&th, nullptr, waiter, unmatched_arg).ok());
+        Fiber th;
+        REQUIRE(th.start(waiter, unmatched_arg).ok());
+        th.detach();
 
-        const auto abstime = turbo::seconds_from_now(1);
+        const Time abstime = turbo::seconds_from_now(1);
         for (size_t i = 0; i < 4 * N; ++i) {
-            args[i].expected_value = *b1;
-            args[i].event = b1;
+            args[i].expected_value = b1;
+            args[i].event = &b1;
             if ((i % 2) == 0) {
                 args[i].expected_result = 0;
-                args[i].ptimeout = turbo::Time::infinite_future();
+                args[i].timeout = turbo::Time::infinite_future();
             } else {
                 args[i].expected_result = turbo::kETIMEDOUT;
-                args[i].ptimeout = abstime;
+                args[i].timeout = abstime;
             }
             if (i < 2 * N) {
                 pthread_create(&t1, nullptr, waiter, &args[i]);
             } else {
-                REQUIRE(fiber_start_urgent(&th, nullptr, waiter, &args[i]).ok());
+                Fiber th1;
+                REQUIRE(th1.start(waiter, &args[i]).ok());
+                th1.detach();
             }
         }
 
         sleep(2);
         for (size_t i = 0; i < 2 * N; ++i) {
-            REQUIRE_EQ(1, turbo::fiber_internal::waitable_event_wake(b1));
+            REQUIRE_EQ(1, b1.notify_one());
         }
-        REQUIRE_EQ(0, turbo::fiber_internal::waitable_event_wake_all(b1));
+        REQUIRE_EQ(0, b1.notify_all());
         sleep(1);
-        turbo::fiber_internal::waitable_event_destroy(b1);
+        b1.destroy();
     }
 
 
     struct event_wait_arg {
-        int *event;
+        WaitEvent<int> *event;
         int expected_val;
         long wait_msec;
         int error_code;
@@ -195,7 +210,8 @@ namespace turbo::fiber_internal {
     void *wait_event(void *void_arg) {
         event_wait_arg *arg = static_cast<event_wait_arg *>(void_arg);
         const auto ts = turbo::milliseconds_from_now(arg->wait_msec);
-        auto rc = turbo::fiber_internal::waitable_event_wait(arg->event, arg->expected_val, ts);
+        TLOG_WARN("expected_val={}" , static_cast<int>(arg->expected_val));
+        auto rc = arg->event->wait_until(ts, arg->expected_val);
         if (arg->error_code != 0) {
             REQUIRE(!rc.ok());
             REQUIRE_EQ(arg->error_code, rc.code());
@@ -206,115 +222,127 @@ namespace turbo::fiber_internal {
     }
 
     TEST_CASE("WaitableEventTest, wait_without_stop") {
-        int *event = turbo::fiber_internal::waitable_event_create_checked<int>();
-        *event = 7;
+        WaitEvent<int> event;
+        event.initialize();
+        event = 7;
         turbo::StopWatcher tm;
         const long WAIT_MSEC = 500;
         for (int i = 0; i < 2; ++i) {
             const FiberAttribute attr =
                     (i == 0 ? FIBER_ATTR_PTHREAD : FIBER_ATTR_NORMAL);
-            event_wait_arg arg = {event, *event, WAIT_MSEC, turbo::kETIMEDOUT};
-            fiber_id_t th;
+            event_wait_arg arg = {&event, event.load(), WAIT_MSEC, turbo::kETIMEDOUT};
+            Fiber th;
 
             tm.reset();
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th, &attr, wait_event, &arg));
-            REQUIRE(fiber_join(th, nullptr).ok());
+            REQUIRE_EQ(turbo::ok_status(), th.start(attr, wait_event, &arg));
+            REQUIRE(th.join(nullptr).ok());
             tm.stop();
 
             REQUIRE_LT(labs(tm.elapsed_mill() - WAIT_MSEC), 250);
         }
-        turbo::fiber_internal::waitable_event_destroy(event);
+        event.destroy();
     }
 
     TEST_CASE("WaitableEventTest, stop_after_running") {
-        int *event = turbo::fiber_internal::waitable_event_create_checked<int>();
-        *event = 7;
+        WaitEvent<int> event;
+        event.initialize();
+        event = 7;
         turbo::StopWatcher tm;
         const long WAIT_MSEC = 500;
         turbo::Duration SleepDuration = turbo::Duration::milliseconds(10);
         for (int i = 0; i < 2; ++i) {
-            const FiberAttribute attr = (i == 0 ? FIBER_ATTR_PTHREAD : FIBER_ATTR_NORMAL);
-            fiber_id_t th;
-            event_wait_arg arg = {event, *event, WAIT_MSEC, turbo::kEINTR};
+            const FiberAttribute attr =
+                    (i == 0 ? FIBER_ATTR_PTHREAD : FIBER_ATTR_NORMAL);
+            Fiber th;
+            TLOG_INFO("make args event={0}, expected={1}, wait_msec={2}, error_code={3}",
+                      turbo::ptr(&event), event.load(), WAIT_MSEC, turbo::kEINTR);
+            event_wait_arg arg = {&event, event.load(), WAIT_MSEC, turbo::kEINTR};
 
             tm.reset();
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th, &attr, wait_event, &arg));
+            REQUIRE_EQ(turbo::ok_status(), th.start(attr, wait_event, &arg));
             REQUIRE_EQ(turbo::ok_status(), turbo::fiber_sleep_for(SleepDuration));
-            REQUIRE_EQ(turbo::ok_status(), fiber_stop(th));
-            fiber_join(th, nullptr);
+            REQUIRE_EQ(turbo::ok_status(), fiber_internal::fiber_stop(th.self()));
+            REQUIRE_EQ(turbo::ok_status(), th.stop());
+            th.join(nullptr);
             tm.stop();
 
             REQUIRE_LT((tm.elapsed() - SleepDuration).abs().to_milliseconds(), 25);
             // REQUIRE(turbo::fiber_internal::get_task_control()->
             //             timer_thread()._idset.empty());
-            REQUIRE_EQ(true, turbo::is_invalid_argument(fiber_stop(th)));
+            REQUIRE_EQ(true, th.stop().ok());
         }
-        turbo::fiber_internal::waitable_event_destroy(event);
+        event.destroy();
     }
 
     TEST_CASE("WaitableEventTest, stop_before_running") {
-        int *event = turbo::fiber_internal::waitable_event_create_checked<int>();
-        *event = 7;
+        WaitEvent<int> event;
+        event.initialize();
+        event = 7;
         turbo::StopWatcher tm;
         const long WAIT_MSEC = 500;
 
         for (int i = 0; i < 2; ++i) {
             const FiberAttribute attr =
                     (i == 0 ? FIBER_ATTR_PTHREAD : FIBER_ATTR_NORMAL) | AttributeFlag::FLAG_NOSIGNAL;
-            fiber_id_t th;
-            event_wait_arg arg = {event, *event, WAIT_MSEC, turbo::kEINTR};
+            Fiber th;
+            event_wait_arg arg = {&event, event.load(), WAIT_MSEC, turbo::kEINTR};
 
             tm.reset();
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_background(&th, &attr, wait_event, &arg));
-            REQUIRE_EQ(turbo::ok_status(), fiber_stop(th));
-            fiber_flush();
-            REQUIRE(fiber_join(th, nullptr).ok());
+            REQUIRE_EQ(turbo::ok_status(), th.start(LaunchPolicy::eLazy, attr, wait_event, &arg));
+            REQUIRE_EQ(turbo::ok_status(), th.stop());
+            turbo::Fiber::fiber_flush();
+            REQUIRE(th.join().ok());
             tm.stop();
 
             REQUIRE_LT(tm.elapsed_mill(), 5);
             // REQUIRE(turbo::fiber_internal::get_task_control()->
             //             timer_thread()._idset.empty());
-            REQUIRE(turbo::is_invalid_argument(fiber_stop(th)));
+            REQUIRE_EQ(turbo::ok_status(), th.stop());
         }
-        turbo::fiber_internal::waitable_event_destroy(event);
+        event.destroy();
     }
 
     void *join_the_waiter(void *arg) {
-        auto rc = fiber_join((fiber_id_t) arg, nullptr);
-        TLOG_INFO("join {} {}", arg, rc.to_string());
-        REQUIRE(rc.ok());
+        REQUIRE(((Fiber *) arg)->join().ok());
         return nullptr;
     }
 
     TEST_CASE("WaitableEventTest, join_cant_be_wakeup") {
         const long WAIT_MSEC = 100;
         turbo::Duration WaitDuration = turbo::Duration::milliseconds(WAIT_MSEC);
-        int *event = turbo::fiber_internal::waitable_event_create_checked<int>();
-        *event = 7;
+        WaitEvent<int> event;
+        event.initialize();
+        event = 7;
         turbo::StopWatcher tm;
-        event_wait_arg arg = {event, *event, 1000, turbo::kEINTR};
+        event_wait_arg arg = {&event, event.load(), 1000, turbo::kEINTR};
 
         for (int i = 0; i < 2; ++i) {
             const FiberAttribute attr =
                     (i == 0 ? FIBER_ATTR_PTHREAD : FIBER_ATTR_NORMAL);
             tm.reset();
-            fiber_id_t th, th2;
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th, nullptr, wait_event, &arg));
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th2, &attr, join_the_waiter, (void *) th));
-            REQUIRE_EQ(turbo::ok_status(), fiber_stop(th2));
+            Fiber th, th2;
+            fiber_id_t fth2;
+            fiber_id_t fth;
+            REQUIRE_EQ(turbo::ok_status(), th.start(wait_event, &arg));
+            fth = th.self();
+            REQUIRE(turbo::Fiber::exists(fth));
+            REQUIRE_EQ(turbo::ok_status(), th2.start(attr, join_the_waiter, &th));
+            fth2 = th2.self();
+            REQUIRE_EQ(turbo::ok_status(), th2.stop());
             REQUIRE_EQ(turbo::ok_status(), turbo::fiber_sleep_for(WaitDuration / 2));
-            REQUIRE(turbo::fiber_internal::FiberWorker::exists(th));
-            REQUIRE(turbo::fiber_internal::FiberWorker::exists(th2));
+            turbo::println("{}, {}", fth, fth2);
+            REQUIRE(turbo::Fiber::exists(fth));
+            REQUIRE(turbo::Fiber::exists(fth2));
             REQUIRE_EQ(turbo::ok_status(), turbo::fiber_sleep_for(WaitDuration / 2));
-            REQUIRE_EQ(turbo::ok_status(), fiber_stop(th));
-            REQUIRE(fiber_join(th2, nullptr).ok());
-            REQUIRE(fiber_join(th, nullptr).ok());
+            REQUIRE_EQ(turbo::ok_status(), th.stop());
+            REQUIRE(th2.join().ok());
+            REQUIRE(th.join().ok());
             tm.stop();
             REQUIRE_LT(tm.elapsed_mill(), WAIT_MSEC + 15);
-            REQUIRE(turbo::is_invalid_argument(fiber_stop(th)));
-            REQUIRE(turbo::is_invalid_argument(fiber_stop(th2)));
+            REQUIRE(th.stop().ok());
+            REQUIRE(th2.stop().ok());
         }
-        turbo::fiber_internal::waitable_event_destroy(event);
+        event.destroy();
     }
 
     TEST_CASE("WaitableEventTest, stop_after_slept") {
@@ -327,21 +355,18 @@ namespace turbo::fiber_internal {
             const FiberAttribute attr =
                     (i == 0 ? FIBER_ATTR_PTHREAD : FIBER_ATTR_NORMAL);
             tm.reset();
-            fiber_id_t th;
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(
-                    &th, &attr, sleeper, (void *) (SLEEP_MSEC * 1000L)));
+            Fiber th;
+            REQUIRE_EQ(turbo::ok_status(), th.start(attr, sleeper, (void *) (SLEEP_MSEC * 1000L)));
             REQUIRE_EQ(turbo::ok_status(), turbo::fiber_sleep_for(WaitDuration));
-            REQUIRE_EQ(turbo::ok_status(), fiber_stop(th));
-            REQUIRE( fiber_join(th, nullptr).ok());
+            REQUIRE_EQ(turbo::ok_status(), th.stop());
+            REQUIRE(th.join().ok());
             tm.stop();
             if (is_pthread_stack(attr)) {
                 REQUIRE_LT(labs(tm.elapsed_mill() - SLEEP_MSEC), 15);
             } else {
                 REQUIRE_LT(labs(tm.elapsed_mill() - WAIT_MSEC), 15);
             }
-            // REQUIRE(turbo::fiber_internal::get_task_control()->
-            //             timer_thread()._idset.empty());
-            REQUIRE(turbo::is_invalid_argument(fiber_stop(th)));
+            REQUIRE(th.stop().ok());
         }
     }
 
@@ -353,11 +378,10 @@ namespace turbo::fiber_internal {
             const FiberAttribute attr =
                     (i == 0 ? FIBER_ATTR_PTHREAD : FIBER_ATTR_NORMAL);
             tm.reset();
-            fiber_id_t th;
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(
-                    &th, &attr, sleeper, (void *) (SLEEP_MSEC * 1000L)));
-            REQUIRE_EQ(turbo::ok_status(), fiber_stop(th));
-            REQUIRE(fiber_join(th, nullptr).ok());
+            Fiber th;
+            REQUIRE_EQ(turbo::ok_status(), th.start(attr, sleeper, (void *) (SLEEP_MSEC * 1000L)));
+            REQUIRE_EQ(turbo::ok_status(), th.stop());
+            REQUIRE(th.join().ok());
             tm.stop();
             if (is_pthread_stack(attr)) {
                 REQUIRE_LT(labs(tm.elapsed_mill() - SLEEP_MSEC), 15);
@@ -366,7 +390,7 @@ namespace turbo::fiber_internal {
             }
             // REQUIRE(turbo::fiber_internal::get_task_control()->
             //             timer_thread()._idset.empty());
-            REQUIRE_EQ(turbo::is_invalid_argument(fiber_stop(th)), true);
+            REQUIRE_EQ(th.stop().ok(), true);
         }
     }
 
@@ -375,16 +399,15 @@ namespace turbo::fiber_internal {
         const long SLEEP_MSEC = 100;
 
         for (int i = 0; i < 2; ++i) {
-            fiber_id_t th;
+            Fiber th;
             const FiberAttribute attr =
                     (i == 0 ? FIBER_ATTR_PTHREAD : FIBER_ATTR_NORMAL) | AttributeFlag::FLAG_NOSIGNAL;
 
             tm.reset();
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_background(&th, &attr, sleeper,
-                                                 (void *) (SLEEP_MSEC * 1000L)));
-            REQUIRE_EQ(turbo::ok_status(), fiber_stop(th));
-            fiber_flush();
-            REQUIRE(fiber_join(th, nullptr).ok());
+            REQUIRE_EQ(turbo::ok_status(), th.start(attr, sleeper, (void *) (SLEEP_MSEC * 1000L)));
+            REQUIRE_EQ(turbo::ok_status(), th.stop());
+            Fiber::fiber_flush();
+            REQUIRE(th.join().ok());
             tm.stop();
 
             if (is_pthread_stack(attr)) {
@@ -392,10 +415,54 @@ namespace turbo::fiber_internal {
             } else {
                 REQUIRE_LT(tm.elapsed_mill(), 10);
             }
-            // REQUIRE(turbo::fiber_internal::get_task_control()->
-            //             timer_thread()._idset.empty());
-            REQUIRE_EQ(turbo::is_invalid_argument(fiber_stop(th)), true);
+            REQUIRE_EQ(th.stop().ok(), true);
         }
     }
 
-}  // namespace turbo::fiber_internal
+
+    void *trigger_signal(void *arg) {
+        pthread_t *th = (pthread_t *) arg;
+        const auto t1 = turbo::Time::time_now();
+        for (size_t i = 0; i < 50; ++i) {
+            turbo::sleep_for(turbo::Duration::milliseconds(10));
+            if (turbo::PlatformThread::kill_thread(*th) == ESRCH) {
+                TLOG_INFO("waiter thread end, trigger count={}", i);
+                break;
+            }
+        }
+        const auto t2 = turbo::Time::time_now();
+        TLOG_INFO("trigger signal thread end, elapsed {} us", (t2 - t1).to_microseconds());
+        return nullptr;
+    }
+
+    TEST_CASE("FiberTest, wait_with_signal_triggered") {
+        turbo::StopWatcher tm;
+
+        const int64_t WAIT_MSEC = 500;
+        WaiterArg waiter_args;
+        pthread_t waiter_th, tigger_th;
+        WaitEvent<std::atomic<int>> event;
+        event.initialize();
+        REQUIRE(event);
+        event = 1;
+        REQUIRE_EQ(0, event.notify_one());
+
+        const auto abstime = turbo::milliseconds_from_now(WAIT_MSEC);
+        waiter_args.expected_value = event.load();
+        waiter_args.event = &event;
+        waiter_args.expected_result = turbo::kETIMEDOUT;
+        waiter_args.timeout = abstime;
+        tm.reset();
+        pthread_create(&waiter_th, nullptr, waiter, &waiter_args);
+        pthread_create(&tigger_th, nullptr, trigger_signal, &waiter_th);
+
+        REQUIRE_EQ(0, pthread_join(waiter_th, nullptr));
+        tm.stop();
+        auto wait_elapsed_ms = tm.elapsed_mill();
+        TLOG_INFO("waiter thread end, elapsed {} ms", wait_elapsed_ms);
+        REQUIRE_LT(labs(wait_elapsed_ms - WAIT_MSEC), 250);
+
+        REQUIRE_EQ(0, pthread_join(tigger_th, nullptr));
+        event.destroy();
+    }
+}  // namespace turbo

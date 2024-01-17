@@ -556,6 +556,7 @@ namespace turbo::fiber_internal {
         b->waiter_lock.lock();
         if (b->value.load(std::memory_order_relaxed) != expected_value) {
             b->waiter_lock.unlock();
+            TLOG_WARN("load value: {} != expected_value: {}", b->value.load(std::memory_order_relaxed), expected_value);
             errno = EWOULDBLOCK;
             return turbo::make_status();
         } else if (task != nullptr && task->interrupted) {
@@ -592,7 +593,6 @@ namespace turbo::fiber_internal {
         if (abstime != turbo::Time::infinite_future()) {
             const auto timeout_duration = abstime - turbo::time_now();
             if (timeout_duration <= MIN_SLEEP) {
-                TLOG_WARN("1");
                 errno = ETIMEDOUT;
                 return turbo::make_status();
             }
@@ -601,7 +601,9 @@ namespace turbo::fiber_internal {
         waitable_event *b = static_cast<waitable_event *>(arg);
         if (b->value.load(std::memory_order_relaxed) != expected_value) {
             std::atomic_thread_fence(std::memory_order_acquire);
-            return turbo::unavailable_error("");
+            TLOG_WARN(6);
+            errno = EWOULDBLOCK;
+            turbo::make_status();
         }
         FiberWorker *g = tls_task_group;
         if (nullptr == g || g->is_current_pthread_task()) {
@@ -641,10 +643,10 @@ namespace turbo::fiber_internal {
         }
         // If timed out as well as value unmatched, return ETIMEDOUT.
         if (WAITER_STATE_TIMEDOUT == bbw.waiter_state) {
-            TLOG_WARN("2");
             errno = ETIMEDOUT;
             return turbo::make_status();
         } else if (WAITER_STATE_UNMATCHEDVALUE == bbw.waiter_state) {
+            TLOG_WARN(5);
             errno = EWOULDBLOCK;
             return turbo::make_status();
         } else if (is_interrupted) {
