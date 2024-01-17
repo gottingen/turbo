@@ -90,6 +90,13 @@ namespace turbo {
         eLazy
     };
 
+    enum class FiberStatus {
+        eInvalid,
+        eRunning,
+        eStopped,
+        eDetached,
+        eJoined
+    };
     /**
      * @ingroup turbo_fiber
      * @brief fiber class
@@ -103,11 +110,13 @@ namespace turbo {
 
         ~Fiber();
 
-        Fiber(Fiber &&other) noexcept;
+        constexpr Fiber(Fiber &&other) noexcept;
 
-        Fiber &operator=(Fiber &&other) noexcept;
+        constexpr Fiber &operator=(Fiber &&other) noexcept;
 
         turbo::Status start(fiber_fn_t &&fn, void *args = nullptr);
+
+        turbo::Status start(const FiberAttribute attr, fiber_fn_t &&fn, void *args = nullptr);
 
         turbo::Status start(LaunchPolicy policy, fiber_fn_t &&fn, void *args = nullptr);
 
@@ -119,16 +128,22 @@ namespace turbo {
         }
 
         // Wait for the fiber to exit.
-        void join();
+        turbo::Status join(void **retval = nullptr);
 
         void detach();
 
-        bool stopped() const;
+        turbo::Status stop();
 
-        void stop();
+        constexpr bool running() const {
+            return _fid != INVALID_FIBER_ID && _status == FiberStatus::eRunning;
+        }
 
-        bool valid() const {
-            return _fid != INVALID_FIBER_ID;
+        constexpr bool joinable() const {
+            return _fid != INVALID_FIBER_ID && _status > FiberStatus::eInvalid && _status < FiberStatus::eDetached;
+        }
+
+        constexpr bool startable() const {
+            return _fid == INVALID_FIBER_ID && _status == FiberStatus::eInvalid;
         }
 
         static void fiber_flush();
@@ -137,12 +152,13 @@ namespace turbo {
         // worker pthreads are not notified.
         static int fiber_about_to_quit();
 
+        static bool exists(fiber_id_t fid);
+
     private:
         // nolint
         TURBO_NON_COPYABLE(Fiber);
-
+        FiberStatus _status{FiberStatus::eInvalid};
         fiber_id_t _fid{INVALID_FIBER_ID};
-        bool _detached{false};
     };
 
     /**
@@ -151,6 +167,8 @@ namespace turbo {
    * @return 0 if success, -1 if error
    */
     int fiber_yield();
+
+    fiber_id_t fiber_self();
 
     /**
      * @ingroup turbo_fiber
@@ -185,19 +203,19 @@ namespace turbo {
 
 
     /// inlined functions
-    inline Fiber::Fiber(Fiber &&other) noexcept {
+    inline constexpr Fiber::Fiber(Fiber &&other) noexcept {
         _fid = other._fid;
-        _detached = other._detached;
+        _status = other._status;
         other._fid = INVALID_FIBER_ID;
-        other._detached = false;
+        other._status = FiberStatus::eInvalid;
     }
 
-    inline Fiber &Fiber::operator=(Fiber &&other) noexcept {
+    inline constexpr Fiber &Fiber::operator=(Fiber &&other) noexcept {
         if (this != &other) {
             _fid = other._fid;
-            _detached = other._detached;
+            _status = other._status;
             other._fid = INVALID_FIBER_ID;
-            other._detached = false;
+            other._status = FiberStatus::eInvalid;
         }
         return *this;
     }

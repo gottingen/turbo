@@ -17,60 +17,108 @@
 //
 
 #include "turbo/fiber/fiber.h"
+#include "turbo/platform/port.h"
+#include "turbo/fiber/internal/fiber_worker.h"
 
 namespace turbo {
 
     turbo::Status Fiber::start(fiber_fn_t &&fn, void *args) {
-        return turbo::fiber_internal::fiber_start_urgent(&_fid, &FIBER_ATTR_NORMAL, std::move(fn), args);
+        if(!startable()) {
+            return turbo::already_exists_error("Fiber already started.");
+        }
+        auto rs = turbo::fiber_internal::fiber_start_urgent(&_fid, &FIBER_ATTR_NORMAL, std::move(fn), args);
+        if(rs.ok()) {
+            _status = FiberStatus::eRunning;
+        }
+        return rs;
+    }
+
+    turbo::Status Fiber::start(const FiberAttribute attr, fiber_fn_t &&fn, void *args) {
+        if(!startable()) {
+            return turbo::already_exists_error("Fiber already started.");
+        }
+        auto rs = turbo::fiber_internal::fiber_start_urgent(&_fid, &attr, std::move(fn), args);
+        if(rs.ok()) {
+            _status = FiberStatus::eRunning;
+        }
+        return rs;
     }
 
     turbo::Status Fiber::start(LaunchPolicy policy, fiber_fn_t &&fn, void *args) {
+        if(!startable()) {
+            return turbo::already_exists_error("Fiber already started.");
+        }
         if (policy == LaunchPolicy::eImmediately) {
-            return turbo::fiber_internal::fiber_start_urgent(&_fid, &FIBER_ATTR_NORMAL, std::move(fn), args);
+            auto rs = turbo::fiber_internal::fiber_start_urgent(&_fid, &FIBER_ATTR_NORMAL, std::move(fn), args);
+            if(rs.ok()) {
+                _status = FiberStatus::eRunning;
+            }
+            return rs;
         } else {
-            return turbo::fiber_internal::fiber_start_background(&_fid, &FIBER_ATTR_NORMAL, std::move(fn), args);
+            auto rs = turbo::fiber_internal::fiber_start_background(&_fid, &FIBER_ATTR_NORMAL, std::move(fn), args);
+            if(rs.ok()) {
+                _status = FiberStatus::eRunning;
+            }
+            return rs;
         }
     }
 
     turbo::Status Fiber::start(LaunchPolicy policy, const FiberAttribute attr, fiber_fn_t &&fn, void *args) {
+        if(!startable()) {
+            return turbo::already_exists_error("Fiber already started.");
+        }
         if (policy == LaunchPolicy::eImmediately) {
-            return turbo::fiber_internal::fiber_start_urgent(&_fid, &attr, std::move(fn), args);
+            auto rs = turbo::fiber_internal::fiber_start_urgent(&_fid, &attr, std::move(fn), args);
+            if(rs.ok()) {
+                _status = FiberStatus::eRunning;
+            }
+            return rs;
         } else {
-            return turbo::fiber_internal::fiber_start_background(&_fid, &attr, std::move(fn), args);
+            auto rs = turbo::fiber_internal::fiber_start_background(&_fid, &attr, std::move(fn), args);
+            if(rs.ok()) {
+                _status = FiberStatus::eRunning;
+            }
+            return rs;
         }
     }
 
-    void Fiber::join() {
-        if (!_detached && valid()) {
-            auto rs = turbo::fiber_internal::fiber_join(_fid, nullptr);
-            TURBO_UNUSED(rs);
+    turbo::Status Fiber::join(void **retval) {
+        if (joinable()) {
+            auto rs = turbo::fiber_internal::fiber_join(_fid, retval);
+            _status = FiberStatus::eJoined;
+            return rs;
         }
-        _fid = INVALID_FIBER_ID;
+        if(_status == FiberStatus::eJoined) {
+            return turbo::ok_status();
+        }
+        return turbo::failed_precondition_error("Fiber is not joinable.");
     }
 
     void Fiber::detach() {
-        _detached = true;
-        _fid = INVALID_FIBER_ID;
+        _status = FiberStatus::eDetached;
     }
 
-    bool Fiber::stopped() const {
-        if (_detached && _fid != INVALID_FIBER_ID) {
-            return turbo::fiber_internal::fiber_stopped(_fid) == 0;
+    turbo::Status Fiber::stop() {
+        if(running()) {
+            _status = FiberStatus::eStopped;
+            return turbo::fiber_internal::fiber_stop(_fid);
         }
-        return true;
-    }
-
-    void Fiber::stop() {
-        if(valid()) {
-            TURBO_UNUSED(turbo::fiber_internal::fiber_stop(_fid));
+        if(_status == FiberStatus::eStopped || _status == FiberStatus::eJoined) {
+            return turbo::ok_status();
         }
+        return turbo::already_stop_error("");
     }
 
     Fiber::~Fiber() {
-        if (!_detached && _fid != INVALID_FIBER_ID) {
-            stop();
-            join();
+        if(joinable()) {
+            TLOG_CRITICAL("You need to call either `join()` or `detach()` prior to destroy "
+                          "a fiber. Otherwise the behavior is undefined.");
+            std::terminate();
         }
+    }
+
+    fiber_id_t fiber_self() {
+        return turbo::fiber_internal::fiber_self();
     }
 
     void Fiber::fiber_flush() {
@@ -79,6 +127,10 @@ namespace turbo {
 
     int Fiber::fiber_about_to_quit() {
         return turbo::fiber_internal::fiber_about_to_quit();
+    }
+
+    bool Fiber::exists(fiber_id_t fid) {
+        return turbo::fiber_internal::FiberWorker::exists(fid);
     }
 }  // namespace turbo
 
