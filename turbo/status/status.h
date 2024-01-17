@@ -300,23 +300,15 @@ namespace turbo {
          */
         [[nodiscard]] bool ok() const;
 
-        // Status::code()
+        // Status::map_code()
         //
         // Returns the canonical error code of type `turbo::StatusCode` of this status.
-        turbo::StatusCode code() const;
+        turbo::StatusCode map_code() const;
 
-        // Status::raw_code()
+        // Status::code()
         //
-        // Returns a raw (canonical) error code corresponding to the enum value of
-        // `google.rpc.Code` definitions within
-        // https://github.com/googleapis/googleapis/blob/master/google/rpc/code.proto.
-        // These values could be out of the range of canonical `turbo::StatusCode`
-        // enum values.
-        //
-        // NOTE: This function should only be called when converting to an associated
-        // wire format. Use `Status::code()` for error handling.
 
-        int raw_code() const;
+        int code() const;
 
         /**
          * @brief Returns the module index of this status.

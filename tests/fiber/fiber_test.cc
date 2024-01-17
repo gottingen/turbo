@@ -92,7 +92,7 @@ namespace turbo::fiber_internal {
     }
 
     TEST_CASE_FIXTURE(FiberTest, "call_fiber_functions_before_tls_created") {
-        REQUIRE_EQ(0, turbo::fiber_sleep_for(turbo::Duration::milliseconds(1)).raw_code());
+        REQUIRE_EQ(0, turbo::fiber_sleep_for(turbo::Duration::milliseconds(1)).code());
         REQUIRE(turbo::is_invalid_argument(fiber_join(0, nullptr)));
         REQUIRE_EQ(0UL, fiber_self());
     }

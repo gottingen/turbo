@@ -36,12 +36,12 @@ namespace {
             const turbo::StatusCode code = turbo::TEST_ERROR;
             REQUIRE_EQ(turbo::status_code_to_string(code), "TEST_ERROR");
             turbo::Status s(code, "");
-            REQUIRE_EQ(s.code(), turbo::kUnknown);
-            REQUIRE_EQ(s.raw_code(), code);
+            REQUIRE_EQ(s.map_code(), turbo::kUnknown);
+            REQUIRE_EQ(s.code(), code);
             REQUIRE_EQ(s.index(), 0);
 
             turbo::Status si(1, code, "");
-            REQUIRE_EQ(si.raw_code(), code);
+            REQUIRE_EQ(si.code(), code);
             REQUIRE_EQ(si.index(), 1);
             std::ostringstream oss;
 
@@ -140,7 +140,7 @@ namespace {
                 turbo::Status status = test.creator(
                         message
                 );
-                REQUIRE_EQ(test.code, status.code());
+                REQUIRE_EQ(test.code, status.map_code());
                 REQUIRE_EQ(message, status.message());
 
                 // Ensure that the classifier returns true for a status produced by the
@@ -161,21 +161,21 @@ namespace {
         SUBCASE(" DefaultConstructor") {
             turbo::Status status;
             REQUIRE(status.ok());
-            REQUIRE_EQ(turbo::kOk, status.code());
+            REQUIRE_EQ(turbo::kOk, status.map_code());
             REQUIRE_EQ("", status.message());
         }
 
         SUBCASE(" OkStatus") {
             turbo::Status status = turbo::ok_status();
             REQUIRE(status.ok());
-            REQUIRE_EQ(turbo::kOk, status.code());
+            REQUIRE_EQ(turbo::kOk, status.map_code());
             REQUIRE_EQ("", status.message());
         }
 
         SUBCASE(" make_status") {
             turbo::Status status = turbo::make_status(100, "this is {} error", 100);
             REQUIRE_FALSE(status.ok());
-            REQUIRE_EQ(100, status.raw_code());
+            REQUIRE_EQ(100, status.code());
             REQUIRE_EQ("this is 100 error", status.message());
         }
 
@@ -183,14 +183,14 @@ namespace {
             {
                 turbo::Status status(turbo::kCancelled, "");
                 REQUIRE_FALSE(status.ok());
-                REQUIRE_EQ(turbo::kCancelled, status.raw_code());
                 REQUIRE_EQ(turbo::kCancelled, status.code());
+                REQUIRE_EQ(turbo::kCancelled, status.map_code());
                 REQUIRE_EQ("", status.message());
             }
             {
                 turbo::Status status(turbo::kInternal, "message");
                 REQUIRE_FALSE(status.ok());
-                REQUIRE_EQ(turbo::kInternal, status.raw_code());
+                REQUIRE_EQ(turbo::kInternal, status.code());
                 REQUIRE_EQ("message", status.message());
             }
         }
@@ -198,8 +198,8 @@ namespace {
         SUBCASE(" ConstructOutOfRangeCode") {
             const int kRawCode = 9999;
             turbo::Status status(static_cast<turbo::StatusCode>(kRawCode), "");
-            REQUIRE_EQ(turbo::kUnknown, status.code());
-            REQUIRE_EQ(kRawCode, status.raw_code());
+            REQUIRE_EQ(turbo::kUnknown, status.map_code());
+            REQUIRE_EQ(kRawCode, status.code());
         }
 
 
@@ -550,7 +550,7 @@ namespace {
 
         SUBCASE("errno_to_status") {
             turbo::Status status = turbo::errno_to_status(ENOENT, "Cannot open 'path'");
-            REQUIRE_EQ(status.code(), turbo::kNotFound);
+            REQUIRE_EQ(status.map_code(), turbo::kNotFound);
             REQUIRE_EQ(status.message(), "Cannot open 'path': No such file or directory");
         }
     }

@@ -170,7 +170,7 @@ public:
     void run() {
         _running_time = turbo::time_now();
         REQUIRE_EQ(_expected_unschedule_result,
-                   _timer_thread->unschedule(_keeper1->_task_id).code());
+                   _timer_thread->unschedule(_keeper1->_task_id).map_code());
         _keeper2->schedule(_timer_thread);
     }
 

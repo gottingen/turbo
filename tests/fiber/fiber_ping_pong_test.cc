@@ -105,7 +105,7 @@ namespace {
         PlayerArg *arg = static_cast<PlayerArg *>(void_arg);
         int counter = INITIAL_FUTEX_VALUE;
         while (!stop) {
-            auto rc = turbo::fiber_internal::waitable_event_wait(arg->wait_addr, counter, nullptr);
+            auto rc = turbo::fiber_internal::waitable_event_wait(arg->wait_addr, counter);
             ++counter;
             ++*arg->wake_addr;
             turbo::fiber_internal::waitable_event_wake(arg->wake_addr);

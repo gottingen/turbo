@@ -71,7 +71,7 @@ namespace turbo::fiber_internal {
                 npthreads.fetch_add(1);
             }
             turbo::fiber_internal::waitable_event_wake_all(even);
-            TURBO_UNUSED(turbo::fiber_internal::waitable_event_wait(odd, 0, nullptr));
+            TURBO_UNUSED(turbo::fiber_internal::waitable_event_wait(odd, 0));
         }
         return nullptr;
     }
@@ -84,7 +84,7 @@ namespace turbo::fiber_internal {
                 npthreads.fetch_add(1);
             }
             turbo::fiber_internal::waitable_event_wake_all(odd);
-            TURBO_UNUSED(turbo::fiber_internal::waitable_event_wait(even, 0, nullptr));
+            TURBO_UNUSED(turbo::fiber_internal::waitable_event_wait(even, 0));
         }
         return nullptr;
     }

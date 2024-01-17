@@ -50,7 +50,7 @@ namespace turbo {
         // Block the current thread until the counter reaches 0 or duetime has expired
         // Returns 0 on success, error code otherwise. ETIMEDOUT is for timeout.
         // This method never returns EINTR.
-        int timed_wait(const timespec *duetime);
+        int timed_wait(turbo::Time duetime);
 
     private:
         int *_event;

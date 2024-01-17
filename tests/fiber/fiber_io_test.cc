@@ -454,23 +454,23 @@ namespace turbo::fiber_internal {
     TEST_CASE("FDTest, invalid_epoll_events") {
         errno = 0;
 #if defined(TURBO_PLATFORM_LINUX)
-        REQUIRE_EQ(turbo::fiber_fd_wait(-1, EPOLLIN).raw_code(), turbo::kEINVAL);
+        REQUIRE_EQ(turbo::fiber_fd_wait(-1, EPOLLIN).code(), turbo::kEINVAL);
 #elif defined(TURBO_PLATFORM_OSX)
-        REQUIRE_EQ(turbo::fiber_fd_wait(-1, EVFILT_READ).raw_code(), turbo::kEINVAL);
+        REQUIRE_EQ(turbo::fiber_fd_wait(-1, EVFILT_READ).code(), turbo::kEINVAL);
 #endif
         REQUIRE_EQ(EINVAL, errno);
         errno = 0;
 #if defined(TURBO_PLATFORM_LINUX)
-        REQUIRE_EQ(turbo::fiber_fd_timedwait(-1, EPOLLIN, nullptr).raw_code(), turbo::kEINVAL);
+        REQUIRE_EQ(turbo::fiber_fd_timedwait(-1, EPOLLIN, turbo::Time::infinite_future()).code(), turbo::kEINVAL);
 #elif defined(TURBO_PLATFORM_OSX)
-        REQUIRE_EQ(turbo::fiber_fd_timedwait(-1, EVFILT_READ, nullptr).raw_code(), turbo::kEINVAL);
+        REQUIRE_EQ(turbo::fiber_fd_timedwait(-1, EVFILT_READ, nullptr).code(), turbo::kEINVAL);
 #endif
         REQUIRE_EQ(EINVAL, errno);
 
         int fds[2];
         REQUIRE_EQ(0, pipe(fds));
 #if defined(TURBO_PLATFORM_LINUX)
-        REQUIRE_EQ(turbo::fiber_fd_wait(fds[0], EPOLLET).raw_code(), turbo::kEINVAL);
+        REQUIRE_EQ(turbo::fiber_fd_wait(fds[0], EPOLLET).code(), turbo::kEINVAL);
         REQUIRE_EQ(EINVAL, errno);
 #endif
         fiber_id_t th;
@@ -489,9 +489,9 @@ namespace turbo::fiber_internal {
     }
 
     void *wait_for_the_fd(void *arg) {
-        timespec ts =turbo::microseconds_from_now(50).to_timespec();
+        auto ts =turbo::microseconds_from_now(50);
 #if defined(TURBO_PLATFORM_LINUX)
-        turbo::fiber_fd_timedwait(*(int*)arg, EPOLLIN, &ts);
+        turbo::fiber_fd_timedwait(*(int*)arg, EPOLLIN, ts);
 #elif defined(TURBO_PLATFORM_OSX)
         fiber_fd_timedwait(*(int *) arg, EVFILT_READ, &ts);
 #endif
@@ -529,7 +529,7 @@ namespace turbo::fiber_internal {
 
         // Launch again, should quit soon due to EBADF
 #if defined(TURBO_PLATFORM_LINUX)
-        REQUIRE(!turbo::fiber_fd_timedwait(fds[0], EPOLLIN, nullptr).ok());
+        REQUIRE(!turbo::fiber_fd_timedwait(fds[0], EPOLLIN, turbo::Time::infinite_future()).ok());
 #elif defined(TURBO_PLATFORM_OSX)
         REQUIRE_EQ(-1, fiber_fd_timedwait(fds[0], EVFILT_READ, nullptr));
 #endif

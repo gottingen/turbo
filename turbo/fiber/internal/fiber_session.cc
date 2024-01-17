@@ -430,7 +430,7 @@ namespace turbo::fiber_internal {
                 uint32_t expected_ver = *event;
                 meta->mutex.unlock();
                 ever_contended = true;
-                auto rc = turbo::fiber_internal::waitable_event_wait(event, expected_ver, nullptr);
+                auto rc = turbo::fiber_internal::waitable_event_wait(event, expected_ver);
                 if (!rc.ok() && !turbo::is_unavailable(rc)) {
                     return errno;
                 }
@@ -517,7 +517,7 @@ namespace turbo::fiber_internal {
             if (!has_ver) {
                 break;
             }
-            auto rs = turbo::fiber_internal::waitable_event_wait(join_futex, expected_ver, nullptr);
+            auto rs = turbo::fiber_internal::waitable_event_wait(join_futex, expected_ver);
             if (!rs.ok() && !turbo::is_unavailable(rs)) {
                 return errno;
             }

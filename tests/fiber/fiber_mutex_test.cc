@@ -84,8 +84,8 @@ namespace turbo::fiber_internal {
     }
 
     void *do_locks(void *arg) {
-        struct timespec t = {-2, 0};
-        REQUIRE(turbo::is_deadline_exceeded(fiber_mutex_timedlock((fiber_mutex_t *) arg, &t)));
+        auto abstime = turbo::Time::from_seconds(-2);
+        REQUIRE(turbo::is_deadline_exceeded(fiber_mutex_timedlock((fiber_mutex_t *) arg, abstime)));
         return nullptr;
     }
 
@@ -97,13 +97,13 @@ namespace turbo::fiber_internal {
         REQUIRE(fiber_mutex_init(&m1, nullptr).ok());
         REQUIRE(fiber_mutex_init(&m2, nullptr).ok());
 
-        struct timespec t = {-2, 0};
+        auto abstime = turbo::Time::from_seconds(-2);
 
         TURBO_UNUSED(fiber_mutex_lock(&m1));
         TURBO_UNUSED(fiber_mutex_lock(&m2));
         fiber_id_t pth;
         REQUIRE(fiber_start_urgent(&pth, nullptr, do_locks, &m1).ok());
-        REQUIRE(turbo::is_deadline_exceeded(fiber_cond_timedwait(&cond, &m2, &t)));
+        REQUIRE(turbo::is_deadline_exceeded(fiber_cond_timedwait(&cond, &m2, abstime)));
         REQUIRE(fiber_join(pth, nullptr).ok());
         fiber_mutex_unlock(&m1);
         fiber_mutex_unlock(&m2);

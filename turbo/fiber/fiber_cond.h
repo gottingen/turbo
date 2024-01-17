@@ -57,23 +57,23 @@ namespace turbo {
         // rather than std::timeout
         turbo::Status wait_for(std::unique_lock<FiberMutex> &lock,
                      long timeout_us) {
-            return wait_until(lock,  turbo::microseconds_from_now(timeout_us).to_timespec());
+            return wait_until(lock,  turbo::microseconds_from_now(timeout_us));
         }
 
         turbo::Status wait_for(std::unique_lock<fiber_mutex_t> &lock, long timeout_us) {
-            return wait_until(lock,  turbo::microseconds_from_now(timeout_us).to_timespec());
+            return wait_until(lock,  turbo::microseconds_from_now(timeout_us));
         }
 
         turbo::Status wait_until(std::unique_lock<FiberMutex> &lock,
-                       timespec duetime) {
+                       turbo::Time duetime) {
            return fiber_internal::fiber_cond_timedwait(
-                    &_cond, lock.mutex()->native_handler(), &duetime);
+                    &_cond, lock.mutex()->native_handler(), duetime);
         }
 
         turbo::Status wait_until(std::unique_lock<fiber_mutex_t> &lock,
-                       timespec duetime) {
+                                 turbo::Time duetime) {
             return  fiber_internal::fiber_cond_timedwait(
-                    &_cond, lock.mutex(), &duetime);
+                    &_cond, lock.mutex(), duetime);
         }
 
         void notify_one() {

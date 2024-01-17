@@ -88,7 +88,7 @@ namespace turbo::fiber_internal {
             }
         }
         fiber_mutex_unlock(m);
-        auto rs = turbo::fiber_internal::waitable_event_wait(ic->seq, expected_seq, nullptr);
+        auto rs = turbo::fiber_internal::waitable_event_wait(ic->seq, expected_seq);
         if (turbo::is_unavailable(rs)) {
             // EINTR should not be returned by cond_*wait according to docs on
             // pthread, however spurious wake-up is OK, just as we do here
@@ -108,8 +108,7 @@ namespace turbo::fiber_internal {
     }
 
     turbo::Status fiber_cond_timedwait(fiber_cond_t *TURBO_RESTRICT c,
-                                       fiber_mutex_t *TURBO_RESTRICT m,
-                                       const struct timespec *TURBO_RESTRICT abstime) {
+                                       fiber_mutex_t *TURBO_RESTRICT m,turbo::Time abstime) {
         turbo::fiber_internal::CondInternal *ic = reinterpret_cast<turbo::fiber_internal::CondInternal *>(c);
         const int expected_seq = ic->seq->load(std::memory_order_relaxed);
         if (ic->m.load(std::memory_order_relaxed) != m) {

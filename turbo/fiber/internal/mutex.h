@@ -41,8 +41,7 @@ namespace turbo::fiber_internal {
 
     [[maybe_unused]] turbo::Status fiber_mutex_lock(fiber_mutex_t *mutex);
 
-    [[maybe_unused]] turbo::Status fiber_mutex_timedlock(fiber_mutex_t *__restrict mutex,
-                                                         const struct timespec *__restrict abstime);
+    [[maybe_unused]] turbo::Status fiber_mutex_timedlock(fiber_mutex_t *__restrict mutex, turbo::Time abstime);
 
     [[maybe_unused]] void fiber_mutex_unlock(fiber_mutex_t *mutex);
 

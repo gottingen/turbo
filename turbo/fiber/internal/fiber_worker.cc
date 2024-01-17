@@ -399,22 +399,25 @@ namespace turbo::fiber_internal {
 
     turbo::Status FiberWorker::join(fiber_id_t tid, void **return_value) {
         if (TURBO_UNLIKELY(!tid)) {  // tid of fiber is never 0.
-            return turbo::invalid_argument_error("");
+            errno = EINVAL;
+            return turbo::make_status();
         }
         FiberEntity *m = address_meta(tid);
         if (TURBO_UNLIKELY(!m)) {
             // The fiber is not created yet, this join is definitely wrong.
-            return turbo::invalid_argument_error("");
+            errno = EINVAL;
+            return turbo::make_status();
         }
         FiberWorker *g = tls_task_group;
         if (g != nullptr && g->current_fid() == tid) {
             // joining self causes indefinite waiting.
-            return turbo::invalid_argument_error("");
+            errno = EINVAL;
+            return turbo::make_status();
         }
         const uint32_t expected_version = get_version(tid);
         while (*m->version_futex == expected_version) {
-            auto rs = waitable_event_wait(m->version_futex, expected_version, nullptr);
-            if (!rs.ok() && !is_unavailable(rs)) {
+            auto rs = waitable_event_wait(m->version_futex, expected_version);
+            if (!rs.ok() && rs.code() != EWOULDBLOCK && rs.code() != kEINTR) {
                 return rs;
             }
         }

@@ -188,7 +188,7 @@ namespace turbo::fiber_internal {
             return 0;
         }
 
-        turbo::Status fd_wait(int fd, unsigned events, const timespec *abstime) {
+        turbo::Status fd_wait(int fd, unsigned events, turbo::Time abstime) {
             std::atomic<EpollFutex *> *p = fd_futexes.get_or_new(fd);
             if (nullptr == p) {
                 errno = ENOMEM;
@@ -420,12 +420,11 @@ namespace turbo::fiber_internal {
 #endif
 
     // For pthreads.
-    turbo::Status pthread_fd_wait(int fd, unsigned events,
-                        const timespec *abstime) {
+    turbo::Status pthread_fd_wait(int fd, unsigned events, turbo::Time abstime) {
         int diff_ms = -1;
-        if (abstime) {
+        if (abstime != turbo::Time::infinite_future()) {
             int64_t now_us = turbo::get_current_time_micros();
-            int64_t abstime_us = turbo::Time::from_timespec(*abstime).to_microseconds();
+            int64_t abstime_us = abstime.to_microseconds();
             if (abstime_us <= now_us) {
                 errno = ETIMEDOUT;
                 return make_status();
@@ -468,14 +467,14 @@ namespace turbo {
         }
         turbo::fiber_internal::FiberWorker *g = turbo::fiber_internal::tls_task_group;
         if (nullptr != g && !g->is_current_pthread_task()) {
-            return turbo::fiber_internal::get_epoll_thread(fd).fd_wait(fd, events, nullptr);
+            return turbo::fiber_internal::get_epoll_thread(fd).fd_wait(fd, events, turbo::Time::infinite_future());
         }
-        return turbo::fiber_internal::pthread_fd_wait(fd, events, nullptr);
+        return turbo::fiber_internal::pthread_fd_wait(fd, events, turbo::Time::infinite_future());
     }
 
     turbo::Status fiber_fd_timedwait(int fd, unsigned events,
-                           const timespec *abstime) {
-        if (nullptr == abstime) {
+                          turbo::Time abstime) {
+        if (turbo::Time::infinite_future() == abstime) {
             return fiber_fd_wait(fd, events);
         }
         if (fd < 0) {

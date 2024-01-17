@@ -45,7 +45,7 @@ namespace turbo {
      * @return
      */
     turbo::Status fiber_fd_timedwait(int fd, unsigned epoll_events,
-                                  const timespec *abstime);
+                                  turbo::Time abstime);
     /**
      * @ingroup turbo_fiber
      * @brief fiber close fd

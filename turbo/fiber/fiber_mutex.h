@@ -40,7 +40,7 @@ namespace turbo {
             auto ec = fiber_internal::fiber_mutex_init(&_mutex, nullptr);
             if (!ec.ok()) {
                 TLOG_CRITICAL("FiberMutex constructor failed: {}", ec.message());
-                throw std::system_error(std::error_code(ec.raw_code(), std::system_category()), "FiberMutex constructor failed");
+                throw std::system_error(std::error_code(ec.code(), std::system_category()), "FiberMutex constructor failed");
             }
         }
 
@@ -54,7 +54,7 @@ namespace turbo {
             auto ec = fiber_internal::fiber_mutex_lock(&_mutex);
             if (!ec.ok()) {
                 TLOG_CRITICAL("FiberMutex lock failed: {}", ec.to_string());
-                throw std::system_error(std::error_code(ec.raw_code(), std::system_category()), "FiberMutex lock failed");
+                throw std::system_error(std::error_code(ec.code(), std::system_category()), "FiberMutex lock failed");
             }
         }
 

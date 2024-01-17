@@ -118,7 +118,7 @@ namespace turbo {
             if (GetPayloads()->empty() && message().empty()) {
                 // Special case: If this can be represented inlined, it MUST be
                 // inlined (EqualsSlow depends on this behavior).
-                StatusCode c = static_cast<StatusCode>(raw_code());
+                StatusCode c = static_cast<StatusCode>(code());
                 Unref(rep_);
                 rep_ = CodeToInlinedRep(c);
             }
@@ -199,7 +199,7 @@ namespace turbo {
 
     }
     */
-    int Status::raw_code() const {
+    int Status::code() const {
         if (IsInlined(rep_)) {
             return static_cast<int>(InlinedRepToCode(rep_));
         }
@@ -215,16 +215,16 @@ namespace turbo {
         return static_cast<unsigned short int>(rep->index);
     }
 
-    turbo::StatusCode Status::code() const {
-        return errno_to_status_code(raw_code());
-        //return raw_code();
+    turbo::StatusCode Status::map_code() const {
+        return errno_to_status_code(code());
+        //return code();
     }
 
     void Status::PrepareToModify() {
         TURBO_RAW_CHECK(!ok(), "PrepareToModify shouldn't be called on OK status.");
         if (IsInlined(rep_)) {
             rep_ = PointerToRep(new status_internal::StatusRep(static_cast<unsigned short int>(index()),
-                                                               static_cast<turbo::StatusCode>(raw_code()),
+                                                               static_cast<turbo::StatusCode>(code()),
                                                                std::string_view(),
                                                                nullptr));
             return;
@@ -248,7 +248,7 @@ namespace turbo {
     bool Status::EqualsSlow(const turbo::Status &a, const turbo::Status &b) {
         if (IsInlined(a.rep_) != IsInlined(b.rep_)) return false;
         if (a.message() != b.message()) return false;
-        if (a.raw_code() != b.raw_code()) return false;
+        if (a.code() != b.code()) return false;
         if (a.GetPayloads() == b.GetPayloads()) return true;
 
         const status_internal::Payloads no_payloads;
@@ -285,9 +285,9 @@ namespace turbo {
                                  StatusToStringMode::kWithModule;
 
         if (with_module) {
-            turbo::format_append(&text, "{}::{}: {}", TurboModule(index()), status_code_to_string(raw_code()), message());
+            turbo::format_append(&text, "{}::{}: {}", TurboModule(index()), status_code_to_string(code()), message());
         } else {
-            turbo::format_append(&text, "{}: {}", status_code_to_string(raw_code()), message());
+            turbo::format_append(&text, "{}: {}", status_code_to_string(code()), message());
         }
 
         const bool with_payload = (mode & StatusToStringMode::kWithPayload) ==
@@ -315,75 +315,75 @@ namespace turbo {
     }
 
     bool is_aborted(const Status &status) {
-        return status.code() == turbo::kAborted;
+        return status.map_code() == turbo::kAborted;
     }
 
     bool is_already_exists(const Status &status) {
-        return status.code() == turbo::kAlreadyExists;
+        return status.map_code() == turbo::kAlreadyExists;
     }
 
     bool is_cancelled(const Status &status) {
-        return status.code() == turbo::kCancelled;
+        return status.map_code() == turbo::kCancelled;
     }
 
     bool is_data_loss(const Status &status) {
-        return status.code() == turbo::kDataLoss;
+        return status.map_code() == turbo::kDataLoss;
     }
 
     bool is_deadline_exceeded(const Status &status) {
-        return status.code() == turbo::kDeadlineExceeded;
+        return status.map_code() == turbo::kDeadlineExceeded;
     }
 
     bool is_failed_precondition(const Status &status) {
-        return status.code() == turbo::kFailedPrecondition;
+        return status.map_code() == turbo::kFailedPrecondition;
     }
 
     bool is_internal(const Status &status) {
-        return status.code() == turbo::kInternal;
+        return status.map_code() == turbo::kInternal;
     }
 
     bool is_invalid_argument(const Status &status) {
-        return status.code() == turbo::kInvalidArgument;
+        return status.map_code() == turbo::kInvalidArgument;
     }
 
     bool is_not_found(const Status &status) {
-        return status.code() == turbo::kNotFound;
+        return status.map_code() == turbo::kNotFound;
     }
 
     bool is_out_of_range(const Status &status) {
-        return status.code() == turbo::kOutOfRange;
+        return status.map_code() == turbo::kOutOfRange;
     }
 
     bool is_permission_denied(const Status &status) {
-        return status.code() == turbo::kPermissionDenied;
+        return status.map_code() == turbo::kPermissionDenied;
     }
 
     bool is_resource_exhausted(const Status &status) {
-        return status.code() == turbo::kResourceExhausted;
+        return status.map_code() == turbo::kResourceExhausted;
     }
 
     bool is_unauthenticated(const Status &status) {
-        return status.code() == turbo::kUnauthenticated;
+        return status.map_code() == turbo::kUnauthenticated;
     }
 
     bool is_unavailable(const Status &status) {
-        return status.code() == turbo::kUnavailable;
+        return status.map_code() == turbo::kUnavailable;
     }
 
     bool is_unimplemented(const Status &status) {
-        return status.code() == turbo::kUnimplemented;
+        return status.map_code() == turbo::kUnimplemented;
     }
 
     bool is_unknown(const Status &status) {
-        return status.code() == turbo::kUnknown;
+        return status.map_code() == turbo::kUnknown;
     }
 
     bool is_already_stop(const Status &status) {
-        return status.code() == turbo::kAlreadyStop;
+        return status.map_code() == turbo::kAlreadyStop;
     }
 
     bool is_resource_busy(const Status &status) {
-        return status.code() == turbo::kResourceBusy;
+        return status.map_code() == turbo::kResourceBusy;
     }
 
 

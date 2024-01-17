@@ -192,7 +192,7 @@ namespace turbo {
         int expected = _version_of_id(id);
         // acquire fence makes this thread see changes before changing _join_futex.
         while (expected == m->_join_futex->load(std::memory_order_acquire)) {
-            auto rs = turbo::fiber_internal::waitable_event_wait(m->_join_futex, expected, nullptr);
+            auto rs = turbo::fiber_internal::waitable_event_wait(m->_join_futex, expected);
             if (!rs.ok() && !turbo::is_unavailable(rs)) {
                 return rs;
             }

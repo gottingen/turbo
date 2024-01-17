@@ -42,7 +42,7 @@ namespace turbo {
             if (seen_counter <= 0) {
                 return 0;
             }
-            auto rs = turbo::fiber_internal::waitable_event_wait(_event, seen_counter, nullptr);
+            auto rs = turbo::fiber_internal::waitable_event_wait(_event, seen_counter);
             if (!rs.ok() && !turbo::is_unavailable(rs)) {
                 return errno;
             }
@@ -71,7 +71,7 @@ namespace turbo {
         _wait_was_invoked = false;
     }
 
-    int FiberLatch::timed_wait(const timespec *duetime) {
+    int FiberLatch::timed_wait(turbo::Time duetime) {
         _wait_was_invoked = true;
         for (;;) {
             const int seen_counter =
