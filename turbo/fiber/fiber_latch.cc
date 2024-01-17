@@ -43,7 +43,7 @@ namespace turbo {
                 return 0;
             }
             auto rs = turbo::fiber_internal::waitable_event_wait(_event, seen_counter);
-            if (!rs.ok() && !turbo::is_unavailable(rs)) {
+            if (!rs.ok() && rs.code() != EWOULDBLOCK && rs.code() != EINTR) {
                 return errno;
             }
         }
@@ -80,7 +80,7 @@ namespace turbo {
                 return 0;
             }
             auto rs = turbo::fiber_internal::waitable_event_wait(_event, seen_counter, duetime);
-            if (!rs.ok() && !turbo::is_unavailable(rs)) {
+            if (!rs.ok() && rs.code() != EWOULDBLOCK && rs.code() != EINTR) {
                 return errno;
             }
         }

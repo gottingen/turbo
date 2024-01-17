@@ -140,7 +140,7 @@ namespace turbo {
             return turbo::already_exists_error("Variable :{} is already exposed", name_);
         }
         if (name.empty()) {
-            return turbo::invalid_argument_error("Variable name cannot be empty");
+            return turbo::make_status(kEINVAL);
         }
         name_ = name;
         description_ = description;

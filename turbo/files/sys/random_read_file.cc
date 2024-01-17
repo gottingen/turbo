@@ -46,7 +46,7 @@ namespace turbo {
         _option = option;
         _file_path = path;
         if(_file_path.empty()) {
-            return turbo::invalid_argument_error("file path is empty");
+            return turbo::make_status(kEINVAL, "file path is empty");
         }
         if (_listener.before_open) {
             _listener.before_open(_file_path);

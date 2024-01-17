@@ -38,7 +38,7 @@ namespace turbo::sys_io {
 
     turbo::ResultStatus<size_t> file_size(int fd) {
         if (fd == -1) {
-            return turbo::invalid_argument_error("Failed getting file size. fp is null");
+            return turbo::make_status(kEINVAL);
         }
 // 64 bits(but not in osx or cygwin, where fstat64 is deprecated)
 #    if (defined(__linux__) || defined(__sun) || defined(_AIX)) && (defined(__LP64__) || defined(_LP64))

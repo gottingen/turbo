@@ -431,7 +431,7 @@ namespace turbo::fiber_internal {
                 meta->mutex.unlock();
                 ever_contended = true;
                 auto rc = turbo::fiber_internal::waitable_event_wait(event, expected_ver);
-                if (!rc.ok() && !turbo::is_unavailable(rc)) {
+                if (!rc.ok() && rc.code() != EWOULDBLOCK && rc.code() != EINTR) {
                     return errno;
                 }
                 meta->mutex.lock();
@@ -518,7 +518,7 @@ namespace turbo::fiber_internal {
                 break;
             }
             auto rs = turbo::fiber_internal::waitable_event_wait(join_futex, expected_ver);
-            if (!rs.ok() && !turbo::is_unavailable(rs)) {
+            if (!rs.ok() && rs.code() != EWOULDBLOCK && rs.code() != EINTR) {
                 return errno;
             }
         }

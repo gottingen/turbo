@@ -63,8 +63,8 @@ namespace turbo {
         // returned by schedule() ever.
         // Returns:
         //   ok()   -  Removed the task which does not run yet
-        //  not_found_error()   -  The task does not exist.
-        //   resource_busy_error   -  The task is just running.
+        //   ESTOP   -  The task does not exist.
+        //   EBUSY   -  The task is just running.
         [[maybe_unused]] turbo::Status unschedule(TaskId task_id);
 
         // Get identifier of internal pthread.
@@ -115,7 +115,7 @@ namespace turbo {
                 instance->timer_thread = new(std::nothrow) TimerThread;
                 if (instance->timer_thread == nullptr) {
                     //TLOG_CRITICAL("Fail to new timer_thread");
-                    return turbo::resource_exhausted_error("Fail to new timer_thread");
+                    return turbo::make_status(kENOMEM,"Fail to new timer_thread");
                 }
                 const TimerThreadOptions *options_ptr = options;
                 TimerThreadOptions default_options;

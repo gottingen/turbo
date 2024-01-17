@@ -42,11 +42,11 @@ namespace turbo {
         [[nodiscard]] virtual turbo::Status flush() = 0;
 
         [[nodiscard]] virtual  turbo::Status write(std::string_view buff) {
-            return turbo::unimplemented_error("not implemented");
+            return turbo::make_status(kENOSYS);
         }
 
         [[nodiscard]] virtual  turbo::Status write(const turbo::IOBuf &buff) {
-            return turbo::unimplemented_error("not implemented");
+            return turbo::make_status(kENOSYS);
         }
 
         [[nodiscard]] virtual turbo::Status truncate(size_t size) = 0;
@@ -77,12 +77,12 @@ namespace turbo {
 
         [[nodiscard]] virtual turbo::Status
         write(off_t offset, std::string_view buff, bool truncate = false) {
-            return turbo::unimplemented_error("not implemented");
+            return turbo::make_status(kENOSYS);
         }
 
         [[nodiscard]] virtual turbo::Status
         write(off_t offset, const turbo::IOBuf &buff, bool truncate = false) {
-            return turbo::unimplemented_error("not implemented");
+            return turbo::make_status(kENOSYS);
         }
 
         template<typename ...Args>
@@ -115,11 +115,11 @@ namespace turbo {
         [[nodiscard]] virtual turbo::Status truncate(size_t size) = 0;
 
         [[nodiscard]] virtual turbo::Status write(std::string_view buff) {
-            return turbo::unimplemented_error("not implemented");
+            return turbo::make_status(kENOSYS);
         }
 
         [[nodiscard]] virtual turbo::Status write(const turbo::IOBuf &buff) {
-            return turbo::unimplemented_error("not implemented");
+            return turbo::make_status(kENOSYS);
         }
 
         template<typename ...Args>

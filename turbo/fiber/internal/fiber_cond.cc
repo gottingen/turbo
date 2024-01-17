@@ -84,12 +84,13 @@ namespace turbo::fiber_internal {
             fiber_mutex_t *expected_m = nullptr;
             if (!ic->m.compare_exchange_strong(
                     expected_m, m, std::memory_order_relaxed)) {
-                return turbo::invalid_argument_error("");
+                return turbo::make_status(kEINVAL);
             }
         }
         fiber_mutex_unlock(m);
+        turbo::Status rc;
         auto rs = turbo::fiber_internal::waitable_event_wait(ic->seq, expected_seq);
-        if (turbo::is_unavailable(rs)) {
+        if (!rs.ok() && rs.code() != EWOULDBLOCK && rs.code() != kEINTR) {
             // EINTR should not be returned by cond_*wait according to docs on
             // pthread, however spurious wake-up is OK, just as we do here
             // so that users can check flags in the loop often companioning
@@ -101,10 +102,10 @@ namespace turbo::fiber_internal {
             //   mutex.unlock();
             // After interruption, above code should wake up from the cond_wait
             // soon and check the `stop' flag and other predicates.
-            rs = ok_status();
+            rc = rs;
         }
         const auto rc2 = fiber_mutex_lock_contended(m);
-        return (!rc2.ok() ? rc2 : rs);
+        return (!rc2.ok() ? rc2 : rc);
     }
 
     turbo::Status fiber_cond_timedwait(fiber_cond_t *TURBO_RESTRICT c,
@@ -116,17 +117,18 @@ namespace turbo::fiber_internal {
             fiber_mutex_t *expected_m = nullptr;
             if (!ic->m.compare_exchange_strong(
                     expected_m, m, std::memory_order_relaxed)) {
-                return turbo::invalid_argument_error("");
+                return turbo::make_status(kEINVAL);
             }
         }
         fiber_mutex_unlock(m);
+        turbo::Status rc;
         auto rs = turbo::fiber_internal::waitable_event_wait(ic->seq, expected_seq, abstime);
-        if (turbo::is_unavailable(rs)) {
+        if (!rs.ok() && rs.code() != EWOULDBLOCK && rs.code() != kEINTR) {
             // note: see comments in fiber_cond_wait on EINTR.
-            rs = ok_status();
+            rc = rs;
         }
         const auto rc2 = fiber_mutex_lock_contended(m);
-        return (!rc2.ok() ? rc2 : rs);
+        return (!rc2.ok() ? rc2 : rc);
     }
 
 }  // namespace turbo::fiber_internal

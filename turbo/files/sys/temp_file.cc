@@ -81,7 +81,7 @@ namespace turbo {
 
     turbo::Status TempFile::write(const void *buf, size_t count) {
         if(!_ever_opened) {
-            return turbo::unavailable_error("file not opened");
+            return turbo::make_status(kEBADFD);
         }
         return _file.write(buf, count);
     }

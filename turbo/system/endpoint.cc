@@ -409,7 +409,7 @@ namespace turbo {
         struct sockaddr_storage serv_addr;
         socklen_t serv_addr_size = 0;
         if (TURBO_UNLIKELY(!to_sockaddr(&serv_addr, &serv_addr_size))) {
-            return turbo::internal_error("Fail to convert EndPoint to sockaddr");
+            return turbo::make_status(kEINVAL,"Fail to convert EndPoint to sockaddr");
         }
         FDGuard sockfd(socket(serv_addr.ss_family, SOCK_STREAM, 0));
         if (sockfd < 0) {
@@ -439,7 +439,7 @@ namespace turbo {
         struct sockaddr_storage serv_addr;
         socklen_t serv_addr_size = 0;
         if (TURBO_UNLIKELY(!to_sockaddr(&serv_addr, &serv_addr_size))) {
-            return turbo::internal_error("Fail to convert EndPoint to sockaddr");
+            return turbo::make_status(kEINVAL,"Fail to convert EndPoint to sockaddr");
         }
         FDGuard sockfd(::socket(serv_addr.ss_family, SOCK_STREAM, 0));
         if (sockfd < 0) {

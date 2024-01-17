@@ -297,14 +297,14 @@ namespace turbo::fiber_internal {
                                        std::function<void *(void *)> &&fn,
                                        void *__restrict arg) {
         if (TURBO_UNLIKELY(!fn)) {
-            return turbo::invalid_argument_error("");
+            return turbo::make_status(kEINVAL);
         }
         const int64_t start_ns = turbo::get_current_time_nanos();
         const FiberAttribute using_attr = (attr ? *attr : FIBER_ATTR_NORMAL);
         turbo::ResourceId<FiberEntity> slot;
         FiberEntity *m = turbo::get_resource(&slot);
         if (TURBO_UNLIKELY(!m)) {
-            return turbo::resource_exhausted_error("");
+            return turbo::make_status(kENOMEM);
         }
         TDLOG_CHECK(m->current_waiter.load(std::memory_order_relaxed) == nullptr);
         m->stop = false;
@@ -351,14 +351,14 @@ namespace turbo::fiber_internal {
                                        std::function<void *(void *)> &&fn,
                                        void *__restrict arg) {
         if (TURBO_UNLIKELY(!fn)) {
-            return turbo::invalid_argument_error("");
+            return turbo::make_status(kEINVAL);
         }
         const int64_t start_ns = turbo::get_current_time_nanos();
         const FiberAttribute using_attr = (attr ? *attr : FIBER_ATTR_NORMAL);
         turbo::ResourceId<FiberEntity> slot;
         FiberEntity *m = turbo::get_resource(&slot);
         if (TURBO_UNLIKELY(!m)) {
-            return turbo::resource_exhausted_error("");
+            return turbo::make_status(kENOMEM);
         }
         TDLOG_CHECK(m->current_waiter.load(std::memory_order_relaxed) == nullptr);
         m->stop = false;
@@ -764,7 +764,8 @@ namespace turbo::fiber_internal {
             // errno to ESTOP when the thread is stopping, and print FATAL
             // otherwise. To make smooth transitions, ESTOP is still set instead
             // of EINTR when the thread is stopping.
-            return e.meta->stop ? turbo::already_stop_error("") : turbo::unavailable_error("");
+            errno =  e.meta->stop ? ESTOP : EINTR;
+            return turbo::make_status();
         }
         return turbo::ok_status();
     }
@@ -775,7 +776,7 @@ namespace turbo::fiber_internal {
             fiber_id_t tid, EventWaiterNode **pw, uint64_t *sleep_id) {
         FiberEntity *const m = FiberWorker::address_meta(tid);
         if (m == nullptr) {
-            return turbo::invalid_argument_error("");
+            return turbo::make_status(kEINVAL);
         }
         const uint32_t given_ver = get_version(tid);
         SpinLockHolder l(&m->version_lock);
@@ -786,7 +787,7 @@ namespace turbo::fiber_internal {
             m->interrupted = true;
             return turbo::ok_status();
         }
-        return turbo::invalid_argument_error("");
+        return turbo::make_status(kEINVAL);
     }
 
     static turbo::Status set_event_waiter(fiber_id_t tid, EventWaiterNode *w) {
@@ -800,7 +801,7 @@ namespace turbo::fiber_internal {
                 return turbo::ok_status();
             }
         }
-        return turbo::invalid_argument_error("");
+        return turbo::make_status(kEINVAL);
     }
 
     // The interruption is "persistent" compared to the ones caused by signals,
@@ -836,7 +837,7 @@ namespace turbo::fiber_internal {
                     g->ready_to_run(tid);
                 } else {
                     if (!c) {
-                        return turbo::invalid_argument_error("");
+                        return turbo::make_status(kEINVAL);
                     }
                     c->choose_one_group()->ready_to_run_remote(tid);
                 }

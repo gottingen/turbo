@@ -737,7 +737,7 @@ namespace {
             size_t b1len = b1.length(), b2len = b2.length();
             errno = 0;
             turbo::println("b1.length={} - {} ({})", b1len, b1.cut_into_file_descriptor(fds[1]).value(), strerror(errno));
-            turbo::println("b2.length={} - {} ({})", b1len, b2.append_from_file_descriptor(fds[0], LONG_MAX).value(), strerror(errno));
+            turbo::println("b2.length={} - {} ({})", b2len, b2.append_from_file_descriptor(fds[0], LONG_MAX).value(), strerror(errno));
         }
         turbo::println("b1.length={}, b2.length={}", b1.length(), b2.length());
 
@@ -990,11 +990,11 @@ namespace {
             for (size_t j = 0; j < ps.size(); ++j) {
                 b2.append(ps[j]);
                 if (b2.length() >= HINT) {
-                    b2.cut_into_file_descriptor(ofd);
+                    REQUIRE(b2.cut_into_file_descriptor(ofd).ok());
                 }
             }
-            b2.cut_into_file_descriptor(ofd);
-            b1.cut_into_file_descriptor(ofd);
+            REQUIRE(b2.cut_into_file_descriptor(ofd).ok());
+            REQUIRE(b1.cut_into_file_descriptor(ofd).ok());
 
             close(ifd);
             close(ofd);
@@ -1238,10 +1238,10 @@ namespace {
 
     TEST_CASE_FIXTURE(IOBufTest, "append_from_fd_with_offset") {
         turbo::TempFile file;
-        file.open();
-        file.write("dummy");
+        REQUIRE(file.open().ok());
+        REQUIRE(file.write("dummy").ok());
         turbo::FDGuard fd(open(file.path().c_str(), O_RDWR | O_TRUNC));
-        REQUIRE(fd >= 0);
+        REQUIRE_GE(fd , 0);
         turbo::IOPortal buf;
         char dummy[10 * 1024];
         buf.append(dummy, sizeof(dummy));
@@ -1278,7 +1278,7 @@ namespace {
         number_per_thread = 10240;
         pthread_t threads[8];
         long fd = open(".out.txt", O_RDWR | O_CREAT | O_TRUNC, 0644);
-        REQUIRE(fd >= 0);
+        REQUIRE_GE(fd , 0);
         for (size_t i = 0; i < TURBO_ARRAY_SIZE(threads); ++i) {
             REQUIRE_EQ(0, pthread_create(&threads[i], nullptr, cut_into_fd, (void*)fd));
         }
@@ -1312,7 +1312,7 @@ namespace {
             REQUIRE_FALSE(p.empty());
             actual.append(p.data(), p.size());
         }
-        REQUIRE(expected == actual);
+        REQUIRE_EQ(expected , actual);
     }
 
     TEST_CASE_FIXTURE(IOBufTest, "swap") {
@@ -1350,11 +1350,11 @@ namespace {
             REQUIRE_EQ(saved_a[n], *it);
         }
         REQUIRE_EQ(saved_a.size(), n);
-        REQUIRE(saved_a == a);
+        REQUIRE_EQ(saved_a , a);
 
         // append more to the iobuf, iterator should still be ended.
         a.append(", this is iobuf");
-        REQUIRE(it == nullptr);
+        REQUIRE_EQ(it , nullptr);
 
         // append more-than-one-block data to the iobuf
         for (int i = 0; i < 1024; ++i) {
@@ -1366,7 +1366,7 @@ namespace {
             REQUIRE_EQ(saved_a[n], *it2);
         }
         REQUIRE_EQ(saved_a.size(), n);
-        REQUIRE(saved_a == a);
+        REQUIRE_EQ(saved_a, a);
     }
 
     TEST_CASE_FIXTURE(IOBufTest, "appender") {

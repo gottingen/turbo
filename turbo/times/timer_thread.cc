@@ -135,20 +135,20 @@ namespace turbo {
         }
         if (_options.num_buckets == 0) {
             TLOG_ERROR("num_buckets can't be 0");
-            return turbo::invalid_argument_error("num_buckets can't be 0");
+            return turbo::make_status(kEINVAL);
         }
         if (_options.num_buckets > 1024) {
             TLOG_ERROR("num_buckets={} is too big", _options.num_buckets);
-            return turbo::invalid_argument_error("num_buckets is too big");
+            return turbo::make_status(kEINVAL);
         }
         _buckets = new(std::nothrow) Bucket[_options.num_buckets];
         if (nullptr == _buckets) {
             TLOG_ERROR("Fail to new _buckets");
-            return turbo::resource_exhausted_error("Fail to new _buckets");
+            return make_status(kENOMEM);
         }
         const int ret = pthread_create(&_thread, nullptr, TimerThread::run_this, this);
         if (ret) {
-            return turbo::unavailable_error("");
+            return turbo::make_status();
         }
         _started = true;
         return turbo::ok_status();
@@ -246,19 +246,17 @@ namespace turbo {
         Task *const task = turbo::address_resource(slot_id);
         if (task == nullptr) {
             TLOG_ERROR("Invalid task_id={}", task_id);
-            return turbo::invalid_argument_error("Invalid task_id");
+            return turbo::make_status(kEINVAL);
         }
         const uint32_t id_version = version_of_task_id(task_id);
         uint32_t expected_version = id_version;
         // This CAS is rarely contended, should be fast.
         // The acquire fence is paired with release fence in Task::run_and_delete
         // to make sure that we see all changes brought by fn(arg).
-        if (task->version.compare_exchange_strong(
-                expected_version, id_version + 2,
-                std::memory_order_acquire)) {
+        if (task->version.compare_exchange_strong(expected_version, id_version + 2,std::memory_order_acquire)) {
             return turbo::ok_status();
         }
-        return (expected_version == id_version + 1) ? turbo::resource_busy_error("") : turbo::not_found_error("");
+        return (expected_version == id_version + 1) ? turbo::make_status(kEBUSY) : turbo::make_status(kESTOP);
     }
 
     bool TimerThread::Task::run_and_delete() {

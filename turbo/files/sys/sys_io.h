@@ -41,7 +41,7 @@ namespace turbo::sys_io {
 
 #define INVALID_FD_RETURN(fd) \
     if ((fd) == INVALID_FILE_HANDLER) { \
-        return turbo::unavailable_error("file not open for read yet"); \
+        return turbo::make_status(kEBADFD, "file not open for read yet"); \
     }
 
 #endif // TURBO_FILES_INTERNAL_SYS_IO_H_

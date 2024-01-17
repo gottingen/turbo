@@ -241,7 +241,7 @@ namespace turbo::fiber_internal {
             }
 #endif
             auto rs = waitable_event_wait(futex, expected_val, abstime);
-            if (!rs.ok() && !is_unavailable(rs)) {
+            if (!rs.ok() && rs.code() != EWOULDBLOCK && rs.code() != EINTR) {
                 return rs;
             }
             return turbo::ok_status();

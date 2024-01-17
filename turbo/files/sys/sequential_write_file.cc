@@ -76,7 +76,7 @@ namespace turbo {
     turbo::Status SequentialWriteFile::reopen(bool truncate) {
         close();
         if (_file_path.empty()) {
-            return turbo::invalid_argument_error("file name empty");
+            return turbo::make_status(kEINVAL);
         }
         OpenOption option = _option;
         if(truncate) {
@@ -102,7 +102,7 @@ namespace turbo {
             auto wrs = piece_data.cut_into_file_descriptor(_fd, left);
             if (wrs.ok() && wrs.value() > 0) {
                 left -= wrs.value();
-            } else if (is_unavailable(wrs.status())) {
+            } else if (wrs.status().code() != EWOULDBLOCK && wrs.status().code() != EINTR) {
                 continue;
             } else {
                 TLOG_WARN("write falied, err: {} fd: {} size: {}", wrs.status().to_string(), _fd, size);

@@ -35,18 +35,18 @@ namespace turbo::fiber_internal {
                                   turbo::timer_task_fn_t&& on_timer, void *arg) {
         turbo::fiber_internal::ScheduleGroup *c = turbo::fiber_internal::get_or_new_task_control();
         if (c == nullptr) {
-            return turbo::resource_exhausted_error("");
+            return turbo::make_status(kENOMEM);
         }
         // already init by ScheduleGroup::init
         auto *tt = get_fiber_timer_thread();
         if (tt == nullptr) {
-            return turbo::resource_exhausted_error("");
+            return turbo::make_status(kENOMEM);
         }
         const auto tmp = tt->schedule(std::move(on_timer), arg, abstime);
         if (tmp != INVALID_FIBER_TIMER_ID) {
             return tmp;
         }
-        return turbo::already_stop_error("");
+        return make_status(kESTOP);
     }
 
     turbo::Status fiber_timer_del(fiber_timer_id id) {
@@ -54,14 +54,14 @@ namespace turbo::fiber_internal {
         if (c != nullptr) {
             turbo::TimerThread *tt = get_fiber_timer_thread();
             if (tt == nullptr) {
-                return turbo::invalid_argument_error("");
+                return turbo::make_status(kEINVAL);
             }
             const auto state = tt->unschedule(id);
-            if (state.ok() || turbo::is_not_found(state)) {
+            if (state.ok() || state.code() == kESTOP) {
                 return turbo::ok_status();
             }
         }
-        return turbo::invalid_argument_error("");
+        return turbo::make_status(kEINVAL);
     }
 
 }

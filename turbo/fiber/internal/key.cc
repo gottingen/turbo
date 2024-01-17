@@ -30,29 +30,29 @@ namespace turbo::fiber_internal {
 
     class KeyTable;
 
-// defined in task_group.cpp
+    // defined in task_group.cpp
     extern __thread FiberWorker *tls_task_group;
     extern thread_local fiber_local_storage tls_bls;
     static __thread bool tls_ever_created_keytable = false;
 
-// We keep thread specific data in a two-level array. The top-level array
-// contains at most KEY_1STLEVEL_SIZE pointers to dynamically allocated
-// arrays of at most KEY_2NDLEVEL_SIZE data pointers. Many applications
-// may just occupy one or two second level array, thus this machanism keeps
-// memory footprint smaller and we can change KEY_1STLEVEL_SIZE to a
-// bigger number more freely. The tradeoff is an additional memory indirection:
-// negligible at most time.
+    // We keep thread specific data in a two-level array. The top-level array
+    // contains at most KEY_1STLEVEL_SIZE pointers to dynamically allocated
+    // arrays of at most KEY_2NDLEVEL_SIZE data pointers. Many applications
+    // may just occupy one or two second level array, thus this machanism keeps
+    // memory footprint smaller and we can change KEY_1STLEVEL_SIZE to a
+    // bigger number more freely. The tradeoff is an additional memory indirection:
+    // negligible at most time.
     static const uint32_t KEY_2NDLEVEL_SIZE = 32;
 
-// Notice that we're trying to make the memory of second level and first
-// level both 256 bytes to make memory allocator happier.
+    // Notice that we're trying to make the memory of second level and first
+    // level both 256 bytes to make memory allocator happier.
     static const uint32_t KEY_1STLEVEL_SIZE = 31;
 
-// Max tls in one thread, currently the value is 992 which should be enough
-// for most projects.
+    // Max tls in one thread, currently the value is 992 which should be enough
+    // for most projects.
     static const uint32_t KEYS_MAX = KEY_2NDLEVEL_SIZE * KEY_1STLEVEL_SIZE;
 
-// destructors/version of TLS.
+    // destructors/version of TLS.
     struct KeyInfo {
         uint32_t version;
 
@@ -327,9 +327,9 @@ namespace turbo::fiber_internal {
         return 0;
     }
 
-// TODO: this is not strict `reserve' because we only check #free.
-// Currently there's no way to track KeyTables that may be returned
-// to the pool in future.
+    // TODO: this is not strict `reserve' because we only check #free.
+    // Currently there's no way to track KeyTables that may be returned
+    // to the pool in future.
     void fiber_keytable_pool_reserve(fiber_keytable_pool_t *pool,
                                      size_t nfree,
                                      fiber_local_key key,

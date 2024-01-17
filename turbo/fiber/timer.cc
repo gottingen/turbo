@@ -88,7 +88,7 @@ namespace turbo {
             return turbo::already_exists_error("");
         }
         if (duration < MIN_DURATION) {
-            return turbo::invalid_argument_error("duration too short");
+            return turbo::make_status(kEINVAL, "duration to short");
         }
         return turbo::ok_status();
     }

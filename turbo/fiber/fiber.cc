@@ -24,7 +24,7 @@ namespace turbo {
 
     turbo::Status Fiber::start(fiber_fn_t &&fn, void *args) {
         if(!startable()) {
-            return turbo::already_exists_error("Fiber already started.");
+            return turbo::make_status(kEEXIST, "Fiber already started.");
         }
         auto rs = turbo::fiber_internal::fiber_start_urgent(&_fid, &FIBER_ATTR_NORMAL, std::move(fn), args);
         if(rs.ok()) {
@@ -35,7 +35,7 @@ namespace turbo {
 
     turbo::Status Fiber::start(const FiberAttribute attr, fiber_fn_t &&fn, void *args) {
         if(!startable()) {
-            return turbo::already_exists_error("Fiber already started.");
+            return turbo::make_status(kEEXIST, "Fiber already started.");
         }
         auto rs = turbo::fiber_internal::fiber_start_urgent(&_fid, &attr, std::move(fn), args);
         if(rs.ok()) {
@@ -46,7 +46,7 @@ namespace turbo {
 
     turbo::Status Fiber::start(LaunchPolicy policy, fiber_fn_t &&fn, void *args) {
         if(!startable()) {
-            return turbo::already_exists_error("Fiber already started.");
+            return turbo::make_status(kEEXIST, "Fiber already started.");
         }
         if (policy == LaunchPolicy::eImmediately) {
             auto rs = turbo::fiber_internal::fiber_start_urgent(&_fid, &FIBER_ATTR_NORMAL, std::move(fn), args);
@@ -65,7 +65,7 @@ namespace turbo {
 
     turbo::Status Fiber::start(LaunchPolicy policy, const FiberAttribute attr, fiber_fn_t &&fn, void *args) {
         if(!startable()) {
-            return turbo::already_exists_error("Fiber already started.");
+            return turbo::make_status(kEEXIST, "Fiber already started.");
         }
         if (policy == LaunchPolicy::eImmediately) {
             auto rs = turbo::fiber_internal::fiber_start_urgent(&_fid, &attr, std::move(fn), args);
@@ -91,7 +91,7 @@ namespace turbo {
         if(_status == FiberStatus::eJoined) {
             return turbo::ok_status();
         }
-        return turbo::failed_precondition_error("Fiber is not joinable.");
+        return turbo::make_status(kEINVAL, "Fiber is not joinable.");
     }
 
     void Fiber::detach() {
@@ -106,7 +106,7 @@ namespace turbo {
         if(_status == FiberStatus::eStopped || _status == FiberStatus::eJoined) {
             return turbo::ok_status();
         }
-        return turbo::already_stop_error("");
+        return turbo::make_status(kESTOP, "Fiber is not running.");
     }
 
     Fiber::~Fiber() {

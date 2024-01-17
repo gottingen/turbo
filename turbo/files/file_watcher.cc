@@ -34,10 +34,10 @@ namespace turbo {
 
     turbo::Status FileWatcher::init_from_not_exist(const char *file_path) {
         if (nullptr == file_path) {
-            return turbo::invalid_argument_error("file path is nullptr");
+            return turbo::make_status(kEINVAL);
         }
         if (!_file_path.empty()) {
-            return turbo::invalid_argument_error("file path is not empty");
+            return turbo::make_status(kEINVAL);
         }
         _file_path = file_path;
         return ok_status();

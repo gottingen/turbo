@@ -108,7 +108,7 @@ namespace turbo::fiber_internal {
         std::atomic<unsigned> *whole = (std::atomic<unsigned> *) m->event;
         while (whole->exchange(FIBER_MUTEX_CONTENDED) & FIBER_MUTEX_LOCKED) {
             auto rs = turbo::fiber_internal::waitable_event_wait(whole, FIBER_MUTEX_CONTENDED);
-            if (!rs.ok() && !is_unavailable(rs)) {
+            if (!rs.ok() && rs.code() != EWOULDBLOCK && rs.code() != EINTR) {
                 // a mutex lock should ignore interrruptions in general since
                 // user code is unlikely to check the return value.
                 return rs;
@@ -121,7 +121,7 @@ namespace turbo::fiber_internal {
         std::atomic<unsigned> *whole = (std::atomic<unsigned> *) m->event;
         while (whole->exchange(FIBER_MUTEX_CONTENDED) & FIBER_MUTEX_LOCKED) {
             auto rs = turbo::fiber_internal::waitable_event_wait(whole, FIBER_MUTEX_CONTENDED, abstime);
-            if (!rs.ok() && !is_unavailable(rs)) {
+            if (!rs.ok() && rs.code() != EWOULDBLOCK && rs.code() != EINTR) {
                 // a mutex lock should ignore interrruptions in general since
                 // user code is unlikely to check the return value.
                 return rs;
@@ -138,7 +138,7 @@ namespace turbo::fiber_internal {
                          const fiber_mutexattr_t *__restrict) {
         m->event = turbo::fiber_internal::waitable_event_create_checked<unsigned>();
         if (!m->event) {
-            return turbo::resource_exhausted_error("");
+            return turbo::make_status(kENOMEM);
         }
         *m->event = 0;
         return turbo::ok_status();
@@ -153,7 +153,7 @@ namespace turbo::fiber_internal {
         if (!split->locked.exchange(1, std::memory_order_acquire)) {
             return turbo::ok_status();
         }
-        return turbo::resource_busy_error("");
+        return turbo::make_status(kEBUSY);
     }
 
     turbo::Status fiber_mutex_lock_contended(fiber_mutex_t *m) {

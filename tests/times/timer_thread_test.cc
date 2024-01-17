@@ -170,7 +170,7 @@ public:
     void run() {
         _running_time = turbo::time_now();
         REQUIRE_EQ(_expected_unschedule_result,
-                   _timer_thread->unschedule(_keeper1->_task_id).map_code());
+                   _timer_thread->unschedule(_keeper1->_task_id).code());
         _keeper2->schedule(_timer_thread);
     }
 
@@ -209,10 +209,10 @@ TEST_CASE("TimerThreadTest, schedule_and_unschedule_in_task") {
     sleep(1);  // let keeper1/3/5 run
 
     TestTask test_task1(&timer_thread, &keeper1, &keeper2, turbo::kOk);
-    timer_thread.schedule(TestTask::routine, &test_task1, past_time);
+    TURBO_UNUSED(timer_thread.schedule(TestTask::routine, &test_task1, past_time));
 
-    TestTask test_task2(&timer_thread, &keeper3, &keeper4, turbo::kNotFound);
-    timer_thread.schedule(TestTask::routine, &test_task2, past_time);
+    TestTask test_task2(&timer_thread, &keeper3, &keeper4, turbo::kESTOP);
+    TURBO_UNUSED(timer_thread.schedule(TestTask::routine, &test_task2, past_time));
 
     sleep(1);
     // test_task1/2 should be both blocked by keeper5.
@@ -220,7 +220,7 @@ TEST_CASE("TimerThreadTest, schedule_and_unschedule_in_task") {
     keeper4.expect_not_run();
 
     // unscheduling (running) keeper5 should have no effect and returns 1
-    REQUIRE(turbo::is_resource_busy(timer_thread.unschedule(keeper5._task_id)));
+    REQUIRE_EQ(timer_thread.unschedule(keeper5._task_id).code() , turbo::kEBUSY);
 
     // wake up keeper5 to let test_task1/2 run.
     keeper5.wakeup();

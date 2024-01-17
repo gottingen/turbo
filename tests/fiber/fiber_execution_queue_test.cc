@@ -73,7 +73,9 @@ namespace {
         }
         TLOG_INFO("stop");
         REQUIRE_EQ(0, turbo::execution_queue_stop(queue_id));
+        TLOG_INFO("execute");
         REQUIRE_NE(0,  turbo::execution_queue_execute(queue_id, 0));
+        TLOG_INFO("join");
         REQUIRE(turbo::execution_queue_join(queue_id).ok());
         REQUIRE_EQ(expected_result, result);
         REQUIRE(stopped);

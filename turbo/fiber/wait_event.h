@@ -128,7 +128,7 @@ namespace turbo {
         TURBO_ASSERT(event_ == nullptr);
         event_ = turbo::fiber_internal::waitable_event_create_checked<T>();
         if (event_ == nullptr) {
-            return turbo::resource_exhausted_error("wait event create failed");
+            return turbo::make_status(kENOMEM);
         }
         if constexpr (is_atomic) {
             event_->store(event, std::memory_order_relaxed);

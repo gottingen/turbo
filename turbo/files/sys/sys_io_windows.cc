@@ -45,7 +45,7 @@ namespace turbo::sys_io {
 
     turbo::ResultStatus<size_t> file_size(int fd) {
         if (fd == -1) {
-            return turbo::invalid_argument_error("Failed getting file size. fp is null");
+            return turbo::make_status(kEINVAL);
         }
 #    if defined(_WIN64) // 64 bits
                 __int64 ret = ::_filelengthi64(fd);

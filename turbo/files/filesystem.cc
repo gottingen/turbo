@@ -51,7 +51,7 @@ namespace turbo {
         std::error_code ec;
         auto len = turbo::filesystem::file_size(path, ec);
         if (ec) {
-            return turbo::internal_error(ec.message());
+            return turbo::make_status(ec);
         }
         std::string buf;
         buf.reserve(kBuffSize);
@@ -82,7 +82,7 @@ namespace turbo {
         std::error_code ec;
         auto len = turbo::filesystem::file_size(path, ec);
         if (ec) {
-            return turbo::internal_error(ec.message());
+            return turbo::make_status(ec);
         }
         std::string buf;
         buf.reserve(kBuffSize);

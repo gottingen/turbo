@@ -236,7 +236,7 @@ TURBO_REGISTER_ERRNO(turbo::kESHUTDOWN, "Cannot send after transport endpoint sh
 //109
 TURBO_REGISTER_ERRNO(turbo::kETOOMANYREFS, "Too many references: cannot splice");
 //110
-TURBO_REGISTER_ERRNO(turbo::kETIMEDOUT, "Connection timed out");
+TURBO_REGISTER_ERRNO(turbo::kETIMEDOUT, "timed out");
 //111
 TURBO_REGISTER_ERRNO(turbo::kECONNREFUSED, "Connection refused");
 //112

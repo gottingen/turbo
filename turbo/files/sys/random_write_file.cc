@@ -77,7 +77,7 @@ namespace turbo {
     turbo::Status RandomWriteFile::reopen(bool truncate) {
         close();
         if (_file_path.empty()) {
-            return turbo::invalid_argument_error("file name empty");
+            return turbo::make_status(kEINVAL);
         }
         OpenOption option = _option;
         if (truncate) {
@@ -88,7 +88,7 @@ namespace turbo {
 
     turbo::Status RandomWriteFile::write(off_t offset, const void *data, size_t size, bool truncate) {
         if (_fd == -1) {
-            return turbo::unavailable_error("file not open for read yet");
+            return turbo::make_status(kEBADFD);
         }
 
         ssize_t write_size = ::pwrite(_fd, data, size, static_cast<off_t>(offset));

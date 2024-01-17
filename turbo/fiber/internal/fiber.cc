@@ -82,7 +82,7 @@ namespace turbo::fiber_internal {
                           void *TURBO_RESTRICT arg) {
         ScheduleGroup *c = get_or_new_task_control();
         if (nullptr == c) {
-            return turbo::resource_exhausted_error("");
+            return make_status(kENOMEM);
         }
         if (attr != nullptr && is_nosignal(*attr)) {
             // Remember the FiberWorker to insert NOSIGNAL tasks for 2 reasons:
@@ -96,8 +96,7 @@ namespace turbo::fiber_internal {
             }
             return g->start_background<true>(tid, attr, std::move(fn), arg);
         }
-        return c->choose_one_group()->start_background<true>(
-                tid, attr, std::move(fn), arg);
+        return c->choose_one_group()->start_background<true>(tid, attr, std::move(fn), arg);
     }
 
     struct TidTraits {
@@ -222,11 +221,11 @@ namespace turbo::fiber_internal {
     turbo::Status fiber_set_concurrency(int num) {
         if (num < turbo::FiberConfig::FIBER_MIN_CONCURRENCY || num > turbo::FiberConfig::FIBER_MAX_CONCURRENCY) {
             TLOG_ERROR("Invalid concurrency={}", num);
-            return turbo::invalid_argument_error("");
+            return turbo::make_status(EINVAL);
         }
         if (turbo::FiberConfig::get_instance().fiber_min_concurrency > 0) {
             if (num < turbo::FiberConfig::get_instance().fiber_min_concurrency) {
-                return turbo::invalid_argument_error("");
+                return turbo::make_status(EINVAL);
             }
             if (turbo::fiber_internal::never_set_fiber_concurrency) {
                 turbo::fiber_internal::never_set_fiber_concurrency = false;
@@ -237,7 +236,7 @@ namespace turbo::fiber_internal {
         turbo::fiber_internal::ScheduleGroup *c = turbo::fiber_internal::get_task_control();
         if (c != nullptr) {
             if (num < c->concurrency()) {
-                return turbo::resource_exhausted_error("");
+                return turbo::make_status(EPERM);
             } else if (num == c->concurrency()) {
                 return turbo::ok_status();
             }
@@ -265,7 +264,7 @@ namespace turbo::fiber_internal {
             return turbo::ok_status();
         }
         return (num == turbo::FiberConfig::get_instance().fiber_concurrency ? turbo::ok_status()
-                                                                            : turbo::resource_exhausted_error(""));
+                                                                            : turbo::make_status(EPERM));
     }
 
     int fiber_about_to_quit() {

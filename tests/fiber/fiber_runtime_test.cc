@@ -37,10 +37,10 @@ namespace turbo::fiber_internal {
 
     TEST_CASE("FiberTest, setconcurrency") {
         REQUIRE_EQ(8 + turbo::FiberConfig::FIBER_EPOLL_THREAD_NUM, (size_t) turbo::fiber_get_concurrency());
-        REQUIRE_EQ(turbo::invalid_argument_error(""), turbo::fiber_set_concurrency(turbo::FiberConfig::FIBER_MIN_CONCURRENCY - 1));
-        REQUIRE_EQ(turbo::invalid_argument_error(""), turbo::fiber_set_concurrency(0));
-        REQUIRE_EQ(turbo::invalid_argument_error(""), turbo::fiber_set_concurrency(-1));
-        REQUIRE_EQ(turbo::invalid_argument_error(""), turbo::fiber_set_concurrency(turbo::FiberConfig::FIBER_MAX_CONCURRENCY + 1));
+        REQUIRE_EQ(kEINVAL, turbo::fiber_set_concurrency(turbo::FiberConfig::FIBER_MIN_CONCURRENCY - 1).code());
+        REQUIRE_EQ(kEINVAL, turbo::fiber_set_concurrency(0).code());
+        REQUIRE_EQ(kEINVAL, turbo::fiber_set_concurrency(-1).code());
+        REQUIRE_EQ(kEINVAL, turbo::fiber_set_concurrency(turbo::FiberConfig::FIBER_MAX_CONCURRENCY + 1).code());
         REQUIRE_EQ(turbo::ok_status(), turbo::fiber_set_concurrency(turbo::FiberConfig::FIBER_MIN_CONCURRENCY));
         REQUIRE_EQ(turbo::FiberConfig::FIBER_MIN_CONCURRENCY, turbo::fiber_get_concurrency());
         REQUIRE_EQ(turbo::ok_status(), turbo::fiber_set_concurrency(turbo::FiberConfig::FIBER_MIN_CONCURRENCY + 1));
@@ -51,7 +51,7 @@ namespace turbo::fiber_internal {
         REQUIRE_EQ(turbo::FiberConfig::FIBER_MIN_CONCURRENCY + 1, turbo::fiber_get_concurrency());
         REQUIRE_EQ(turbo::ok_status(), turbo::fiber_set_concurrency(turbo::FiberConfig::FIBER_MIN_CONCURRENCY + 5));
         REQUIRE_EQ(turbo::FiberConfig::FIBER_MIN_CONCURRENCY + 5, turbo::fiber_get_concurrency());
-        REQUIRE_EQ(turbo::resource_exhausted_error(""), turbo::fiber_set_concurrency(turbo::FiberConfig::FIBER_MIN_CONCURRENCY + 1));
+        REQUIRE_EQ(kEPERM, turbo::fiber_set_concurrency(turbo::FiberConfig::FIBER_MIN_CONCURRENCY + 1).code());
         REQUIRE_EQ(turbo::FiberConfig::FIBER_MIN_CONCURRENCY + 5, turbo::fiber_get_concurrency());
     }
 
