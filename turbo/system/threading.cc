@@ -35,4 +35,8 @@ namespace turbo {
     void PlatformThread::register_sigurg(int signo, signal_handler handler) {
         signal(signo, handler);
     }
+
+    int PlatformThread::set_current_affinity(std::vector<int> affinity) {
+        return set_affinity(current_handle(), affinity);
+    }
 }  // namespace turbo

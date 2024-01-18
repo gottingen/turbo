@@ -254,6 +254,15 @@ namespace turbo {
         return ResourcePool<T>::singleton()->describe_resources();
     }
 
+    template <typename T>
+    uint64_t make_resource_id(uint32_t index, ResourceId<T> rid) {
+        return (static_cast<uint64_t>(index) << 32) | rid.id;
+    }
+
+    template <typename T>
+    ResourceId<T> get_resource_id(uint64_t id) {
+        return ResourceId<T>{static_cast<uint32_t>(id & 0xFFFFFFFF)};
+    }
 
 }  // namespace turbo
 

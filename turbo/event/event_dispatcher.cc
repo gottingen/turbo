@@ -1,0 +1,184 @@
+// Copyright 2023 The Elastic-AI Authors.
+// part of Elastic AI Search
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//
+// Created by jeff on 24-1-18.
+//
+
+#include "turbo/event/event_dispatcher.h"
+#include "turbo/event/internal/epoll_poller.h"
+
+namespace turbo {
+    EventDispatcher::~EventDispatcher() {
+        if(running()) {
+            stop();
+            join();
+        }
+        if (_wakeup_fds[0] != -1) {
+            ::close(_wakeup_fds[0]);
+        }
+        if (_wakeup_fds[1] != -1) {
+            ::close(_wakeup_fds[1]);
+        }
+    }
+    turbo::Status EventDispatcher::start(const FiberAttribute *consumer_thread_attr) {
+        if (running()) {
+            return turbo::ok_status();
+        }
+        _poller.reset(new EpollPoller());
+        if(!_poller){
+            return turbo::make_status(kENOMEM, "new EpollPoller failed");
+        }
+
+        turbo::Status status = _poller->initialize();
+        if (!status.ok()) {
+            return status;
+        }
+        // add wake up
+        _wakeup_fds[0] = -1;
+        _wakeup_fds[1] = -1;
+        if (pipe(_wakeup_fds) != 0) {
+            TLOG_CRITICAL("Fail to create pipe: {}", strerror(errno));
+            return make_status(errno, "Fail to create pipe");
+        }
+        auto rs = _poller->add_poll_in(0, _wakeup_fds[0]);
+        if (!rs.ok()) {
+            TLOG_CRITICAL("Fail to add poll in: {}", rs.to_string());
+            return rs;
+        }
+        _consumer_thread_attr = (consumer_thread_attr  ?
+                                 *consumer_thread_attr : FIBER_ATTR_NORMAL);
+
+        FiberAttribute epoll_thread_attr = _consumer_thread_attr | AttributeFlag::FLAG_NEVER_QUIT;
+
+        rs = _fiber.start(epoll_thread_attr, fiber_func, this);
+        if (!rs.ok()) {
+            TLOG_CRITICAL("Fail to create epoll thread: {}", rs.to_string());
+            return rs;
+        }
+        return turbo::ok_status();
+    }
+
+    bool EventDispatcher::running() const {
+        return _fiber.running() && _poller != nullptr && !_stop;
+    }
+
+    void EventDispatcher::stop() {
+        if(!running() && _poller && !_stop){
+            return;
+        }
+        _stop = true;
+        uint64_t buf = 1;
+        auto r = ::write(_wakeup_fds[1], &buf, sizeof(buf));
+        TURBO_UNUSED(r);
+        _poller->destroy();
+    }
+
+    void EventDispatcher::join() {
+        _fiber.join();
+        _poller.reset();
+    }
+
+    void* EventDispatcher::fiber_func(void* arg) {
+        EventDispatcher* dispatcher = (EventDispatcher*)arg;
+        dispatcher->loop();
+        return nullptr;
+    }
+
+    void EventDispatcher::loop() {
+        std::vector<PollResult> poll_results;
+        poll_results.reserve(1024);
+        while (!_stop) {
+            auto rs = _poller->poll(poll_results, 1000);
+            _num_iterators++;
+            if(_stop) {
+                break;
+            }
+
+            if (!rs.ok()) {
+                if(rs.code() == kEINTR){
+                    continue;
+                }
+                TLOG_CRITICAL("Fail to poll, {}", rs.to_string());
+                break;
+            }
+
+            for (auto& poll_result : poll_results) {
+                if (poll_result.event_channel_id == 0) {
+                    // wake up
+                    auto hw_rs = handle_wakeup();
+                    if (!hw_rs.ok()) {
+                        TLOG_CRITICAL("Fail to handle wakeup, {}", rs.to_string());
+                    }
+                    continue;
+                }
+                ResourceId<EventChannel> channel_id{ poll_result.event_channel_id};
+                auto *event_channel = turbo::address_resource(channel_id);
+                if(!event_channel){
+                    /// let it leak, user do not close the fd and remove the channel, let user
+                    /// to fix they code
+                    TLOG_CRITICAL("Fail to get event channel: {}", poll_result.event_channel_id);
+                    continue;
+                }
+                if(poll_result.events & EPOLLIN){
+                    event_channel->handle_read(poll_result.fd, poll_result.events);
+                }
+                if(poll_result.events & EPOLLOUT){
+                    event_channel->handle_write(poll_result.fd, poll_result.events);
+                }
+            }
+            poll_results.clear();
+        }
+    }
+
+    int EventDispatcher::add_consumer(EventChannelId channel_id, int fd) {
+        TURBO_ASSERT(_poller);
+        auto rs = _poller->add_poll_in(channel_id, fd);
+        if (!rs.ok()) {
+            TLOG_CRITICAL("Fail to add poll in: {}", rs.to_string());
+            return -1;
+        }
+        return 0;
+    }
+
+    int EventDispatcher::add_poll_out(EventChannelId channel_id, int fd, bool pollin) {
+        TURBO_ASSERT(_poller);
+        auto rs = _poller->add_poll_out(channel_id, fd, pollin);
+        if (!rs.ok()) {
+            TLOG_CRITICAL("Fail to add poll out: {}", rs.to_string());
+            return -1;
+        }
+        return 0;
+    }
+
+    int EventDispatcher::remove_poll_out(EventChannelId channel_id, int fd, bool pollin) {
+        TURBO_ASSERT(_poller);
+        auto rs = _poller->remove_poll_out(channel_id, fd, pollin);
+        if (!rs.ok()) {
+            TLOG_CRITICAL("Fail to remove poll out: {}", rs.to_string());
+            return -1;
+        }
+        return 0;
+    }
+
+    turbo::Status EventDispatcher::handle_wakeup() {
+        uint64_t buf;
+        auto r =::read(_wakeup_fds[0], &buf, sizeof(buf));
+        if (r < 0) {
+            TLOG_CRITICAL("Fail to read wakeup fd: {}", strerror(errno));
+            return make_status();
+        }
+        return turbo::ok_status();
+    }
+}  // namespace turbo

@@ -98,5 +98,9 @@ namespace turbo {
 
     void TerminateOnThread() {}
 
+    int PlatformThread::set_affinity(PlatformThreadHandle thread_handle, std::vector<int> affinity) {
+        return -1;
+    }
+
 }  // namespace turbo
 #endif  // defined(TURBO_PLATFORM_OSX)

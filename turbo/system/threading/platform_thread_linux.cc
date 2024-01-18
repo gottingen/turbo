@@ -111,5 +111,16 @@ namespace turbo {
 
     void TerminateOnThread() {}
 
+    int PlatformThread::set_affinity(PlatformThreadHandle thread_handle, std::vector<int> affinity) {
+        if (affinity.empty()) {
+            return -1;
+        }
+        cpu_set_t cpuset;
+        CPU_ZERO(&cpuset);
+        for (auto&& e : affinity) {
+            CPU_SET(e, &cpuset);
+        }
+        return pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
+    }
 }  // namespace turbo
 #endif  // defined(TURBO_PLATFORM_LINUX)

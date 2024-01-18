@@ -21,6 +21,7 @@
 #include "turbo/format/format.h"
 #include "turbo/concurrent/call_once.h"
 #include <csignal>
+#include <vector>
 
 namespace turbo {
 
@@ -175,6 +176,10 @@ namespace turbo {
         kill_thread(pthread_t handle, int signo = SIGURG, signal_handler handler = do_nothing_handler);
 
         static void join(PlatformThreadHandle thread_handle);
+
+        static int set_affinity(PlatformThreadHandle thread_handle, std::vector<int> affinity);
+
+        static int set_current_affinity(std::vector<int> affinity);
     private:
 
         static once_flag sigaction_flag;

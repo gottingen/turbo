@@ -91,7 +91,7 @@ namespace turbo {
         // We need to make sure VDSOSupport::Init() is called before any setuid or
         // chroot calls, so InitializeSymbolizer() should be called very early in the
         // life of a program.
-        turbo::debugging_internal::VDSOSupport::Init();
+        turbo::debugging_internal::VDSOSupport::initialize();
 #endif
         if (argv0_value != nullptr) {
             free(argv0_value);

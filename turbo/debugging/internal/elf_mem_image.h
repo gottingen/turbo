@@ -47,7 +47,7 @@
 
 namespace turbo::debugging_internal {
 
-// An in-memory ELF image (may not exist on disk).
+    // An in-memory ELF image (may not exist on disk).
     class ElfMemImage {
     private:
         // Sentinel: there could never be an elf image at &kInvalidBaseSentinel.
