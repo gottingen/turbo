@@ -160,7 +160,7 @@ namespace turbo::fiber_internal {
         }
         fiber_id_t bth[1];
         for (size_t i = 0; i < TURBO_ARRAY_SIZE(bth); ++i) {
-            REQUIRE(fiber_start_urgent(&bth[i], nullptr, worker2, &k).ok());
+            REQUIRE(fiber_start(&bth[i], nullptr, worker2, &k).ok());
         }
         for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             REQUIRE_EQ(0, pthread_join(th[i], nullptr));
@@ -213,7 +213,7 @@ namespace turbo::fiber_internal {
         pthread_t th;
         fiber_id_t bth;
         REQUIRE_EQ(0, pthread_create(&th, nullptr, use_invalid_keys, &keys));
-        REQUIRE(fiber_start_urgent(&bth, nullptr, use_invalid_keys, &keys).ok());
+        REQUIRE(fiber_start(&bth, nullptr, use_invalid_keys, &keys).ok());
         REQUIRE_EQ(0, pthread_join(th, nullptr));
         REQUIRE(fiber_join(bth, nullptr).ok());
         REQUIRE_EQ(0, fiber_key_delete(keys.valid_key));
@@ -269,8 +269,8 @@ namespace turbo::fiber_internal {
         fiber_id_t bth;
         fiber_id_t bth2;
         REQUIRE_EQ(0, pthread_create(&pth, nullptr, sid_thread, &pth_data));
-        REQUIRE(fiber_start_urgent(&bth, nullptr, sid_thread, &bth_data).ok());
-        REQUIRE(fiber_start_urgent(&bth2, &FIBER_ATTR_PTHREAD,
+        REQUIRE(fiber_start(&bth, nullptr, sid_thread, &bth_data).ok());
+        REQUIRE(fiber_start(&bth2, &FIBER_ATTR_PTHREAD,
                                    sid_thread, &fib2_data).ok());
 
         REQUIRE_EQ(0, pthread_join(pth, nullptr));
@@ -310,7 +310,7 @@ namespace turbo::fiber_internal {
         REQUIRE_EQ(tls, fiber_getspecific(data->key));
         if (data->level++ == 0) {
             fiber_id_t bth;
-            REQUIRE(fiber_start_urgent(&bth, nullptr, set_before_any_fiber, data).ok());
+            REQUIRE(fiber_start(&bth, nullptr, set_before_any_fiber, data).ok());
             REQUIRE(fiber_join(bth, nullptr).ok());
             REQUIRE_EQ(1, data->ndestroy);
         } else {
@@ -384,14 +384,14 @@ namespace turbo::fiber_internal {
 
         PoolData fib_data = {key, nullptr, 0, 3};
         fiber_id_t fid;
-        REQUIRE(fiber_start_urgent(&fid, &attr, pool_thread, &fib_data).ok());
+        REQUIRE(fiber_start(&fid, &attr, pool_thread, &fib_data).ok());
         REQUIRE(fiber_join(fid, nullptr).ok());
         REQUIRE_EQ(0, fib_data.seq);
         REQUIRE_EQ(1, fiber_keytable_pool_size(&pool));
 
         PoolData fib2_data = {key, &fib_data, 0, 3};
         fiber_id_t fid2;
-        REQUIRE(fiber_start_urgent(&fid2, &attr2, pool_thread, &fib2_data).ok());
+        REQUIRE(fiber_start(&fid2, &attr2, pool_thread, &fib2_data).ok());
         REQUIRE(fiber_join(fid2, nullptr).ok());
         REQUIRE_EQ(0, fib2_data.seq);
         REQUIRE_EQ(1, fiber_keytable_pool_size(&pool));

@@ -20,15 +20,29 @@
 
 namespace turbo {
 
+    turbo::Status EventChannel::initialize(resource_id id, int32_t ver) {
+        this->rid = id;
+        this->version = ver;
+        return wait_event.initialize(0);
+    }
+
+    void EventChannel::destroy() {
+        wait_event.destroy();
+    }
+
+    EventChannel::~EventChannel() {
+        destroy();
+    }
+
     void EventChannel::handle_read(int fd, int events) {
         if (read_callback) {
-            read_callback(rid, fd, events);
+            read_callback(this, fd, events);
         }
     }
 
     void EventChannel::handle_write(int fd, int events) {
         if (write_callback) {
-            write_callback(rid, fd);
+            write_callback(this, fd);
         }
     }
 

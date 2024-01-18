@@ -32,7 +32,7 @@ namespace turbo {
 
         ~EventDispatcher();
 
-        Status start(const FiberAttribute *consumer_thread_attr);
+        Status start(const FiberAttribute *consumer_thread_attr, bool run_in_pthread = false);
 
         bool running() const;
 
@@ -46,7 +46,11 @@ namespace turbo {
 
         int remove_poll_out(EventChannelId channel_id, int fd, bool pollin);
 
+        turbo::Status remove_poll_in(int fd);
+
         int64_t num_iterators() const { return _num_iterators; }
+
+        constexpr bool run_in_pthread() const { return _run_in_pthread; }
 
     private:
         TURBO_NON_COPYABLE(EventDispatcher);
@@ -55,17 +59,18 @@ namespace turbo {
 
         void loop();
 
-        int RemoveConsumer(int fd);
+        static void handle_wakeup(EventChannel *channel, int fd, int event);
 
-        Status handle_wakeup();
-
+        EventChannelId _wakeup_channel;
         volatile bool _stop{false};
 
         int _wakeup_fds[2];
 
         int64_t _num_iterators{0};
 
+        bool _run_in_pthread{false};
         Fiber _fiber;
+        pthread_t  _thread_id{0};
 
         FiberAttribute _consumer_thread_attr;
 

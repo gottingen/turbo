@@ -83,11 +83,11 @@ namespace turbo::fiber_internal {
         fiber_id_t wth[8];
         const size_t NW = TURBO_ARRAY_SIZE(wth);
         for (size_t i = 0; i < NW; ++i) {
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&wth[i], nullptr, waiter, &a));
+            REQUIRE_EQ(turbo::ok_status(), fiber_start(&wth[i], nullptr, waiter, &a));
         }
 
         fiber_id_t sth;
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&sth, nullptr, signaler, &a));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&sth, nullptr, signaler, &a));
 
         turbo::fiber_sleep_for(turbo::Duration::microseconds(SIGNAL_INTERVAL_US * 200));
 
@@ -254,7 +254,7 @@ namespace turbo::fiber_internal {
         TLOG_INFO("start");
         for (size_t i = 0; i < TURBO_ARRAY_SIZE(fmutex_waiter_threads); ++i) {
            // TLOG_INFO("start {}", i);
-            REQUIRE(turbo::fiber_internal::fiber_start_urgent(&fmutex_waiter_threads[i], nullptr,
+            REQUIRE(turbo::fiber_start(&fmutex_waiter_threads[i], nullptr,
                                         cv_fmutex_waiter, &a).ok());
             REQUIRE_EQ(0, pthread_create(&mutex_waiter_threads[i], nullptr,
                                         cv_mutex_waiter, &a));
@@ -270,7 +270,7 @@ namespace turbo::fiber_internal {
         pthread_join(signal_thread, nullptr);
         a.cond.notify_all();
         for (size_t i = 0; i < TURBO_ARRAY_SIZE(fmutex_waiter_threads); ++i) {
-            turbo::fiber_internal::fiber_join(fmutex_waiter_threads[i], nullptr);
+            turbo::fiber_join(fmutex_waiter_threads[i], nullptr);
             pthread_join(mutex_waiter_threads[i], nullptr);
         }
         TLOG_INFO("stop 2");
@@ -338,7 +338,7 @@ namespace turbo::fiber_internal {
         ProfilerStart("cond.prof");
 #endif
         for (int i = 0; i < 2; ++i) {
-            REQUIRE(fiber_start_urgent(&threads[i], nullptr, ping_pong_thread, &arg).ok());
+            REQUIRE(fiber_start(&threads[i], nullptr, ping_pong_thread, &arg).ok());
         }
         usleep(1000 * 1000);
         arg.stopped = true;
@@ -414,7 +414,7 @@ namespace turbo::fiber_internal {
 
         fiber_id_t normal_threads[NTHREADS];
         for (int i = 0; i < NTHREADS; ++i) {
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&normal_threads[i], nullptr, wait_thread, &ba));
+            REQUIRE_EQ(turbo::ok_status(), fiber_start(&normal_threads[i], nullptr, wait_thread, &ba));
         }
         pthread_t pthreads[NTHREADS];
         for (int i = 0; i < NTHREADS; ++i) {
@@ -499,7 +499,7 @@ namespace turbo::fiber_internal {
         c.Init();
         turbo::StopWatcher tm;
         TLOG_INFO("workers {}", turbo::fiber_get_concurrency());
-        TURBO_UNUSED(fiber_start_urgent(&tid, &FIBER_ATTR_PTHREAD, wait_cond_thread, &c));
+        TURBO_UNUSED(fiber_start(&tid, &FIBER_ATTR_PTHREAD, wait_cond_thread, &c));
         std::vector<fiber_id_t> tids;
         tids.reserve(32768);
         tm.reset();
@@ -532,7 +532,7 @@ namespace turbo::fiber_internal {
 
     TEST_CASE("CondTest, too_many_fibers_from_fiber") {
         fiber_id_t th;
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th, nullptr, run_launch_many_fibers, nullptr));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th, nullptr, run_launch_many_fibers, nullptr));
         TURBO_UNUSED(fiber_join(th, nullptr));
     }
 }  // namespace  turbo::fiber_internal

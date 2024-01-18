@@ -80,6 +80,35 @@ namespace turbo {
      */
     using fiber_internal::FIBER_ATTR_DEBUG;
 
+    ///////////////////////////// c api ////////////////////////////////
+
+    [[maybe_unused]] turbo::Status fiber_start(fiber_id_t *TURBO_RESTRICT tid,
+                                                      const FiberAttribute *TURBO_RESTRICT attr,
+                                                      fiber_fn_t &&fn,
+                                                      void *TURBO_RESTRICT args);
+
+    [[maybe_unused]] turbo::Status fiber_start_background(fiber_id_t *TURBO_RESTRICT tid,
+                                                          const FiberAttribute *TURBO_RESTRICT attr,
+                                                          fiber_fn_t &&fn,
+                                                          void *TURBO_RESTRICT args);
+
+    turbo::Status fiber_interrupt(fiber_id_t tid);
+
+    turbo::Status fiber_stop(fiber_id_t tid);
+
+    bool fiber_stopped(fiber_id_t tid);
+
+    fiber_id_t fiber_self(void);
+
+    int fiber_equal(fiber_id_t t1, fiber_id_t t2);
+
+    void fiber_exit(void *retval) __attribute__((__noreturn__));
+
+    int fiber_yield();
+
+    turbo::Status fiber_join(fiber_id_t bt, void **fiber_return);
+
+    void fiber_flush();
     /**
      * @ingroup turbo_fiber
      * @brief fiber launch policy,
@@ -161,14 +190,6 @@ namespace turbo {
         fiber_id_t _fid{INVALID_FIBER_ID};
     };
 
-    /**
-   * @ingroup turbo_fiber
-   * @brief yield cpu to other fibers
-   * @return 0 if success, -1 if error
-   */
-    int fiber_yield();
-
-    fiber_id_t fiber_self();
 
     /**
      * @ingroup turbo_fiber

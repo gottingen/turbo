@@ -261,7 +261,7 @@ namespace turbo {
             tm.reset();
             REQUIRE_EQ(turbo::ok_status(), th.start(attr, wait_event, &arg));
             REQUIRE_EQ(turbo::ok_status(), turbo::fiber_sleep_for(SleepDuration));
-            REQUIRE_EQ(turbo::ok_status(), fiber_internal::fiber_stop(th.self()));
+            REQUIRE_EQ(turbo::ok_status(), fiber_stop(th.self()));
             REQUIRE_EQ(turbo::ok_status(), th.stop());
             th.join(nullptr);
             tm.stop();

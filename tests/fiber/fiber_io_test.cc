@@ -303,7 +303,7 @@ namespace turbo::fiber_internal {
             cm[i]->times = REP;
 #ifdef RUN_CLIENT_IN_FIBER
             turbo::make_non_blocking(cm[i]->fd);
-            REQUIRE_EQ(0, fiber_start_urgent(&cth[i], nullptr, client_thread, cm[i]));
+            REQUIRE_EQ(0, fiber_start(&cth[i], nullptr, client_thread, cm[i]));
 #else
             REQUIRE_EQ(0, pthread_create(&cth[i], nullptr, client_thread, cm[i]));
 #endif
@@ -317,7 +317,7 @@ namespace turbo::fiber_internal {
             EpollMeta *em = new EpollMeta;
             em->epfd = epfd[i];
 #ifdef RUN_EPOLL_IN_FIBER
-            REQUIRE_EQ(0, fiber_start_urgent(&eth[i], epoll_thread, em, nullptr);
+            REQUIRE_EQ(0, fiber_start(&eth[i], epoll_thread, em, nullptr);
 #else
             REQUIRE_EQ(0, pthread_create(&eth[i], nullptr, epoll_thread, em));
 #endif
@@ -474,7 +474,7 @@ namespace turbo::fiber_internal {
         REQUIRE_EQ(EINVAL, errno);
 #endif
         fiber_id_t th;
-        REQUIRE_EQ(true, fiber_start_urgent(&th, nullptr, close_the_fd, &fds[1]).ok());
+        REQUIRE_EQ(true, fiber_start(&th, nullptr, close_the_fd, &fds[1]).ok());
         turbo::StopWatcher tm;
         tm.reset();
 #if defined(TURBO_PLATFORM_LINUX)
@@ -504,7 +504,7 @@ namespace turbo::fiber_internal {
         pthread_t th;
         REQUIRE_EQ(0, pthread_create(&th, nullptr, wait_for_the_fd, &fds[0]));
         fiber_id_t bth;
-        REQUIRE_EQ(true, fiber_start_urgent(&bth, nullptr, wait_for_the_fd, &fds[0]).ok());
+        REQUIRE_EQ(true, fiber_start(&bth, nullptr, wait_for_the_fd, &fds[0]).ok());
         turbo::StopWatcher tm;
         tm.reset();
         REQUIRE_EQ(0, pthread_join(th, nullptr));
@@ -519,7 +519,7 @@ namespace turbo::fiber_internal {
         int fds[2];
         REQUIRE_EQ(0, pipe(fds));
         fiber_id_t bth;
-        REQUIRE_EQ(true, fiber_start_urgent(&bth, nullptr, wait_for_the_fd, &fds[0]).ok());
+        REQUIRE_EQ(true, fiber_start(&bth, nullptr, wait_for_the_fd, &fds[0]).ok());
         turbo::StopWatcher tm;
         tm.reset();
         REQUIRE(turbo::fiber_fd_close(fds[0]).ok());

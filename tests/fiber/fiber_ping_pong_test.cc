@@ -172,9 +172,9 @@ namespace {
                 REQUIRE_EQ(0, pthread_create(&th2, nullptr, sutex_player, arg2));
             } else if (use_futex) {
                 REQUIRE_EQ(turbo::ok_status(),
-                           turbo::fiber_internal::fiber_start_background(&bth1, nullptr, futex_player, arg1));
+                           turbo::fiber_start_background(&bth1, nullptr, futex_player, arg1));
                 REQUIRE_EQ(turbo::ok_status(),
-                           turbo::fiber_internal::fiber_start_background(&bth2, nullptr, futex_player, arg2));
+                           turbo::fiber_start_background(&bth2, nullptr, futex_player, arg2));
             } else {
                 REQUIRE(false);
             }

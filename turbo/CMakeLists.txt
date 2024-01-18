@@ -53,6 +53,7 @@ set(TURBO_ALL_SRC
         "debugging/internal/vdso_support.cc"
         "debugging/leak_check.cc"
         "event/channel.cc"
+        "event/internal/time_core.cc"
         "event/event_dispatcher.cc"
         "event/internal/epoll_poller.cc"
         "fiber/internal/context.cc"

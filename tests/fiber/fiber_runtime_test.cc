@@ -24,7 +24,7 @@
 #include <turbo/fiber/internal/waitable_event.h>
 #include "turbo/log/logging.h"
 #include "turbo/fiber/runtime.h"
-#include "turbo/fiber/internal/fiber.h"
+#include "turbo/fiber/fiber.h"
 #include "turbo/fiber/internal/schedule_group.h"
 
 namespace turbo::fiber_internal {
@@ -47,7 +47,7 @@ namespace turbo::fiber_internal {
         REQUIRE_EQ(turbo::FiberConfig::FIBER_MIN_CONCURRENCY + 1, turbo::fiber_get_concurrency());
         REQUIRE_EQ(turbo::ok_status(), turbo::fiber_set_concurrency(turbo::FiberConfig::FIBER_MIN_CONCURRENCY));  // smaller value
         fiber_id_t th;
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th, nullptr, dummy, nullptr));
+        REQUIRE_EQ(turbo::ok_status(), turbo::fiber_start(&th, nullptr, dummy, nullptr));
         REQUIRE_EQ(turbo::FiberConfig::FIBER_MIN_CONCURRENCY + 1, turbo::fiber_get_concurrency());
         REQUIRE_EQ(turbo::ok_status(), turbo::fiber_set_concurrency(turbo::FiberConfig::FIBER_MIN_CONCURRENCY + 5));
         REQUIRE_EQ(turbo::FiberConfig::FIBER_MIN_CONCURRENCY + 5, turbo::fiber_get_concurrency());

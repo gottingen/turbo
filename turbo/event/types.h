@@ -25,9 +25,11 @@ namespace turbo {
 
     typedef uint64_t resource_id;
 
-    typedef std::function<void(resource_id rid, int fd, int event)> ReadCallback;
+    struct EventChannel;
 
-    typedef std::function<void(resource_id rid, int fd)> WriteCallback;
+    typedef std::function<void(EventChannel *channel, int fd, int event)> ReadCallback;
+
+    typedef std::function<void(EventChannel *channel, int fd)> WriteCallback;
 
     /// do not  define and using on error callback here, user should handle error by the above callbacks.
 }  // namespace turbo

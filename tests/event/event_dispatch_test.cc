@@ -20,32 +20,36 @@
 #include "turbo/times/stop_watcher.h"
 #include "turbo/event/event_dispatcher.h"
 
+
 TEST_CASE("event_dispatcher wakeup") {
     turbo::EventDispatcher dispatcher;
     turbo::FiberAttribute attr;
     turbo::Status status = dispatcher.start(&attr);
-    CHECK(status.ok());
-    CHECK(dispatcher.running());
+    REQUIRE(status.ok());
+    REQUIRE(dispatcher.running());
     turbo::StopWatcher watcher;
     watcher.reset();
     dispatcher.stop();
     dispatcher.join();
-    CHECK_LT(watcher.elapsed_mill(),10);
-    CHECK(!dispatcher.running());
+    REQUIRE_LT(watcher.elapsed_mill(),10);
+    REQUIRE(!dispatcher.running());
 }
 
 TEST_CASE("event_dispatcher wakeup") {
     turbo::EventDispatcher dispatcher;
     turbo::FiberAttribute attr;
     turbo::Status status = dispatcher.start(&attr);
-    CHECK(status.ok());
-    CHECK(dispatcher.running());
+    TLOG_INFO("started");
+    REQUIRE(status.ok());
+    REQUIRE(dispatcher.running());
     turbo::sleep_for(turbo::Duration::milliseconds(1500));
-    CHECK_GE(dispatcher.num_iterators(), 1);
+    REQUIRE_GE(dispatcher.num_iterators(), 1);
     turbo::StopWatcher watcher;
     watcher.reset();
     dispatcher.stop();
+    TLOG_INFO("stop");
     dispatcher.join();
-    CHECK_LT(watcher.elapsed_mill(),10);
-    CHECK(!dispatcher.running());
+    TLOG_INFO("join");
+    REQUIRE_LT(watcher.elapsed_mill(),10);
+    REQUIRE(!dispatcher.running());
 }

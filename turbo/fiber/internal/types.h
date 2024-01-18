@@ -85,9 +85,10 @@ namespace turbo::fiber_internal {
 
     // Attributes for thread creation.
     struct FiberAttribute {
-        StackType stack_type;
-        AttributeFlag flags;
-        fiber_keytable_pool_t *keytable_pool;
+        FiberAttribute() = default;
+        StackType stack_type {StackType::STACK_TYPE_NORMAL};
+        AttributeFlag flags{AttributeFlag::FLAG_NONE};
+        fiber_keytable_pool_t *keytable_pool{nullptr};
 
         void operator=(unsigned stacktype_and_flags) {
             const unsigned stack_type_int = (stacktype_and_flags & 7);

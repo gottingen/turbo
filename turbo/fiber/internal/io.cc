@@ -26,7 +26,7 @@
 #include "turbo/hash/hash.h"   // fmix32
 #include "turbo/fiber/internal/waitable_event.h"
 #include "turbo/fiber/internal/fiber_worker.h"                  // FiberWorker
-#include "turbo/fiber/internal/fiber.h"                             // fiber_start_urgent
+#include "turbo/fiber/fiber.h"                             // fiber_start
 #include "turbo/fiber/io.h"
 #include "turbo/status/error.h"
 

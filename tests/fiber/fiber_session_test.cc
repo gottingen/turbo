@@ -326,11 +326,11 @@ namespace {
         for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             args[i].id = id1;
             args[i].thread_started = false;
-            REQUIRE_EQ(turbo::ok_status(), turbo::fiber_internal::fiber_start_urgent(&th[i], nullptr, stopped_waiter, &args[i]));
+            REQUIRE_EQ(turbo::ok_status(), turbo::fiber_start(&th[i], nullptr, stopped_waiter, &args[i]));
         }
         // stop does not wake up turbo::fiber_session_join
         for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
-            turbo::fiber_internal::fiber_stop(th[i]);
+            turbo::fiber_stop(th[i]);
         }
         turbo::fiber_usleep(10000);
         for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
@@ -339,7 +339,7 @@ namespace {
         // destroy the id to end the joinings.
         REQUIRE_EQ(0, turbo::fiber_session_unlock_and_destroy(id1));
         for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
-            REQUIRE_EQ(turbo::ok_status(), turbo::fiber_internal::fiber_join(th[i], nullptr));
+            REQUIRE_EQ(turbo::ok_status(), turbo::fiber_join(th[i], nullptr));
         }
     }
 
@@ -444,10 +444,10 @@ namespace {
         turbo::fiber_id_t bth;
         FailToLockIdArgs args = { id, EPERM };
         REQUIRE_EQ(0, pthread_create(&pth, nullptr, fail_to_lock_id, &args));
-        REQUIRE_EQ(turbo::ok_status(), turbo::fiber_internal::fiber_start_background(&bth, nullptr, fail_to_lock_id, &args));
+        REQUIRE_EQ(turbo::ok_status(), turbo::fiber_start_background(&bth, nullptr, fail_to_lock_id, &args));
         // The threads should quit soon.
         pthread_join(pth, nullptr);
-        turbo::fiber_internal::fiber_join(bth, nullptr);
+        turbo::fiber_join(bth, nullptr);
         turbo::fiber_internal::session_status(id, std::cout);
         REQUIRE_EQ(0, turbo::fiber_session_unlock_and_destroy(id));
     }
@@ -468,10 +468,10 @@ namespace {
         pthread_t pth;
         turbo::fiber_id_t bth;
         REQUIRE_EQ(0, pthread_create(&pth, nullptr, succeed_to_lock_id, &id));
-        REQUIRE_EQ(turbo::ok_status(), turbo::fiber_internal::fiber_start_background(&bth, nullptr, succeed_to_lock_id, &id));
+        REQUIRE_EQ(turbo::ok_status(), turbo::fiber_start_background(&bth, nullptr, succeed_to_lock_id, &id));
         // The threads should quit soon.
         pthread_join(pth, nullptr);
-        turbo::fiber_internal::fiber_join(bth, nullptr);
+        turbo::fiber_join(bth, nullptr);
         turbo::fiber_internal::session_status(id, std::cout);
         REQUIRE_EQ(0, fiber_session_lock(id, nullptr));
         REQUIRE_EQ(0, turbo::fiber_session_unlock_and_destroy(id));
@@ -486,7 +486,7 @@ namespace {
         turbo::fiber_id_t bth;
         FailToLockIdArgs args = { id, EPERM };
         REQUIRE_EQ(0, pthread_create(&pth, nullptr, fail_to_lock_id, &args));
-        REQUIRE_EQ(turbo::ok_status(), turbo::fiber_internal::fiber_start_background(&bth, nullptr, fail_to_lock_id, &args));
+        REQUIRE_EQ(turbo::ok_status(), turbo::fiber_start_background(&bth, nullptr, fail_to_lock_id, &args));
 
         usleep(100000);
         REQUIRE_FALSE(any_thread_quit);
@@ -494,7 +494,7 @@ namespace {
 
         // The threads should quit soon.
         pthread_join(pth, nullptr);
-        turbo::fiber_internal::fiber_join(bth, nullptr);
+        turbo::fiber_join(bth, nullptr);
         turbo::fiber_internal::session_status(id, std::cout);
         REQUIRE_EQ(0, turbo::fiber_session_unlock_and_destroy(id));
     }

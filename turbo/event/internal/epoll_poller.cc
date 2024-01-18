@@ -37,6 +37,7 @@ namespace turbo {
             TLOG_CRITICAL("Fail to create epoll, {}", rs.to_string());
             return rs;
         }
+        make_close_on_exec(_epfd);
         return turbo::ok_status();
     }
 

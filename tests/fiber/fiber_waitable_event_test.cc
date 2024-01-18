@@ -89,13 +89,13 @@ namespace turbo::fiber_internal {
         pthread_t pth[M];
         for (size_t i = 0; i < N; ++i) {
             FiberAttribute attr = (i == 0 ? FIBER_ATTR_PTHREAD : FIBER_ATTR_NORMAL);
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(
+            REQUIRE_EQ(turbo::ok_status(), fiber_start(
                     &th[i], &attr, sleeper,
                     (void *) (100000L * (i + 1))));
         }
         th[N] = 0;  // joiner will join tids in `th' until seeing 0.
         for (size_t i = 0; i < M; ++i) {
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&jth[i], nullptr, joiner, th));
+            REQUIRE_EQ(turbo::ok_status(), fiber_start(&jth[i], nullptr, joiner, th));
         }
         for (size_t i = 0; i < M; ++i) {
             REQUIRE_EQ(0, pthread_create(&pth[i], nullptr, joiner, th));
@@ -155,7 +155,7 @@ namespace turbo::fiber_internal {
         unmatched_arg->ptimeout = turbo::Time::infinite_future();
         pthread_create(&t2, nullptr, waiter, unmatched_arg);
         fiber_id_t th;
-        REQUIRE(fiber_start_urgent(&th, nullptr, waiter, unmatched_arg).ok());
+        REQUIRE(fiber_start(&th, nullptr, waiter, unmatched_arg).ok());
 
         const auto abstime = turbo::seconds_from_now(1);
         for (size_t i = 0; i < 4 * N; ++i) {
@@ -171,7 +171,7 @@ namespace turbo::fiber_internal {
             if (i < 2 * N) {
                 pthread_create(&t1, nullptr, waiter, &args[i]);
             } else {
-                REQUIRE(fiber_start_urgent(&th, nullptr, waiter, &args[i]).ok());
+                REQUIRE(fiber_start(&th, nullptr, waiter, &args[i]).ok());
             }
         }
 
@@ -217,7 +217,7 @@ namespace turbo::fiber_internal {
             fiber_id_t th;
 
             tm.reset();
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th, &attr, wait_event, &arg));
+            REQUIRE_EQ(turbo::ok_status(), fiber_start(&th, &attr, wait_event, &arg));
             REQUIRE(fiber_join(th, nullptr).ok());
             tm.stop();
 
@@ -238,7 +238,7 @@ namespace turbo::fiber_internal {
             event_wait_arg arg = {event, *event, WAIT_MSEC, turbo::kEINTR};
 
             tm.reset();
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th, &attr, wait_event, &arg));
+            REQUIRE_EQ(turbo::ok_status(), fiber_start(&th, &attr, wait_event, &arg));
             REQUIRE_EQ(turbo::ok_status(), turbo::fiber_sleep_for(SleepDuration));
             REQUIRE_EQ(turbo::ok_status(), fiber_stop(th));
             fiber_join(th, nullptr);
@@ -299,8 +299,8 @@ namespace turbo::fiber_internal {
                     (i == 0 ? FIBER_ATTR_PTHREAD : FIBER_ATTR_NORMAL);
             tm.reset();
             fiber_id_t th, th2;
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th, nullptr, wait_event, &arg));
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th2, &attr, join_the_waiter, (void *) th));
+            REQUIRE_EQ(turbo::ok_status(), fiber_start(&th, nullptr, wait_event, &arg));
+            REQUIRE_EQ(turbo::ok_status(), fiber_start(&th2, &attr, join_the_waiter, (void *) th));
             REQUIRE_EQ(turbo::ok_status(), fiber_stop(th2));
             REQUIRE_EQ(turbo::ok_status(), turbo::fiber_sleep_for(WaitDuration / 2));
             REQUIRE(turbo::fiber_internal::FiberWorker::exists(th));
@@ -328,7 +328,7 @@ namespace turbo::fiber_internal {
                     (i == 0 ? FIBER_ATTR_PTHREAD : FIBER_ATTR_NORMAL);
             tm.reset();
             fiber_id_t th;
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(
+            REQUIRE_EQ(turbo::ok_status(), fiber_start(
                     &th, &attr, sleeper, (void *) (SLEEP_MSEC * 1000L)));
             REQUIRE_EQ(turbo::ok_status(), turbo::fiber_sleep_for(WaitDuration));
             REQUIRE_EQ(turbo::ok_status(), fiber_stop(th));
@@ -354,7 +354,7 @@ namespace turbo::fiber_internal {
                     (i == 0 ? FIBER_ATTR_PTHREAD : FIBER_ATTR_NORMAL);
             tm.reset();
             fiber_id_t th;
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(
+            REQUIRE_EQ(turbo::ok_status(), fiber_start(
                     &th, &attr, sleeper, (void *) (SLEEP_MSEC * 1000L)));
             REQUIRE_EQ(turbo::ok_status(), fiber_stop(th));
             REQUIRE(fiber_join(th, nullptr).ok());

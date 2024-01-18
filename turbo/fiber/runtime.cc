@@ -20,15 +20,15 @@
 namespace turbo {
 
     int fiber_get_concurrency(void) {
-        return turbo::fiber_internal::fiber_get_concurrency();
+        return turbo::fiber_internal::fiber_get_concurrency_impl();
     }
 
     turbo::Status fiber_set_concurrency(int num) {
-        return turbo::fiber_internal::fiber_set_concurrency(num);
+        return turbo::fiber_internal::fiber_set_concurrency_impl(num);
     }
 
     void fiber_stop_world() {
-        turbo::fiber_internal::fiber_stop_world();
+        turbo::fiber_internal::fiber_stop_world_impl();
     }
 
 }  // namespace turbo

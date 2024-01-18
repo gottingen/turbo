@@ -84,7 +84,7 @@ namespace turbo {
             // we can't determine whether the code after execute() is urgent (like
             // unlock a std::mutex) in which case implicit context switch may
             // cause undefined behavior (e.g. deadlock)
-            if (!fiber_start_background(&tid, &_options.fiber_attr,_execute_tasks, node).ok()) {
+            if (!turbo::fiber_start_background(&tid, &_options.fiber_attr,_execute_tasks, node).ok()) {
                 TDLOG_CRITICAL("Fail to start fiber");
                 _execute_tasks(node);
             }

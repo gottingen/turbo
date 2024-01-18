@@ -256,7 +256,7 @@ namespace turbo {
 
     template <typename T>
     uint64_t make_resource_id(uint32_t index, ResourceId<T> rid) {
-        return (static_cast<uint64_t>(index) << 32) | rid.id;
+        return (static_cast<uint64_t>(index) << 32) | rid.value;
     }
 
     template <typename T>

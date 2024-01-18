@@ -28,6 +28,7 @@
 #include "turbo/fiber/fiber_mutex.h"
 #include "turbo/fiber/fiber_cond.h"
 #include "turbo/fiber/fiber.h"
+#include "turbo/fiber/runtime.h"
 #include "turbo/system/sysinfo.h"
 #include "turbo/format/print.h"
 #include "turbo/times/stop_watcher.h"
@@ -57,7 +58,7 @@ namespace turbo::fiber_internal {
         REQUIRE(fiber_mutex_lock(&m).ok());
         REQUIRE_EQ(1u, *get_futex(m));
         fiber_id_t th1;
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th1, nullptr, locker, &m));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th1, nullptr, locker, &m));
         TLOG_INFO("1");
         usleep(5000); // wait for locker to run.
         REQUIRE_EQ(257u, *get_futex(m)); // contention
@@ -102,7 +103,7 @@ namespace turbo::fiber_internal {
         TURBO_UNUSED(fiber_mutex_lock(&m1));
         TURBO_UNUSED(fiber_mutex_lock(&m2));
         fiber_id_t pth;
-        REQUIRE(fiber_start_urgent(&pth, nullptr, do_locks, &m1).ok());
+        REQUIRE(fiber_start(&pth, nullptr, do_locks, &m1).ok());
         REQUIRE(turbo::is_deadline_exceeded(fiber_cond_timedwait(&cond, &m2, abstime)));
         REQUIRE(fiber_join(pth, nullptr).ok());
         fiber_mutex_unlock(&m1);
@@ -268,7 +269,7 @@ namespace turbo::fiber_internal {
         }
         for (int i = 0; i < M; ++i) {
             const FiberAttribute *attr = i % 2 ? nullptr : &FIBER_ATTR_PTHREAD;
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&fibers[i], attr, loop_until_stopped, &m));
+            REQUIRE_EQ(turbo::ok_status(), fiber_start(&fibers[i], attr, loop_until_stopped, &m));
         }
         turbo::fiber_sleep_for(turbo::Duration::microseconds(1000L * 1000));
         g_stopped = true;

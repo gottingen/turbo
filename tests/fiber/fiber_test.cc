@@ -23,6 +23,7 @@
 #include "turbo/times/time.h"
 #include "turbo/log/logging.h"
 #include "turbo/fiber/fiber.h"
+#include "turbo/fiber/runtime.h"
 #include "turbo/fiber/internal/fiber_entity.h"
 #include "turbo/times/stop_watcher.h"
 
@@ -162,7 +163,7 @@ namespace turbo::fiber_internal {
         TLOG_INFO("launcher({}) main thread {}", arg, pthread_self());
         for (size_t i = 0; !stop; ++i) {
             fiber_id_t th;
-            REQUIRE(fiber_start_urgent(&th, nullptr, do_nothing, (void *) i).ok());
+            REQUIRE(fiber_start(&th, nullptr, do_nothing, (void *) i).ok());
             TURBO_UNUSED(turbo::fiber_sleep_for(turbo::Duration::microseconds(100000L)));
         }
         return nullptr;
@@ -181,14 +182,14 @@ namespace turbo::fiber_internal {
     void *misc(void *arg) {
         TLOG_INFO("misc({}) main thread {}", arg, pthread_self());
         fiber_id_t th[8];
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th[0], nullptr, sleep_for_awhile, (void *) 2));
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th[1], nullptr, just_exit, (void *) 3));
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th[2], nullptr, repeated_sleep, (void *) 4));
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th[3], nullptr, repeated_sleep, (void *) 68));
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th[4], nullptr, spin_and_log, (void *) 5));
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th[5], nullptr, spin_and_log, (void *) 85));
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th[6], nullptr, launcher, (void *) 6));
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th[7], nullptr, stopper, nullptr));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th[0], nullptr, sleep_for_awhile, (void *) 2));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th[1], nullptr, just_exit, (void *) 3));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th[2], nullptr, repeated_sleep, (void *) 4));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th[3], nullptr, repeated_sleep, (void *) 68));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th[4], nullptr, spin_and_log, (void *) 5));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th[5], nullptr, spin_and_log, (void *) 85));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th[6], nullptr, launcher, (void *) 6));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th[7], nullptr, stopper, nullptr));
         for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             REQUIRE(fiber_join(th[i], nullptr).ok());
         }
@@ -198,7 +199,7 @@ namespace turbo::fiber_internal {
     TEST_CASE_FIXTURE(FiberTest, "sanity") {
         TLOG_INFO("main thread {}", pthread_self());
         fiber_id_t th1;
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th1, nullptr, misc, (void *) 1));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th1, nullptr, misc, (void *) 1));
         TLOG_INFO("main thread {}", pthread_self());
         REQUIRE(fiber_join(th1, nullptr).ok());
     }
@@ -225,7 +226,7 @@ namespace turbo::fiber_internal {
 
     TEST_CASE_FIXTURE(FiberTest, "backtrace") {
         fiber_id_t th;
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th, nullptr, tf, nullptr));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th, nullptr, tf, nullptr));
         REQUIRE(fiber_join(th, nullptr).ok());
 
         char **text = backtrace_symbols(bt_array, bt_cnt);
@@ -237,7 +238,7 @@ namespace turbo::fiber_internal {
 
     TEST_CASE_FIXTURE(FiberTest, "lambda_backtrace") {
         fiber_id_t th;
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th, nullptr, [](void*)->void*{
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th, nullptr, [](void*)->void*{
             if (call_do_bt() != 57) {
                 return (void *) 1L;
             }
@@ -261,7 +262,7 @@ namespace turbo::fiber_internal {
     TEST_CASE_FIXTURE(FiberTest, "fiber_self") {
         REQUIRE_EQ(0ul, fiber_self());
         fiber_id_t bth;
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&bth, nullptr, show_self, nullptr));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&bth, nullptr, show_self, nullptr));
         REQUIRE(fiber_join(bth, nullptr).ok());
     }
 
@@ -279,7 +280,7 @@ namespace turbo::fiber_internal {
 
         // Joining self
         fiber_id_t th;
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th, nullptr, join_self, nullptr));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th, nullptr, join_self, nullptr));
     }
 
     void *change_errno(void *arg) {
@@ -290,7 +291,7 @@ namespace turbo::fiber_internal {
     TEST_CASE_FIXTURE(FiberTest, "errno_not_changed") {
         fiber_id_t th;
         errno = 1;
-        REQUIRE(fiber_start_urgent(&th, nullptr, change_errno, (void *) (intptr_t) 2).ok());
+        REQUIRE(fiber_start(&th, nullptr, change_errno, (void *) (intptr_t) 2).ok());
         REQUIRE_EQ(1, errno);
     }
 
@@ -339,7 +340,7 @@ namespace turbo::fiber_internal {
                 tm.reset();
                 for (size_t i = 0; i < N; ++i) {
                     fiber_id_t t1;
-                    REQUIRE(fiber_start_urgent(
+                    REQUIRE(fiber_start(
                             &t1, &FIBER_ATTR_SMALL, adding_func, &s).ok());
                     th.push_back(t1);
                 }
@@ -353,7 +354,7 @@ namespace turbo::fiber_internal {
                     TURBO_UNUSED(fiber_join(th[i], nullptr));
                 }
 
-                TLOG_INFO("[Round {}] fiber_start_urgent takes {}ns, sum={}", j + 1,
+                TLOG_INFO("[Round {}] fiber_start takes {}ns, sum={}", j + 1,
                           tm.elapsed_nano() / N, s.load());
                 REQUIRE_EQ(N * (j + 1), (size_t) s);
 
@@ -366,7 +367,7 @@ namespace turbo::fiber_internal {
     void *fiber_starter(void *void_counter) {
         while (!stop.load(std::memory_order_relaxed)) {
             fiber_id_t th;
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th, nullptr, adding_func, void_counter));
+            REQUIRE_EQ(turbo::ok_status(), fiber_start(&th, nullptr, adding_func, void_counter));
         }
         return nullptr;
     }
@@ -392,7 +393,7 @@ namespace turbo::fiber_internal {
             stop = false;
             for (int i = 0; i < cur_con; ++i) {
                 counters[i].value = 0;
-                REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(
+                REQUIRE_EQ(turbo::ok_status(), fiber_start(
                         &th[i], nullptr, fiber_starter, &counters[i].value));
             }
             turbo::StopWatcher tm;
@@ -429,13 +430,13 @@ namespace turbo::fiber_internal {
             turbo::StopWatcher tm;
             tm.reset();
             fiber_id_t th;
-            REQUIRE(fiber_start_urgent(&th, nullptr, log_start_latency, &tm).ok());
+            REQUIRE(fiber_start(&th, nullptr, log_start_latency, &tm).ok());
             auto status = fiber_join(th, nullptr);
             REQUIRE(status.ok());
             fiber_id_t th2;
             turbo::StopWatcher tm2;
             tm2.reset();
-            REQUIRE(fiber_start_background(&th2, nullptr, log_start_latency, &tm2).ok());
+            REQUIRE(turbo::fiber_start_background(&th2, nullptr, log_start_latency, &tm2).ok());
              status = fiber_join(th2, nullptr);
             REQUIRE(status.ok());
             if (!warmup) {
@@ -456,7 +457,7 @@ namespace turbo::fiber_internal {
 
     TEST_CASE_FIXTURE(FiberTest, "stop_sleep") {
         fiber_id_t th;
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(
                 &th, nullptr, sleep_for_awhile_with_sleep, (void *) 1000000L));
         turbo::StopWatcher tm;
         tm.reset();
@@ -475,10 +476,10 @@ namespace turbo::fiber_internal {
         fiber_id_t th5;
         const FiberAttribute attr = FIBER_ATTR_PTHREAD;
 
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th1, nullptr, just_exit, nullptr));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th1, nullptr, just_exit, nullptr));
         REQUIRE_EQ(turbo::ok_status(), fiber_start_background(&th2, nullptr, just_exit, nullptr));
         REQUIRE_EQ(0, pthread_create(&th3, nullptr, just_exit, nullptr));
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th4, &attr, just_exit, nullptr));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th4, &attr, just_exit, nullptr));
         REQUIRE_EQ(turbo::ok_status(), fiber_start_background(&th5, &attr, just_exit, nullptr));
 
         REQUIRE(fiber_join(th1, nullptr).ok());
@@ -490,9 +491,9 @@ namespace turbo::fiber_internal {
 
     TEST_CASE_FIXTURE(FiberTest, "fiber_equal") {
         fiber_id_t th1;
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th1, nullptr, do_nothing, nullptr));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th1, nullptr, do_nothing, nullptr));
         fiber_id_t th2;
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th2, nullptr, do_nothing, nullptr));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th2, nullptr, do_nothing, nullptr));
         REQUIRE_EQ(0, fiber_equal(th1, th2));
         fiber_id_t th3 = th2;
         REQUIRE_EQ(1, fiber_equal(th3, th2));
@@ -513,7 +514,7 @@ namespace turbo::fiber_internal {
         fiber_id_t th1;
         pthread_t run = 0;
         const pthread_t pid = pthread_self();
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th1, &attr, mark_run, &run));
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th1, &attr, mark_run, &run));
         if (pthread_task) {
             turbo::fiber_sleep_for(turbo::Duration::microseconds(100000L));
             // due to NOSIGNAL, mark_run did not run.
@@ -542,12 +543,12 @@ namespace turbo::fiber_internal {
         usleep(10000);
 
         fiber_id_t th1;
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th1, &FIBER_ATTR_PTHREAD,
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th1, &FIBER_ATTR_PTHREAD,
                                         check_sleep, (void *) 1));
         REQUIRE(fiber_join(th1, nullptr).ok());
 
         fiber_id_t th2;
-        REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&th2, nullptr,
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th2, nullptr,
                                         check_sleep, (void *) 0));
         REQUIRE(fiber_join(th2, nullptr).ok());
     }
@@ -560,7 +561,7 @@ namespace turbo::fiber_internal {
         for (size_t i = 0; i < 100000; ++i) {
             FiberAttribute attr = FIBER_ATTR_NORMAL | AttributeFlag::FLAG_NOSIGNAL;
             fiber_id_t tid;
-            REQUIRE_EQ(turbo::ok_status(), fiber_start_urgent(&tid, &attr, dummy_thread, nullptr));
+            REQUIRE_EQ(turbo::ok_status(), fiber_start(&tid, &attr, dummy_thread, nullptr));
         }
     }
 

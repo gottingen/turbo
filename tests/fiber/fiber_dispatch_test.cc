@@ -151,8 +151,7 @@ namespace {
 #endif
                 if (m->req.fetch_add(1, std::memory_order_acquire) == 0) {
                     turbo::fiber_id_t th;
-                    TURBO_UNUSED(fiber_start_urgent(
-                            &th, &turbo::FIBER_ATTR_SMALL, process_thread, m));
+                    TURBO_UNUSED(turbo::fiber_start(&th, &turbo::FIBER_ATTR_SMALL, process_thread, m));
                     ++em->nthread;
                 } else {
                     ++em->nfold;
@@ -272,7 +271,7 @@ namespace {
             em[i] = m;
             m->epfd = epfd[i];
 #ifdef RUN_EPOLL_IN_FIBER
-            REQUIRE(turbo::fiber_internal::fiber_start_background(&eth[i], nullptr, epoll_thread, m).ok());
+            REQUIRE(turbo::fiber_start_background(&eth[i], nullptr, epoll_thread, m).ok());
 #else
             REQUIRE_EQ(0, pthread_create(&eth[i], nullptr, epoll_thread, m));
 #endif
@@ -314,7 +313,7 @@ namespace {
                         REQUIRE_EQ(0, kevent(epfd[i], &kqueue_event, 1, nullptr, 0, nullptr));
 #endif
 #ifdef RUN_EPOLL_IN_FIBER
-            turbo::fiber_internal::fiber_join(eth[i], nullptr);
+            turbo::fiber_join(eth[i], nullptr);
 #else
             pthread_join(eth[i], nullptr);
 #endif
