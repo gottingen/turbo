@@ -90,6 +90,20 @@ namespace turbo::fiber_internal {
         return true;
     }
 
+    FiberWorker *FiberWorker::get_current_worker() {
+        return tls_task_group;
+    }
+
+    bool FiberWorker::is_running_on_fiber() {
+        auto *g = tls_task_group;
+        return g != nullptr && !g->is_current_pthread_task();
+    }
+
+    bool FiberWorker::is_running_on_pthread() {
+        auto *g = tls_task_group;
+        return g == nullptr || g->is_current_pthread_task();
+    }
+
     bool FiberWorker::wait_task(fiber_id_t *tid) {
         do {
 #ifndef FIBER_DONT_SAVE_PARKING_STATE
@@ -129,7 +143,7 @@ namespace turbo::fiber_internal {
             }
         }
         // Don't forget to add elapse of last wait_task.
-        current_task()->stat.cputime_ns += turbo::get_current_time_nanos() - _last_run_ns;
+        current_fiber()->stat.cputime_ns += turbo::get_current_time_nanos() - _last_run_ns;
     }
 
     FiberWorker::FiberWorker(ScheduleGroup *c)
@@ -330,7 +344,7 @@ namespace turbo::fiber_internal {
         } else {
             // NOSIGNAL affects current task, not the new task.
             RemainedFn functor = nullptr;
-            if (g->current_task()->about_to_quit) {
+            if (g->current_fiber()->about_to_quit) {
                 functor = ready_to_run_in_worker_ignoresignal;
             } else {
                 functor = ready_to_run_in_worker;
@@ -672,7 +686,7 @@ namespace turbo::fiber_internal {
         SleepArgs e = *static_cast<SleepArgs *>(void_args);
         FiberWorker *g = e.group;
 
-        TimerThread::TaskId sleep_id;
+        TimerId sleep_id;
         sleep_id = get_fiber_timer_thread()->schedule(ready_to_run_from_timer_thread, void_args,
                 turbo::microseconds_from_now(e.timeout_us));
 
@@ -715,7 +729,7 @@ namespace turbo::fiber_internal {
         FiberWorker *g = *pg;
         // We have to schedule timer after we switched to next fiber otherwise
         // the timer may wake up(jump to) current still-running context.
-        SleepArgs e = {timeout_us, g->current_fid(), g->current_task(), g};
+        SleepArgs e = {timeout_us, g->current_fid(), g->current_fiber(), g};
         g->set_remained(_add_sleep_event, &e);
         sched(pg);
         g = *pg;
@@ -751,7 +765,7 @@ namespace turbo::fiber_internal {
         FiberWorker *g = *pg;
         // We have to schedule timer after we switched to next fiber otherwise
         // the timer may wake up(jump to) current still-running context.
-        SleepArgs e = {static_cast<uint64_t>(span.to_microseconds()), g->current_fid(), g->current_task(), g};
+        SleepArgs e = {static_cast<uint64_t>(span.to_microseconds()), g->current_fid(), g->current_fiber(), g};
         g->set_remained(_add_sleep_event, &e);
         sched(pg);
         g = *pg;

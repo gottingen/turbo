@@ -24,24 +24,14 @@
 #include "turbo/concurrent/spinlock.h"
 #include "turbo/concurrent/spinlock_wait.h"
 #include "turbo/status/status.h"
+#include "turbo/event/timer.h"
 
 namespace turbo {
 
-    struct TimerThreadOptions {
-        size_t num_buckets{13};
-        TimerThreadOptions() = default;
-    };
-
-    typedef std::function<void(void *)> timer_task_fn_t;
-
     class TimerCore {
     public:
-        struct Task;
 
         class Bucket;
-
-        using TaskId = uint64_t;
-        constexpr static TaskId INVALID_TASK_ID = 0;
 
         TimerCore();
 
@@ -50,11 +40,11 @@ namespace turbo {
         // Start the timer thread.
         // This method should only be called once.
         // return 0 if success, errno otherwise.
-        turbo::Status initialize(const TimerThreadOptions *options);
+        turbo::Status initialize(const TimerOptions *options);
 
         // Schedule |fn(arg)| to run at realtime |abstime| approximately.
         // Returns: identifier of the scheduled task, INVALID_TASK_ID on error.
-        [[nodiscard]] std::pair<TaskId,bool> schedule(timer_task_fn_t&& fn, void *arg, const turbo::Time &abstime);
+        [[nodiscard]] std::pair<TimerId ,bool> schedule(timer_task_fn_t&& fn, void *arg, const turbo::Time &abstime);
 
         // Prevent the task denoted by `task_id' from running. `task_id' must be
         // returned by schedule() ever.
@@ -62,15 +52,22 @@ namespace turbo {
         //   ok()   -  Removed the task which does not run yet
         //   ESTOP   -  The task does not exist.
         //   EBUSY   -  The task is just running.
-        [[maybe_unused]] turbo::Status unschedule(TaskId task_id);
+        [[maybe_unused]] turbo::Status unschedule(TimerId task_id);
 
-        void run_timer_tasks();
+        turbo::Time run_timer_tasks();
+
+        turbo::Time next_run_time() const { return _nearest_run_time; }
+
+        void stop();
 
     private:
-        TimerThreadOptions _options;
+
+        void run_timer_tasks_once();
+        TimerOptions _options;
         Bucket *_buckets;                   // list of tasks to be run
         SpinLock _mutex;              // protect _nearest_run_time
         turbo::Time _nearest_run_time;
+        bool _stop{false};
     };
 }   // namespace turbo
 

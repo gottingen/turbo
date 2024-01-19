@@ -35,15 +35,17 @@ namespace turbo {
         EventChannel(const EventChannel &) = delete;
         EventChannel &operator=(const EventChannel &) = delete;
         /// this handle_read
-        void handle_read(int fd, int events);
+        void handle_read(int events);
 
-        void handle_write(int fd, int events);
+        void handle_write(int events);
 
         ReadCallback                 read_callback{nullptr};
         WriteCallback                write_callback{nullptr};
         resource_id                  rid{DEFAULT_EVENT_CHANNEL_ID};
         int32_t                      version{0};
         WaitEvent<std::atomic<int>>  wait_event;
+        void *                       user_data{nullptr};
+        int                          fd{-1};
         turbo::Status initialize(resource_id rid, int32_t version);
 
         void destroy();

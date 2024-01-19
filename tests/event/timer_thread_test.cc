@@ -17,7 +17,7 @@
 
 #include "turbo/testing/test.h"
 #include "turbo/log/logging.h"
-#include "turbo/times/timer_thread.h"
+#include "turbo/event/internal/timer_thread.h"
 #include "turbo/concurrent/spinlock_wait.h"
 #include "turbo/times/stop_watcher.h"
 
@@ -82,7 +82,7 @@ public:
     }
 
     turbo::Time _expect_run_time;
-    turbo::TimerThread::TaskId _task_id;
+    turbo::TimerId _task_id;
 
 private:
     const char *_name;
@@ -149,10 +149,10 @@ TEST_CASE("TimerThreadTest, start_after_schedule") {
     turbo::Time past_time;
     TimeKeeper keeper(past_time, "keeper1");
     keeper.schedule(&timer_thread);
-    REQUIRE_EQ(turbo::TimerThread::INVALID_TASK_ID, keeper._task_id);
+    REQUIRE_EQ(turbo::INVALID_TIMER_ID, keeper._task_id);
     REQUIRE_EQ(timer_thread.start(nullptr).ok(), true);
     keeper.schedule(&timer_thread);
-    REQUIRE_NE(turbo::TimerThread::INVALID_TASK_ID, keeper._task_id);
+    REQUIRE_NE(turbo::INVALID_TIMER_ID, keeper._task_id);
     auto current_time = turbo::seconds_from_now(0);
     sleep(1);  // make sure timer thread start and run
     timer_thread.stop_and_join();

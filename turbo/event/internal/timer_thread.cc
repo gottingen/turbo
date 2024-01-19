@@ -21,19 +21,19 @@
 #include <queue>                           // heap functions
 #include "turbo/log/logging.h"
 #include "turbo/memory/resource_pool.h"
-#include "turbo/times/timer_thread.h"
+#include "turbo/event/internal/timer_thread.h"
 #include "turbo/platform/port.h"
 #include "turbo/hash/hash.h"
 #include "turbo/system/sysinfo.h"
 #include "turbo/system/threading.h"
 #include <utility>
 
+namespace turbo::fiber_internal {
+// Defined in schedule_group.cc
+    extern void run_worker_startfn();
+}  // end namespace turbo::fiber_internal
+
 namespace turbo {
-
-    // Defined in task_control.cpp
-    void run_worker_startfn() {
-
-    }
 
     // A task contains the necessary information for running fn(arg).
     // Tasks are created in Bucket::schedule and destroyed in TimerThread::run
@@ -44,7 +44,7 @@ namespace turbo {
         void *arg;
         // Current TaskId, checked against version in TimerThread::run to test
         // if this task is unscheduled.
-        TaskId task_id;
+        TimerId task_id;
         // initial_version:     not run yet
         // initial_version + 1: running
         // initial_version + 2: removed (also the version of next Task reused
@@ -72,7 +72,7 @@ namespace turbo {
         ~Bucket() {}
 
         struct ScheduleResult {
-            TimerThread::TaskId task_id;
+            TimerId task_id;
             bool earlier;
         };
 
@@ -90,18 +90,18 @@ namespace turbo {
         Task *_task_head;
     };
 
-    inline TimerThread::TaskId make_task_id(
+    inline TimerId make_task_id(
             turbo::ResourceId<TimerThread::Task> slot, uint32_t version) {
-        return TimerThread::TaskId((((uint64_t) version) << 32) | slot.value);
+        return TimerId((((uint64_t) version) << 32) | slot.value);
     }
 
     inline
-    turbo::ResourceId<TimerThread::Task> slot_of_task_id(TimerThread::TaskId id) {
+    turbo::ResourceId<TimerThread::Task> slot_of_task_id(TimerId id) {
         turbo::ResourceId<TimerThread::Task> slot = {(id & 0xFFFFFFFFul)};
         return slot;
     }
 
-    inline uint32_t version_of_task_id(TimerThread::TaskId id) {
+    inline uint32_t version_of_task_id(TimerId id) {
         return (uint32_t) (id >> 32);
     }
 
@@ -126,7 +126,7 @@ namespace turbo {
         _buckets = nullptr;
     }
 
-    turbo::Status TimerThread::start(const TimerThreadOptions *options_in) {
+    turbo::Status TimerThread::start(const TimerOptions *options_in) {
         if (_started) {
             return turbo::ok_status();
         }
@@ -176,7 +176,7 @@ namespace turbo {
         turbo::ResourceId<Task> slot_id;
         Task *task = turbo::get_resource<Task>(&slot_id);
         if (task == nullptr) {
-            ScheduleResult result = {INVALID_TASK_ID, false};
+            ScheduleResult result = {INVALID_TIMER_ID, false};
             return result;
         }
         task->next = nullptr;
@@ -188,7 +188,7 @@ namespace turbo {
             task->version.fetch_add(2, std::memory_order_relaxed);
             version = 2;
         }
-        const TaskId id = make_task_id(slot_id, version);
+        const TimerId id = make_task_id(slot_id, version);
         task->task_id = id;
         bool earlier = false;
         {
@@ -204,11 +204,11 @@ namespace turbo {
         return result;
     }
 
-    TimerThread::TaskId TimerThread::schedule(
+    TimerId TimerThread::schedule(
             timer_task_fn_t &&fn, void *arg, const turbo::Time &abstime) {
         if (_stop.load(std::memory_order_relaxed) || !_started) {
             // Not add tasks when TimerThread is about to stop.
-            return INVALID_TASK_ID;
+            return INVALID_TIMER_ID;
         }
         // Hashing by pthread id is better for cache locality.
         const Bucket::ScheduleResult result =
@@ -241,7 +241,7 @@ namespace turbo {
     // unscheduled tasks do not occupy additional memory. 2730 is a large ratio
     // between timeout and latency in most RPC scenarios, this is why we don't
     // try to reuse tasks right now inside unschedule() with more complicated code.
-    turbo::Status TimerThread::unschedule(TaskId task_id) {
+    turbo::Status TimerThread::unschedule(TimerId task_id) {
         const turbo::ResourceId<Task> slot_id = slot_of_task_id(task_id);
         Task *const task = turbo::address_resource(slot_id);
         if (task == nullptr) {
@@ -298,7 +298,7 @@ namespace turbo {
     }
 
     void TimerThread::run() {
-        run_worker_startfn();
+        fiber_internal::run_worker_startfn();
         TLOG_INFO("Started TimerThread={}", pthread_self());
 
         // min heap of tasks (ordered by run_time)
@@ -385,12 +385,7 @@ namespace turbo {
                 }
             }
 
-            turbo::Duration du;
-            const auto now = turbo::time_now();
-            if (next_run_time != turbo::Time::infinite_future()) {
-                du = next_run_time - now;
-            }
-            auto r = _nsignals.wait_for(expected_nsignals, du);
+            auto r = _nsignals.wait_until(expected_nsignals, next_run_time);
             TURBO_UNUSED(r);
         }
         TLOG_INFO("Ended TimerThread={}", pthread_self());
@@ -415,6 +410,6 @@ namespace turbo {
         }
     }
 
-    template turbo::Status init_timer_thread<global_timer_thread_tag>(const TimerThreadOptions *options = nullptr);
+    template turbo::Status init_timer_thread<global_timer_thread_tag>(const TimerOptions *options = nullptr);
     template TimerThread * get_timer_thread<global_timer_thread_tag>();
 }  // end namespace turbo

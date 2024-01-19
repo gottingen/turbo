@@ -79,7 +79,7 @@ namespace turbo {
     void FiberTimer::cancel() {
         if (is_valid()) {
             turbo::fiber_internal::fiber_timer_del(_timer_id);
-            _timer_id = INVALID_FIBER_TIMER_ID;
+            _timer_id = INVALID_TIMER_ID;
         }
     }
 
@@ -97,7 +97,7 @@ namespace turbo {
         auto *timer = static_cast<FiberTimer *>(arg);
         timer->_on_timer(timer->_arg);
         timer->_triggered = true;
-        timer->_timer_id = INVALID_FIBER_TIMER_ID;
+        timer->_timer_id = INVALID_TIMER_ID;
         if(timer->_duration > MIN_DURATION) {
             ++timer->_repeat;
             timer->run_after(timer->_duration, std::move(timer->_on_timer), timer->_arg);

@@ -48,13 +48,3 @@ carbin_cc_test(
         turbo::time_internal_test_util
         turbo::turbo
 )
-carbin_cc_test(
-        NAME
-        timer_thread_test
-        SOURCES
-        "timer_thread_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
-)

@@ -120,7 +120,7 @@ namespace turbo {
         // epoll_wait will keep returning events of the fd continuously, making
         // program abnormal.
         if (epoll_ctl(_epfd, EPOLL_CTL_DEL, fd, NULL) < 0) {
-            TLOG_WARN("Fail to remove fd={} from epfd={}", fd, _epfd);
+            TLOG_WARN("Fail to remove fd={} from epfd={} err:{}", fd, _epfd, strerror(errno));
             return make_status();
         }
         return turbo::ok_status();
@@ -151,6 +151,10 @@ namespace turbo {
             }
         }
         return turbo::ok_status();
+    }
+
+    Poller * create_poller() {
+        return new EpollPoller();
     }
 }  // namespace turbo
 #endif // TURBO_PLATFORM_LINUX

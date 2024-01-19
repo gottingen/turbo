@@ -98,6 +98,10 @@ namespace turbo {
 
     bool fiber_stopped(fiber_id_t tid);
 
+    bool is_running_on_fiber();
+
+    bool is_running_on_pthread();
+
     fiber_id_t fiber_self(void);
 
     int fiber_equal(fiber_id_t t1, fiber_id_t t2);

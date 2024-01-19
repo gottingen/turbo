@@ -20,7 +20,6 @@
 #include "turbo/log/logging.h"
 #include "turbo/fiber/internal/fiber_worker.h"                // FiberWorker
 #include "turbo/fiber/internal/schedule_group.h"
-#include "turbo/times/timer_thread.h"
 #include "turbo/fiber/internal/list_of_abafree_id.h"
 #include "turbo/fiber/internal/fiber.h"
 #include "turbo/log/logging.h"
@@ -270,9 +269,9 @@ namespace turbo::fiber_internal {
     int fiber_about_to_quit_impl() {
         turbo::fiber_internal::FiberWorker *g = turbo::fiber_internal::tls_task_group;
         if (g != nullptr) {
-            turbo::fiber_internal::FiberEntity *current_task = g->current_task();
-            if (!is_never_quit(current_task->attr)) {
-                current_task->about_to_quit = true;
+            turbo::fiber_internal::FiberEntity *current_fiber = g->current_fiber();
+            if (!is_never_quit(current_fiber->attr)) {
+                current_fiber->about_to_quit = true;
             }
             return 0;
         }

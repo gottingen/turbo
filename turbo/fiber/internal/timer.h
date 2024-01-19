@@ -19,19 +19,19 @@
 #ifndef TURBO_FIBER_INTERNAL_TIMER_H_
 #define TURBO_FIBER_INTERNAL_TIMER_H_
 
-#include "turbo/times/timer_thread.h"
+#include "turbo/event/internal/timer_thread.h"
 #include "turbo/fiber/internal/types.h"
 #include "turbo/status/result_status.h"
 
 namespace turbo {
     struct fiber_timer_thread{};
-    extern template turbo::Status init_timer_thread<fiber_timer_thread>(const TimerThreadOptions *options = nullptr);
+    extern template turbo::Status init_timer_thread<fiber_timer_thread>(const TimerOptions *options = nullptr);
     extern template TimerThread * get_timer_thread<fiber_timer_thread>();
 }
 
 namespace turbo::fiber_internal {
 
-    inline turbo::Status init_fiber_timer_thread(const TimerThreadOptions *options = nullptr) {
+    inline turbo::Status init_fiber_timer_thread(const TimerOptions *options = nullptr) {
         return turbo::init_timer_thread<fiber_timer_thread>(options);
     }
     inline TimerThread *get_fiber_timer_thread() {
@@ -41,12 +41,12 @@ namespace turbo::fiber_internal {
     // Run `on_timer(arg)' at or after real-time `abstime'. Put identifier of the
     // timer into *id.
     // Return 0 on success, errno otherwise.
-    turbo::ResultStatus<fiber_timer_id> fiber_timer_add(const turbo::Time &abstime,
+    turbo::ResultStatus<TimerId> fiber_timer_add(const turbo::Time &abstime,
                         turbo::timer_task_fn_t&& on_timer, void *arg);
 
     // Unschedule the timer associated with `id'.
     // Returns: 0 - exist & not-run; 1 - still running; EINVAL - not exist.
-    turbo::Status fiber_timer_del(fiber_timer_id id);
+    turbo::Status fiber_timer_del(TimerId id);
 
 }  // namespace turbo::fiber_internal
 #endif  // TURBO_FIBER_INTERNAL_TIMER_H_

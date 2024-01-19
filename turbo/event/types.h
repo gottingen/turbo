@@ -27,11 +27,24 @@ namespace turbo {
 
     struct EventChannel;
 
-    typedef std::function<void(EventChannel *channel, int fd, int event)> ReadCallback;
+    typedef std::function<void(EventChannel *channel, int event)> ReadCallback;
 
-    typedef std::function<void(EventChannel *channel, int fd)> WriteCallback;
+    typedef std::function<void(EventChannel *channel, int event)> WriteCallback;
 
     /// do not  define and using on error callback here, user should handle error by the above callbacks.
+
+    using TimerId = uint64_t;
+
+    constexpr static TimerId INVALID_TIMER_ID = 0;
+
+    typedef std::function<void(void *)> timer_task_fn_t;
+
+    struct TimerOptions {
+        size_t   num_buckets{13};
+        uint64_t nano_delta{100};
+        TimerOptions() = default;
+    };
+
 }  // namespace turbo
 
 #endif  // TURBO_EVENT_TYPES_H_

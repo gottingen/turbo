@@ -48,6 +48,14 @@ namespace turbo {
         return turbo::fiber_internal::fiber_stopped_impl(tid);
     }
 
+    bool is_running_on_fiber() {
+        return turbo::fiber_internal::FiberWorker::is_running_on_fiber();
+    }
+
+    bool is_running_on_pthread() {
+        return turbo::fiber_internal::FiberWorker::is_running_on_pthread();
+    }
+
     fiber_id_t fiber_self(void) {
         return turbo::fiber_internal::fiber_self_impl();
     }

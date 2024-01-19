@@ -40,7 +40,9 @@ namespace turbo {
 
         void join();
 
-        int add_consumer(EventChannelId channel_id, int fd);
+        void wakeup();
+
+        int add_poll_in(EventChannelId channel_id, int fd);
 
         int add_poll_out(EventChannelId channel_id, int fd, bool pollin);
 
@@ -59,11 +61,12 @@ namespace turbo {
 
         void loop();
 
-        static void handle_wakeup(EventChannel *channel, int fd, int event);
+        static void handle_wakeup(EventChannel *channel, int event);
 
         EventChannelId _wakeup_channel;
-        volatile bool _stop{false};
+        bool _stop{false};
 
+        // for compact do not use eventfd on linux
         int _wakeup_fds[2];
 
         int64_t _num_iterators{0};

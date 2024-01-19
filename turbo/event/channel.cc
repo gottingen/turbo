@@ -34,15 +34,15 @@ namespace turbo {
         destroy();
     }
 
-    void EventChannel::handle_read(int fd, int events) {
+    void EventChannel::handle_read(int events) {
         if (read_callback) {
-            read_callback(this, fd, events);
+            read_callback(this, events);
         }
     }
 
-    void EventChannel::handle_write(int fd, int events) {
+    void EventChannel::handle_write( int events) {
         if (write_callback) {
-            write_callback(this, fd);
+            write_callback(this, events);
         }
     }
 

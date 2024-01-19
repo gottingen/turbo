@@ -24,3 +24,25 @@ carbin_cc_test(
         DEPS
         turbo::turbo
 )
+
+carbin_cc_test(
+        NAME
+        timer_dispatcher_test
+        SOURCES
+        "timerfd_dispatcher_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_test(
+        NAME
+        timer_thread_test
+        SOURCES
+        "timer_thread_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        turbo::turbo
+)

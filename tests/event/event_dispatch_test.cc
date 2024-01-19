@@ -53,3 +53,22 @@ TEST_CASE("event_dispatcher wakeup") {
     REQUIRE_LT(watcher.elapsed_mill(),10);
     REQUIRE(!dispatcher.running());
 }
+
+TEST_CASE("event_dispatcher wakeup") {
+    turbo::EventDispatcher dispatcher;
+    turbo::FiberAttribute attr;
+    turbo::Status status = dispatcher.start(&attr, true);
+    TLOG_INFO("started");
+    REQUIRE(status.ok());
+    REQUIRE(dispatcher.running());
+    turbo::sleep_for(turbo::Duration::milliseconds(1500));
+    REQUIRE_GE(dispatcher.num_iterators(), 1);
+    turbo::StopWatcher watcher;
+    watcher.reset();
+    dispatcher.stop();
+    TLOG_INFO("stop");
+    dispatcher.join();
+    TLOG_INFO("join");
+    REQUIRE_LT(watcher.elapsed_mill(),10);
+    REQUIRE(!dispatcher.running());
+}

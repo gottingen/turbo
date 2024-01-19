@@ -134,6 +134,12 @@ namespace turbo::fiber_internal {
 
         static bool is_stopped(fiber_id_t tid);
 
+        static FiberWorker *get_current_worker();
+
+        static bool is_running_on_fiber();
+
+        static bool is_running_on_pthread();
+
         // The fiber running run_main_task();
         fiber_id_t main_tid() const { return _main_tid; }
 
@@ -142,13 +148,8 @@ namespace turbo::fiber_internal {
         // Routine of the main task which should be called from a dedicated pthread.
         void run_main_task();
 
-        // current_task is a function in macOS 10.0+
-#ifdef current_task
-#undef current_task
-#endif
-
         // Meta/Identifier of current task in this group.
-        FiberEntity *current_task() const { return _cur_meta; }
+        FiberEntity *current_fiber() const { return _cur_meta; }
 
         fiber_id_t current_fid() const { return _cur_meta->tid; }
 
@@ -310,7 +311,7 @@ namespace turbo::fiber_internal {
             return g->ready_to_run(next_tid);
         }
         ReadyToRunArgs args = {g->current_fid(), false};
-        g->set_remained((g->current_task()->about_to_quit
+        g->set_remained((g->current_fiber()->about_to_quit
                          ? ready_to_run_in_worker_ignoresignal
                          : ready_to_run_in_worker),
                         &args);

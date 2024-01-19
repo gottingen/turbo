@@ -22,7 +22,7 @@
 #include "turbo/status/status.h"
 
 namespace turbo {
-    template Status init_timer_thread<fiber_timer_thread>(const TimerThreadOptions *options);
+    template Status init_timer_thread<fiber_timer_thread>(const TimerOptions *options);
     template TimerThread * get_timer_thread<fiber_timer_thread>();
 }
 namespace turbo::fiber_internal {
@@ -31,7 +31,7 @@ namespace turbo::fiber_internal {
 
     extern turbo::fiber_internal::ScheduleGroup * get_task_control();
 
-    turbo::ResultStatus<fiber_timer_id> fiber_timer_add(const turbo::Time &abstime,
+    turbo::ResultStatus<TimerId> fiber_timer_add(const turbo::Time &abstime,
                                   turbo::timer_task_fn_t&& on_timer, void *arg) {
         turbo::fiber_internal::ScheduleGroup *c = turbo::fiber_internal::get_or_new_task_control();
         if (c == nullptr) {
@@ -43,13 +43,13 @@ namespace turbo::fiber_internal {
             return turbo::make_status(kENOMEM);
         }
         const auto tmp = tt->schedule(std::move(on_timer), arg, abstime);
-        if (tmp != INVALID_FIBER_TIMER_ID) {
+        if (tmp != INVALID_TIMER_ID) {
             return tmp;
         }
         return make_status(kESTOP);
     }
 
-    turbo::Status fiber_timer_del(fiber_timer_id id) {
+    turbo::Status fiber_timer_del(TimerId id) {
         turbo::fiber_internal::ScheduleGroup *c = turbo::fiber_internal::get_task_control();
         if (c != nullptr) {
             turbo::TimerThread *tt = get_fiber_timer_thread();

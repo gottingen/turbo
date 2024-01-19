@@ -25,9 +25,6 @@ namespace turbo {
 
     class FiberTimer {
     public:
-        using fiber_timer_id = turbo::fiber_internal::fiber_timer_id;
-        static constexpr fiber_timer_id INVALID_FIBER_TIMER_ID = turbo::fiber_internal::INVALID_FIBER_TIMER_ID;
-
         static constexpr turbo::Duration MIN_DURATION = turbo::Duration::microseconds(2);
 
         FiberTimer() = default;
@@ -64,13 +61,13 @@ namespace turbo {
         timer_task_fn_t _on_timer;
         turbo::Duration _duration;
         size_t _repeat{0};
-        turbo::fiber_internal::fiber_timer_id _timer_id{INVALID_FIBER_TIMER_ID};
+        TimerId _timer_id{INVALID_TIMER_ID};
     };
 
     /// inlines
 
     bool FiberTimer::is_valid() const {
-        return _timer_id != INVALID_FIBER_TIMER_ID;
+        return _timer_id != INVALID_TIMER_ID;
     }
 }  // namespace turbo
 #endif  // TURBO_FIBER_TIMER_H_

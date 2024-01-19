@@ -38,6 +38,9 @@ bug fix
 * fix gcc12 compile error for <cstddef> not directly included in compress tuple
 * fix global operator `%` `+` `-` `*` `/` for Duration will modify rhs or lhs value.
 * fix bug for turbo::fiber io, when the process is killed, the fiber io will not exit hang by epoll_wait.
+* fix timer cpu high usage bug, when the timer is empty, it will cause cpu high usage.
+
+
 
 v0.9.39 - v0.9.43
 ================================

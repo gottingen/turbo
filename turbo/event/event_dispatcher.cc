@@ -38,12 +38,10 @@ namespace turbo {
 
     turbo::Status EventDispatcher::start(const FiberAttribute *consumer_thread_attr, bool run_in_pthread) {
         if (running()) {
-            TLOG_WARN("EventDispatcher is running");
             return turbo::ok_status();
         }
         _run_in_pthread = run_in_pthread;
-        TLOG_INFO("Start EventDispatcher");
-        _poller.reset(new EpollPoller());
+        _poller.reset(create_poller());
         if (!_poller) {
             return turbo::make_status(kENOMEM, "new EpollPoller failed");
         }
@@ -54,7 +52,6 @@ namespace turbo {
         }
         // add wake up
         // initialize wakeup channel
-        TLOG_INFO("Initialize wakeup channel");
         auto wakeup_channel = get_event_channel(&_wakeup_channel);
         if (!wakeup_channel) {
             return make_status(kENOMEM, "Fail to get wakeup channel");
@@ -67,13 +64,13 @@ namespace turbo {
         }
         wakeup_channel->read_callback = handle_wakeup;
         // create pipe
-        TLOG_INFO("Create pipe");
         _wakeup_fds[0] = -1;
         _wakeup_fds[1] = -1;
         if (pipe(_wakeup_fds) != 0) {
             TLOG_CRITICAL("Fail to create pipe: {}", strerror(errno));
             return make_status(errno, "Fail to create pipe");
         }
+        wakeup_channel->fd = _wakeup_fds[0];
         make_non_blocking(_wakeup_fds[0]);
         make_non_blocking(_wakeup_fds[1]);
         rs = _poller->add_poll_in(_wakeup_channel, _wakeup_fds[0]);
@@ -85,7 +82,6 @@ namespace turbo {
         _consumer_thread_attr = (consumer_thread_attr ?
                                  *consumer_thread_attr : FIBER_ATTR_NORMAL);
 
-        TLOG_INFO("start epoll thread");
         if (run_in_pthread) {
             if (pthread_create(&_thread_id, nullptr, fiber_func, this) != 0) {
                 return make_status(errno, "Fail to create epoll thread");
@@ -103,7 +99,6 @@ namespace turbo {
             TLOG_CRITICAL("Fail to create epoll thread: {}", rs.to_string());
             return rs;
         }
-        TLOG_INFO("EventDispatcher started");
         return turbo::ok_status();
     }
 
@@ -123,14 +118,22 @@ namespace turbo {
             return;
         }
         _stop = true;
+        wakeup();
+        if(_run_in_pthread) {
+
+        } else {
+            _fiber.stop();
+        }
+    }
+
+    void EventDispatcher::wakeup() {
         uint64_t buf = 1;
         auto r = ::write(_wakeup_fds[1], &buf, sizeof(buf));
         TURBO_UNUSED(r);
-        _fiber.stop();
     }
 
     void EventDispatcher::join() {
-        //_fiber.join();
+        wakeup();
         if (_run_in_pthread) {
             if (_thread_id != 0) {
                 pthread_join(_thread_id, nullptr);
@@ -151,7 +154,6 @@ namespace turbo {
         std::vector<PollResult> poll_results;
         poll_results.reserve(1024);
         while (!_stop) {
-            TLOG_INFO("Polling...");
             auto rs = _poller->poll(poll_results, 1000);
             _num_iterators++;
             if (_stop) {
@@ -180,17 +182,17 @@ namespace turbo {
                     continue;
                 }
                 if (poll_result.events & EPOLLIN) {
-                    event_channel->handle_read(poll_result.fd, poll_result.events);
+                    event_channel->handle_read(poll_result.events);
                 }
                 if (poll_result.events & EPOLLOUT) {
-                    event_channel->handle_write(poll_result.fd, poll_result.events);
+                    event_channel->handle_write(poll_result.events);
                 }
             }
             poll_results.clear();
         }
     }
 
-    int EventDispatcher::add_consumer(EventChannelId channel_id, int fd) {
+    int EventDispatcher::add_poll_in(EventChannelId channel_id, int fd) {
         TURBO_ASSERT(_poller);
         auto rs = _poller->add_poll_in(channel_id, fd);
         if (!rs.ok()) {
@@ -230,11 +232,11 @@ namespace turbo {
         return turbo::ok_status();
     }
 
-    void EventDispatcher::handle_wakeup(EventChannel *channel, int fd, int event) {
+    void EventDispatcher::handle_wakeup(EventChannel *channel, int event) {
         TURBO_UNUSED(channel);
         TURBO_UNUSED(event);
         uint64_t buf;
-        auto r = ::read(fd, &buf, sizeof(buf));
+        auto r = ::read(channel->fd, &buf, sizeof(buf));
         if (r < 0 && errno != EAGAIN && errno != EINTR) {
             TLOG_CRITICAL("Fail to read wakeup fd: {}", strerror(errno));
         }

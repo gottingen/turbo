@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-#ifndef TURBO_TIMES_TIMER_THREAD_H_
-#define TURBO_TIMES_TIMER_THREAD_H_
+#ifndef TURBO_EVENT_INTERNAL_TIMER_THREAD_H_
+#define TURBO_EVENT_INTERNAL_TIMER_THREAD_H_
 
 #include <vector>
 #include <thread>
@@ -24,24 +24,15 @@
 #include "turbo/concurrent/spinlock.h"
 #include "turbo/concurrent/spinlock_wait.h"
 #include "turbo/status/status.h"
+#include "turbo/event/types.h"
 
 namespace turbo {
-
-    struct TimerThreadOptions {
-        size_t num_buckets{13};
-        TimerThreadOptions() = default;
-    };
-
-    typedef std::function<void(void *)> timer_task_fn_t;
 
     class TimerThread {
     public:
         struct Task;
 
         class Bucket;
-
-        using TaskId = uint64_t;
-        constexpr static TaskId INVALID_TASK_ID = 0;
 
         TimerThread();
 
@@ -50,14 +41,14 @@ namespace turbo {
         // Start the timer thread.
         // This method should only be called once.
         // return 0 if success, errno otherwise.
-        turbo::Status start(const TimerThreadOptions *options);
+        turbo::Status start(const TimerOptions *options);
 
         // Stop the timer thread. Later schedule() will return INVALID_TASK_ID.
         void stop_and_join();
 
         // Schedule |fn(arg)| to run at realtime |abstime| approximately.
         // Returns: identifier of the scheduled task, INVALID_TASK_ID on error.
-        [[nodiscard]] TaskId schedule(timer_task_fn_t&& fn, void *arg, const turbo::Time &abstime);
+        [[nodiscard]] TimerId schedule(timer_task_fn_t &&fn, void *arg, const turbo::Time &abstime);
 
         // Prevent the task denoted by `task_id' from running. `task_id' must be
         // returned by schedule() ever.
@@ -65,7 +56,7 @@ namespace turbo {
         //   ok()   -  Removed the task which does not run yet
         //   ESTOP   -  The task does not exist.
         //   EBUSY   -  The task is just running.
-        [[maybe_unused]] turbo::Status unschedule(TaskId task_id);
+        [[maybe_unused]] turbo::Status unschedule(TimerId task_id);
 
         // Get identifier of internal pthread.
         // Returns (pthread_t)0 if start() is not called yet.
@@ -80,7 +71,7 @@ namespace turbo {
         bool _started;            // whether the timer thread was started successfully.
         std::atomic<bool> _stop;
 
-        TimerThreadOptions _options;
+        TimerOptions _options;
         Bucket *_buckets;                   // list of tasks to be run
         SpinLock _mutex;              // protect _nearest_run_time
         turbo::Time _nearest_run_time;
@@ -101,13 +92,14 @@ namespace turbo {
             }*/
         }
 
-        static TimerThreadInstance* get_instance() {
+        static TimerThreadInstance *get_instance() {
             static TimerThreadInstance instance;
             return &instance;
         }
-        static turbo::Status init_timer_thread(const TimerThreadOptions *options = nullptr) {
+
+        static turbo::Status init_timer_thread(const TimerOptions *options = nullptr) {
             auto instance = get_instance();
-            if(instance->timer_thread != nullptr) {
+            if (instance->timer_thread != nullptr) {
                 return turbo::ok_status();
             }
             std::lock_guard<std::mutex> lock(instance->mutex);
@@ -115,10 +107,10 @@ namespace turbo {
                 instance->timer_thread = new(std::nothrow) TimerThread;
                 if (instance->timer_thread == nullptr) {
                     //TLOG_CRITICAL("Fail to new timer_thread");
-                    return turbo::make_status(kENOMEM,"Fail to new timer_thread");
+                    return turbo::make_status(kENOMEM, "Fail to new timer_thread");
                 }
-                const TimerThreadOptions *options_ptr = options;
-                TimerThreadOptions default_options;
+                const TimerOptions *options_ptr = options;
+                TimerOptions default_options;
                 if (options_ptr == nullptr) {
                     options_ptr = &default_options;
                 }
@@ -133,36 +125,41 @@ namespace turbo {
             return turbo::ok_status();
         }
 
-        static TimerThread * get_timer_thread() {
+        static TimerThread *get_timer_thread() {
             return get_instance()->timer_thread;
         }
+
     private:
         TimerThread *timer_thread{nullptr};
-        std::mutex  mutex;
+        std::mutex mutex;
     };
 
-    struct global_timer_thread_tag {};
+    struct global_timer_thread_tag {
+    };
 
     template<typename Tag>
-    inline turbo::Status init_timer_thread(const TimerThreadOptions *options = nullptr) {
+    inline turbo::Status init_timer_thread(const TimerOptions *options = nullptr) {
         return TimerThreadInstance<Tag>::init_timer_thread(options);
     }
 
     template<typename Tag>
-    inline TimerThread * get_timer_thread() {
+    inline TimerThread *get_timer_thread() {
         return TimerThreadInstance<Tag>::get_timer_thread();
     }
 
-    extern template turbo::Status init_timer_thread<global_timer_thread_tag>(const TimerThreadOptions *options = nullptr);
-    extern template TimerThread * get_timer_thread<global_timer_thread_tag>();
+    extern template turbo::Status
+    init_timer_thread<global_timer_thread_tag>(const TimerOptions *options = nullptr);
 
-    inline turbo::Status init_global_timer_thread(const TimerThreadOptions *options = nullptr) {
+    extern template TimerThread *get_timer_thread<global_timer_thread_tag>();
+
+    inline turbo::Status init_global_timer_thread(const TimerOptions *options = nullptr) {
         return init_timer_thread<global_timer_thread_tag>(options);
     }
+
     inline TimerThread *get_global_timer_thread() {
         return get_timer_thread<global_timer_thread_tag>();
     }
 
 }   // namespace turbo
 
-#endif  // TURBO_TIMES_TIMER_THREAD_H_
+#endif  // TURBO_EVENT_INTERNAL_TIMER_THREAD_H_

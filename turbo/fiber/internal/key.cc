@@ -298,7 +298,7 @@ namespace turbo::fiber_internal {
             saved_free_keytables = kt->next;
             turbo::fiber_internal::tls_bls.keytable = kt;
             if (g) {
-                g->current_task()->local_storage.keytable = kt;
+                g->current_fiber()->local_storage.keytable = kt;
             }
             delete kt;
             if (old_kt == kt) {
@@ -307,7 +307,7 @@ namespace turbo::fiber_internal {
         }
         turbo::fiber_internal::tls_bls.keytable = old_kt;
         if (g) {
-            g->current_task()->local_storage.keytable = old_kt;
+            g->current_fiber()->local_storage.keytable = old_kt;
         }
         // TODO: return_keytable may race with this function, we don't destroy
         return 0;
@@ -434,7 +434,7 @@ namespace turbo::fiber_internal {
             turbo::fiber_internal::tls_bls.keytable = kt;
             turbo::fiber_internal::FiberWorker *const g = turbo::fiber_internal::tls_task_group;
             if (g) {
-                g->current_task()->local_storage.keytable = kt;
+                g->current_fiber()->local_storage.keytable = kt;
             }
             if (!turbo::fiber_internal::tls_ever_created_keytable) {
                 turbo::fiber_internal::tls_ever_created_keytable = true;
@@ -451,10 +451,10 @@ namespace turbo::fiber_internal {
         }
         turbo::fiber_internal::FiberWorker *const g = turbo::fiber_internal::tls_task_group;
         if (g) {
-            turbo::fiber_internal::FiberEntity *const task = g->current_task();
+            turbo::fiber_internal::FiberEntity *const task = g->current_fiber();
             kt = turbo::fiber_internal::borrow_keytable(task->attr.keytable_pool);
             if (kt) {
-                g->current_task()->local_storage.keytable = kt;
+                g->current_fiber()->local_storage.keytable = kt;
                 turbo::fiber_internal::tls_bls.keytable = kt;
                 return kt->get_data(key);
             }

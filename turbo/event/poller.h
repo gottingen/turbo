@@ -51,6 +51,8 @@ namespace turbo {
 
         virtual Status poll(std::vector<PollResult> &poll_results, int timeout) = 0;
     };
+
+    Poller * create_poller();
 }  // namespace turbo
 
 #endif  // TURBO_EVENT_POLLER_H_

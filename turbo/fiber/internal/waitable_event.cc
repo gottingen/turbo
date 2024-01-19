@@ -78,7 +78,7 @@ namespace turbo::fiber_internal {
     // waitable_event::waiters.
     struct FiberEventWaiterNode : public EventWaiterNode {
         FiberEntity *task_meta;
-        TimerThread::TaskId sleep_id;
+        TimerId sleep_id;
         WaiterState waiter_state;
         int expected_value;
         waitable_event *initial_event;
@@ -546,7 +546,7 @@ namespace turbo::fiber_internal {
         turbo::Status rc;
 
         if (g) {
-            task = g->current_task();
+            task = g->current_fiber();
             task->current_waiter.store(&pw, std::memory_order_release);
         }
         b->waiter_lock.lock();
@@ -606,7 +606,7 @@ namespace turbo::fiber_internal {
         // tid is 0 iff the thread is non-fiber
         bbw.tid = g->current_fid();
         bbw.container.store(nullptr, std::memory_order_relaxed);
-        bbw.task_meta = g->current_task();
+        bbw.task_meta = g->current_fiber();
         bbw.sleep_id = 0;
         bbw.waiter_state = WAITER_STATE_READY;
         bbw.expected_value = expected_value;
