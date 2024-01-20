@@ -55,6 +55,7 @@ set(TURBO_ALL_SRC
         "event/channel.cc"
         "event/once_task.cc"
         "event/timer.cc"
+        "event/future_io.cc"
         "event/event_dispatcher.cc"
         "event/internal/time_core.cc"
         "event/internal/timerfd.cc"

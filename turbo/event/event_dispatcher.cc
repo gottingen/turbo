@@ -18,6 +18,8 @@
 
 #include "turbo/event/event_dispatcher.h"
 #include "turbo/event/internal/epoll_poller.h"
+#include "turbo/hash/hash.h"
+#include "turbo/concurrent/call_once.h"
 
 namespace turbo {
     EventDispatcher::~EventDispatcher() {
@@ -240,5 +242,77 @@ namespace turbo {
         if (r < 0 && errno != EAGAIN && errno != EINTR) {
             TLOG_CRITICAL("Fail to read wakeup fd: {}", strerror(errno));
         }
+    }
+
+    int io_dispatcher_concurrency = kDefaultIODispatcherConcurrent;
+    bool g_user_fiber = kUserFiber;
+
+    void setup_event_dispatcher(int concurrency, bool user_fiber) {
+        TLOG_CHECK(concurrency > 0, "concurrency must be greater than 0");
+        io_dispatcher_concurrency = concurrency;
+        g_user_fiber = user_fiber;
+    }
+
+    std::vector<EventDispatcher *> g_io_dispatchers;
+    EventDispatcher * listener_dispatcher = nullptr;
+
+    void destroy_event_dispatchers() {
+        for (int i = 0; i < io_dispatcher_concurrency; i++) {
+            g_io_dispatchers[i]->stop();
+            g_io_dispatchers[i]->join();
+            delete g_io_dispatchers[i];
+        }
+        listener_dispatcher->stop();
+        listener_dispatcher->join();
+        delete listener_dispatcher;
+    }
+
+    void init_event_dispatchers() {
+        FiberAttribute consumer_thread_attr = FIBER_ATTR_NORMAL;
+        if(!g_user_fiber) {
+            consumer_thread_attr = FIBER_ATTR_PTHREAD;
+        }
+        g_io_dispatchers.resize(io_dispatcher_concurrency);
+        for (int i = 0; i < io_dispatcher_concurrency; i++) {
+            g_io_dispatchers[i] = new EventDispatcher();
+            if(!g_io_dispatchers[i]) {
+                TLOG_CRITICAL("Fail to create io dispatcher");
+                exit(-1);
+            }
+            if(g_io_dispatchers[i]->start(&consumer_thread_attr, g_user_fiber).ok()) {
+                TLOG_INFO("Start io dispatcher {} success", i);
+            } else {
+                TLOG_CRITICAL("Fail to start io dispatcher {}", i);
+                exit(-1);
+            }
+        }
+        listener_dispatcher = new EventDispatcher();
+        if(!listener_dispatcher) {
+            TLOG_CRITICAL("Fail to create listener dispatcher");
+            exit(-1);
+        }
+        if(listener_dispatcher->start(&consumer_thread_attr, g_user_fiber).ok()) {
+            TLOG_INFO("Start listener dispatcher success");
+        } else {
+            TLOG_CRITICAL("Fail to start listener dispatcher");
+            exit(-1);
+        }
+        TLOG_CHECK_EQ(0, atexit(destroy_event_dispatchers), "Fail to register destroy_event_dispatchers");
+    }
+
+    turbo::once_flag init_event_dispatchers_once;
+
+    EventDispatcher *get_listener_dispatcher() {
+        turbo::call_once(init_event_dispatchers_once, init_event_dispatchers);
+        return listener_dispatcher;
+    }
+
+    EventDispatcher *get_io_dispatcher(int fd) {
+        turbo::call_once(init_event_dispatchers_once, init_event_dispatchers);
+        if(io_dispatcher_concurrency == 1) {
+            return g_io_dispatchers[0];
+        }
+        auto index = turbo::hash_mixer4(fd);
+        return g_io_dispatchers[index % io_dispatcher_concurrency];
     }
 }  // namespace turbo

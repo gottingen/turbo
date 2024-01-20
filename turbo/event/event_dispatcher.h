@@ -79,6 +79,15 @@ namespace turbo {
 
         std::unique_ptr<Poller> _poller{nullptr};
     };
+
+    static constexpr int kDefaultIODispatcherConcurrent = 4;
+    static constexpr bool kUserFiber = true;
+
+    void setup_event_dispatcher(int concurrency, bool user_fiber = kUserFiber);
+
+    EventDispatcher *get_listener_dispatcher();
+
+    EventDispatcher *get_io_dispatcher(int fd);
 }  // namespace turbo
 
 #endif  // TURBO_EVENT_EVENT_DISPATCHER_H_

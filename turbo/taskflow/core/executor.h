@@ -1178,7 +1178,7 @@ namespace turbo {
         return _workers.size();
     }
 
-// Function: num_topologies
+    // Function: num_topologies
     inline size_t Executor::num_topologies() const {
 #ifdef __cpp_lib_atomic_wait
         return _num_topologies.load(std::memory_order_relaxed);
@@ -1187,24 +1187,24 @@ namespace turbo {
 #endif
     }
 
-// Function: num_taskflows
+    // Function: num_taskflows
     inline size_t Executor::num_taskflows() const {
         return _taskflows.size();
     }
 
-// Function: _this_worker
+    // Function: _this_worker
     inline Worker *Executor::_this_worker() {
         auto itr = _wids.find(std::this_thread::get_id());
         return itr == _wids.end() ? nullptr : &_workers[itr->second];
     }
 
-// Function: this_worker_id
+    // Function: this_worker_id
     inline int Executor::this_worker_id() const {
         auto i = _wids.find(std::this_thread::get_id());
         return i == _wids.end() ? -1 : static_cast<int>(_workers[i->second]._id);
     }
 
-// Procedure: _spawn
+    // Procedure: _spawn
     inline void Executor::_spawn(size_t N) {
 
 #ifdef __cpp_lib_atomic_wait
@@ -1401,7 +1401,7 @@ namespace turbo {
         goto explore_task;
     }
 
-// Function: make_observer
+    // Function: make_observer
     template<typename Observer, typename... ArgsT>
     std::shared_ptr<Observer> Executor::make_observer(ArgsT &&... args) {
 
