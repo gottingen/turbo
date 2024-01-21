@@ -27,14 +27,13 @@
 
 #include <string>
 #include <vector>
-
+#include <optional>
 #include "turbo/flags/flag.h"
 #include "turbo/flags/marshalling.h"
 #include "turbo/flags/parse.h"
 #include "turbo/flags/reflection.h"
 #include "turbo/strings/string_view.h"
-#include "turbo/time/time.h"
-#include "turbo/types/optional.h"
+#include "turbo/times/time.h"
 #include "benchmark/benchmark.h"
 
 namespace {
@@ -255,7 +254,7 @@ namespace {
 
         while (state.KeepRunningBatch(kNumFlags)) {
             for (auto *flag_ptr: FlagPtrs_bool) {
-                benchmark::DoNotOptimize(turbo::find_command_line_flag(flag_ptr->Name()));
+                benchmark::DoNotOptimize(turbo::find_command_line_flag(flag_ptr->name()));
             }
         }
     }
