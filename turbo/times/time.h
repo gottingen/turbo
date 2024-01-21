@@ -977,6 +977,28 @@ namespace turbo {
     inline Duration Time::fraction(Duration unit) const {
         return rep_.fraction(unit);
     }
+
+    // turbo_parse_flag()
+    //
+    // Parses the command-line flag string representation `text` into a Time value.
+    // Time flags must be specified in a format that matches turbo::RFC3339_full.
+    //
+    // For example:
+    //
+    //   --start_time=2016-01-02T03:04:05.678+08:00
+    //
+    // Note: A UTC offset (or 'Z' indicating a zero-offset from UTC) is required.
+    //
+    // Additionally, if you'd like to specify a time as a count of
+    // seconds/milliseconds/etc from the Unix epoch, use an turbo::Duration flag
+    // and add that duration to turbo::UnixEpoch() to get an turbo::Time.
+        bool turbo_parse_flag(std::string_view text, Time* t, std::string* error);
+
+    // turbo_unparse_flag()
+    //
+    // Unparses a Time value into a command-line string representation using
+    // the format specified by `turbo::ParseTime()`.
+        std::string turbo_unparse_flag(Time t);
 }  // namespace turbo
 
 #endif  // TURBO_TIME_TIME_H_

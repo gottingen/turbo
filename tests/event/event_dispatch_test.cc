@@ -19,7 +19,7 @@
 #include "turbo/testing/test.h"
 #include "turbo/times/stop_watcher.h"
 #include "turbo/event/event_dispatcher.h"
-
+#include "turbo/log/logging.h"
 
 TEST_CASE("event_dispatcher wakeup") {
     turbo::EventDispatcher dispatcher;

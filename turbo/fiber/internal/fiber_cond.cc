@@ -20,6 +20,7 @@
 #include "turbo/fiber/internal/fiber_cond.h"
 #include "turbo/fiber/internal/waitable_event.h"
 #include "turbo/fiber/internal/types.h"                       // fiber_cond_t
+#include "turbo/base/internal/raw_logging.h"
 
 namespace turbo::fiber_internal {
     struct CondInternal {
@@ -42,7 +43,7 @@ namespace turbo::fiber_internal {
                         const fiber_condattr_t *) {
         c->m = nullptr;
         c->seq = turbo::fiber_internal::waitable_event_create_checked<int>();
-        TLOG_CHECK(c->seq != nullptr, "fiber_cond_init: waitable_event_create_checked failed");
+        TURBO_RAW_CHECK(c->seq != nullptr, "fiber_cond_init: waitable_event_create_checked failed");
         *c->seq = 0;
         return ok_status();
     }

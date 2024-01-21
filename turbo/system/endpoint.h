@@ -187,6 +187,8 @@ namespace turbo {
 
         void set(IPAddr ip, int port);
 
+        void set(int port);
+
         // Get the local end of a socket connection
         bool local_side(int fd);
 
@@ -300,6 +302,34 @@ namespace turbo {
             return formatter<std::string>::format(p.to_str().c_str(), ctx);
         }
     };
+
+    // turbo_parse_flag()
+    //
+    // Parses a command-line flag string representation `text` into a Duration
+    // value. EndPoint flags must be specified in a format that is valid input for
+    // `turbo::ParseDuration()`.
+    bool turbo_parse_flag(std::string_view text, EndPoint *dst, std::string *error);
+
+
+    // turbo_unparse_flag()
+    //
+    // Unparses a EndPoint value into a command-line string representation using
+    // the format specified by `turbo::ParseDuration()`.
+    std::string turbo_unparse_flag(EndPoint d);
+
+    // turbo_parse_flag()
+    //
+    // Parses a command-line flag string representation `text` into a Duration
+    // value. IPAddr flags must be specified in a format that is valid input for
+    // `turbo::ParseDuration()`.
+    bool turbo_parse_flag(std::string_view text, IPAddr *dst, std::string *error);
+
+
+    // turbo_unparse_flag()
+    //
+    // Unparses a IPAddr value into a command-line string representation using
+    // the format specified by `turbo::ParseDuration()`.
+    std::string turbo_unparse_flag(IPAddr d);
 }  // namespace turbo
 
 #endif  // TURBO_SYSTEM_ENDPOINT_H_

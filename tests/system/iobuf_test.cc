@@ -30,6 +30,7 @@
 #include "turbo/random/random.h"
 #include "turbo/system/atexit.h"
 #include "turbo/files/filesystem.h"
+#include "turbo/log/logging.h"
 
 namespace turbo::files_internal {
     namespace iobuf {

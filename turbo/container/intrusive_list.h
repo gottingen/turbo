@@ -28,8 +28,45 @@ namespace turbo {
     class intrusive_list;
 
     struct intrusive_list_node {
-        intrusive_list_node *next;
-        intrusive_list_node *prev;
+        intrusive_list_node *next{this};
+        intrusive_list_node *prev{this};
+
+        void insert_before(intrusive_list_node* e) {
+            this->next = e;
+            this->prev = e->prev;
+            e->prev->next = this;
+            e->prev = this;
+        }
+
+        void insert_after(intrusive_list_node* e) {
+            this->next = e->next;
+            this->prev = e;
+            e->next->prev = this;
+            e->next = this;
+        }
+
+        void remove_from_list() {
+            this->prev->next = this->next;
+            this->next->prev = this->prev;
+            this->next = this;
+            this->prev = this;
+        }
+
+        void insert_before_as_list(intrusive_list_node* e) {
+            intrusive_list_node* pprev = this->prev;
+            pprev->next = e;
+            this->prev = e->prev;
+            e->prev->next = this;
+            e->prev = pprev;
+        }
+
+        void insert_after_as_list(intrusive_list_node* e) {
+            intrusive_list_node* pprev = this->prev;
+            pprev->next = e->next;
+            this->prev = e;
+            e->next->prev = pprev;
+            e->next = this;
+        }
     };
 
     /// intrusive_list_iterator

@@ -22,6 +22,7 @@
 
 #include "turbo/fiber/internal/types.h"
 #include "turbo/status/status.h"
+#include "turbo/base/internal/raw_logging.h"
 
 namespace turbo::fiber_internal {
 
@@ -82,11 +83,11 @@ namespace std {
 
         void lock() {
             if (!_mutex) {
-                TDLOG_CHECK(false, "Invalid operation");
+                TURBO_RAW_CHECK(false, "Invalid operation");
                 return;
             }
             if (_owns_lock) {
-                TDLOG_CHECK(false, "Detected deadlock issue");
+                TURBO_RAW_CHECK(false, "Detected deadlock issue");
                 return;
             }
             _owns_lock = fiber_mutex_lock(_mutex).ok();
@@ -94,11 +95,11 @@ namespace std {
 
         bool try_lock() {
             if (!_mutex) {
-                TDLOG_CHECK(false, "Invalid operation");
+                TURBO_RAW_CHECK(false, "Invalid operation");
                 return false;
             }
             if (_owns_lock) {
-                TLOG_CHECK(false, "Detected deadlock issue");
+                TURBO_RAW_CHECK(false, "Detected deadlock issue");
                 return false;
             }
             _owns_lock = fiber_mutex_trylock(_mutex).ok();
@@ -107,7 +108,7 @@ namespace std {
 
         void unlock() {
             if (!_owns_lock) {
-                TDLOG_CHECK("Invalid operation");
+                TURBO_RAW_CHECK(false,"Invalid operation");
                 return;
             }
             if (_mutex) {

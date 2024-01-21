@@ -34,7 +34,7 @@ namespace turbo::profiling_internal {
         typedef AgentCombiner<T, T, CombineOp, SetterOp> combiner_type;
         typedef typename combiner_type::Agent agent_type;
     public:
-        Reducer(typename add_cr_non_integral<T>::type identity = static_cast<add_cr_non_integral<int>::type>(T()),
+        Reducer(typename add_cr_non_integral<T>::type identity = static_cast<typename add_cr_non_integral<T>::type>(T()),
                 const CombineOp &cop = CombineOp(),
                 const SetterOp &setter_op = SetterOp())
                 : _combiner(identity, identity, cop, setter_op) {

@@ -41,7 +41,7 @@ namespace turbo {
             return format("{}{}", cs.year(), Time::from_civil(ncs, utc).to_string(fmt, utc));
         }
 
-         template<typename CivilT>
+        template<typename CivilT>
         bool ParseYearAnd(std::string_view fmt, std::string_view s, CivilT *c) {
             // Civil times support a larger year range than turbo::Time, so we need to
             // parse the year separately, normalize it, then use turbo::parse_time on the
@@ -138,27 +138,27 @@ namespace turbo {
         return ParseYearAnd("", s, c);
     }
 
-    bool parse_lenient_Civil_time(std::string_view s, CivilSecond *c) {
+    bool parse_lenient_civil_time(std::string_view s, CivilSecond *c) {
         return ParseLenient(s, c);
     }
 
-    bool parse_lenient_Civil_time(std::string_view s, CivilMinute *c) {
+    bool parse_lenient_civil_time(std::string_view s, CivilMinute *c) {
         return ParseLenient(s, c);
     }
 
-    bool parse_lenient_Civil_time(std::string_view s, CivilHour *c) {
+    bool parse_lenient_civil_time(std::string_view s, CivilHour *c) {
         return ParseLenient(s, c);
     }
 
-    bool parse_lenient_Civil_time(std::string_view s, CivilDay *c) {
+    bool parse_lenient_civil_time(std::string_view s, CivilDay *c) {
         return ParseLenient(s, c);
     }
 
-    bool parse_lenient_Civil_time(std::string_view s, CivilMonth *c) {
+    bool parse_lenient_civil_time(std::string_view s, CivilMonth *c) {
         return ParseLenient(s, c);
     }
 
-    bool parse_lenient_Civil_time(std::string_view s, CivilYear *c) {
+    bool parse_lenient_civil_time(std::string_view s, CivilYear *c) {
         return ParseLenient(s, c);
     }
 
@@ -190,4 +190,39 @@ namespace turbo {
 
     }  // namespace time_internal
 
+    bool turbo_parse_flag(string_view s, CivilSecond *c, std::string *) {
+        return parse_lenient_civil_time(s, c);
+    }
+
+    bool turbo_parse_flag(string_view s, CivilMinute *c, std::string *) {
+        return parse_lenient_civil_time(s, c);
+    }
+
+    bool turbo_parse_flag(string_view s, CivilHour *c, std::string *) {
+        return parse_lenient_civil_time(s, c);
+    }
+
+    bool turbo_parse_flag(string_view s, CivilDay *c, std::string *) {
+        return parse_lenient_civil_time(s, c);
+    }
+
+    bool turbo_parse_flag(string_view s, CivilMonth *c, std::string *) {
+        return parse_lenient_civil_time(s, c);
+    }
+
+    bool turbo_parse_flag(string_view s, CivilYear *c, std::string *) {
+        return parse_lenient_civil_time(s, c);
+    }
+
+    std::string turbo_unparse_flag(CivilSecond c) { return format_civil_time(c); }
+
+    std::string turbo_unparse_flag(CivilMinute c) { return format_civil_time(c); }
+
+    std::string turbo_unparse_flag(CivilHour c) { return format_civil_time(c); }
+
+    std::string turbo_unparse_flag(CivilDay c) { return format_civil_time(c); }
+
+    std::string turbo_unparse_flag(CivilMonth c) { return format_civil_time(c); }
+
+    std::string turbo_unparse_flag(CivilYear c) { return format_civil_time(c); }
 }  // namespace turbo

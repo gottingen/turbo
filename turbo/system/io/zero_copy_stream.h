@@ -94,7 +94,7 @@ namespace turbo {
         // In the case of a read error, the method reads as much data as possible into
         // the cord before returning false. The default implementation iterates over
         // the buffers and appends up to `count` bytes of data into `cord` using the
-        // `absl::CordBuffer` API.
+        // `turbo::CordBuffer` API.
         //
         // Some streams may implement this in a way that avoids copying by sharing or
         // reference counting existing data managed by the stream implementation.
@@ -167,7 +167,7 @@ namespace turbo {
 
         // Write a given chunk of data to the output.  Some output streams may
         // implement this in a way that avoids copying. Check AllowsAliasing() before
-        // calling WriteAliasedRaw(). It will ABSL_CHECK fail if WriteAliasedRaw() is
+        // calling WriteAliasedRaw(). It will TURBO_CHECK fail if WriteAliasedRaw() is
         // called on a stream that does not allow aliasing.
         //
         // NOTE: It is caller's responsibility to ensure that the chunk of memory

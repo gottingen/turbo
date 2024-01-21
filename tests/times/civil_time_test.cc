@@ -772,100 +772,100 @@ TEST_CASE("CivilTime, FormatAndParseLenient") {
   turbo::CivilYear y;
   REQUIRE_EQ("1970", turbo::format_civil_time(y));
 
-  REQUIRE(turbo::parse_lenient_Civil_time("2015-01-02T03:04:05", &ss));
+  REQUIRE(turbo::parse_lenient_civil_time("2015-01-02T03:04:05", &ss));
   REQUIRE_EQ("2015-01-02T03:04:05", turbo::format_civil_time(ss));
 
-  REQUIRE(turbo::parse_lenient_Civil_time("2015-01-02T03:04:05", &mm));
+  REQUIRE(turbo::parse_lenient_civil_time("2015-01-02T03:04:05", &mm));
   REQUIRE_EQ("2015-01-02T03:04", turbo::format_civil_time(mm));
 
-  REQUIRE(turbo::parse_lenient_Civil_time("2015-01-02T03:04:05", &hh));
+  REQUIRE(turbo::parse_lenient_civil_time("2015-01-02T03:04:05", &hh));
   REQUIRE_EQ("2015-01-02T03", turbo::format_civil_time(hh));
 
-  REQUIRE(turbo::parse_lenient_Civil_time("2015-01-02T03:04:05", &d));
+  REQUIRE(turbo::parse_lenient_civil_time("2015-01-02T03:04:05", &d));
   REQUIRE_EQ("2015-01-02", turbo::format_civil_time(d));
 
-  REQUIRE(turbo::parse_lenient_Civil_time("2015-01-02T03:04:05", &m));
+  REQUIRE(turbo::parse_lenient_civil_time("2015-01-02T03:04:05", &m));
   REQUIRE_EQ("2015-01", turbo::format_civil_time(m));
 
-  REQUIRE(turbo::parse_lenient_Civil_time("2015-01-02T03:04:05", &y));
+  REQUIRE(turbo::parse_lenient_civil_time("2015-01-02T03:04:05", &y));
   REQUIRE_EQ("2015", turbo::format_civil_time(y));
 }
 
 TEST_CASE("CivilTime, ParseEdgeCases") {
   turbo::CivilSecond ss;
   REQUIRE(
-      turbo::parse_lenient_Civil_time("9223372036854775807-12-31T23:59:59", &ss));
+      turbo::parse_lenient_civil_time("9223372036854775807-12-31T23:59:59", &ss));
   REQUIRE_EQ("9223372036854775807-12-31T23:59:59", turbo::format_civil_time(ss));
   REQUIRE(
-      turbo::parse_lenient_Civil_time("-9223372036854775808-01-01T00:00:00", &ss));
+      turbo::parse_lenient_civil_time("-9223372036854775808-01-01T00:00:00", &ss));
   REQUIRE_EQ("-9223372036854775808-01-01T00:00:00", turbo::format_civil_time(ss));
 
   turbo::CivilMinute mm;
   REQUIRE(
-      turbo::parse_lenient_Civil_time("9223372036854775807-12-31T23:59", &mm));
+      turbo::parse_lenient_civil_time("9223372036854775807-12-31T23:59", &mm));
   REQUIRE_EQ("9223372036854775807-12-31T23:59", turbo::format_civil_time(mm));
   REQUIRE(
-      turbo::parse_lenient_Civil_time("-9223372036854775808-01-01T00:00", &mm));
+      turbo::parse_lenient_civil_time("-9223372036854775808-01-01T00:00", &mm));
   REQUIRE_EQ("-9223372036854775808-01-01T00:00", turbo::format_civil_time(mm));
 
   turbo::CivilHour hh;
   REQUIRE(
-      turbo::parse_lenient_Civil_time("9223372036854775807-12-31T23", &hh));
+      turbo::parse_lenient_civil_time("9223372036854775807-12-31T23", &hh));
   REQUIRE_EQ("9223372036854775807-12-31T23", turbo::format_civil_time(hh));
   REQUIRE(
-      turbo::parse_lenient_Civil_time("-9223372036854775808-01-01T00", &hh));
+      turbo::parse_lenient_civil_time("-9223372036854775808-01-01T00", &hh));
   REQUIRE_EQ("-9223372036854775808-01-01T00", turbo::format_civil_time(hh));
 
   turbo::CivilDay d;
-  REQUIRE(turbo::parse_lenient_Civil_time("9223372036854775807-12-31", &d));
+  REQUIRE(turbo::parse_lenient_civil_time("9223372036854775807-12-31", &d));
   REQUIRE_EQ("9223372036854775807-12-31", turbo::format_civil_time(d));
-  REQUIRE(turbo::parse_lenient_Civil_time("-9223372036854775808-01-01", &d));
+  REQUIRE(turbo::parse_lenient_civil_time("-9223372036854775808-01-01", &d));
   REQUIRE_EQ("-9223372036854775808-01-01", turbo::format_civil_time(d));
 
   turbo::CivilMonth m;
-  REQUIRE(turbo::parse_lenient_Civil_time("9223372036854775807-12", &m));
+  REQUIRE(turbo::parse_lenient_civil_time("9223372036854775807-12", &m));
   REQUIRE_EQ("9223372036854775807-12", turbo::format_civil_time(m));
-  REQUIRE(turbo::parse_lenient_Civil_time("-9223372036854775808-01", &m));
+  REQUIRE(turbo::parse_lenient_civil_time("-9223372036854775808-01", &m));
   REQUIRE_EQ("-9223372036854775808-01", turbo::format_civil_time(m));
 
   turbo::CivilYear y;
-  REQUIRE(turbo::parse_lenient_Civil_time("9223372036854775807", &y));
+  REQUIRE(turbo::parse_lenient_civil_time("9223372036854775807", &y));
   REQUIRE_EQ("9223372036854775807", turbo::format_civil_time(y));
-  REQUIRE(turbo::parse_lenient_Civil_time("-9223372036854775808", &y));
+  REQUIRE(turbo::parse_lenient_civil_time("-9223372036854775808", &y));
   REQUIRE_EQ("-9223372036854775808", turbo::format_civil_time(y));
 
   // Tests some valid, but interesting, cases
-  REQUIRE(turbo::parse_lenient_Civil_time("0", &ss)) ;
+  REQUIRE(turbo::parse_lenient_civil_time("0", &ss)) ;
   REQUIRE_EQ(turbo::CivilYear(0), ss);
-  REQUIRE(turbo::parse_lenient_Civil_time("0-1", &ss)) ;
+  REQUIRE(turbo::parse_lenient_civil_time("0-1", &ss)) ;
   REQUIRE_EQ(turbo::CivilMonth(0, 1), ss);
-  REQUIRE(turbo::parse_lenient_Civil_time(" 2015 ", &ss));
+  REQUIRE(turbo::parse_lenient_civil_time(" 2015 ", &ss));
   REQUIRE_EQ(turbo::CivilYear(2015), ss);
-  REQUIRE(turbo::parse_lenient_Civil_time(" 2015-6 ", &ss));
+  REQUIRE(turbo::parse_lenient_civil_time(" 2015-6 ", &ss));
   REQUIRE_EQ(turbo::CivilMonth(2015, 6), ss);
-  REQUIRE(turbo::parse_lenient_Civil_time("2015-6-7", &ss));
+  REQUIRE(turbo::parse_lenient_civil_time("2015-6-7", &ss));
   REQUIRE_EQ(turbo::CivilDay(2015, 6, 7), ss);
-  REQUIRE(turbo::parse_lenient_Civil_time(" 2015-6-7 ", &ss)) ;
+  REQUIRE(turbo::parse_lenient_civil_time(" 2015-6-7 ", &ss)) ;
   REQUIRE_EQ(turbo::CivilDay(2015, 6, 7), ss);
-  REQUIRE(turbo::parse_lenient_Civil_time("2015-06-07T10:11:12 ", &ss));
+  REQUIRE(turbo::parse_lenient_civil_time("2015-06-07T10:11:12 ", &ss));
   REQUIRE_EQ(turbo::CivilSecond(2015, 6, 7, 10, 11, 12), ss);
-  REQUIRE(turbo::parse_lenient_Civil_time(" 2015-06-07T10:11:12 ", &ss)) ;
+  REQUIRE(turbo::parse_lenient_civil_time(" 2015-06-07T10:11:12 ", &ss)) ;
   REQUIRE_EQ(turbo::CivilSecond(2015, 6, 7, 10, 11, 12), ss);
-  REQUIRE(turbo::parse_lenient_Civil_time("-01-01", &ss)) ;
+  REQUIRE(turbo::parse_lenient_civil_time("-01-01", &ss)) ;
   REQUIRE_EQ(turbo::CivilMonth(-1, 1), ss);
 
   // Tests some invalid cases
-  REQUIRE_FALSE(turbo::parse_lenient_Civil_time("01-01-2015", &ss)) ;
-  REQUIRE_FALSE(turbo::parse_lenient_Civil_time("2015-", &ss)) ;
-  REQUIRE_FALSE(turbo::parse_lenient_Civil_time("0xff-01", &ss)) ;
-  REQUIRE_FALSE(turbo::parse_lenient_Civil_time("2015-02-30T04:05:06", &ss)) ;
-  REQUIRE_FALSE(turbo::parse_lenient_Civil_time("2015-02-03T04:05:96", &ss)) ;
-  REQUIRE_FALSE(turbo::parse_lenient_Civil_time("X2015-02-03T04:05:06", &ss)) ;
-  REQUIRE_FALSE(turbo::parse_lenient_Civil_time("2015-02-03T04:05:003", &ss)) ;
-  REQUIRE_FALSE(turbo::parse_lenient_Civil_time("2015 -02-03T04:05:06", &ss)) ;
-  REQUIRE_FALSE(turbo::parse_lenient_Civil_time("2015-02-03-04:05:06", &ss)) ;
-  REQUIRE_FALSE(turbo::parse_lenient_Civil_time("2015:02:03T04-05-06", &ss)) ;
-  REQUIRE_FALSE(turbo::parse_lenient_Civil_time("9223372036854775808", &y));
+  REQUIRE_FALSE(turbo::parse_lenient_civil_time("01-01-2015", &ss)) ;
+  REQUIRE_FALSE(turbo::parse_lenient_civil_time("2015-", &ss)) ;
+  REQUIRE_FALSE(turbo::parse_lenient_civil_time("0xff-01", &ss)) ;
+  REQUIRE_FALSE(turbo::parse_lenient_civil_time("2015-02-30T04:05:06", &ss)) ;
+  REQUIRE_FALSE(turbo::parse_lenient_civil_time("2015-02-03T04:05:96", &ss)) ;
+  REQUIRE_FALSE(turbo::parse_lenient_civil_time("X2015-02-03T04:05:06", &ss)) ;
+  REQUIRE_FALSE(turbo::parse_lenient_civil_time("2015-02-03T04:05:003", &ss)) ;
+  REQUIRE_FALSE(turbo::parse_lenient_civil_time("2015 -02-03T04:05:06", &ss)) ;
+  REQUIRE_FALSE(turbo::parse_lenient_civil_time("2015-02-03-04:05:06", &ss)) ;
+  REQUIRE_FALSE(turbo::parse_lenient_civil_time("2015:02:03T04-05-06", &ss)) ;
+  REQUIRE_FALSE(turbo::parse_lenient_civil_time("9223372036854775808", &y));
 }
 
 TEST_CASE("CivilTime, OutputStream") {

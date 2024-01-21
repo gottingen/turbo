@@ -33,7 +33,6 @@
 // The C++20 draft standard includes a `std::span` type. As of June 2020, the
 // differences between `turbo::Span` and `std::span` are:
 //    * `turbo::Span` has `operator==` (which is likely a design bug,
-//       per https://abseil.io/blog/20180531-regular-types)
 //    * `turbo::Span` has the factory functions `MakeSpan()` and
 //      `MakeConstSpan()`
 //    * bounds-checked access to `turbo::Span` is accomplished with `at()`

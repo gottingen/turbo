@@ -168,8 +168,7 @@ namespace turbo::raw_log_internal {
                                          const char *file, int line,
                                          const std::string &message);
 
-    TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES TURBO_DLL extern base_internal::AtomicHook<
-            InternalLogFunction>
+    TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES TURBO_DLL extern base_internal::AtomicHook<InternalLogFunction>
             internal_log_function;
 
     // Registers hooks of the above types.  Only a single hook of each type may be

@@ -71,7 +71,7 @@ namespace turbo {
 
     }  // namespace
 
-    std::string Time::to_string(std::string_view format,turbo::TimeZone tz) const {
+    std::string Time::to_string(std::string_view format, turbo::TimeZone tz) const {
         if (*this == turbo::Time::infinite_future()) return std::string(kInfiniteFutureStr);
         if (*this == turbo::Time::infinite_past()) return std::string(kInfinitePastStr);
         const auto parts = Split(*this);
@@ -79,22 +79,22 @@ namespace turbo {
                                     cctz::time_zone(tz));
     }
 
-    std::string Time::to_string(turbo::TimeZone tz) const{
+    std::string Time::to_string(turbo::TimeZone tz) const {
         return to_string(RFC3339_full, tz);
     }
 
-    std::string Time::to_string() const{
+    std::string Time::to_string() const {
         return to_string(RFC3339_full, turbo::local_time_zone());
     }
 
-    bool Time::parse_time(std::string_view format, std::string_view input,std::string *err) {
+    bool Time::parse_time(std::string_view format, std::string_view input, std::string *err) {
         return parse_time(format, input, turbo::utc_time_zone(), err);
     }
 
     // If the input string does not contain an explicit UTC offset, interpret
     // the fields with respect to the given TimeZone.
     bool Time::parse_time(std::string_view format, std::string_view input,
-                   turbo::TimeZone tz, std::string *err) {
+                          turbo::TimeZone tz, std::string *err) {
         auto strip_leading_space = [](std::string_view *sv) {
             while (!sv->empty()) {
                 if (!std::isspace(sv->front())) return;
@@ -138,4 +138,12 @@ namespace turbo {
         return b;
     }
 
+    // Functions required to support turbo::Time flags.
+    bool turbo_parse_flag(std::string_view text, turbo::Time *t, std::string *error) {
+        return t->parse_time(RFC3339_full, text, turbo::utc_time_zone(), error);
+    }
+
+    std::string turbo_unparse_flag(turbo::Time t) {
+        return t.to_string(RFC3339_full, turbo::utc_time_zone());
+    }
 }  // namespace turbo

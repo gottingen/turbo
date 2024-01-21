@@ -20,7 +20,9 @@
 #define TURBO_FIBER_INTERNAL_TYPES_H_
 
 #include <cstdint>
-#include "turbo/log/logging.h"
+#include <mutex>
+#include <ostream>
+#include <functional>
 
 namespace turbo::fiber_internal {
     typedef uint64_t fiber_id_t;

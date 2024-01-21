@@ -107,12 +107,7 @@
 //
 // The `defined(TURBO_LTS_RELEASE_VERSION)` part of the check excludes
 // live-at-head clients from the minimum version assertion.
-//
-// See https://abseil.io/about/releases for more information on Turbo release
-// management.
-//
 // LTS releases can be obtained from
-// https://github.com/abseil/abseil-cpp/releases.
 #undef TURBO_LTS_RELEASE_VERSION
 #undef TURBO_LTS_RELEASE_PATCH_LEVEL
 
@@ -225,6 +220,21 @@
 #define TURBO_HAVE_HWADDRESS_SANITIZER 1
 #elif TURBO_HAVE_FEATURE(hwaddress_sanitizer)
 #define TURBO_HAVE_HWADDRESS_SANITIZER 1
+#endif
+
+// `TURBO_INTERNAL_HAS_RTTI` determines whether turbo is being compiled with
+// RTTI support.
+#ifdef TURBO_INTERNAL_HAS_RTTI
+#error TURBO_INTERNAL_HAS_RTTI cannot be directly set
+#elif TURBO_HAVE_FEATURE(cxx_rtti)
+#define TURBO_INTERNAL_HAS_RTTI 1
+#elif defined(__GNUC__) && defined(__GXX_RTTI)
+#define TURBO_INTERNAL_HAS_RTTI 1
+#elif defined(_MSC_VER) && defined(_CPPRTTI)
+#define TURBO_INTERNAL_HAS_RTTI 1
+#elif !defined(__GNUC__) && !defined(_MSC_VER)
+// Unknown compiler, default to RTTI
+#define TURBO_INTERNAL_HAS_RTTI 1
 #endif
 
 // TURBO_HAVE_LEAK_SANITIZER

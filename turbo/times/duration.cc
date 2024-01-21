@@ -763,4 +763,9 @@ namespace turbo {
         return true;
     }
 
+
+    bool turbo_parse_flag(std::string_view text, Duration* dst, std::string*) {
+        return dst->parse_duration(text);
+    }
+    std::string turbo_unparse_flag(Duration d) { return d.to_string(); }
 }  // namespace turbo

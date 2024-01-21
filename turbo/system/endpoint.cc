@@ -40,6 +40,10 @@ namespace turbo {
         }
     }
 
+    void EndPoint::set(int port) {
+        _port = port;
+    }
+
     void EndPoint::reset(void) {
         if (ExtendedEndPoint::is_extended(*this)) {
             ExtendedEndPoint *eep = ExtendedEndPoint::address(*this);
@@ -531,5 +535,44 @@ namespace turbo {
     }
 
 
+    // turbo_parse_flag()
+    //
+    // Parses a command-line flag string representation `text` into a Duration
+    // value. EndPoint flags must be specified in a format that is valid input for
+    // `turbo::ParseDuration()`.
+    bool turbo_parse_flag(std::string_view text, EndPoint *dst, std::string *error) {
+        std::string str(text);
+        // avoid parse error when text is not null-terminated
+        return dst->parse(str.c_str());
+    }
+
+
+    // turbo_unparse_flag()
+    //
+    // Unparses a EndPoint value into a command-line string representation using
+    // the format specified by `turbo::ParseDuration()`.
+    std::string turbo_unparse_flag(EndPoint d) {
+        return d.to_str().c_str();
+    }
+
+    // turbo_parse_flag()
+    //
+    // Parses a command-line flag string representation `text` into a Duration
+    // value. IPAddr flags must be specified in a format that is valid input for
+    // `turbo::ParseDuration()`.
+    bool turbo_parse_flag(std::string_view text, IPAddr *dst, std::string *error) {
+        std::string str(text);
+        // avoid parse error when text is not null-terminated
+        return dst->parse(str.c_str());
+    }
+
+
+    // turbo_unparse_flag()
+    //
+    // Unparses a IPAddr value into a command-line string representation using
+    // the format specified by `turbo::ParseDuration()`.
+    std::string turbo_unparse_flag(IPAddr d) {
+        return d.to_str().c_str();
+    }
 }  // namespace turbo
 

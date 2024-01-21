@@ -14,6 +14,7 @@
 //
 
 #include "turbo/event/internal/common_timer.h"
+#include "turbo/base/internal/raw_logging.h"
 
 namespace turbo {
 
@@ -32,15 +33,15 @@ namespace turbo {
         return turbo::ok_status();
     }
 
-    [[nodiscard]] TimerId CommonTimer::run_at(timer_task_fn_t&& fn, void *arg, const turbo::Time &abstime) {
+    [[nodiscard]] TimerId CommonTimer::run_at(timer_task_fn_t &&fn, void *arg, const turbo::Time &abstime) {
         return _timer_thread.schedule(std::move(fn), arg, abstime);
     }
 
-    [[nodiscard]] TimerId CommonTimer::run_after(timer_task_fn_t&& fn, void *arg, const turbo::Duration &du) {
+    [[nodiscard]] TimerId CommonTimer::run_after(timer_task_fn_t &&fn, void *arg, const turbo::Duration &du) {
         return _timer_thread.schedule(std::move(fn), arg, Time::time_now() + du);
     }
 
-    [[maybe_unused]] turbo::Status CommonTimer::cancel(TimerId id)  {
+    [[maybe_unused]] turbo::Status CommonTimer::cancel(TimerId id) {
         return _timer_thread.unschedule(id);
     }
 
@@ -63,12 +64,12 @@ namespace turbo {
         TimerfdInitializer() {
             common_timer_ptr = new CommonTimer();
             if (!common_timer_ptr) {
-                TLOG_CRITICAL("Fail to create timerfd {}", errno);
+                TURBO_RAW_LOG(FATAL, "Fail to create timerfd %d", errno);
                 return;
             }
             auto rs = common_timer_ptr->start(TimerOptions{});
             if (!rs.ok()) {
-                TLOG_CRITICAL("Fail to start timerfd {}", rs.to_string());
+                TURBO_RAW_LOG(FATAL, "Fail to start timerfd %s", rs.to_string().c_str());
                 delete common_timer_ptr;
                 common_timer_ptr = nullptr;
             }

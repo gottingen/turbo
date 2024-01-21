@@ -466,7 +466,7 @@ namespace turbo {
      *       bool ok = turbo::parse_civil_time("2018-01-02", &d); // OK
      *       @endcode
      *       Note that parsing will fail if the string's format does not match the
-     *       expected type exactly. `parse_lenient_Civil_time()` below is more lenient.
+     *       expected type exactly. `parse_lenient_civil_time()` below is more lenient.
      *
      */
     bool parse_civil_time(std::string_view s, CivilSecond *c);
@@ -510,45 +510,45 @@ namespace turbo {
      *      Example:
      *      @code
      *      turbo::CivilDay d;
-     *      bool ok = turbo::parse_lenient_Civil_time("1969-07-20", &d); // OK
-     *      ok = turbo::parse_lenient_Civil_time("1969-07-20T10", &d);   // OK: T10 floored
-     *      ok = turbo::parse_lenient_Civil_time("1969-07", &d);   // OK: day defaults to 1
+     *      bool ok = turbo::parse_lenient_civil_time("1969-07-20", &d); // OK
+     *      ok = turbo::parse_lenient_civil_time("1969-07-20T10", &d);   // OK: T10 floored
+     *      ok = turbo::parse_lenient_civil_time("1969-07", &d);   // OK: day defaults to 1
      *      @endcode
      * @param s The string to parse.
      * @param c The output parameter to store the parsed civil-time value.
      * @return `true` if the string was parsed successfully.
      */
-    bool parse_lenient_Civil_time(std::string_view s, CivilSecond *c);
+    bool parse_lenient_civil_time(std::string_view s, CivilSecond *c);
 
     /**
      * @ingroup turbo_times_civil_time
-     * @brief  overload for parse_lenient_Civil_time
+     * @brief  overload for parse_lenient_civil_time
      */
-    bool parse_lenient_Civil_time(std::string_view s, CivilMinute *c);
+    bool parse_lenient_civil_time(std::string_view s, CivilMinute *c);
 
     /**
      * @ingroup turbo_times_civil_time
-     * @brief  overload for parse_lenient_Civil_time
+     * @brief  overload for parse_lenient_civil_time
      */
-    bool parse_lenient_Civil_time(std::string_view s, CivilHour *c);
+    bool parse_lenient_civil_time(std::string_view s, CivilHour *c);
 
     /**
      * @ingroup turbo_times_civil_time
-     * @brief  overload for parse_lenient_Civil_time
+     * @brief  overload for parse_lenient_civil_time
      */
-    bool parse_lenient_Civil_time(std::string_view s, CivilDay *c);
+    bool parse_lenient_civil_time(std::string_view s, CivilDay *c);
 
     /**
      * @ingroup turbo_times_civil_time
-     * @brief  overload for parse_lenient_Civil_time
+     * @brief  overload for parse_lenient_civil_time
      */
-    bool parse_lenient_Civil_time(std::string_view s, CivilMonth *c);
+    bool parse_lenient_civil_time(std::string_view s, CivilMonth *c);
 
     /**
      * @ingroup turbo_times_civil_time
-     * @brief  overload for parse_lenient_Civil_time
+     * @brief  overload for parse_lenient_civil_time
      */
-    bool parse_lenient_Civil_time(std::string_view s, CivilYear *c);
+    bool parse_lenient_civil_time(std::string_view s, CivilYear *c);
 
     namespace time_internal {  // For functions found via ADL on civil-time tags.
 
@@ -577,6 +577,28 @@ namespace turbo {
 
     }  // namespace time_internal
 
+    // turbo_parse_flag()
+    //
+    // Parses the command-line flag string representation `s` into a civil-time
+    // value. Flags must be specified in a format that is valid for
+    // `turbo::parse_lenient_civil_time()`.
+    bool turbo_parse_flag(std::string_view s, CivilSecond* c, std::string* error);
+    bool turbo_parse_flag(std::string_view s, CivilMinute* c, std::string* error);
+    bool turbo_parse_flag(std::string_view s, CivilHour* c, std::string* error);
+    bool turbo_parse_flag(std::string_view s, CivilDay* c, std::string* error);
+    bool turbo_parse_flag(std::string_view s, CivilMonth* c, std::string* error);
+    bool turbo_parse_flag(std::string_view s, CivilYear* c, std::string* error);
+
+    // turbo_unparse_flag()
+    //
+    // Unparses a civil-time value into a command-line string representation using
+    // the format specified by `turbo::parse_civil_time()`.
+    std::string turbo_unparse_flag(CivilSecond c);
+    std::string turbo_unparse_flag(CivilMinute c);
+    std::string turbo_unparse_flag(CivilHour c);
+    std::string turbo_unparse_flag(CivilDay c);
+    std::string turbo_unparse_flag(CivilMonth c);
+    std::string turbo_unparse_flag(CivilYear c);
 }  // namespace turbo
 
 #endif  // TURBO_TIME_CIVIL_TIME_H_

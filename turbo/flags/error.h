@@ -109,7 +109,7 @@ namespace turbo {
             return IncorrectConstruction(name + ": Cannot set 0 expected, use a flag instead");
         }
 
-        static IncorrectConstruction SetFlag(std::string name) {
+        static IncorrectConstruction set_flag(std::string name) {
             return IncorrectConstruction(name + ": Cannot set an expected number for flags");
         }
 

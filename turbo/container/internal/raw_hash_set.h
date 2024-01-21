@@ -565,11 +565,6 @@ namespace turbo::container_internal {
 //                      four bits of each i8 lane in the second argument as
 //                      indices.
 
-// https://github.com/abseil/abseil-cpp/issues/209
-// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=87853
-// _mm_cmpgt_epi8 is broken under GCC with -funsigned-char
-// Work around this by using the portable implementation of Group
-// when using -funsigned-char under GCC.
     inline __m128i _mm_cmpgt_epi8_fixed(__m128i a, __m128i b) {
 #if defined(__GNUC__) && !defined(__clang__)
         if (std::is_unsigned<char>::value) {

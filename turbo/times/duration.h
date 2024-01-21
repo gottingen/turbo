@@ -54,13 +54,13 @@ namespace turbo {
 
         template<std::intmax_t N>
         constexpr Duration from_int64(int64_t v,
-                                     std::ratio<1, N>);
+                                      std::ratio<1, N>);
 
         constexpr Duration from_int64(int64_t v,
-                                     std::ratio<60>);
+                                      std::ratio<60>);
 
         constexpr Duration from_int64(int64_t v,
-                                     std::ratio<3600>);
+                                      std::ratio<3600>);
 
         template<typename T>
         using EnableIfIntegral = typename std::enable_if<
@@ -273,6 +273,7 @@ namespace turbo {
          * @return the quotient
          */
         constexpr double safe_float_mod(Duration den) const;
+
         /**
          * @ingroup turbo_times_duration
          * @brief Truncates a duration (toward zero) to a multiple of a non-zero unit.
@@ -316,6 +317,7 @@ namespace turbo {
          * @return
          */
         Duration ceil(Duration unit) const;
+
         /**
          * @ingroup turbo_times_duration
          * @brief Returns the nearest integral mod of a duration using the passed duration
@@ -355,7 +357,7 @@ namespace turbo {
      * @param d
      * @return
      */
-     bool parse_duration(std::string_view dur_string);
+        bool parse_duration(std::string_view dur_string);
 
     public:
         /////// creators ///////
@@ -448,6 +450,7 @@ namespace turbo {
         static constexpr Duration zero();
 
         constexpr Duration abs() const;
+
     private:
         template<typename Ratio>
         constexpr int64_t to_int64(Ratio) const;
@@ -678,7 +681,7 @@ namespace turbo {
     }
 
     constexpr timespec Duration::to_timespec() const {
-        timespec ts{0,0};
+        timespec ts{0, 0};
         if (!is_infinite()) {
             int64_t rep_hi = rep_hi_;
             uint32_t rep_lo = rep_lo_;
@@ -828,15 +831,15 @@ namespace turbo {
     }
 
     // Fastpath implementations for the 6 common duration units.
-    constexpr int64_t Duration::to_int64(std::nano) const{
+    constexpr int64_t Duration::to_int64(std::nano) const {
         return to_nanoseconds();
     }
 
-    constexpr int64_t Duration::to_int64(std::micro) const{
+    constexpr int64_t Duration::to_int64(std::micro) const {
         return to_microseconds();
     }
 
-    constexpr int64_t Duration::to_int64(std::milli) const{
+    constexpr int64_t Duration::to_int64(std::milli) const {
         return to_milliseconds();
     }
 
@@ -896,7 +899,7 @@ namespace turbo {
         return rep_hi_ < 0
                ? time_internal::MakeDuration((std::numeric_limits<int64_t>::max)(), ~uint32_t{0})
                : time_internal::MakeDuration((std::numeric_limits<int64_t>::min)(),
-                              ~uint32_t{0});
+                                             ~uint32_t{0});
     }
 
 
@@ -955,7 +958,7 @@ namespace turbo {
 
         template<std::intmax_t N>
         constexpr Duration from_int64(int64_t v,
-                                     std::ratio<1, N>) {
+                                      std::ratio<1, N>) {
             static_assert(0 < N && N <= 1000000000, "Unsupported ratio");
             // Subsecond ratios cannot overflow.
             return MakeNormalizedDuration(
@@ -963,7 +966,7 @@ namespace turbo {
         }
 
         constexpr Duration from_int64(int64_t v,
-                                     std::ratio<60>) {
+                                      std::ratio<60>) {
             return (v <= (std::numeric_limits<int64_t>::max)() / 60 &&
                     v >= (std::numeric_limits<int64_t>::min)() / 60)
                    ? MakeDuration(v * 60)
@@ -971,7 +974,7 @@ namespace turbo {
         }
 
         constexpr Duration from_int64(int64_t v,
-                                     std::ratio<3600>) {
+                                      std::ratio<3600>) {
             return (v <= (std::numeric_limits<int64_t>::max)() / 3600 &&
                     v >= (std::numeric_limits<int64_t>::min)() / 3600)
                    ? MakeDuration(v * 3600)
@@ -1129,6 +1132,20 @@ namespace turbo {
             return d.to_minutes<double>();
         }
     };
+
+    // turbo_parse_flag()
+    //
+    // Parses a command-line flag string representation `text` into a Duration
+    // value. Duration flags must be specified in a format that is valid input for
+    // `turbo::ParseDuration()`.
+    bool turbo_parse_flag(std::string_view text, Duration *dst, std::string *error);
+
+
+    // turbo_unparse_flag()
+    //
+    // Unparses a Duration value into a command-line string representation using
+    // the format specified by `turbo::ParseDuration()`.
+    std::string turbo_unparse_flag(Duration d);
 
 }  // namespace turbo
 
