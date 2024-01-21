@@ -44,3 +44,4 @@ bazel-*
 .clwb
 carbin
 docs/xml
+.vscode
