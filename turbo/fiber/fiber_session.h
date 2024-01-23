@@ -32,6 +32,8 @@ namespace turbo {
     using turbo::fiber_internal::session_on_error_msg;
     using turbo::fiber_internal::fiber_mutex_t;
 
+    static constexpr fiber_session_t INVALID_FIBER_SESSION = {0};
+
 
     inline int fiber_session_create(fiber_session_t *session) {
         return turbo::fiber_internal::fiber_session_create(session, nullptr, nullptr);
