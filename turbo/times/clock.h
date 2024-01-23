@@ -96,6 +96,10 @@ namespace turbo {
         return Time::time_now() + Duration::from_timespec(ts);
     }
 
+    inline turbo::Time from_now(Duration d) {
+        return Time::time_now() + d;
+    }
+
     inline turbo::Time from_now(timeval tv) {
         return Time::time_now() + Duration::from_timeval(tv);
     }

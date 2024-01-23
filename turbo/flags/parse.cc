@@ -72,9 +72,9 @@ namespace turbo {
             TURBO_CONST_INIT std::vector<const CommandLineFlag *> *specified_flags
                     TURBO_GUARDED_BY(specified_flags_guard) = nullptr;
 
-// Suggesting at most kMaxHints flags in case of misspellings.
+            // Suggesting at most kMaxHints flags in case of misspellings.
             TURBO_CONST_INIT const size_t kMaxHints = 100;
-// Suggesting only flags which have a smaller distance than kMaxDistance.
+            // Suggesting only flags which have a smaller distance than kMaxDistance.
             TURBO_CONST_INIT const size_t kMaxDistance = 3;
 
             struct SpecifiedFlagsCompare {
@@ -100,7 +100,7 @@ namespace turbo {
 // to be set on the command line.  Avoid reading or setting them from C++ code.
 TURBO_FLAG(std::vector<std::string>, flagfile, {},
           "comma-separated list of files to load flags from")
-.OnUpdate([]() {
+.on_update([]() {
     if (turbo::get_flag(FLAGS_flagfile).empty()) return;
 
     std::unique_lock l(turbo::flags_internal::processing_checks_guard);
@@ -116,7 +116,7 @@ TURBO_FLAG(std::vector<std::string>, flagfile, {},
 TURBO_FLAG(std::vector<std::string>, fromenv, {},
           "comma-separated list of flags to set from the environment"
           " [use 'export FLAGS_flag1=value']")
-.OnUpdate([]() {
+.on_update([]() {
     if (turbo::get_flag(FLAGS_fromenv).empty()) return;
 
     std::unique_lock l(turbo::flags_internal::processing_checks_guard);
@@ -132,7 +132,7 @@ TURBO_FLAG(std::vector<std::string>, fromenv, {},
 TURBO_FLAG(std::vector<std::string>, tryfromenv, {},
           "comma-separated list of flags to try to set from the environment if "
           "present")
-.OnUpdate([]() {
+.on_update([]() {
     if (turbo::get_flag(FLAGS_tryfromenv).empty()) return;
 
     std::unique_lock l(turbo::flags_internal::processing_checks_guard);

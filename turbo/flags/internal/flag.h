@@ -666,9 +666,9 @@ namespace turbo {
             alignas(std::shared_mutex) mutable char data_guard_[sizeof(std::shared_mutex)];
         };
 
-///////////////////////////////////////////////////////////////////////////////
-// The Flag object parameterized by the flag's value type. This class implements
-// flag reflection handle interface.
+        ///////////////////////////////////////////////////////////////////////////////
+        // The Flag object parameterized by the flag's value type. This class implements
+        // flag reflection handle interface.
 
         template<typename T>
         class Flag {
@@ -818,7 +818,7 @@ namespace turbo {
         ///////////////////////////////////////////////////////////////////////////////
         // This class facilitates Flag object registration and tail expression-based
         // flag definition, for example:
-        // TURBO_FLAG(int, foo, 42, "Foo help").OnUpdate(NotifyFooWatcher);
+        // TURBO_FLAG(int, foo, 42, "Foo help").on_update(NotifyFooWatcher);
         struct FlagRegistrarEmpty {
         };
 
@@ -830,7 +830,7 @@ namespace turbo {
                     flags_internal::RegisterCommandLineFlag(flag_.impl_, filename);
             }
 
-            FlagRegistrar OnUpdate(FlagCallbackFunc cb) &&{
+            FlagRegistrar on_update(FlagCallbackFunc cb) &&{
                 flag_.impl_.SetCallback(cb);
                 return *this;
             }

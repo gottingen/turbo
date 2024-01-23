@@ -1,5 +1,5 @@
-// Copyright 2023 The Elastic-AI Authors.
-// part of Elastic AI Search
+// Copyright 2023 The Turbo Authors.
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -12,32 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//
-// Created by jeff on 24-1-20.
-//
 
-#include "turbo/profiling/internal/sampler.h"
-#include "turbo/profiling/internal/reducer.h"
-#include "turbo/status/status.h"
-#include "turbo/system/threading.h"
+#include "turbo/var/reducer.h"
+#include "turbo/var/internal/sampler.h"
+#include "turbo/var/passive_status.h"
+#include "turbo/var/window.h"
+#include "turbo/times/time.h"
+#include "turbo/flags/flag.h"
 
-namespace turbo::profiling_internal {
+TURBO_FLAG(turbo::Duration , var_sampler_thread_start_delay, turbo::Duration::milliseconds(10), "var sampler thread start delay us");
+TURBO_FLAG(bool, var_enable_sampling, true, "is enable var sampling");
 
+namespace turbo::var_internal {
 
     const int WARN_NOSLEEP_THRESHOLD = 2;
 
-        // Combine two circular linked list into one.
     struct CombineSampler {
-        void operator()(Sampler* & s1, Sampler* s2) const {
-            if (s2 == NULL) {
+        void operator()(Sampler *&s1, Sampler *s2) const {
+            if (s2 == nullptr) {
                 return;
             }
-            if (s1 == NULL) {
+            if (s1 == nullptr) {
                 s1 = s2;
                 return;
             }
-
-            s1->InsertBeforeAsList(s2);
+            s1->insert_before_as_list(s2);
         }
     };
 
@@ -56,26 +55,24 @@ namespace turbo::profiling_internal {
     // list of Samplers. Waking through the list and call take_sample().
     // If a Sampler needs to be deleted, we just mark it as unused and the
     // deletion is taken place in the thread as well.
-    class SamplerCollector : public Reducer<Sampler*, CombineSampler, CombineSampler> {
+    class SamplerCollector : public turbo::Reducer<Sampler*, CombineSampler> {
     public:
+        SamplerCollector()
+                : _created(false), _stop(false), _cumulated_time_us(0) {
+            create_sampling_thread();
+        }
+
+        ~SamplerCollector() {
+            if (_created) {
+                _stop = true;
+                pthread_join(_tid, nullptr);
+                _created = false;
+            }
+        }
 
         static SamplerCollector *get_instance() {
             static SamplerCollector instance;
             return &instance;
-        }
-
-        SamplerCollector()
-                : _created(false)
-                , _stop(false)
-                , _cumulated_time_us() {
-            create_sampling_thread();
-        }
-        ~SamplerCollector() {
-            if (_created) {
-                _stop = true;
-                pthread_join(_tid, NULL);
-                _created = false;
-            }
         }
 
     private:
@@ -87,18 +84,18 @@ namespace turbo::profiling_internal {
         // * A forked program can be forked again.
 
         static void child_callback_atfork() {
-            return SamplerCollector::get_instance()->after_forked_as_child();
+            SamplerCollector::get_instance()->after_forked_as_child();
         }
 
         void create_sampling_thread() {
-            const int rc = pthread_create(&_tid, NULL, sampling_thread, this);
+            const int rc = pthread_create(&_tid, nullptr, sampling_thread, this);
             if (rc != 0) {
-                TLOG_CRITICAL("Fail to create sampling_thread, %s", turbo::terror(rc));
+                TURBO_RAW_LOG(FATAL, "Fail to create sampling_thread, %s", terror(rc));
             } else {
                 _created = true;
                 if (!registered_atfork) {
                     registered_atfork = true;
-                    pthread_atfork(NULL, NULL, child_callback_atfork);
+                    pthread_atfork(nullptr, nullptr, child_callback_atfork);
                 }
             }
         }
@@ -110,32 +107,30 @@ namespace turbo::profiling_internal {
 
         void run();
 
-        static void* sampling_thread(void* arg) {
-            turbo::PlatformThread::set_name("bvar_sampler");
-            static_cast<SamplerCollector*>(arg)->run();
-            return NULL;
+        static void *sampling_thread(void *arg) {
+            PlatformThread::set_name("var_sampler");
+            static_cast<SamplerCollector *>(arg)->run();
+            return nullptr;
         }
 
-        static double get_cumulated_time(void* arg) {
-            return static_cast<SamplerCollector*>(arg)->_cumulated_time_us.to_seconds<double>();
+        static double get_cumulated_time(void *arg) {
+            return static_cast<SamplerCollector *>(arg)->_cumulated_time_us / 1000.0 / 1000.0;
         }
 
     private:
         bool _created;
         bool _stop;
-        turbo::Duration _cumulated_time_us;
+        int64_t _cumulated_time_us;
         pthread_t _tid;
     };
-
 #ifndef UNIT_TEST
-    static PassiveStatus<double>* s_cumulated_time_bvar = NULL;
-    static bvar::PerSecond<bvar::PassiveStatus<double> >* s_sampling_thread_usage_bvar = NULL;
+    static PassiveStatus<double> *s_cumulated_time_var = nullptr;
+    static turbo::PerSecond <turbo::PassiveStatus<double>> *s_sampling_thread_usage_bvar = nullptr;
 #endif
 
-    DEFINE_int32(bvar_sampler_thread_start_delay_us, 10000, "bvar sampler thread start delay us");
 
     void SamplerCollector::run() {
-        ::usleep(FLAGS_bvar_sampler_thread_start_delay_us);
+        turbo::sleep_for(get_flag(FLAGS_var_sampler_thread_start_delay));
 
 #ifndef UNIT_TEST
         // NOTE:
@@ -143,56 +138,57 @@ namespace turbo::profiling_internal {
         //   may be abandoned at any time after forking.
         // * They can't created inside the constructor of SamplerCollector as well,
         //   which results in deadlock.
-        if (s_cumulated_time_bvar == NULL) {
-            s_cumulated_time_bvar =
-                    new PassiveStatus<double>(get_cumulated_time, this);
+        if (s_cumulated_time_var == nullptr) {
+            s_cumulated_time_var =
+                    new turbo::PassiveStatus<double>(get_cumulated_time, this);
         }
-        if (s_sampling_thread_usage_bvar == NULL) {
+        if (s_sampling_thread_usage_bvar == nullptr) {
             s_sampling_thread_usage_bvar =
-                    new bvar::PerSecond<bvar::PassiveStatus<double> >(
-                            "bvar_sampler_collector_usage", s_cumulated_time_bvar, 10);
+                    new turbo::PerSecond <turbo::PassiveStatus<double>>(
+                            "var_sampler_collector_usage", s_cumulated_time_var, 10);
         }
 #endif
 
-        butil::LinkNode<Sampler> root;
+        turbo::intrusive_list_node root;
         int consecutive_nosleep = 0;
         while (!_stop) {
-            auto abstime = turbo::Time::time_now();
-            Sampler* s = this->reset();
+
+            int64_t abstime = turbo::get_current_time_micros();
+            Sampler *s = this->reset();
             if (s) {
-                s->InsertBeforeAsList(&root);
+                s->insert_before_as_list(&root);
             }
-            for (butil::LinkNode<Sampler>* p = root.next(); p != &root;) {
+            for (turbo::intrusive_list_node *p = root.next; p != &root;) {
                 // We may remove p from the list, save next first.
-                butil::LinkNode<Sampler>* saved_next = p->next();
-                Sampler* s = p->value();
-                s->_mutex.lock();
-                if (!s->_used) {
-                    s->_mutex.unlock();
-                    p->RemoveFromList();
-                    delete s;
+                turbo::intrusive_list_node *saved_next = p->next;
+                auto *ss = static_cast<Sampler*>(p);
+                ss->_mutex.lock();
+                if (!ss->_used) {
+                    ss->_mutex.unlock();
+                    ss->remove_from_list();
+                    delete ss;
                 } else {
-                    s->take_sample();
-                    s->_mutex.unlock();
+                    ss->take_sample();
+                    ss->_mutex.unlock();
                 }
                 p = saved_next;
             }
             bool slept = false;
-            auto now = turbo::Time::time_now();
+            int64_t now = turbo::get_current_time_micros();
             _cumulated_time_us += now - abstime;
-            abstime += turbo::Duration::microseconds(1000000L);
+            abstime += 1000000L;
             while (abstime > now) {
-                turbo::sleep_for(abstime - now);
+                ::usleep(abstime - now);
                 slept = true;
-                now =  turbo::Time::time_now();
+                now = turbo::get_current_time_micros();
             }
             if (slept) {
                 consecutive_nosleep = 0;
             } else {
                 if (++consecutive_nosleep >= WARN_NOSLEEP_THRESHOLD) {
                     consecutive_nosleep = 0;
-                    TLOG_WARN("bvar is busy at sampling for %d seconds!",
-                              WARN_NOSLEEP_THRESHOLD);
+                    TURBO_RAW_LOG(WARNING, "var is busy at sampling for %d seconds!",
+                                  WARN_NOSLEEP_THRESHOLD);
                 }
             }
         }
@@ -202,8 +198,12 @@ namespace turbo::profiling_internal {
 
     Sampler::~Sampler() {}
 
+
+
     void Sampler::schedule() {
-        (*SamplerCollector::get_instance())<<this;
+        if (get_flag(FLAGS_var_enable_sampling)) {
+            (*SamplerCollector::get_instance())<< this;
+        }
     }
 
     void Sampler::destroy() {
@@ -212,5 +212,4 @@ namespace turbo::profiling_internal {
         _mutex.unlock();
     }
 
-
-}  // namespace turbo::profiling_internal
+}  // namespace namespace turbo::var_internal

@@ -140,8 +140,8 @@ set(TURBO_ALL_SRC
         "platform/internal/low_level_alloc.cc"
         "profiling/internal/exponential_biased.cc"
         "profiling/internal/periodic_sampler.cc"
-        "profiling/variable.cc"
-        "profiling/prometheus_dumper.cc"
+        #"profiling/variable.cc"
+        #"profiling/prometheus_dumper.cc"
         "random/discrete_distribution.cc"
         "random/gaussian_distribution.cc"
         "random/bytes.cc"
@@ -225,7 +225,12 @@ set(TURBO_ALL_SRC
         "unicode/codec/validate_utf8.cc"
         "unicode/codec/validate_utf16.cc"
         "unicode/codec/validate_utf32.cc"
-   #     "var/variable.cc"
+        "var/variable.cc"
+        "var/collector.cc"
+        "var/flag_variable.cc"
+        "var/latency_recorder.cc"
+        "var/internal/sampler.cc"
+        "var/internal/percentile.cc"
         )
 
 if (BUILD_STATIC_LIBRARY)

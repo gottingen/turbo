@@ -152,11 +152,11 @@ namespace turbo {
 #define TURBO_FLAG(Type, name, default_value, help) \
   TURBO_FLAG_IMPL(Type, name, default_value, help)
 
-// TURBO_FLAG().OnUpdate()
+// TURBO_FLAG().on_update()
 //
 // Defines a flag of type `T` with a callback attached:
 //
-//   TURBO_FLAG(T, name, default_value, help).OnUpdate(callback);
+//   TURBO_FLAG(T, name, default_value, help).on_update(callback);
 //
 // `callback` should be convertible to `void (*)()`.
 //
@@ -171,7 +171,7 @@ namespace turbo {
 // that eventually the flag value and the derived data structure will be
 // consistent.
 //
-// Note: TURBO_FLAG.OnUpdate() does not have a public definition. Hence, this
+// Note: TURBO_FLAG.on_update() does not have a public definition. Hence, this
 // comment serves as its API documentation.
 
 // -----------------------------------------------------------------------------

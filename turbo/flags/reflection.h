@@ -45,6 +45,10 @@ namespace turbo {
     // name to a flag reflection handle.
     turbo::flat_hash_map<std::string_view, turbo::CommandLineFlag *> get_all_flags();
 
+    bool set_command_line_flag(std::string_view name, std::string_view value);
+
+    std::string_view get_command_line_flag(std::string_view name);
+
     //------------------------------------------------------------------------------
     // FlagSaver
     //------------------------------------------------------------------------------

@@ -1067,22 +1067,22 @@ namespace turbo {
 
     } // namespace turbo::detail
 
-// Checks is nameof_type supported compiler.
+    // Checks is nameof_type supported compiler.
     inline constexpr bool is_nameof_type_supported = detail::nameof_type_supported<void>::value;
 
-// Checks is nameof_type_rtti supported compiler.
+    // Checks is nameof_type_rtti supported compiler.
     inline constexpr bool is_nameof_type_rtti_supported = detail::nameof_type_rtti_supported<void>::value;
 
-// Checks is nameof_member supported compiler.
+    // Checks is nameof_member supported compiler.
     inline constexpr bool is_nameof_member_supported = detail::nameof_member_supported<void>::value;
 
-// Checks is nameof_pointer supported compiler.
+    // Checks is nameof_pointer supported compiler.
     inline constexpr bool is_nameof_pointer_supported = detail::nameof_pointer_supported<void>::value;
 
-// Checks is nameof_enum supported compiler.
+    // Checks is nameof_enum supported compiler.
     inline constexpr bool is_nameof_enum_supported = detail::nameof_enum_supported<void>::value;
 
-// Obtains name of enum variable.
+    // Obtains name of enum variable.
     template<typename E>
     [[nodiscard]] constexpr auto nameof_enum(E value) noexcept -> detail::enable_if_enum_t<E, string_view> {
         using D = std::decay_t<E>;

@@ -335,7 +335,7 @@ namespace turbo {
         delete impl_;
     }
 
-// --------------------------------------------------------------------
+    // --------------------------------------------------------------------
 
     CommandLineFlag *find_command_line_flag(std::string_view name) {
         if (name.empty()) return nullptr;
@@ -344,7 +344,7 @@ namespace turbo {
         return registry.FindFlag(name);
     }
 
-// --------------------------------------------------------------------
+    // --------------------------------------------------------------------
 
     turbo::flat_hash_map<std::string_view, turbo::CommandLineFlag *> get_all_flags() {
         turbo::flat_hash_map<std::string_view, turbo::CommandLineFlag *> res;
@@ -354,5 +354,19 @@ namespace turbo {
         return res;
     }
 
+    bool set_command_line_flag(std::string_view name, std::string_view value) {
+        if (name.empty()) return false;
+        auto *flag = find_command_line_flag(name);
+        if (flag == nullptr) return false;
+        std::string error;
+        return flag->parse_from(value, &error);
+    }
+
+    std::string_view get_command_line_flag(std::string_view name) {
+        if (name.empty()) return "";
+        auto *flag = find_command_line_flag(name);
+        if (flag == nullptr) return "";
+        return flag->current_value();
+    }
 
 }  // namespace turbo

@@ -129,7 +129,7 @@ TURBO_FLAG(float, test_flag_10, 1.234e12f, "");
 TURBO_FLAG(std::string, test_flag_11, "", "");
 TURBO_FLAG(turbo::Duration, test_flag_12, turbo::Duration::minutes(10), "");
 static int counter = 0;
-TURBO_FLAG(int, test_flag_13, 200, "").OnUpdate([]() { counter++; });
+TURBO_FLAG(int, test_flag_13, 200, "").on_update([]() { counter++; });
 TURBO_FLAG(CustomUDT, test_flag_14, {}, "");
 
 namespace {

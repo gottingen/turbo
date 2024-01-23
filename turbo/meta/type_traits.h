@@ -177,6 +177,12 @@ namespace turbo {
   ((sizeof(__VA_ARGS__)), static_cast<std::type_info const*>(nullptr))
 #endif
 
+    template<typename T>
+    struct add_cr_non_integral {
+        typedef typename std::conditional<std::is_integral<T>::value, T,
+                typename std::add_lvalue_reference_t<typename std::add_const_t<T>>>::type type;
+    };
+
     //  type_info_of
     //
     //  Returns &typeid(T) if RTTI is available, nullptr otherwise.

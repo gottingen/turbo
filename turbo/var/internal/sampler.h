@@ -1,5 +1,5 @@
-// Copyright 2023 The Elastic-AI Authors.
-// part of Elastic AI Search
+// Copyright 2023 The Turbo Authors.
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -13,28 +13,28 @@
 // limitations under the License.
 //
 
-#ifndef TURBO_PROFILING_INTERNAL_SAMPLER_H_
-#define TURBO_PROFILING_INTERNAL_SAMPLER_H_
+#ifndef  TURBO_VAR_INTERNAL_SAMPLER_H_
+#define  TURBO_VAR_INTERNAL_SAMPLER_H_
 
 #include <vector>
-#include "turbo//container/intrusive_list.h"
-#include "turbo/log/logging.h"
-#include "turbo/container/bounded_queue.h"// BoundedQueue
-#include "turbo/meta/type_traits.h"
-#include "turbo/times/time.h"
+#include <mutex>
+#include <type_traits>
+#include "turbo/container/intrusive_list.h"
+#include "turbo/base/internal/raw_logging.h"
+#include "turbo/container/bounded_queue.h"
 #include "turbo/meta/reflect.h"
+#include "turbo/times/clock.h"
 
-namespace turbo::profiling_internal {
-
+namespace turbo::var_internal {
 
     template<typename T>
     struct Sample {
         T data;
-        turbo::Time time_us;
+        int64_t time_us;
 
-        Sample() : data(), time_us() {}
+        Sample() : data(), time_us(0) {}
 
-        Sample(const T &data2, turbo::Time time2) : data(data2), time_us(time2) {}
+        Sample(const T &data2, int64_t time2) : data(data2), time_us(time2) {}
     };
 
     class Sampler : public turbo::intrusive_list_node {
@@ -63,23 +63,14 @@ namespace turbo::profiling_internal {
         std::mutex _mutex;
     };
 
-    // Representing a non-existing operator so that we can test
-    // is_same<Op, VoidOp>::value to write code for different branches.
-    // The false branch should be removed by compiler at compile-time.
     struct VoidOp {
         template<typename T>
         T operator()(const T &, const T &) const {
-            TLOG_CHECK(false, "This function should never be called, abort");
+            TURBO_RAW_LOG(FATAL, "This function should never be called, abort");
             abort();
         }
     };
 
-    // The sampler for reducer-alike variables.
-    // The R should have following methods:
-    //  - T reset();
-    //  - T get_value();
-    //  - Op op();
-    //  - InvOp inv_op();
     template<typename R, typename T, typename Op, typename InvOp>
     class ReducerSampler : public Sampler {
     public:
@@ -103,11 +94,12 @@ namespace turbo::profiling_internal {
                 const size_t new_cap =
                         std::max(_q.capacity() * 2, (size_t) _window_size + 1);
                 const size_t memsize = sizeof(Sample<T>) * new_cap;
-                void *mem = malloc(memsize);
-                if (NULL == mem) {
+                void *mem = ::malloc(memsize);
+                if (nullptr == mem) {
                     return;
                 }
-                turbo::bounded_queue<Sample<T> > new_q(mem, memsize, turbo::OWNS_STORAGE);
+                turbo::bounded_queue<Sample<T> > new_q(
+                        mem, memsize, turbo::OWNS_STORAGE);
                 Sample<T> tmp;
                 while (_q.pop(&tmp)) {
                     new_q.push(tmp);
@@ -131,32 +123,33 @@ namespace turbo::profiling_internal {
                 // get_value() of _reducer can still be called.
                 latest.data = _reducer->get_value();
             }
-            latest.time_us = turbo::Time::time_now();
+            latest.time_us = turbo::get_current_time_micros();
             _q.elim_push(latest);
         }
 
         bool get_value(time_t window_size, Sample<T> *result) {
             if (window_size <= 0) {
-                TLOG_CRITICAL("Invalid window_size=%ld", window_size);
+                TURBO_RAW_LOG(FATAL, "Invalid window_size=%ld", window_size);
                 return false;
             }
-            BAIDU_SCOPED_LOCK(_mutex);
+            std::unique_lock l(_mutex);
             if (_q.size() <= 1UL) {
                 // We need more samples to get reasonable result.
+                TURBO_RAW_LOG(WARNING, "Not enough samples, size=%ld", _q.size());
                 return false;
             }
             Sample<T> *oldest = _q.bottom(window_size);
-            if (NULL == oldest) {
+            if (nullptr == oldest) {
                 oldest = _q.top();
             }
             Sample<T> *latest = _q.bottom();
-            DCHECK(latest != oldest);
             if (std::is_same<InvOp, VoidOp>::value) {
                 // No inverse op. Sum up all samples within the window.
                 result->data = latest->data;
                 for (int i = 1; true; ++i) {
                     Sample<T> *e = _q.bottom(i);
                     if (e == oldest) {
+                        TURBO_RAW_LOG(INFO, "ReducerSampler loop i=%d",i);
                         break;
                     }
                     _reducer->op()(result->data, e->data);
@@ -173,10 +166,10 @@ namespace turbo::profiling_internal {
         // Change the time window which can only go larger.
         int set_window_size(time_t window_size) {
             if (window_size <= 0 || window_size > MAX_SECONDS_LIMIT) {
-                TLOG_ERROR("Invalid window_size={}", window_size);
+                TURBO_RAW_LOG(ERROR, "Invalid window_size=%ld", window_size);
                 return -1;
             }
-            BAIDU_SCOPED_LOCK(_mutex);
+            std::unique_lock l(_mutex);
             if (window_size > _window_size) {
                 _window_size = window_size;
             }
@@ -185,16 +178,16 @@ namespace turbo::profiling_internal {
 
         void get_samples(std::vector<T> *samples, time_t window_size) {
             if (window_size <= 0) {
-                TLOG_CRITICAL("Invalid window_size={} ", window_size);
+                TURBO_RAW_LOG(FATAL, "Invalid window_size=%ld", window_size);
                 return;
             }
-            BAIDU_SCOPED_LOCK(_mutex);
+            std::unique_lock l(_mutex);
             if (_q.size() <= 1) {
                 // We need more samples to get reasonable result.
                 return;
             }
             Sample<T> *oldest = _q.bottom(window_size);
-            if (NULL == oldest) {
+            if (nullptr == oldest) {
                 oldest = _q.top();
             }
             for (int i = 1; true; ++i) {
@@ -209,9 +202,9 @@ namespace turbo::profiling_internal {
     private:
         R *_reducer;
         time_t _window_size;
-        turbo::bounded_queue<Sample<T>> _q;
+        turbo::bounded_queue<Sample<T> > _q;
     };
 
-}  // namespace turbo::profiling_internal
+}  // namespace turbo::var_internal
 
-#endif // TURBO_PROFILING_INTERNAL_SAMPLER_H_
+#endif  // TURBO_VAR_INTERNAL_SAMPLER_H_

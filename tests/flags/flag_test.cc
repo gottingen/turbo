@@ -187,7 +187,7 @@ bool TestConstructionFor(const turbo::Flag<T>& f1, turbo::Flag<T>& f2) {
   EXPECT_EQ(turbo::get_flag_reflection_handle(f1).filename(), "file");
 
   flags::FlagRegistrar<T, false>(TURBO_FLAG_IMPL_FLAG_PTR(f2), nullptr)
-      .OnUpdate(TestCallback);
+      .on_update(TestCallback);
 
   EXPECT_EQ(turbo::get_flag_reflection_handle(f2).name(), "f2");
   EXPECT_EQ(turbo::get_flag_reflection_handle(f2).help(), "dynamic help");
@@ -734,9 +734,9 @@ void TestFlagCB();
 
 }  // namespace
 
-TURBO_FLAG(int, test_flag_with_cb, 100, "").OnUpdate(TestFlagCB);
+TURBO_FLAG(int, test_flag_with_cb, 100, "").on_update(TestFlagCB);
 
-TURBO_FLAG(int, test_flag_with_lambda_cb, 200, "").OnUpdate([]() {
+TURBO_FLAG(int, test_flag_with_lambda_cb, 200, "").on_update([]() {
   cb_test_value = turbo::get_flag(FLAGS_test_flag_with_lambda_cb) +
                   turbo::get_flag(FLAGS_test_flag_with_cb);
 });
