@@ -44,6 +44,10 @@ namespace turbo {
 
         bool is_valid() const;
 
+        void detach() {
+            _timer_id = INVALID_TIMER_ID;
+        }
+
         const turbo::Duration & duration() const { return _duration; }
 
         size_t repeat() const { return _repeat; }
