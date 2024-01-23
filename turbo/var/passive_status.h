@@ -165,12 +165,12 @@ namespace turbo {
         SeriesSampler *_series_sampler;
     };
 
-// ccover g++ may complain about ADDITIVE is undefined unless it's 
-// explicitly declared here.
+    // ccover g++ may complain about ADDITIVE is undefined unless it's
+    // explicitly declared here.
     template<typename Tp> const bool PassiveStatus<Tp>::ADDITIVE;
 
-// Specialize std::string for using std::ostream& as a more friendly
-// interface for user's callback.
+    // Specialize std::string for using std::ostream& as a more friendly
+    // interface for user's callback.
     template<>
     class PassiveStatus<std::string> : public Variable {
     public:
