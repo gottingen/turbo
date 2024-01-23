@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/profiling/internal/periodic_sampler.h"
+#include "turbo/var/internal/periodic_sampler.h"
 
 #include <thread>  // NOLINT(build/c++11)
 
@@ -20,7 +20,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-namespace turbo::profiling_internal {
+namespace turbo::var_internal {
     namespace {
 
         using testing::Eq;
@@ -174,4 +174,4 @@ namespace turbo::profiling_internal {
         }
 
     }  // namespace
-}  // namespace turbo::profiling_internal
+}  // namespace turbo::var_internal

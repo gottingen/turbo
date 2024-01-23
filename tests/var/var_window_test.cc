@@ -33,22 +33,22 @@ protected:
 
 TEST_F(WindowTest, window) {
     const int window_size = 2;
-    // test turbo::Adder
-    turbo::Adder<int> adder;
-    turbo::Window<turbo::Adder<int> > window_adder(&adder, window_size);
-    turbo::PerSecond<turbo::Adder<int> > per_second_adder(&adder, window_size);
-    turbo::WindowEx<turbo::Adder<int>, 2> window_ex_adder("window_ex_adder");
-    turbo::PerSecondEx<turbo::Adder<int>, window_size> per_second_ex_adder("per_second_ex_adder");
+    // test turbo::Counter
+    turbo::Counter<int> adder;
+    turbo::Window<turbo::Counter<int> > window_adder(&adder, window_size);
+    turbo::PerSecond<turbo::Counter<int> > per_second_adder(&adder, window_size);
+    turbo::WindowEx<turbo::Counter<int>, 2> window_ex_adder("window_ex_adder");
+    turbo::PerSecondEx<turbo::Counter<int>, window_size> per_second_ex_adder("per_second_ex_adder");
 
-    // test turbo::Maxer
-    turbo::Maxer<int> maxer;
-    turbo::Window<turbo::Maxer<int> > window_maxer(&maxer, window_size);
-    turbo::WindowEx<turbo::Maxer<int>, window_size> window_ex_maxer;
+    // test turbo::MaxerGauge
+    turbo::MaxerGauge<int> maxer;
+    turbo::Window<turbo::MaxerGauge<int> > window_maxer(&maxer, window_size);
+    turbo::WindowEx<turbo::MaxerGauge<int>, window_size> window_ex_maxer;
 
-    // test turbo::Miner
-    turbo::Miner<int> miner;
-    turbo::Window<turbo::Miner<int> > window_miner(&miner, window_size);
-    turbo::WindowEx<turbo::Miner<int>, window_size> window_ex_miner;
+    // test turbo::MinerGauge
+    turbo::MinerGauge<int> miner;
+    turbo::Window<turbo::MinerGauge<int> > window_miner(&miner, window_size);
+    turbo::WindowEx<turbo::MinerGauge<int>, window_size> window_ex_miner;
 
     // test turbo::IntRecorder
     turbo::IntRecorder recorder;

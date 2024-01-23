@@ -116,7 +116,7 @@ namespace turbo {
         //           _error.expose_as("foo_bar_apple_pie", "error");
         //       }
         //   private:
-        //       turbo::Adder<int> _error;
+        //       turbo::Counter<int> _error;
         //   };
         //   }  // foo
         //   }  // bar

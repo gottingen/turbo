@@ -17,9 +17,11 @@
 #ifndef  TURBO_VAR_VAR_H_
 #define  TURBO_VAR_VAR_H_
 
-#include "turbo/var/reducer.h"
 #include "turbo/var/recorder.h"
 #include "turbo/var/status.h"
+#include "turbo/var/miner_gauge.h"
+#include "turbo/var/maxer_gauge.h"
+#include "turbo/var/counter.h"
 #include "turbo/var/passive_status.h"
 #include "turbo/var/latency_recorder.h"
 #include "turbo/var/flag_variable.h"

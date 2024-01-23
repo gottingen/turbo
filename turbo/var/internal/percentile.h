@@ -24,7 +24,6 @@
 #include <math.h>                       // ceil
 #include <type_traits>
 #include "turbo/platform/port.h"
-#include "turbo/var/reducer.h"               // Reducer
 #include "turbo/var/window.h"                // Window
 #include "turbo/var/internal/combiner.h"       // AgentCombiner
 #include "turbo/var/internal/sampler.h"        // ReducerSampler

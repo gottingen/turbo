@@ -48,7 +48,7 @@
 #include "turbo/meta/utility.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/per_thread_tls.h"
-#include "turbo/profiling/internal/sample_recorder.h"
+#include "turbo/var/internal/sample_recorder.h"
 
 namespace turbo::container_internal {
     // Stores information about a sampled hashtable.  All mutations to this *must*

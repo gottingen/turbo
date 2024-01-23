@@ -28,7 +28,6 @@
 #include "turbo/meta/version.h"
 #include "turbo/module/version.h"
 #include "turbo/platform/version.h"
-#include "turbo/profiling/version.h"
 #include "turbo/random/version.h"
 #include "turbo/simd/version.h"
 #include "turbo/strings/version.h"
@@ -37,6 +36,7 @@
 #include "turbo/fiber/version.h"
 #include "turbo/taskflow/version.h"
 #include "turbo/system/version.h"
+#include "turbo/var/version.h"
 
 namespace turbo {
 
@@ -76,6 +76,7 @@ namespace turbo {
     static_assert(kMinCompatibleVersion <= fiber_version, "Turbo version is lower than fiber version");
     static_assert(kMinCompatibleVersion <= tf_version, "Turbo version is lower than tf version");
     static_assert(kMinCompatibleVersion <= sys_version, "Turbo version is lower than tf version");
+    static_assert(kMinCompatibleVersion <= var_version, "Turbo version is lower than var version");
 
     // turbo version is the most recent version of the library
     static_assert(version >= base_version, "Turbo version is lower than base version");
@@ -99,6 +100,7 @@ namespace turbo {
     static_assert(version >= files_version, "Turbo version is lower than fiber version");
     static_assert(version >= tf_version, "Turbo version is lower than taskflow version");
     static_assert(version >= sys_version, "Turbo version is lower than taskflow version");
+    static_assert(version >= var_version, "Turbo version is lower than var version");
 
 
 } // namespace turbo

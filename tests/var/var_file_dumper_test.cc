@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-#include "turbo/var/reducer.h"
+#include "turbo/var/counter.h"
 #include <gtest/gtest.h>
 #include <stdlib.h>
 #include "turbo/flags/reflection.h"
@@ -25,11 +25,11 @@ protected:
 };
 
 TEST_F(FileDumperTest, filters) {
-    turbo::Adder<int> a1("a_latency");
-    turbo::Adder<int> a2("a_qps");
-    turbo::Adder<int> a3("a_error");
-    turbo::Adder<int> a4("process_*");
-    turbo::Adder<int> a5("default");
+    turbo::Counter<int> a1("a_latency");
+    turbo::Counter<int> a2("a_qps");
+    turbo::Counter<int> a3("a_error");
+    turbo::Counter<int> a4("process_*");
+    turbo::Counter<int> a5("default");
     turbo::set_command_line_flag("var_dump_interval", "1");
     turbo::set_command_line_flag("var_dump", "true");
     sleep(2);

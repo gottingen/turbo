@@ -17,7 +17,6 @@
 #include <map>
 #include <gflags/gflags.h>
 #include "turbo/system/threading.h"
-#include "turbo/var/reducer.h"
 #include "turbo/var/passive_status.h"
 #include "turbo/var/collector.h"
 #include "turbo/flags/flag.h"

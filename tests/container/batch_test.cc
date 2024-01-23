@@ -15,7 +15,7 @@
 #define TURBO_OPTION_HARDENED 0
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "turbo/testing/test.h"
-#include "turbo/profiling/batch.h"
+#include "turbo/container/batch.h"
 
 
 TEST_CASE("batch printing") {

@@ -32,8 +32,6 @@
 #include "turbo/memory/resource_pool.h"                 // ResourcePool
 #include "turbo/concurrent/work_stealing_queue.h"        // WorkStealingQueue
 #include "turbo/fiber/internal/parking_lot.h"
-#include "turbo/profiling/counter.h"
-#include "turbo/profiling/unique_gauge.h"
 
 namespace turbo::fiber_internal {
 

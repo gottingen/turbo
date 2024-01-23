@@ -37,7 +37,7 @@ TEST(RecorderTest, test_complement) {
     TLOG_INFO("sizeof(LatencyRecorder)={} {} {} {} {} {}",
               sizeof(turbo::LatencyRecorder),
               sizeof(turbo::var_internal::Percentile),
-              sizeof(turbo::Maxer<int64_t>),
+              sizeof(turbo::MaxerGauge<int64_t>),
               sizeof(turbo::IntRecorder),
               sizeof(turbo::Window<turbo::IntRecorder>),
               sizeof(turbo::Window<turbo::var_internal::Percentile>));

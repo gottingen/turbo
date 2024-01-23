@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/profiling/internal/periodic_sampler.h"
+#include "turbo/var/internal/periodic_sampler.h"
 
 #include <atomic>
 
-#include "turbo/profiling/internal/exponential_biased.h"
-
-namespace turbo::profiling_internal {
+namespace turbo::var_internal {
 
     int64_t PeriodicSamplerBase::GetExponentialBiased(int period) noexcept {
         return rng_.GetStride(period);
@@ -46,5 +44,5 @@ namespace turbo::profiling_internal {
         return true;
     }
 
-}  // namespace turbo::profiling_internal
+}  // namespace turbo::var_internal
 

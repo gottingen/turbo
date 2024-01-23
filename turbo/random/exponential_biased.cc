@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/profiling/internal/exponential_biased.h"
-
+#include "turbo/random/exponential_biased.h"
 #include <stdint.h>
 
 #include <algorithm>
 #include <atomic>
 #include <cmath>
 #include <limits>
-
 #include "turbo/platform/port.h"
 
-namespace turbo::profiling_internal {
+namespace turbo {
 
     // The algorithm generates a random number between 0 and 1 and applies the
     // inverse cumulative distribution function for an exponential. Specifically:
@@ -85,4 +83,4 @@ namespace turbo::profiling_internal {
         initialized_ = true;
     }
 
-}  // namespace turbo::profiling_internal
+}  // namespace turbo

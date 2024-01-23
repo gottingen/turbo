@@ -20,7 +20,7 @@
 
 #include "turbo/concurrent/notification.h"
 #include "turbo/platform/port.h"
-#include "turbo/profiling/internal/sample_recorder.h"
+#include "turbo/var/internal/sample_recorder.h"
 #include "turbo/concurrent/internal/thread_pool.h"
 #include "turbo/times/clock.h"
 #include "turbo/times/time.h"

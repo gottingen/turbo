@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_PROFILING_INTERNAL_EXPONENTIAL_BIASED_H_
-#define TURBO_PROFILING_INTERNAL_EXPONENTIAL_BIASED_H_
+#ifndef TURBO_RANDOM_EXPONENTIAL_BIASED_H_
+#define TURBO_RANDOM_EXPONENTIAL_BIASED_H_
 
 #include <stdint.h>
 
 #include "turbo/platform/port.h"
 
-namespace turbo::profiling_internal {
+namespace turbo {
     // ExponentialBiased provides a small and fast random number generator for a
     // rounded exponential distribution. This generator manages very little state,
     // and imposes no synchronization overhead. This makes it useful in specialized
@@ -119,6 +119,6 @@ namespace turbo::profiling_internal {
         return (prng_mult * rnd + prng_add) & prng_mod_mask;
     }
 
-}  // namespace turbo::profiling_internal
+}  // namespace turbo
 
-#endif  // TURBO_PROFILING_INTERNAL_EXPONENTIAL_BIASED_H_
+#endif  // TURBO_RANDOM_EXPONENTIAL_BIASED_H_

@@ -17,7 +17,10 @@
 #define  TURBO_VAR_LATENCY_RECORDER_H_
 
 #include "turbo/var/recorder.h"
-#include "turbo/var/reducer.h"
+#include "turbo/var/operators.h"
+#include "turbo/var/maxer_gauge.h"
+#include "turbo/var/miner_gauge.h"
+#include "turbo/var/counter.h"
 #include "turbo/var/passive_status.h"
 #include "turbo/var/internal/percentile.h"
 
@@ -26,7 +29,7 @@ namespace turbo::var_internal {
     class Percentile;
 
     typedef Window<IntRecorder, SERIES_IN_SECOND> RecorderWindow;
-    typedef Window<Maxer<int64_t>, SERIES_IN_SECOND> MaxWindow;
+    typedef Window<MaxerGauge<int64_t>, SERIES_IN_SECOND> MaxWindow;
     typedef Window<Percentile, SERIES_IN_SECOND> PercentileWindow;
 
 
@@ -53,7 +56,7 @@ namespace turbo::var_internal {
 
     protected:
         IntRecorder _latency;
-        Maxer<int64_t> _max_latency;
+        MaxerGauge<int64_t> _max_latency;
         Percentile _latency_percentile;
 
         RecorderWindow _latency_window;

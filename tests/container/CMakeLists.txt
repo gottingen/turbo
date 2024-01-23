@@ -669,3 +669,12 @@ carbin_cc_test(
         ${CARBIN_DEPS_LINK}
         turbo::turbo
 )
+carbin_cc_test(
+        NAME container_batch_test
+        SOURCES
+        batch_test.cc
+        COPTS ${CARBIN_CXX_OPTIONS}
+        DEPS
+        ${CARBIN_DEPS_LINK}
+        turbo::turbo
+)

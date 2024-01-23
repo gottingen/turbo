@@ -18,7 +18,7 @@
 #define  TURBO_VAR_PASSIVE_STATUS_H_
 
 #include "turbo/var/variable.h"
-#include "turbo/var/reducer.h"
+#include "turbo/var/operators.h"
 
 namespace turbo {
 

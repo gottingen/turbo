@@ -13,20 +13,13 @@
 // limitations under the License.
 //
 
-#ifndef TURBO_PROFILING_VERSION_H_
-#define TURBO_PROFILING_VERSION_H_
+#ifndef TURBO_VAR_VERSION_H_
+#define TURBO_VAR_VERSION_H_
 
 #include "turbo/module/module_version.h"
 
-/**
- * @defgroup turbo_profiling_variable Turbo Profiling Counters
- * @defgroup turbo_profiling_counters Turbo Profiling Counters
- * @defgroup turbo_profiling_gauges Turbo Profiling Gauges
- * @defgroup turbo_profiling_histogram Turbo Profiling Histogram
- * @defgroup turbo_profiling_dumper Turbo Profiling Dumpers
- */
 namespace turbo {
 
-    static constexpr turbo::ModuleVersion profiling_version = turbo::ModuleVersion{0, 9, 39};
+    static constexpr turbo::ModuleVersion var_version = turbo::ModuleVersion{0, 9, 39};
 }  // namespace turbo
-#endif  // TURBO_PROFILING_VERSION_H_
+#endif  // TURBO_VAR_VERSION_H_

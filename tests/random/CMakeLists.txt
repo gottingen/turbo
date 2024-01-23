@@ -558,3 +558,15 @@ carbin_cc_test(
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
 )
+carbin_cc_test(
+        NAME
+        exponential_biased_test
+        SOURCES
+        "exponential_biased_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        turbo::turbo
+        ${GTEST_LIB}
+        ${GTEST_MAIN_LIB}
+)

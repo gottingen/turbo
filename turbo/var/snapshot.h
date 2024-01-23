@@ -16,8 +16,8 @@
 // Created by jeff on 23-12-20.
 //
 
-#ifndef TURBO_PROFILING_SNAPSHOT_H_
-#define TURBO_PROFILING_SNAPSHOT_H_
+#ifndef TURBO_VAR_SNAPSHOT_H_
+#define TURBO_VAR_SNAPSHOT_H_
 
 #include <variant>
 #include <string>
@@ -102,4 +102,4 @@ namespace turbo {
 
 }  // namespace turbo
 
-#endif  // TURBO_PROFILING_SNAPSHOT_H_
+#endif  // TURBO_VAR_SNAPSHOT_H_

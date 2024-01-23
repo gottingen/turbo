@@ -21,7 +21,7 @@
 #include <atomic>
 #include <type_traits>
 #include "turbo/var/variable.h"
-#include "turbo/var/reducer.h"
+#include "turbo/var/operators.h"
 
 TURBO_DECLARE_FLAG(bool, var_save_series);
 

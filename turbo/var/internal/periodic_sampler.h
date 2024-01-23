@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_PROFILING_INTERNAL_PERIODIC_SAMPLER_H_
-#define TURBO_PROFILING_INTERNAL_PERIODIC_SAMPLER_H_
+#ifndef TURBO_VAR_INTERNAL_PERIODIC_SAMPLER_H_
+#define TURBO_VAR_INTERNAL_PERIODIC_SAMPLER_H_
 
 #include <stdint.h>
 
 #include <atomic>
 
 #include "turbo/platform/port.h"
-#include "turbo/profiling/internal/exponential_biased.h"
+#include "turbo/random/exponential_biased.h"
 
-namespace turbo::profiling_internal {
+namespace turbo::var_internal {
 
     // PeriodicSamplerBase provides the basic period sampler implementation.
     //
@@ -150,7 +150,7 @@ namespace turbo::profiling_internal {
         //   ICC   x64 (OK) : https://gcc.godbolt.org/z/ptTNfD
         //   MSVC  x64 (OK) : https://gcc.godbolt.org/z/76j4-5
         uint64_t stride_ = 0;
-        turbo::profiling_internal::ExponentialBiased rng_;
+        turbo::ExponentialBiased rng_;
     };
 
     inline bool PeriodicSamplerBase::SubtleMaybeSample() noexcept {
@@ -205,6 +205,6 @@ namespace turbo::profiling_internal {
     template<typename Tag, int default_period>
     std::atomic<int> PeriodicSampler<Tag, default_period>::period_(default_period);
 
-}  // namespace turbo::profiling_internal
+}  // namespace turbo:var_internal
 
-#endif  // TURBO_PROFILING_INTERNAL_PERIODIC_SAMPLER_H_
+#endif  // TURBO_VAR_INTERNAL_PERIODIC_SAMPLER_H_

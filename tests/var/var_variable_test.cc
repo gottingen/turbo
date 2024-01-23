@@ -210,12 +210,12 @@ namespace {
         ASSERT_EQ(0, turbo::Variable::dump_exposed(&d, NULL));
         ASSERT_TRUE(d._list.empty());
 
-        turbo::Adder<int> v2("var2");
+        turbo::Counter<int> v2("var2");
         v2 << 2;
         turbo::StatusVar<int> v1("var1", 1);
         turbo::StatusVar<int> v1_2("var1", 12);
         turbo::StatusVar<int> v3("foo.bar.Apple", "var3", 3);
-        turbo::Adder<int> v4("foo.bar.BaNaNa", "var4");
+        turbo::Counter<int> v4("foo.bar.BaNaNa", "var4");
         v4 << 4;
         turbo::BasicPassiveStatus<int> v5(
                 "foo::bar::Car_Rot", "var5", print_int, NULL);

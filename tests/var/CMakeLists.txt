@@ -48,7 +48,7 @@ carbin_cc_test(
         NAME
         var_percentile_unittest
         SOURCES
-        "var_percentile_unittest.cc"
+        "var_percentile_test.cc"
         COPTS
         ${CARBIN_CXX_OPTIONS}
         "-fno-access-control"
@@ -96,7 +96,7 @@ carbin_cc_test(
         NAME
         var_window_unittest
         SOURCES
-        "var_window_unittest.cc"
+        "var_window_test.cc"
         COPTS
         ${CARBIN_CXX_OPTIONS}
         "-fno-access-control"
@@ -155,3 +155,18 @@ carbin_cc_test(
         ${GMOCK_LIB}
         ${GTEST_MAIN_LIB}
 )
+
+carbin_cc_test(
+        NAME
+        sample_recorder_test
+        SOURCES
+        "periodic_sampler_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        turbo::turbo
+        ${GTEST_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
+)
+

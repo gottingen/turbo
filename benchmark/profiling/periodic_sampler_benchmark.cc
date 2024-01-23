@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/profiling/internal/periodic_sampler.h"
+#include "turbo/var/internal/periodic_sampler.h"
 #include "benchmark/benchmark.h"
 
 namespace turbo {
