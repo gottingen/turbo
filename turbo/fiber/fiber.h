@@ -21,6 +21,13 @@
 
 #include "turbo/fiber/internal/types.h"
 #include "turbo/fiber/internal/fiber.h"
+#include "turbo/fiber/fiber_local.h"
+#include "turbo/fiber/fiber_cond.h"
+#include "turbo/fiber/fiber_mutex.h"
+#include "turbo/fiber/fiber_session.h"
+#include "turbo/fiber/timer.h"
+#include "turbo/fiber/wait_event.h"
+#include "turbo/fiber/runtime.h"
 #include "turbo/status/status.h"
 
 namespace turbo {
@@ -100,21 +107,10 @@ namespace turbo {
 
     bool fiber_stopped(fiber_id_t tid);
 
-    bool is_running_on_fiber();
-
-    bool is_running_on_pthread();
-
-    fiber_id_t fiber_self(void);
-
-    int fiber_equal(fiber_id_t t1, fiber_id_t t2);
-
     void fiber_exit(void *retval) __attribute__((__noreturn__));
-
-    int fiber_yield();
 
     turbo::Status fiber_join(fiber_id_t bt, void **fiber_return);
 
-    void fiber_flush();
     /**
      * @ingroup turbo_fiber
      * @brief fiber launch policy,
@@ -200,37 +196,34 @@ namespace turbo {
 
         static void end_span(void *parent);
 
+        static bool is_running_on_fiber();
+
+        static bool is_running_on_pthread();
+
+        static fiber_id_t fiber_self(void);
+
+        static int equal(fiber_id_t t1, fiber_id_t t2);
+
+        static turbo::Status sleep_until(const turbo::Time &deadline);
+
+        static turbo::Status sleep_for(const turbo::Duration &span);
+
+        static turbo::Status sleep(uint64_t sec);
+
+        static turbo::Status usleep(uint64_t usec);
+
+        static turbo::Status msleep(uint64_t msec);
+
+        static turbo::Status nsleep(uint64_t nsec);
+
+        static  turbo::Status yield();
+
     private:
         // nolint
         TURBO_NON_COPYABLE(Fiber);
         FiberStatus _status{FiberStatus::eInvalid};
         fiber_id_t _fid{INVALID_FIBER_ID};
     };
-
-
-    /**
-     * @ingroup turbo_fiber
-     * @brief sleep until deadline
-     * @param deadline
-     * @return status.ok() if success, otherwise error
-     */
-    turbo::Status fiber_sleep_until(const turbo::Time &deadline);
-
-    /**
-     * @ingroup turbo_fiber
-     * @brief sleep for a duration
-     * @param span
-     * @return status.ok() if success, otherwise error
-     */
-    turbo::Status fiber_sleep_for(const turbo::Duration &span);
-
-    turbo::Status fiber_usleep(uint64_t usec);
-
-    turbo::Status fiber_msleep(uint64_t msec);
-
-    turbo::Status fiber_nsleep(uint64_t nsec);
-
-    turbo::Status fiber_sleep(uint64_t sec);
 
     /**
      * @ingroup turbo_fiber
@@ -259,20 +252,20 @@ namespace turbo {
     }
 
     /// inlined functions
-    inline turbo::Status fiber_usleep(uint64_t usec) {
-        return fiber_sleep_for(turbo::Duration::microseconds(usec));
+    inline turbo::Status Fiber::usleep(uint64_t usec) {
+        return sleep_for(turbo::Duration::microseconds(usec));
     }
 
-    inline turbo::Status fiber_msleep(uint64_t msec) {
-        return fiber_sleep_for(turbo::Duration::milliseconds(msec));
+    inline turbo::Status Fiber::msleep(uint64_t msec) {
+        return sleep_for(turbo::Duration::milliseconds(msec));
     }
 
-    inline turbo::Status fiber_nsleep(uint64_t nsec) {
-        return fiber_sleep_for(turbo::Duration::nanoseconds(nsec));
+    inline turbo::Status Fiber::nsleep(uint64_t nsec) {
+        return sleep_for(turbo::Duration::nanoseconds(nsec));
     }
 
-    inline turbo::Status fiber_sleep(uint64_t sec) {
-        return fiber_sleep_for(turbo::Duration::seconds(sec));
+    inline turbo::Status Fiber::sleep(uint64_t sec) {
+        return sleep_for(turbo::Duration::seconds(sec));
     }
 }  // namespace turbo
 #endif // TURBO_FIBER_FIBER_H_

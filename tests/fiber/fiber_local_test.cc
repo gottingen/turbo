@@ -89,7 +89,7 @@ namespace turbo::fiber_internal {
 
         }
         // Sleep a while to make some context switches. TLS should be unchanged.
-        turbo::fiber_sleep_for(turbo::Duration::microseconds(10000));
+        turbo::Fiber::sleep_for(turbo::Duration::microseconds(10000));
 
         for (size_t i = 0; i < TURBO_ARRAY_SIZE(k); ++i) {
             REQUIRE_EQ(ws[i], fiber_getspecific(k[i]));
@@ -314,7 +314,7 @@ namespace turbo::fiber_internal {
             REQUIRE(fiber_join(bth, nullptr).ok());
             REQUIRE_EQ(1, data->ndestroy);
         } else {
-            turbo::fiber_sleep_for(turbo::Duration::microseconds(1000));
+            turbo::Fiber::sleep_for(turbo::Duration::microseconds(1000));
         }
         REQUIRE_EQ(tls, fiber_getspecific(data->key));
     }

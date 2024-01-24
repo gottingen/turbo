@@ -319,6 +319,6 @@ namespace {
 #endif
         }
         turbo::fiber_internal::stop_and_join_epoll_threads();
-        turbo::fiber_sleep_for(turbo::Duration::microseconds(100000));
+        turbo::Fiber::sleep_for(turbo::Duration::microseconds(100000));
     }
 }

@@ -70,7 +70,7 @@ namespace turbo {
 
     /// inlines
 
-    bool FiberTimer::is_valid() const {
+    inline bool FiberTimer::is_valid() const {
         return _timer_id != INVALID_TIMER_ID;
     }
 }  // namespace turbo

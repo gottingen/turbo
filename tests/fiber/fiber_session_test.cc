@@ -44,14 +44,14 @@ namespace {
 
     void* signaller(void* void_arg) {
         SignalArg arg = *(SignalArg*)void_arg;
-        turbo::fiber_usleep(arg.sleep_us_before_fight);
+        turbo::Fiber::usleep(arg.sleep_us_before_fight);
         void* data = nullptr;
         int rc = turbo::fiber_session_trylock(arg.id, &data);
         if (rc == 0) {
             REQUIRE_EQ(0xdead, *(int*)data);
             ++*(int*)data;
             //REQUIRE_EQ(EBUSY, bthread_id_destroy(arg.id, ECANCELED));
-            turbo::fiber_usleep(arg.sleep_us_before_signal);
+            turbo::Fiber::usleep(arg.sleep_us_before_signal);
             REQUIRE_EQ(0, turbo::fiber_session_unlock_and_destroy(arg.id));
             return void_arg;
         } else {
@@ -220,7 +220,7 @@ namespace {
         turbo::StopWatcher tm;
         tm.reset();
         REQUIRE_EQ(0, fiber_session_lock(id, nullptr));
-        turbo::fiber_usleep(2000);
+        turbo::Fiber::usleep(2000);
         REQUIRE_EQ(0, fiber_session_unlock(id));
         tm.stop();
         TLOG_INFO("Unlocked, tm={}", tm.elapsed_micro());
@@ -245,7 +245,7 @@ namespace {
         turbo::fiber_session_t id = { (uintptr_t)arg };
         int rc = fiber_session_lock(id, nullptr);
         if (rc == 0) {
-            turbo::fiber_usleep(2000);
+            turbo::Fiber::usleep(2000);
             REQUIRE_EQ(0, turbo::fiber_session_unlock_and_destroy(id));
             return (void*)1;
         } else {
@@ -285,7 +285,7 @@ namespace {
             args[i].id = id1;
             REQUIRE_EQ(0, pthread_create(&th[i], nullptr, signaller, &args[i]));
         }
-        turbo::fiber_usleep(10000);
+        turbo::Fiber::usleep(10000);
         // join() waits until destroy() is called.
         REQUIRE_EQ(0, turbo::fiber_session_join(id1));
         REQUIRE_EQ(0xdead + 1, x);
@@ -332,7 +332,7 @@ namespace {
         for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             turbo::fiber_stop(th[i]);
         }
-        turbo::fiber_usleep(10000);
+        turbo::Fiber::usleep(10000);
         for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             REQUIRE(turbo::fiber_internal::FiberWorker::exists(th[i]));
         }
@@ -372,7 +372,7 @@ namespace {
         for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             REQUIRE_EQ(0, pthread_create(&th[i], nullptr, waiter, (void*)(intptr_t)id[i].value));
         }
-        turbo::fiber_usleep(10000);
+        turbo::Fiber::usleep(10000);
         REQUIRE_EQ(0, turbo::fiber_session_list_reset(&list, EBADF));
 
         for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {

@@ -23,6 +23,7 @@
 namespace turbo {
     namespace fiber_internal {
         extern __thread turbo::fiber_internal::fiber_local_storage tls_bls;
+        extern __thread FiberWorker *tls_task_group;
     }  // namespace fiber_internal
 
     [[maybe_unused]] turbo::Status fiber_start(fiber_id_t *TURBO_RESTRICT tid,
@@ -51,21 +52,6 @@ namespace turbo {
         return turbo::fiber_internal::fiber_stopped_impl(tid);
     }
 
-    bool is_running_on_fiber() {
-        return turbo::fiber_internal::FiberWorker::is_running_on_fiber();
-    }
-
-    bool is_running_on_pthread() {
-        return turbo::fiber_internal::FiberWorker::is_running_on_pthread();
-    }
-
-    fiber_id_t fiber_self(void) {
-        return turbo::fiber_internal::fiber_self_impl();
-    }
-
-    int fiber_equal(fiber_id_t t1, fiber_id_t t2) {
-        return turbo::fiber_internal::fiber_equal_impl(t1, t2);
-    }
 
     void fiber_exit(void *retval) {
         turbo::fiber_internal::fiber_exit_impl(retval);
@@ -73,10 +59,6 @@ namespace turbo {
 
     turbo::Status fiber_join(fiber_id_t bt, void **fiber_return) {
         return turbo::fiber_internal::fiber_join_impl(bt, fiber_return);
-    }
-
-    void fiber_flush() {
-        turbo::fiber_internal::fiber_flush_impl();
     }
 
     turbo::Status Fiber::start(fiber_fn_t &&fn, void *args) {
@@ -221,6 +203,51 @@ namespace turbo {
 
     bool Fiber::exists(fiber_id_t fid) {
         return turbo::fiber_internal::FiberWorker::exists(fid);
+    }
+
+    bool Fiber::is_running_on_fiber() {
+        return turbo::fiber_internal::FiberWorker::is_running_on_fiber();
+    }
+
+    bool Fiber::is_running_on_pthread() {
+        return turbo::fiber_internal::FiberWorker::is_running_on_pthread();
+    }
+
+    fiber_id_t Fiber::fiber_self(void) {
+        return turbo::fiber_internal::fiber_self_impl();
+    }
+
+    int Fiber::equal(fiber_id_t t1, fiber_id_t t2) {
+        return turbo::fiber_internal::fiber_equal_impl(t1, t2);
+    }
+
+    turbo::Status Fiber::sleep_until(const turbo::Time& deadline) {
+        turbo::fiber_internal::FiberWorker *g = turbo::fiber_internal::tls_task_group;
+        if (nullptr != g && !g->is_current_pthread_task()) {
+            return turbo::fiber_internal::FiberWorker::sleep(&g, deadline);
+        }
+        turbo::sleep_until(deadline);
+        return turbo::ok_status();
+    }
+
+    turbo::Status Fiber::sleep_for(const turbo::Duration& span) {
+        turbo::fiber_internal::FiberWorker *g = turbo::fiber_internal::tls_task_group;
+        if (nullptr != g && !g->is_current_pthread_task()) {
+            return turbo::fiber_internal::FiberWorker::sleep(&g, span);
+        }
+        turbo::sleep_for(span);
+        return turbo::ok_status();
+    }
+
+    turbo::Status Fiber::yield() {
+        turbo::fiber_internal::FiberWorker *g = turbo::fiber_internal::tls_task_group;
+        if (nullptr != g && !g->is_current_pthread_task()) {
+            turbo::fiber_internal::FiberWorker::yield(&g);
+            return turbo::ok_status();
+        }
+        // pthread_yield is not available on MAC
+        auto r = sched_yield();
+        return r == 0 ? turbo::ok_status() : turbo::make_status();
     }
 }  // namespace turbo
 

@@ -82,7 +82,7 @@ namespace turbo {
         return turbo::fiber_internal::fiber_session_lock_verbose(session, pdata, location);
     }
 
-    int fiber_session_error_verbose(fiber_session_t session, int error_code,
+    inline int fiber_session_error_verbose(fiber_session_t session, int error_code,
                                     const char *location) {
         return turbo::fiber_internal::fiber_session_error_verbose(session, error_code, location);
     }

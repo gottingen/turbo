@@ -74,7 +74,6 @@ set(TURBO_ALL_SRC
         "fiber/internal/io.cc"
         "fiber/internal/fiber_cond.cc"
         "fiber/internal/fiber_worker.cc"
-        "fiber/this_fiber.cc"
         "fiber/fiber.cc"
         "fiber/timer.cc"
         "fiber/fiber_session.cc"

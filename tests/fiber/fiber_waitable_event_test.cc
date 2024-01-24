@@ -45,7 +45,7 @@ namespace turbo::fiber_internal {
     }
 
     void *sleeper(void *arg) {
-        TURBO_UNUSED(turbo::fiber_sleep_for(turbo::Duration::microseconds((uint64_t)arg)));
+        TURBO_UNUSED(turbo::Fiber::sleep_for(turbo::Duration::microseconds((uint64_t)arg)));
         return nullptr;
     }
 
@@ -58,7 +58,7 @@ namespace turbo::fiber_internal {
             long elp = turbo::get_current_time_micros() - t1;
             REQUIRE_LE(labs(elp - (th - (fiber_id_t *) arg + 1) * 100000L), 15000L);
             TLOG_INFO("Joined thread {0} at {1}us [{2}]",
-                      *th, elp, fiber_self());
+                      *th, elp, Fiber::fiber_self());
         }
         for (fiber_id_t *th = (fiber_id_t *) arg; *th; ++th) {
             REQUIRE(fiber_join(*th, nullptr).ok());
@@ -239,7 +239,7 @@ namespace turbo::fiber_internal {
 
             tm.reset();
             REQUIRE_EQ(turbo::ok_status(), fiber_start(&th, &attr, wait_event, &arg));
-            REQUIRE_EQ(turbo::ok_status(), turbo::fiber_sleep_for(SleepDuration));
+            REQUIRE_EQ(turbo::ok_status(), turbo::Fiber::sleep_for(SleepDuration));
             REQUIRE_EQ(turbo::ok_status(), fiber_stop(th));
             fiber_join(th, nullptr);
             tm.stop();
@@ -267,7 +267,7 @@ namespace turbo::fiber_internal {
             tm.reset();
             REQUIRE_EQ(turbo::ok_status(), fiber_start_background(&th, &attr, wait_event, &arg));
             REQUIRE_EQ(turbo::ok_status(), fiber_stop(th));
-            fiber_flush();
+            Fiber::fiber_flush();
             REQUIRE(fiber_join(th, nullptr).ok());
             tm.stop();
 
@@ -302,10 +302,10 @@ namespace turbo::fiber_internal {
             REQUIRE_EQ(turbo::ok_status(), fiber_start(&th, nullptr, wait_event, &arg));
             REQUIRE_EQ(turbo::ok_status(), fiber_start(&th2, &attr, join_the_waiter, (void *) th));
             REQUIRE_EQ(turbo::ok_status(), fiber_stop(th2));
-            REQUIRE_EQ(turbo::ok_status(), turbo::fiber_sleep_for(WaitDuration / 2));
+            REQUIRE_EQ(turbo::ok_status(), turbo::Fiber::sleep_for(WaitDuration / 2));
             REQUIRE(turbo::fiber_internal::FiberWorker::exists(th));
             REQUIRE(turbo::fiber_internal::FiberWorker::exists(th2));
-            REQUIRE_EQ(turbo::ok_status(), turbo::fiber_sleep_for(WaitDuration / 2));
+            REQUIRE_EQ(turbo::ok_status(), turbo::Fiber::sleep_for(WaitDuration / 2));
             REQUIRE_EQ(turbo::ok_status(), fiber_stop(th));
             REQUIRE(fiber_join(th2, nullptr).ok());
             REQUIRE(fiber_join(th, nullptr).ok());
@@ -330,7 +330,7 @@ namespace turbo::fiber_internal {
             fiber_id_t th;
             REQUIRE_EQ(turbo::ok_status(), fiber_start(
                     &th, &attr, sleeper, (void *) (SLEEP_MSEC * 1000L)));
-            REQUIRE_EQ(turbo::ok_status(), turbo::fiber_sleep_for(WaitDuration));
+            REQUIRE_EQ(turbo::ok_status(), turbo::Fiber::sleep_for(WaitDuration));
             REQUIRE_EQ(turbo::ok_status(), fiber_stop(th));
             REQUIRE( fiber_join(th, nullptr).ok());
             tm.stop();
@@ -383,7 +383,7 @@ namespace turbo::fiber_internal {
             REQUIRE_EQ(turbo::ok_status(), fiber_start_background(&th, &attr, sleeper,
                                                  (void *) (SLEEP_MSEC * 1000L)));
             REQUIRE_EQ(turbo::ok_status(), fiber_stop(th));
-            fiber_flush();
+            Fiber::fiber_flush();
             REQUIRE(fiber_join(th, nullptr).ok());
             tm.stop();
 

@@ -50,7 +50,7 @@ namespace turbo {
     }
 
     void *sleeper(void *arg) {
-        TURBO_UNUSED(turbo::fiber_sleep_for(turbo::Duration::microseconds((uint64_t) arg)));
+        TURBO_UNUSED(turbo::Fiber::sleep_for(turbo::Duration::microseconds((uint64_t) arg)));
         return nullptr;
     }
 
@@ -67,7 +67,7 @@ namespace turbo {
             turbo::println("{}", i);
             REQUIRE_LE(labs(elp - (i + 1) * 100000L), 15000L);
             TLOG_INFO("Joined thread {0} at {1}us [{2}]",
-                      fid, elp, fiber_self());
+                      fid, elp, Fiber::fiber_self());
         }
         for (size_t i = 0; i < fs->size(); ++i) {
             REQUIRE((*fs)[i].join(nullptr).ok());
@@ -260,7 +260,7 @@ namespace turbo {
 
             tm.reset();
             REQUIRE_EQ(turbo::ok_status(), th.start(attr, wait_event, &arg));
-            REQUIRE_EQ(turbo::ok_status(), turbo::fiber_sleep_for(SleepDuration));
+            REQUIRE_EQ(turbo::ok_status(), turbo::Fiber::sleep_for(SleepDuration));
             REQUIRE_EQ(turbo::ok_status(), fiber_stop(th.self()));
             REQUIRE_EQ(turbo::ok_status(), th.stop());
             th.join(nullptr);
@@ -329,11 +329,11 @@ namespace turbo {
             REQUIRE_EQ(turbo::ok_status(), th2.start(attr, join_the_waiter, &th));
             fth2 = th2.self();
             REQUIRE_EQ(turbo::ok_status(), th2.stop());
-            REQUIRE_EQ(turbo::ok_status(), turbo::fiber_sleep_for(WaitDuration / 2));
+            REQUIRE_EQ(turbo::ok_status(), turbo::Fiber::sleep_for(WaitDuration / 2));
             turbo::println("{}, {}", fth, fth2);
             REQUIRE(turbo::Fiber::exists(fth));
             REQUIRE(turbo::Fiber::exists(fth2));
-            REQUIRE_EQ(turbo::ok_status(), turbo::fiber_sleep_for(WaitDuration / 2));
+            REQUIRE_EQ(turbo::ok_status(), turbo::Fiber::sleep_for(WaitDuration / 2));
             REQUIRE_EQ(turbo::ok_status(), th.stop());
             REQUIRE(th2.join().ok());
             REQUIRE(th.join().ok());
@@ -357,7 +357,7 @@ namespace turbo {
             tm.reset();
             Fiber th;
             REQUIRE_EQ(turbo::ok_status(), th.start(attr, sleeper, (void *) (SLEEP_MSEC * 1000L)));
-            REQUIRE_EQ(turbo::ok_status(), turbo::fiber_sleep_for(WaitDuration));
+            REQUIRE_EQ(turbo::ok_status(), turbo::Fiber::sleep_for(WaitDuration));
             REQUIRE_EQ(turbo::ok_status(), th.stop());
             REQUIRE(th.join().ok());
             tm.stop();

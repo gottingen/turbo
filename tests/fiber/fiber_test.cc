@@ -93,16 +93,16 @@ namespace turbo::fiber_internal {
     }
 
     TEST_CASE_FIXTURE(FiberTest, "call_fiber_functions_before_tls_created") {
-        REQUIRE_EQ(0, turbo::fiber_sleep_for(turbo::Duration::milliseconds(1)).code());
+        REQUIRE_EQ(0, turbo::Fiber::sleep_for(turbo::Duration::milliseconds(1)).code());
         REQUIRE(turbo::is_invalid_argument(fiber_join(0, nullptr)));
-        REQUIRE_EQ(0UL, fiber_self());
+        REQUIRE_EQ(0UL, turbo::Fiber::fiber_self());
     }
 
     std::atomic<bool> stop(false);
 
     void *sleep_for_awhile(void *arg) {
         TLOG_INFO("sleep_for_awhile({}) main thread {}", arg, pthread_self());
-        TURBO_UNUSED(turbo::fiber_sleep_for(turbo::Duration::microseconds(100000L)));
+        TURBO_UNUSED(turbo::Fiber::sleep_for(turbo::Duration::microseconds(100000L)));
         TLOG_INFO("sleep_for_awhile({}) main thread {}", arg, pthread_self());
         return nullptr;
     }
@@ -117,7 +117,7 @@ namespace turbo::fiber_internal {
     void *repeated_sleep(void *arg) {
         for (size_t i = 0; !stop; ++i) {
             TLOG_INFO("repeated_sleep({}) i={}", arg, i);
-            TURBO_UNUSED(turbo::fiber_sleep_for(turbo::Duration::microseconds(100000L)));
+            TURBO_UNUSED(turbo::Fiber::sleep_for(turbo::Duration::microseconds(100000L)));
         }
         return nullptr;
     }
@@ -164,7 +164,7 @@ namespace turbo::fiber_internal {
         for (size_t i = 0; !stop; ++i) {
             fiber_id_t th;
             REQUIRE(fiber_start(&th, nullptr, do_nothing, (void *) i).ok());
-            TURBO_UNUSED(turbo::fiber_sleep_for(turbo::Duration::microseconds(100000L)));
+            TURBO_UNUSED(turbo::Fiber::sleep_for(turbo::Duration::microseconds(100000L)));
         }
         return nullptr;
     }
@@ -173,7 +173,7 @@ namespace turbo::fiber_internal {
         // Need this thread to set `stop' to true. Reason: If spin_and_log (which
         // never yields CPU) is scheduled to main thread, main thread cannot get
         // to run again.
-        TURBO_UNUSED(turbo::fiber_sleep_for(turbo::Duration::microseconds(5 * 1000000L)));
+        TURBO_UNUSED(turbo::Fiber::sleep_for(turbo::Duration::microseconds(5 * 1000000L)));
         TLOG_INFO("about to stop");
         stop = true;
         return nullptr;
@@ -254,20 +254,20 @@ namespace turbo::fiber_internal {
     }
 
     void *show_self(void *) {
-        REQUIRE_NE(0ul, fiber_self());
-        TLOG_INFO("fiber_self={}", fiber_self());
+        REQUIRE_NE(0ul, turbo::Fiber::fiber_self());
+        TLOG_INFO("fiber_self={}", turbo::Fiber::fiber_self());
         return nullptr;
     }
 
     TEST_CASE_FIXTURE(FiberTest, "fiber_self") {
-        REQUIRE_EQ(0ul, fiber_self());
+        REQUIRE_EQ(0ul, turbo::Fiber::fiber_self());
         fiber_id_t bth;
         REQUIRE_EQ(turbo::ok_status(), fiber_start(&bth, nullptr, show_self, nullptr));
         REQUIRE(fiber_join(bth, nullptr).ok());
     }
 
     void *join_self(void *) {
-        REQUIRE(turbo::is_invalid_argument(fiber_join(fiber_self(), nullptr)));
+        REQUIRE(turbo::is_invalid_argument(fiber_join(turbo::Fiber::fiber_self(), nullptr)));
         return nullptr;
     }
 
@@ -304,7 +304,7 @@ namespace turbo::fiber_internal {
             if (10000 == s->fetch_add(1)) {
                 t1 = turbo::get_current_time_micros();
             }
-            turbo::fiber_sleep_for(turbo::Duration::microseconds(sleep_in_adding_func));
+            turbo::Fiber::sleep_for(turbo::Duration::microseconds(sleep_in_adding_func));
             if (t1) {
                 TLOG_INFO("elapse is {}ns", turbo::get_current_time_micros() - t1);
             }
@@ -399,7 +399,7 @@ namespace turbo::fiber_internal {
             }
             turbo::StopWatcher tm;
             tm.reset();
-            turbo::fiber_sleep_for(turbo::Duration::microseconds(200000L));
+            turbo::Fiber::sleep_for(turbo::Duration::microseconds(200000L));
             stop = true;
             for (int i = 0; i < cur_con; ++i) {
                 TURBO_UNUSED(fiber_join(th[i], nullptr));
@@ -452,7 +452,7 @@ namespace turbo::fiber_internal {
     }
 
     void *sleep_for_awhile_with_sleep(void *arg) {
-        turbo::fiber_sleep_for(turbo::Duration::microseconds((intptr_t) arg));
+        turbo::Fiber::sleep_for(turbo::Duration::microseconds((intptr_t) arg));
         return nullptr;
     }
 
@@ -462,7 +462,7 @@ namespace turbo::fiber_internal {
                 &th, nullptr, sleep_for_awhile_with_sleep, (void *) 1000000L));
         turbo::StopWatcher tm;
         tm.reset();
-        turbo::fiber_sleep_for(turbo::Duration::microseconds(10000L));
+        turbo::Fiber::sleep_for(turbo::Duration::microseconds(10000L));
         REQUIRE_EQ(turbo::ok_status(), fiber_stop(th));
         REQUIRE(fiber_join(th, nullptr).ok());
         tm.stop();
@@ -495,9 +495,9 @@ namespace turbo::fiber_internal {
         REQUIRE_EQ(turbo::ok_status(), fiber_start(&th1, nullptr, do_nothing, nullptr));
         fiber_id_t th2;
         REQUIRE_EQ(turbo::ok_status(), fiber_start(&th2, nullptr, do_nothing, nullptr));
-        REQUIRE_EQ(0, fiber_equal(th1, th2));
+        REQUIRE_EQ(0, turbo::Fiber::equal(th1, th2));
         fiber_id_t th3 = th2;
-        REQUIRE_EQ(1, fiber_equal(th3, th2));
+        REQUIRE_EQ(1, turbo::Fiber::equal(th3, th2));
         REQUIRE(fiber_join(th1, nullptr).ok());
         REQUIRE(fiber_join(th2, nullptr).ok());
     }
@@ -508,7 +508,7 @@ namespace turbo::fiber_internal {
     }
 
     void *check_sleep(void *pthread_task) {
-        REQUIRE_NE(fiber_self(), 0);
+        REQUIRE_NE(turbo::Fiber::fiber_self(), 0);
         // Create a no-signal task that other worker will not steal. The task will be
         // run if current fiber does context switch.
         FiberAttribute attr = FIBER_ATTR_NORMAL | AttributeFlag::FLAG_NOSIGNAL;
@@ -517,14 +517,14 @@ namespace turbo::fiber_internal {
         const pthread_t pid = pthread_self();
         REQUIRE_EQ(turbo::ok_status(), fiber_start(&th1, &attr, mark_run, &run));
         if (pthread_task) {
-            turbo::fiber_sleep_for(turbo::Duration::microseconds(100000L));
+            turbo::Fiber::sleep_for(turbo::Duration::microseconds(100000L));
             // due to NOSIGNAL, mark_run did not run.
             // FIXME: actually runs. someone is still stealing.
             // REQUIRE_EQ((pthread_t)0, run);
-            // turbo::fiber_sleep_for = usleep for FIBER_ATTR_PTHREAD
+            // turbo::Fiber::sleep_for = usleep for FIBER_ATTR_PTHREAD
             REQUIRE_EQ(pid, pthread_self());
             // schedule mark_run
-            fiber_flush();
+            turbo::Fiber::fiber_flush();
         } else {
             // start_urgent should jump to the new thread first, then back to
             // current thread.
@@ -598,7 +598,7 @@ namespace turbo::fiber_internal {
     }
 
     static void *yield_thread(void *) {
-        turbo::fiber_yield();
+        turbo::Fiber::yield();
         return nullptr;
     }
 
