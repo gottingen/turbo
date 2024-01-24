@@ -37,13 +37,11 @@ namespace turbo::system_internal {
 
     // For ipv6/unix socket address.
     //
-    // We have to keep butil::EndPoint ABI compatible because it is used so widely, and the size of butil::EndPoint is
+    // We have to keep turbo::EndPoint ABI compatible because it is used so widely, and the size of turbo::EndPoint is
     // too small to store more information such as ipv6 address.
     // We store enough information about endpoint in such tiny struct by putting real things in another big object
     // holding by ResourcePool. The EndPoint::ip saves ResourceId, while EndPoint::port denotes if the EndPoint object
     // is an old style ipv4 endpoint.
-    // Note that since ResourcePool has been implemented in bthread, we copy it into this repo and change its namespace to
-    // butil::details. Those two headers will not be published.
 
     // If EndPoint.port equals to this value, we should get the extended endpoint in resource pool.
     const static int EXTENDED_ENDPOINT_PORT = 123456789;

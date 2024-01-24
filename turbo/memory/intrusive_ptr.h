@@ -45,9 +45,6 @@ namespace turbo {
         //
         //  The object is responsible for destroying itself.
 
-        // NOTE: sp_convertible is different from butil::is_convertible
-        // (in butil/type_traits.h) that it converts pointers only. Using
-        // butil::is_convertible results in ctor/dtor issues.
         template<class Y, class T>
         struct sp_convertible {
             typedef char (&yes)[1];

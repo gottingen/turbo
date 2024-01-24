@@ -58,7 +58,7 @@ namespace turbo {
         // interleaving status of threads even in highly contended situations.
         // You should also create the sample using a malloc() impl. that are
         // unlikely to contend, keeping interruptions minimal.
-        // `cpuwide_us' should be got from butil::cpuwide_time_us(). If it's far
+        // `cpuwide_us' should be got from turbo::get_current_microseconds. If it's far
         // from the timestamp updated by collecting thread(which basically means
         // the thread is not scheduled by OS in time), this sample is directly
         // destroy()-ed to avoid memory explosion.
@@ -71,7 +71,7 @@ namespace turbo {
         // indefinitely long(not recommended). If too many samples wait for
         // this funcion due to previous sample's blocking, they'll be destroy()-ed.
         // If you need to run destruction code upon thread's exit, use
-        // butil::thread_atexit. Dumping thread run this function in batch, each
+        // thread_atexit. Dumping thread run this function in batch, each
         // batch is counted as one "round", `round_index' is the round that
         // dumping thread is currently at, counting from 1.
         virtual void dump_and_destroy(size_t round_index) = 0;
