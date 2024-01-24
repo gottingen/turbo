@@ -29,6 +29,8 @@ feature improvement
     possible as it can to avoid namespace pollution and make the semantics clear.
 * promote performance of log module by using zero copy iobuf io and turbo times.
 * improve poll api for fiber io operation.
+* add inheritable for fiber, which can inherit the fiber context from parent fiber.
+  with the api Fiber::start_span, Fiber::end_span, Fiber::get_span.
 
 bug fix
 --------------------------------
