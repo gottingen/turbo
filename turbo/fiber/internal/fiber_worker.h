@@ -197,6 +197,10 @@ namespace turbo::fiber_internal {
         // Get the meta associate with the task.
         static FiberEntity *address_meta(fiber_id_t tid);
 
+        static void print_fiber(std::ostream &os, fiber_id_t tid);
+
+        static void print_fiber(memory_buffer &buffer, fiber_id_t tid);
+
         // Push a task into _rq, if _rq is full, retry after some time. This
         // process make go on indefinitely.
         void push_rq(fiber_id_t tid);

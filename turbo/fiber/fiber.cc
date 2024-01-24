@@ -193,6 +193,16 @@ namespace turbo {
         }
     }
 
+    std::string Fiber::describe() const {
+        memory_buffer buffer;
+        turbo::fiber_internal::FiberWorker::print_fiber(buffer, _fid);
+        return {buffer.data(), buffer.size()};
+    }
+
+    void Fiber::describe(std::ostream &os) const {
+        turbo::fiber_internal::FiberWorker::print_fiber(os, _fid);
+    }
+
     void Fiber::fiber_flush() {
         turbo::fiber_internal::fiber_flush_impl();
     }
@@ -248,6 +258,16 @@ namespace turbo {
         // pthread_yield is not available on MAC
         auto r = sched_yield();
         return r == 0 ? turbo::ok_status() : turbo::make_status();
+    }
+
+    void Fiber::print(std::ostream &os, fiber_id_t tid) {
+        turbo::fiber_internal::FiberWorker::print_fiber(os, tid);
+    }
+
+    std::string Fiber::print(fiber_id_t tid) {
+        std::ostringstream oss;
+        turbo::fiber_internal::FiberWorker::print_fiber(oss, tid);
+        return oss.str();
     }
 }  // namespace turbo
 

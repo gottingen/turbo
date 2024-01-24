@@ -873,7 +873,7 @@ namespace turbo::fiber_internal {
         sched(pg);
     }
 
-    void print_task(std::ostream &os, fiber_id_t tid) {
+    void FiberWorker::print_fiber(std::ostream &os, fiber_id_t tid) {
         FiberEntity *const m = FiberWorker::address_meta(tid);
         if (m == nullptr) {
             os << "fiber=" << tid << " : never existed";
@@ -920,6 +920,52 @@ namespace turbo::fiber_internal {
                << "\nuptime_ns=" << turbo::get_current_time_nanos() - cpuwide_start_ns
                << "\ncputime_ns=" << stat.cputime_ns
                << "\nnswitch=" << stat.nswitch;
+        }
+    }
+    void FiberWorker::print_fiber(memory_buffer &buffer, fiber_id_t tid){
+        FiberEntity *const m = FiberWorker::address_meta(tid);
+        if (m == nullptr) {
+            format_to(std::back_inserter(buffer), "fiber={} : never existed", tid);
+            return;
+        }
+        const uint32_t given_ver = get_version(tid);
+        bool matched = false;
+        bool stop = false;
+        bool interrupted = false;
+        bool about_to_quit = false;
+        std::function<void *(void *)> *fn = nullptr;
+        void *arg = nullptr;
+        FiberAttribute attr = FIBER_ATTR_NORMAL;
+        bool has_tls = false;
+        int64_t cpuwide_start_ns = 0;
+        FiberStatistics stat = {0, 0};
+        {
+            SpinLockHolder l(&m->version_lock);
+            if (given_ver == *m->version_futex) {
+                matched = true;
+                stop = m->stop;
+                interrupted = m->interrupted;
+                about_to_quit = m->about_to_quit;
+                fn = &m->fn;
+                arg = m->arg;
+                attr = m->attr;
+                has_tls = m->local_storage.keytable;
+                cpuwide_start_ns = m->cpuwide_start_ns;
+                stat = m->stat;
+            }
+        }
+        if (!matched) {
+            format_to(std::back_inserter(buffer), "fiber={} : not exist now", tid);
+        } else {
+            format_to(std::back_inserter(buffer), "fiber={} :\nstop={}\ninterrupted={}\nabout_to_quit={}\nfn={}\narg={}\nattr={stack_type={}"
+               " flags={}"
+               " keytable_pool={}}\nhas_tls={}\nuptime_ns={}\ncputime_ns={}\nnswitch={}", tid, stop, interrupted, about_to_quit, (void *) fn, (void *) arg, attr.stack_type
+               , attr.flags
+               , turbo::ptr(attr.keytable_pool)
+               , has_tls
+               , turbo::get_current_time_nanos() - cpuwide_start_ns
+               , stat.cputime_ns
+               , stat.nswitch);
         }
     }
 

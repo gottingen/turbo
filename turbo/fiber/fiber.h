@@ -29,6 +29,7 @@
 #include "turbo/fiber/wait_event.h"
 #include "turbo/fiber/runtime.h"
 #include "turbo/status/status.h"
+#include "turbo/format/format.h"
 
 namespace turbo {
 
@@ -182,6 +183,10 @@ namespace turbo {
             return _fid == INVALID_FIBER_ID && _status == FiberStatus::eInvalid;
         }
 
+        std::string describe() const;
+
+        void describe(std::ostream &os) const;
+
         static void fiber_flush();
 
         // Mark the calling fiber as "about to quit". When the fiber is scheduled,
@@ -218,6 +223,9 @@ namespace turbo {
 
         static  turbo::Status yield();
 
+        static void print(std::ostream &os, fiber_id_t tid);
+
+        static std::string print(fiber_id_t tid);
     private:
         // nolint
         TURBO_NON_COPYABLE(Fiber);
@@ -267,5 +275,28 @@ namespace turbo {
     inline turbo::Status Fiber::sleep(uint64_t sec) {
         return sleep_for(turbo::Duration::seconds(sec));
     }
+
+    template<>
+    struct formatter<Fiber> {
+        bool details = false;
+        constexpr auto parse(basic_format_parse_context<char> &ctx)
+        -> decltype(ctx.begin()) {
+            auto begin = ctx.begin(), end = ctx.end();
+            if (begin != end && (*begin == 'd' || *begin == 'D')) {
+                ++begin;
+                details = true;
+            }
+            return begin;
+        }
+
+        template<typename FormatContext>
+        auto format(const Fiber &f, FormatContext &ctx) {
+            if(details) {
+                return format_to(ctx.out(), "{}", f.describe());
+            } else {
+                return format_to(ctx.out(), "{}", f.self());
+            }
+        }
+    };
 }  // namespace turbo
 #endif // TURBO_FIBER_FIBER_H_
