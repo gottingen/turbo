@@ -80,6 +80,8 @@ namespace turbo {
      */
     using fiber_internal::FIBER_ATTR_DEBUG;
 
+    using fiber_internal::FIBER_ATTR_NORMAL_WITH_SPAN;
+
     ///////////////////////////// c api ////////////////////////////////
 
     [[maybe_unused]] turbo::Status fiber_start(fiber_id_t *TURBO_RESTRICT tid,
@@ -151,6 +153,11 @@ namespace turbo {
 
         turbo::Status start(const FiberAttribute attr, fiber_fn_t &&fn, void *args = nullptr);
 
+        turbo::Status start_lazy(fiber_fn_t &&fn, void *args = nullptr);
+
+        turbo::Status start_lazy(const FiberAttribute attr, fiber_fn_t &&fn, void *args = nullptr);
+
+
         turbo::Status start(LaunchPolicy policy, fiber_fn_t &&fn, void *args = nullptr);
 
         turbo::Status start(LaunchPolicy policy, const FiberAttribute attr, fiber_fn_t &&fn, void *args = nullptr);
@@ -186,6 +193,12 @@ namespace turbo {
         static int fiber_about_to_quit();
 
         static bool exists(fiber_id_t fid);
+
+        static void start_span(void *parent);
+
+        static void *get_span();
+
+        static void end_span(void *parent);
 
     private:
         // nolint

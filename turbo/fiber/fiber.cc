@@ -21,6 +21,9 @@
 #include "turbo/fiber/internal/fiber_worker.h"
 
 namespace turbo {
+    namespace fiber_internal {
+        extern __thread turbo::fiber_internal::fiber_local_storage tls_bls;
+    }  // namespace fiber_internal
 
     [[maybe_unused]] turbo::Status fiber_start(fiber_id_t *TURBO_RESTRICT tid,
                                                       const FiberAttribute *TURBO_RESTRICT attr,
@@ -98,6 +101,29 @@ namespace turbo {
         return rs;
     }
 
+    turbo::Status Fiber::start_lazy(fiber_fn_t &&fn, void *args) {
+        if(!startable()) {
+            return turbo::make_status(kEEXIST, "Fiber already started.");
+        }
+        auto rs = turbo::fiber_internal::fiber_start_background_impl(&_fid, &FIBER_ATTR_NORMAL, std::move(fn), args);
+        if(rs.ok()) {
+            _status = FiberStatus::eRunning;
+        }
+        return rs;
+    }
+
+    turbo::Status Fiber::start_lazy(const FiberAttribute attr, fiber_fn_t &&fn, void *args) {
+        if(!startable()) {
+            return turbo::make_status(kEEXIST, "Fiber already started.");
+        }
+        auto rs = turbo::fiber_internal::fiber_start_background_impl(&_fid, &attr, std::move(fn), args);
+        if(rs.ok()) {
+            _status = FiberStatus::eRunning;
+        }
+        return rs;
+    }
+
+
     turbo::Status Fiber::start(LaunchPolicy policy, fiber_fn_t &&fn, void *args) {
         if(!startable()) {
             return turbo::make_status(kEEXIST, "Fiber already started.");
@@ -168,6 +194,20 @@ namespace turbo {
             TLOG_CRITICAL("You need to call either `join()` or `detach()` prior to destroy "
                           "a fiber. Otherwise the behavior is undefined.");
             std::terminate();
+        }
+    }
+
+    void Fiber::start_span(void *parent) {
+        turbo::fiber_internal::tls_bls.parent_span = parent;
+    }
+
+    void *Fiber::get_span() {
+        return turbo::fiber_internal::tls_bls.parent_span;
+    }
+
+    void Fiber::end_span(void *parent) {
+        if(turbo::fiber_internal::tls_bls.parent_span == parent) {
+            turbo::fiber_internal::tls_bls.parent_span = nullptr;
         }
     }
 

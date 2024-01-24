@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//
-// Created by jeff on 24-1-11.
-//
 
 #ifndef TURBO_FIBER_FIBER_SESSION_H_
 #define TURBO_FIBER_FIBER_SESSION_H_

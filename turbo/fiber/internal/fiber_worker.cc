@@ -39,7 +39,7 @@ namespace turbo::fiber_internal {
     // Sync with FiberEntity::local_storage when a fiber is created or destroyed.
     // During running, the two fields may be inconsistent, use tls_bls as the
     // groundtruth.
-    thread_local fiber_local_storage tls_bls = FIBER_LOCAL_STORAGE_INITIALIZER;
+    thread_local fiber_local_storage tls_bls = LOCAL_STORAGE_INIT;
 
     // defined in fiber/key.cpp
     extern void return_keytable(fiber_keytable_pool_t *, KeyTable *);
@@ -329,6 +329,9 @@ namespace turbo::fiber_internal {
         TDLOG_CHECK(m->stack == nullptr);
         m->attr = using_attr;
         m->local_storage = LOCAL_STORAGE_INIT;
+        if (is_inherit(using_attr)) {
+            m->local_storage.parent_span = tls_bls.parent_span;
+        }
         m->cpuwide_start_ns = start_ns;
         m->stat = EMPTY_STAT;
         m->tid = make_tid(*m->version_futex, slot);
@@ -383,6 +386,9 @@ namespace turbo::fiber_internal {
         TDLOG_CHECK(m->stack == nullptr);
         m->attr = using_attr;
         m->local_storage = LOCAL_STORAGE_INIT;
+        if (is_inherit(using_attr)) {
+            m->local_storage.parent_span = tls_bls.parent_span;
+        }
         m->cpuwide_start_ns = start_ns;
         m->stat = EMPTY_STAT;
         m->tid = make_tid(*m->version_futex, slot);

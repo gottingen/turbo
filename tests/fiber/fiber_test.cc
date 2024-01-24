@@ -238,12 +238,12 @@ namespace turbo::fiber_internal {
 
     TEST_CASE_FIXTURE(FiberTest, "lambda_backtrace") {
         fiber_id_t th;
-        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th, nullptr, [](void*)->void*{
+        REQUIRE_EQ(turbo::ok_status(), fiber_start(&th, nullptr, [](void *) -> void * {
             if (call_do_bt() != 57) {
                 return (void *) 1L;
             }
             return nullptr;
-            }, nullptr));
+        }, nullptr));
         REQUIRE(fiber_join(th, nullptr).ok());
 
         char **text = backtrace_symbols(bt_array, bt_cnt);
@@ -364,6 +364,7 @@ namespace turbo::fiber_internal {
             }
         }
     }
+
     void *fiber_starter(void *void_counter) {
         while (!stop.load(std::memory_order_relaxed)) {
             fiber_id_t th;
@@ -437,7 +438,7 @@ namespace turbo::fiber_internal {
             turbo::StopWatcher tm2;
             tm2.reset();
             REQUIRE(turbo::fiber_start_background(&th2, nullptr, log_start_latency, &tm2).ok());
-             status = fiber_join(th2, nullptr);
+            status = fiber_join(th2, nullptr);
             REQUIRE(status.ok());
             if (!warmup) {
                 ++REP;
@@ -544,13 +545,44 @@ namespace turbo::fiber_internal {
 
         fiber_id_t th1;
         REQUIRE_EQ(turbo::ok_status(), fiber_start(&th1, &FIBER_ATTR_PTHREAD,
-                                        check_sleep, (void *) 1));
+                                                   check_sleep, (void *) 1));
         REQUIRE(fiber_join(th1, nullptr).ok());
 
         fiber_id_t th2;
         REQUIRE_EQ(turbo::ok_status(), fiber_start(&th2, nullptr,
-                                        check_sleep, (void *) 0));
+                                                   check_sleep, (void *) 0));
         REQUIRE(fiber_join(th2, nullptr).ok());
+    }
+
+
+    void *test_parent_span(void *p) {
+        uint64_t *q = (uint64_t *) p;
+        *q = (uint64_t) (Fiber::get_span());
+        TLOG_INFO("span id in thread is {}", *q);
+        return NULL;
+    }
+
+    TEST_CASE_FIXTURE(FiberTest, "test_span") {
+        uint64_t p1 = 0;
+        uint64_t p2 = 0;
+
+        uint64_t target = 0xBADBEAFUL;
+        TLOG_INFO("Target span id is {}", target);
+
+        turbo::Fiber::start_span((void *) target);
+        turbo::Fiber fb1;
+        auto rs = fb1.start(turbo::FIBER_ATTR_NORMAL_WITH_SPAN, test_parent_span, &p1);
+        REQUIRE(rs.ok());
+        rs = fb1.join();
+        REQUIRE(rs.ok());
+
+        turbo::Fiber fb2;
+        rs = fb2.start_lazy(test_parent_span, &p2);
+        REQUIRE(rs.ok());
+        rs = fb2.join();
+        REQUIRE(rs.ok());
+        REQUIRE_EQ(p1, target);
+        REQUIRE_NE(p2, target);
     }
 
     void *dummy_thread(void *) {

@@ -48,7 +48,8 @@ namespace turbo::fiber_internal {
         FLAG_LOG_START_AND_FINISH = 8,
         FLAG_LOG_CONTEXT_SWITCH = 16,
         FLAG_NOSIGNAL = 32,
-        FLAG_NEVER_QUIT = 64
+        FLAG_NEVER_QUIT = 64,
+        FLAG_INHERIT = 128
     };
 
     inline constexpr AttributeFlag operator|(AttributeFlag lhs, AttributeFlag rhs) {
@@ -144,6 +145,10 @@ namespace turbo::fiber_internal {
         return (attr.flags & AttributeFlag::FLAG_LOG_CONTEXT_SWITCH) != AttributeFlag::FLAG_NONE;
     }
 
+    inline constexpr bool is_inherit(const FiberAttribute &attr) {
+        return (attr.flags & AttributeFlag::FLAG_INHERIT) != AttributeFlag::FLAG_NONE;
+    }
+
     // fibers started with this attribute will run on stack of worker pthread and
     // all fiber functions that would block the fiber will block the pthread.
     // The fiber will not allocate its own stack, simply occupying a little meta
@@ -164,6 +169,9 @@ namespace turbo::fiber_internal {
 
     static constexpr FiberAttribute FIBER_ATTR_MAIN = {
             StackType::STACK_TYPE_MAIN, AttributeFlag::FLAG_NONE, nullptr};
+
+    static constexpr FiberAttribute FIBER_ATTR_NORMAL_WITH_SPAN =
+            { StackType::STACK_TYPE_NORMAL, AttributeFlag::FLAG_INHERIT, nullptr };
 
     // fibers created with this attribute will print log when it's started,
     // context-switched, finished.

@@ -71,15 +71,13 @@ namespace turbo {
         WaitEvent &operator=(const WaitEvent &) = delete;
 
         WaitEvent(WaitEvent &&rhs) noexcept
-                : waiters_(rhs.waiters_.load(std::memory_order_relaxed)),
-                  event_(rhs.event_) {
+                :event_(rhs.event_) {
             rhs.waiters_.store(0, std::memory_order_relaxed);
             rhs.event_ = nullptr;
         }
 
         WaitEvent &operator=(WaitEvent &&rhs) noexcept {
             if (this != &rhs) {
-                waiters_.store(rhs.waiters_.load(std::memory_order_relaxed), std::memory_order_relaxed);
                 rhs.waiters_.store(0, std::memory_order_relaxed);
                 event_ = rhs.event_;
                 rhs.event_ = nullptr;
@@ -111,14 +109,11 @@ namespace turbo {
 
         constexpr T *event();
 
-        constexpr int waiters() const;
-
         constexpr operator bool() const { return is_valid(); }
 
         constexpr WaitEvent &operator=(value_type event);
 
     private:
-        std::atomic<int> waiters_{0};
         T *event_{nullptr};
     };
 
@@ -141,9 +136,7 @@ namespace turbo {
     template<typename T>
     inline turbo::Status WaitEvent<T>::wait(value_type expected) {
         TURBO_ASSERT(event_ != nullptr);
-        ++waiters_;
         auto r = turbo::fiber_internal::waitable_event_wait(event_, static_cast<int>(expected), Time::infinite_future());
-        --waiters_;
         return r;
     }
 
@@ -151,18 +144,14 @@ namespace turbo {
     inline turbo::Status WaitEvent<T>::wait_for(turbo::Duration d, value_type expected) {
         TURBO_ASSERT(event_ != nullptr);
         auto deadline = (turbo::Time::time_now() + d);
-        ++waiters_;
         auto r = turbo::fiber_internal::waitable_event_wait(event_, static_cast<int>(expected), deadline);
-        --waiters_;
         return r;
     }
 
     template<typename T>
     inline turbo::Status WaitEvent<T>::wait_until(turbo::Time deadline, value_type expected) {
         TURBO_ASSERT(event_ != nullptr);
-        ++waiters_;
         auto r = turbo::fiber_internal::waitable_event_wait(event_, static_cast<int>(expected), deadline);
-        --waiters_;
         return r;
     }
 
@@ -217,11 +206,6 @@ namespace turbo {
         } else {
             return *event_;
         }
-    }
-
-    template<typename T>
-    constexpr int WaitEvent<T>::waiters() const {
-        return waiters_.load(std::memory_order_relaxed);
     }
 
     template<typename T>
