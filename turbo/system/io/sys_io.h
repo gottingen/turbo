@@ -51,6 +51,8 @@ namespace turbo {
 
     ssize_t sys_read(FILE_HANDLER fd, const void *data, int count);
 
+    ssize_t file_size(int fd);
+
 
     struct OpenOption {
         int32_t open_tries{1};

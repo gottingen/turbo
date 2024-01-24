@@ -15,6 +15,7 @@
 #include "turbo/system/io/sys_io.h"
 #include "turbo/system/io/fd_guard.h"
 #include "turbo/log/logging.h"
+#include "turbo/status/error.h"  // errno
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -196,3 +197,51 @@ namespace turbo {
     }
 
 }
+
+#ifdef TURBO_PLATFORM_POSIX
+namespace turbo {
+    ssize_t file_size(int fd) {
+        if (fd == -1) {
+            return -1;
+        }
+// 64 bits(but not in osx or cygwin, where fstat64 is deprecated)
+#    if (defined(__linux__) || defined(__sun) || defined(_AIX)) && (defined(__LP64__) || defined(_LP64))
+        struct stat64 st;
+        if (::fstat64(fd, &st) == 0) {
+            return static_cast<size_t>(st.st_size);
+        }
+#    else // other unix or linux 32 bits or cygwin
+        struct stat st;
+        if (::fstat(fd, &st) == 0) {
+            return static_cast<size_t>(st.st_size);
+        }
+#    endif
+        return -1;
+    }
+}
+#endif  // TURBO_PLATFORM_POSIX
+
+#ifdef TURBO_PLATFORM_WINDOWS
+
+namespace turbo {
+        ssize_t file_size(int fd) {
+        if (fd == -1) {
+            return -1;
+        }
+#    if defined(_WIN64) // 64 bits
+                __int64 ret = ::_filelengthi64(fd);
+                if (ret >= 0) {
+                    return static_cast<size_t>(ret);
+                }
+
+#    else // windows 32 bits
+                long ret = ::_filelength(fd);
+                if (ret >= 0) {
+                    return static_cast<size_t>(ret);
+                }
+#    endif
+        return -1;
+    }
+
+}
+#endif  // TURBO_PLATFORM_WINDOWS

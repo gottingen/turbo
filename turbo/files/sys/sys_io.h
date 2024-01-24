@@ -35,8 +35,6 @@ namespace turbo::sys_io {
     turbo::ResultStatus<FILE_HANDLER> open_write(const turbo::filesystem::path &filename, const std::string &mode,
                                                      const FileOption &option = FileOption());
 
-    turbo::ResultStatus<size_t> file_size(int fd);
-
 }  // namespace turbo::sys_io
 
 #define INVALID_FD_RETURN(fd) \

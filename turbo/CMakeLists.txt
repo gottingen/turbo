@@ -199,6 +199,7 @@ set(TURBO_ALL_SRC
         "system/threading/thread_name_registry.cc"
         "system/threading.cc"
         "system/sysinfo.cc"
+        "system/command.cc"
         "system/internal/sysinfo.cc"
         "times/civil_time.cc"
         "times/clock.cc"

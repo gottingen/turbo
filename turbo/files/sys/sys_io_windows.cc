@@ -43,27 +43,6 @@ namespace turbo::sys_io {
         return file_handle;
     }
 
-    turbo::ResultStatus<size_t> file_size(int fd) {
-        if (fd == -1) {
-            return turbo::make_status(kEINVAL);
-        }
-#    if defined(_WIN64) // 64 bits
-                __int64 ret = ::_filelengthi64(fd);
-                if (ret >= 0)
-                {
-                    return static_cast<size_t>(ret);
-                }
-
-#    else // windows 32 bits
-                long ret = ::_filelength(fd);
-                if (ret >= 0)
-                {
-                    return static_cast<size_t>(ret);
-                }
-#    endif
-        return turbo::errno_to_status(errno, "Failed getting file size from fd");
-    }
-
 }
 
 #endif  // TURBO_PLATFORM_WINDOWS

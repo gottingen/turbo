@@ -75,11 +75,14 @@ namespace turbo {
         INVALID_FD_RETURN(_fd);
         size_t len = n;
         if (len == kInfiniteFileSize) {
-            auto r = turbo::sys_io::file_size(_fd);
-            if (!r.ok()) {
-                return r;
+            auto r = turbo::file_size(_fd);
+            if (r == -1) {
+                return make_status();
             }
-            len = r.value();
+            len = r;
+            if(len == 0) {
+                return 0;
+            }
         }
         auto pre_len = content->size();
         content->resize(pre_len + len);
@@ -98,11 +101,14 @@ namespace turbo {
         INVALID_FD_RETURN(_fd);
         size_t len = n;
         if (len == kInfiniteFileSize) {
-            auto r = turbo::sys_io::file_size(_fd);
-            if (!r.ok()) {
-                return r;
+            auto r = turbo::file_size(_fd);
+            if (r == -1) {
+                return make_status();
             }
-            len = r.value();
+            len = r;
+            if(len == 0) {
+                return 0;
+            }
         }
         IOPortal portal;
         auto r = portal.append_from_file_descriptor(_fd, len);

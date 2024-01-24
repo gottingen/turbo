@@ -37,12 +37,12 @@ namespace turbo {
     }
 
     RandomReadFile::~RandomReadFile() {
-        close();
+        this->close();
     }
 
     turbo::Status
     RandomReadFile::open(const turbo::filesystem::path &path, const turbo::OpenOption &option) noexcept {
-        close();
+        this->close();
         _option = option;
         _file_path = path;
         if(_file_path.empty()) {
@@ -84,11 +84,14 @@ namespace turbo {
         INVALID_FD_RETURN(_fd);
         size_t len = n;
         if(len == kInfiniteFileSize) {
-            auto r = turbo::sys_io::file_size(_fd);
-            if(!r.ok()) {
-                return r;
+            auto r = turbo::file_size(_fd);
+            if(r == -1) {
+                return turbo::make_status();
             }
-            len = r.value();
+            len = r - offset;
+            if(len <= 0) {
+                return turbo::make_status(kEINVAL, "bad offset");
+            }
         }
         auto pre_len = content->size();
         content->resize(pre_len + len);
@@ -106,11 +109,14 @@ namespace turbo {
         INVALID_FD_RETURN(_fd);
         size_t len = n;
         if(len == kInfiniteFileSize) {
-            auto r = turbo::sys_io::file_size(_fd);
-            if(!r.ok()) {
-                return r;
+            auto r = turbo::file_size(_fd);
+            if(r == -1) {
+                return turbo::make_status();
             }
-            len = r.value();
+            len = r - offset;
+            if(len <= 0) {
+                return turbo::make_status(kEINVAL, "bad offset");
+            }
         }
         IOPortal portal;
         auto rs = portal.pappend_from_file_descriptor(_fd, offset, len);

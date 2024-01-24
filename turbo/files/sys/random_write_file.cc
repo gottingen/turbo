@@ -147,7 +147,10 @@ namespace turbo {
 
     turbo::ResultStatus<size_t> RandomWriteFile::size() const {
         INVALID_FD_RETURN(_fd);
-        auto rs = turbo::sys_io::file_size(_fd);
+        auto rs = turbo::file_size(_fd);
+        if(rs == -1) {
+            return turbo::make_status();
+        }
         return rs;
     }
 
