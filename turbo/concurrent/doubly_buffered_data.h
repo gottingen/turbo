@@ -242,7 +242,7 @@ namespace turbo {
 
         inline void EndRead() { _mutex.unlock(); }
 
-        inline void WaitReadDone() { std::lock_guard<std::mutex> lock(_mutex); }
+        inline void WaitReadDone() { std::lock_guard<MUTEX> lock(_mutex); }
 
     private:
         DoublyBufferedData *_control;
@@ -257,7 +257,7 @@ namespace turbo {
             return nullptr;
         }
         try {
-            std::lock_guard<std::mutex> lock(_wrappers_mutex);
+            std::lock_guard<MUTEX> lock(_wrappers_mutex);
             _wrappers.push_back(w.get());
         } catch (std::exception &e) {
             return nullptr;
@@ -271,7 +271,7 @@ namespace turbo {
         if (nullptr == w) {
             return;
         }
-        std::lock_guard<std::mutex> lock(_wrappers_mutex);
+        std::lock_guard<MUTEX> lock(_wrappers_mutex);
         for (size_t i = 0; i < _wrappers.size(); ++i) {
             if (_wrappers[i] == w) {
                 _wrappers[i] = _wrappers.back();
@@ -308,7 +308,7 @@ namespace turbo {
         }
 
         {
-            std::lock_guard<std::mutex> lock(_wrappers_mutex);
+            std::lock_guard<MUTEX> lock(_wrappers_mutex);
             for (size_t i = 0; i < _wrappers.size(); ++i) {
                 _wrappers[i]->_control = nullptr;  // hack: disable removal.
                 delete _wrappers[i];
@@ -349,7 +349,7 @@ namespace turbo {
         // than _wrappers_mutex is to avoid blocking threads calling
         // AddWrapper() or RemoveWrapper() too long. Most of the time, modifications
         // are done by one thread, contention should be negligible.
-        std::lock_guard<std::mutex> lock(_modify_mutex);
+        std::lock_guard<MUTEX> lock(_modify_mutex);
         int bg_index = !_index.load(std::memory_order_relaxed);
         // background instance is not accessed by other threads, being safe to
         // modify.
@@ -368,7 +368,7 @@ namespace turbo {
         // Wait until all threads finishes current reading. When they begin next
         // read, they should see updated _index.
         {
-            std::lock_guard<std::mutex> lock(_wrappers_mutex);
+            std::lock_guard<MUTEX> lock(_wrappers_mutex);
             for (size_t i = 0; i < _wrappers.size(); ++i) {
                 _wrappers[i]->WaitReadDone();
             }

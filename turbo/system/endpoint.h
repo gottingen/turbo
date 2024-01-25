@@ -185,6 +185,8 @@ namespace turbo {
 
         bool parse_sockaddr(struct sockaddr_storage *ss, socklen_t size);
 
+        bool parse_ip(const char *ip_str);
+
         void set(IPAddr ip, int port);
 
         void set(int port);
@@ -201,8 +203,6 @@ namespace turbo {
 
         // Get the other end of a socket connection
         static bool test_remote_side(int fd);
-    private:
-        friend class turbo::system_internal::ExtendedEndPoint;
         IPAddr _ip;
         int _port{0};
     };

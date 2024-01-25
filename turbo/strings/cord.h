@@ -1649,10 +1649,10 @@ namespace turbo {
         return x.compare(y) >= 0;
     }
 
-// Nonmember Cord-to-std::string_view relational operators.
-//
-// Due to implicit conversions, these also enable comparisons of Cord with
-// with std::string, ::string, and const char*.
+    // Nonmember Cord-to-std::string_view relational operators.
+    //
+    // Due to implicit conversions, these also enable comparisons of Cord with
+    // with std::string, ::string, and const char*.
     inline bool operator==(const Cord &lhs, std::string_view rhs) {
         size_t lhs_size = lhs.size();
         size_t rhs_size = rhs.size();

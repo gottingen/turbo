@@ -156,7 +156,7 @@ namespace turbo::system_internal {
                     eep->_u.in6.sin6_flowinfo = 0u;
                     eep->_u.in6.sin6_scope_id = 0u;
                     eep->_socklen = sizeof(_u.in6);
-#if defined(OS_MACOSX)
+#if defined(TURBO_PLATFORM_OSX)
                     eep->_u.in6.sin6_len = eep->_socklen;
 #endif
                 }
@@ -170,7 +170,7 @@ namespace turbo::system_internal {
                     int size = sp.copy(eep->_u.un.sun_path, sp.size());
                     eep->_u.un.sun_path[size] = '\0';
                     eep->_socklen = offsetof(sockaddr_un, sun_path) + size + 1;
-#if defined(OS_MACOSX)
+#if defined(TURBO_PLATFORM_OSX)
                     eep->_u.un.sun_len = eep->_socklen;
 #endif
                 }

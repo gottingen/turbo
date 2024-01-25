@@ -187,7 +187,7 @@ namespace turbo {
         if (ret != 0 || result == nullptr) {
             return false;
         }
-#endif // defined(OS_MACOSX)
+#endif // defined(TURBO_PLATFORM_OSX)
         // Only fetch the first address here
         bcopy((char *) result->h_addr, (char *) &_ip, result->h_length);
         return true;
@@ -337,6 +337,10 @@ namespace turbo {
             return true;
         }
         return false;
+    }
+
+    bool EndPoint::parse_ip(const char *ip_str) {
+        return _ip.parse(ip_str);
     }
 
     bool EndPoint::to_hostname(char *host, size_t host_len) const {
