@@ -21,41 +21,28 @@
 
 #include <cstddef>
 #include <cstdint>
+#include "turbo/flags/declare.h"
 
-#define TURBO_FIBER_STACK_GUARD_PAGE_SIZE 4096
-#define TURBO_FIBER_STACK_SIZE_SMALL 32768
-#define TURBO_FIBER_STACK_SIZE_NORMAL 1048576
-#define TURBO_FIBER_STACK_SIZE_LARGE 8388608
-#define TURBO_FIBER_TC_STACK_SMALL 32
-#define TURBO_FIBER_TC_STACK_NORMAL 8
+TURBO_DECLARE_FLAG(int32_t, stack_size_small);
+TURBO_DECLARE_FLAG(int32_t, stack_size_normal);
+TURBO_DECLARE_FLAG(int32_t, stack_size_large);
+TURBO_DECLARE_FLAG(int32_t, guard_page_size);
+TURBO_DECLARE_FLAG(int32_t, tc_stack_small);
+TURBO_DECLARE_FLAG(int32_t, tc_stack_normal);
+TURBO_DECLARE_FLAG(int32_t, task_group_delete_delay);
+TURBO_DECLARE_FLAG(int32_t, task_group_runqueue_capacity);
+TURBO_DECLARE_FLAG(int32_t, task_group_yield_before_idle);
+TURBO_DECLARE_FLAG(int32_t, fiber_concurrency);
+TURBO_DECLARE_FLAG(int32_t, fiber_min_concurrency);
 
-namespace turbo {
+namespace turbo::fiber_config {
 
-    struct FiberStackConfig {
-        static constexpr size_t guard_page_size{TURBO_FIBER_STACK_GUARD_PAGE_SIZE};
-        static constexpr size_t stack_size_small{TURBO_FIBER_STACK_SIZE_SMALL};
-        static constexpr size_t stack_size_normal{TURBO_FIBER_STACK_SIZE_NORMAL};
-        static constexpr size_t stack_size_large{TURBO_FIBER_STACK_SIZE_LARGE};
-        static constexpr size_t tc_stack_small{TURBO_FIBER_TC_STACK_SMALL};
-        static constexpr size_t tc_stack_normal{TURBO_FIBER_TC_STACK_NORMAL};
-    };
+    static constexpr size_t FIBER_EPOLL_THREAD_NUM = 1;
 
-    struct FiberConfig {
-        static FiberConfig &get_instance() {
-            static FiberConfig ins;
-            return ins;
-        }
-        static constexpr size_t FIBER_EPOLL_THREAD_NUM = 1;
+    static constexpr int FIBER_MIN_CONCURRENCY = 3 + FIBER_EPOLL_THREAD_NUM;
+    static constexpr int FIBER_DEFAULT_CONCURRENCY = 8 + FIBER_EPOLL_THREAD_NUM;
+    static constexpr int FIBER_MAX_CONCURRENCY = 1024;
 
-        static constexpr int FIBER_MIN_CONCURRENCY = 3 + FIBER_EPOLL_THREAD_NUM;
-        static constexpr int FIBER_DEFAULT_CONCURRENCY = 8 + FIBER_EPOLL_THREAD_NUM;
-        static constexpr int FIBER_MAX_CONCURRENCY = 1024;
+}  // namespace turbo::fiber_config
 
-        int32_t  task_group_delete_delay{1};
-        int32_t  task_group_runqueue_capacity{4096};
-        int32_t  task_group_yield_before_idle{0};
-        int32_t  fiber_concurrency{FIBER_DEFAULT_CONCURRENCY};
-        int32_t  fiber_min_concurrency{0};
-    };
-}  // namespace turbo
 #endif  // TURBO_FIBER_CONFIG_H_

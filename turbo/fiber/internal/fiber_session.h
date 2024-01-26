@@ -166,6 +166,9 @@ namespace turbo::fiber_internal {
     int fiber_session_list_reset2_fibersafe(FiberSessionList *list, int error_code,
                                             const std::string &error_text,
                                             FiberMutex *mutex);
+    void fiber_session_status(FiberSessionImpl tn, std::ostream &os);
+
+    void fiber_session_pool_status(std::ostream &os);
 
 }  // namespace turbo::fiber_internal
 

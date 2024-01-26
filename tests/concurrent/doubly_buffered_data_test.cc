@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/concurrent/doubly_buffered_data.h"
+#include "turbo/container/doubly_buffered_data.h"
 #include <map>
 #include <thread>  // NOLINT(build/c++11)
 #include <vector>

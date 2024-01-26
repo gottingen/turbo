@@ -36,23 +36,23 @@ namespace turbo::fiber_internal {
     }
 
     TEST_CASE("FiberTest, setconcurrency") {
-        REQUIRE_EQ(8 + turbo::FiberConfig::FIBER_EPOLL_THREAD_NUM, (size_t) turbo::fiber_get_concurrency());
-        REQUIRE_EQ(kEINVAL, turbo::fiber_set_concurrency(turbo::FiberConfig::FIBER_MIN_CONCURRENCY - 1).code());
+        REQUIRE_EQ(8 + turbo::fiber_config::FIBER_EPOLL_THREAD_NUM, (size_t) turbo::fiber_get_concurrency());
+        REQUIRE_EQ(kEINVAL, turbo::fiber_set_concurrency(turbo::fiber_config::FIBER_MIN_CONCURRENCY - 1).code());
         REQUIRE_EQ(kEINVAL, turbo::fiber_set_concurrency(0).code());
         REQUIRE_EQ(kEINVAL, turbo::fiber_set_concurrency(-1).code());
-        REQUIRE_EQ(kEINVAL, turbo::fiber_set_concurrency(turbo::FiberConfig::FIBER_MAX_CONCURRENCY + 1).code());
-        REQUIRE_EQ(turbo::ok_status(), turbo::fiber_set_concurrency(turbo::FiberConfig::FIBER_MIN_CONCURRENCY));
-        REQUIRE_EQ(turbo::FiberConfig::FIBER_MIN_CONCURRENCY, turbo::fiber_get_concurrency());
-        REQUIRE_EQ(turbo::ok_status(), turbo::fiber_set_concurrency(turbo::FiberConfig::FIBER_MIN_CONCURRENCY + 1));
-        REQUIRE_EQ(turbo::FiberConfig::FIBER_MIN_CONCURRENCY + 1, turbo::fiber_get_concurrency());
-        REQUIRE_EQ(turbo::ok_status(), turbo::fiber_set_concurrency(turbo::FiberConfig::FIBER_MIN_CONCURRENCY));  // smaller value
+        REQUIRE_EQ(kEINVAL, turbo::fiber_set_concurrency(turbo::fiber_config::FIBER_MAX_CONCURRENCY + 1).code());
+        REQUIRE_EQ(turbo::ok_status(), turbo::fiber_set_concurrency(turbo::fiber_config::FIBER_MIN_CONCURRENCY));
+        REQUIRE_EQ(turbo::fiber_config::FIBER_MIN_CONCURRENCY, turbo::fiber_get_concurrency());
+        REQUIRE_EQ(turbo::ok_status(), turbo::fiber_set_concurrency(turbo::fiber_config::FIBER_MIN_CONCURRENCY + 1));
+        REQUIRE_EQ(turbo::fiber_config::FIBER_MIN_CONCURRENCY + 1, turbo::fiber_get_concurrency());
+        REQUIRE_EQ(turbo::ok_status(), turbo::fiber_set_concurrency(turbo::fiber_config::FIBER_MIN_CONCURRENCY));  // smaller value
         fiber_id_t th;
         REQUIRE_EQ(turbo::ok_status(), turbo::fiber_start(&th, nullptr, dummy, nullptr));
-        REQUIRE_EQ(turbo::FiberConfig::FIBER_MIN_CONCURRENCY + 1, turbo::fiber_get_concurrency());
-        REQUIRE_EQ(turbo::ok_status(), turbo::fiber_set_concurrency(turbo::FiberConfig::FIBER_MIN_CONCURRENCY + 5));
-        REQUIRE_EQ(turbo::FiberConfig::FIBER_MIN_CONCURRENCY + 5, turbo::fiber_get_concurrency());
-        REQUIRE_EQ(kEPERM, turbo::fiber_set_concurrency(turbo::FiberConfig::FIBER_MIN_CONCURRENCY + 1).code());
-        REQUIRE_EQ(turbo::FiberConfig::FIBER_MIN_CONCURRENCY + 5, turbo::fiber_get_concurrency());
+        REQUIRE_EQ(turbo::fiber_config::FIBER_MIN_CONCURRENCY + 1, turbo::fiber_get_concurrency());
+        REQUIRE_EQ(turbo::ok_status(), turbo::fiber_set_concurrency(turbo::fiber_config::FIBER_MIN_CONCURRENCY + 5));
+        REQUIRE_EQ(turbo::fiber_config::FIBER_MIN_CONCURRENCY + 5, turbo::fiber_get_concurrency());
+        REQUIRE_EQ(kEPERM, turbo::fiber_set_concurrency(turbo::fiber_config::FIBER_MIN_CONCURRENCY + 1).code());
+        REQUIRE_EQ(turbo::fiber_config::FIBER_MIN_CONCURRENCY + 5, turbo::fiber_get_concurrency());
     }
 
     static std::atomic<int> *odd;

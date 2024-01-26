@@ -41,11 +41,11 @@ namespace turbo::fiber_internal {
 
     extern void (*g_worker_startfn)();
 
-    inline ScheduleGroup *get_task_control() {
+    ScheduleGroup *get_task_control() {
         return g_task_control;
     }
 
-    inline ScheduleGroup *get_or_new_task_control() {
+    ScheduleGroup *get_or_new_task_control() {
         std::atomic<ScheduleGroup *> *p = (std::atomic<ScheduleGroup *> *) &g_task_control;
         ScheduleGroup *c = p->load(std::memory_order_consume);
         if (c != nullptr) {
@@ -60,9 +60,9 @@ namespace turbo::fiber_internal {
         if (nullptr == c) {
             return nullptr;
         }
-        int concurrency = FiberConfig::get_instance().fiber_min_concurrency > 0 ?
-                          FiberConfig::get_instance().fiber_min_concurrency :
-                          FiberConfig::get_instance().fiber_concurrency;
+        int concurrency = turbo::get_flag(FLAGS_fiber_min_concurrency) > 0 ?
+                          turbo::get_flag(FLAGS_fiber_min_concurrency) :
+                          turbo::get_flag(FLAGS_fiber_concurrency);
         if (c->init(concurrency) != 0) {
             TLOG_ERROR("Fail to init g_task_control");
             delete c;
@@ -214,22 +214,22 @@ namespace turbo::fiber_internal {
     }
 
     int fiber_get_concurrency_impl(void) {
-        return turbo::FiberConfig::get_instance().fiber_concurrency;
+        return turbo::get_flag(FLAGS_fiber_concurrency);
     }
 
     turbo::Status fiber_set_concurrency_impl(int num) {
-        if (num < turbo::FiberConfig::FIBER_MIN_CONCURRENCY || num > turbo::FiberConfig::FIBER_MAX_CONCURRENCY) {
+        if (num < turbo::fiber_config::FIBER_MIN_CONCURRENCY || num > turbo::fiber_config::FIBER_MAX_CONCURRENCY) {
             TLOG_ERROR("Invalid concurrency={}", num);
             return turbo::make_status(EINVAL);
         }
-        if (turbo::FiberConfig::get_instance().fiber_min_concurrency > 0) {
-            if (num < turbo::FiberConfig::get_instance().fiber_min_concurrency) {
+        if (turbo::get_flag(FLAGS_fiber_min_concurrency) > 0) {
+            if (num < turbo::get_flag(FLAGS_fiber_min_concurrency)) {
                 return turbo::make_status(EINVAL);
             }
             if (turbo::fiber_internal::never_set_fiber_concurrency) {
                 turbo::fiber_internal::never_set_fiber_concurrency = false;
             }
-            turbo::FiberConfig::get_instance().fiber_concurrency = num;
+            turbo::set_flag(&FLAGS_fiber_concurrency,  num);
             return turbo::ok_status();
         }
         turbo::fiber_internal::ScheduleGroup *c = turbo::fiber_internal::get_task_control();
@@ -245,24 +245,24 @@ namespace turbo::fiber_internal {
         if (c == nullptr) {
             if (turbo::fiber_internal::never_set_fiber_concurrency) {
                 turbo::fiber_internal::never_set_fiber_concurrency = false;
-                turbo::FiberConfig::get_instance().fiber_concurrency = num;
-            } else if (num > turbo::FiberConfig::get_instance().fiber_concurrency) {
-                turbo::FiberConfig::get_instance().fiber_concurrency = num;
+                turbo::set_flag(&FLAGS_fiber_concurrency, num);
+            } else if (num > turbo::get_flag(FLAGS_fiber_concurrency)) {
+                turbo::set_flag(&FLAGS_fiber_concurrency, num);
             }
             return turbo::ok_status();
         }
-        if (turbo::FiberConfig::get_instance().fiber_concurrency != c->concurrency()) {
+        if (turbo::get_flag(FLAGS_fiber_concurrency) != c->concurrency()) {
             TLOG_ERROR("failed: fiber_concurrency={} != tc_concurrency={}",
-                       turbo::FiberConfig::get_instance().fiber_concurrency, c->concurrency());
-            turbo::FiberConfig::get_instance().fiber_concurrency = c->concurrency();
+                       turbo::get_flag(FLAGS_fiber_concurrency), c->concurrency());
+            turbo::set_flag(&FLAGS_fiber_concurrency, c->concurrency());
         }
-        if (num > turbo::FiberConfig::get_instance().fiber_concurrency) {
+        if (num > turbo::get_flag(FLAGS_fiber_concurrency)) {
             // Create more workers if needed.
-            turbo::FiberConfig::get_instance().fiber_concurrency +=
-                    c->add_workers(num - turbo::FiberConfig::get_instance().fiber_concurrency);
+            auto n= c->add_workers(num - turbo::get_flag(FLAGS_fiber_concurrency)) + turbo::get_flag(FLAGS_fiber_concurrency);
+            turbo::set_flag(&FLAGS_fiber_concurrency, n);
             return turbo::ok_status();
         }
-        return (num == turbo::FiberConfig::get_instance().fiber_concurrency ? turbo::ok_status()
+        return (num == turbo::get_flag(FLAGS_fiber_concurrency) ? turbo::ok_status()
                                                                             : turbo::make_status(EPERM));
     }
 

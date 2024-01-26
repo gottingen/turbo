@@ -49,6 +49,14 @@ namespace turbo {
 
     }
 
+    inline void fiber_assign_data(void *data) {
+        turbo::fiber_internal::fiber_assign_data(data);
+    }
+
+    inline void *fiber_get_assigned_data() {
+        return turbo::fiber_internal::fiber_get_assigned_data();
+    }
+
 }
 
 namespace turbo {

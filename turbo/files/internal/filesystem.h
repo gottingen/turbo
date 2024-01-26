@@ -841,14 +841,14 @@ public:
 #endif
         };
 
-// [fs.enum.dir.opts]
+        // [fs.enum.dir.opts]
         enum class directory_options : uint16_t {
             none = 0,
             follow_directory_symlink = 1,
             skip_permission_denied = 2,
         };
 
-// [fs.class.file_status] class file_status
+        // [fs.class.file_status] class file_status
         class TURBO_DLL file_status {
         public:
             // [fs.file_status.cons] constructors and destructor
@@ -889,7 +889,7 @@ public:
 
         using file_time_type = std::chrono::time_point<std::chrono::system_clock>;
 
-// [fs.class.directory_entry] Class directory_entry
+        // [fs.class.directory_entry] Class directory_entry
         class TURBO_DLL directory_entry {
         public:
             // [fs.dir.entry.cons] constructors and destructor

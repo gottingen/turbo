@@ -99,7 +99,7 @@ namespace turbo::fiber_internal {
         turbo::SpinLock mutex;
         void *data;
 
-        session_on_error  on_error;
+        session_on_error on_error;
 
         session_on_error_msg on_error2;
 
@@ -182,11 +182,13 @@ namespace turbo::fiber_internal {
         return fiber_session_unlock_and_destroy(tn);
     }
 
-    static const session_on_error default_fiber_session_on_error = session_on_error(default_fiber_session_on_error_func);
+    static const session_on_error default_fiber_session_on_error = session_on_error(
+            default_fiber_session_on_error_func);
 
-    static const session_on_error_msg default_fiber_session_on_error2 = session_on_error_msg(default_fiber_session_on_error2_func);
+    static const session_on_error_msg default_fiber_session_on_error2 = session_on_error_msg(
+            default_fiber_session_on_error2_func);
 
-    void session_status(FiberSessionImpl tn, std::ostream &os) {
+    void fiber_session_status(FiberSessionImpl tn, std::ostream &os) {
         turbo::fiber_internal::Session *const meta = address_resource(turbo::fiber_internal::get_slot(tn));
         if (!meta) {
             os << "Invalid Session=" << tn.value << '\n';
@@ -278,7 +280,7 @@ namespace turbo::fiber_internal {
         os << '\n';
     }
 
-    void session_pool_status(std::ostream &os) {
+    void fiber_session_pool_status(std::ostream &os) {
         os << turbo::describe_resources<Session>() << '\n';
     }
 
@@ -287,7 +289,9 @@ namespace turbo::fiber_internal {
         static const size_t MAX_ENTRIES = 100000;
         static const FiberSessionImpl SESSION_INIT;
 
-        static bool exists(FiberSessionImpl tn) { return turbo::fiber_internal::session_exists_with_true_negatives(tn); }
+        static bool exists(FiberSessionImpl tn) {
+            return turbo::fiber_internal::session_exists_with_true_negatives(tn);
+        }
     };
 
     const FiberSessionImpl session_traits::SESSION_INIT = INVALID_FIBER_SESSION;
@@ -321,7 +325,7 @@ namespace turbo::fiber_internal {
     static int session_create_impl(
             FiberSessionImpl *tn, void *data,
             session_on_error on_error,
-            session_on_error_msg on_error2 ) {
+            session_on_error_msg on_error2) {
         IdResourceId slot;
         Session *const meta = get_resource(&slot);
         if (meta) {
@@ -387,7 +391,7 @@ namespace turbo::fiber_internal {
 
     int fiber_session_create_ranged(FiberSessionImpl *tn, void *data,
                                     const session_on_error &on_error,
-                                  int range) {
+                                    int range) {
         return turbo::fiber_internal::session_create_ranged_impl(
                 tn, data,
                 (on_error ? on_error : turbo::fiber_internal::default_fiber_session_on_error),
@@ -414,7 +418,8 @@ namespace turbo::fiber_internal {
                            range > turbo::fiber_internal::SESSION_MAX_RANGE ||
                            range + meta->first_ver <= meta->locked_ver) {
                     TLOG_CRITICAL_IF(range < 1, "range must be positive, actually {}", range);
-                    TLOG_CRITICAL_IF(range > turbo::fiber_internal::SESSION_MAX_RANGE, "max of range is {} , actually {}",
+                    TLOG_CRITICAL_IF(range > turbo::fiber_internal::SESSION_MAX_RANGE,
+                                     "max of range is {} , actually {}",
                                      turbo::fiber_internal::SESSION_MAX_RANGE, range);
                 } else {
                     meta->locked_ver = meta->first_ver + range;
@@ -445,7 +450,7 @@ namespace turbo::fiber_internal {
     }
 
     int fiber_session_error_verbose(FiberSessionImpl tn, int error_code,
-                                  const char *location) {
+                                    const char *location) {
         return fiber_session_error2_verbose(tn, error_code, std::string(), location);
     }
 
@@ -550,7 +555,7 @@ namespace turbo::fiber_internal {
     }
 
     int fiber_session_lock_verbose(FiberSessionImpl tn, void **pdata,
-                                 const char *location) {
+                                   const char *location) {
         return fiber_session_lock_and_reset_range_verbose(tn, pdata, 0, location);
     }
 
@@ -630,8 +635,8 @@ namespace turbo::fiber_internal {
     }
 
     int fiber_session_list_init(FiberSessionList *list,
-                              unsigned /*size*/,
-                              unsigned /*conflict_size*/) {
+                                unsigned /*size*/,
+                                unsigned /*conflict_size*/) {
         list->impl = nullptr;  // create on demand.
         // Set unused fields to zero as well.
         list->head = 0;
@@ -661,18 +666,18 @@ namespace turbo::fiber_internal {
     }
 
     void fiber_session_list_swap(FiberSessionList *list1,
-                               FiberSessionList *list2) {
+                                 FiberSessionList *list2) {
         std::swap(list1->impl, list2->impl);
     }
 
     int fiber_session_list_reset_pthreadsafe(FiberSessionList *list, int error_code,
-                                           std::mutex *mutex) {
+                                             std::mutex *mutex) {
         return fiber_session_list_reset2_pthreadsafe(
                 list, error_code, std::string(), mutex);
     }
 
     int fiber_session_list_reset_fibersafe(FiberSessionList *list, int error_code,
-                                         turbo::FiberMutex *mutex) {
+                                           turbo::FiberMutex *mutex) {
         return fiber_session_list_reset2_fibersafe(
                 list, error_code, std::string(), mutex);
     }
@@ -696,8 +701,8 @@ namespace turbo::fiber_internal {
     }
 
     int fiber_session_error2_verbose(FiberSessionImpl tn, int error_code,
-                                   const std::string &error_text,
-                                   const char *location) {
+                                     const std::string &error_text,
+                                     const char *location) {
         turbo::fiber_internal::Session *const meta = address_resource(turbo::fiber_internal::get_slot(tn));
         if (!meta) {
             return EINVAL;
@@ -731,8 +736,8 @@ namespace turbo::fiber_internal {
     }
 
     int fiber_session_reset2(FiberSessionList *list,
-                           int error_code,
-                           const std::string &error_text) {
+                             int error_code,
+                             const std::string &error_text) {
         if (list->impl != nullptr) {
             static_cast<turbo::fiber_internal::session_list *>(list->impl)->apply(
                     turbo::fiber_internal::session_resetter(error_code, error_text));
@@ -741,8 +746,8 @@ namespace turbo::fiber_internal {
     }
 
     int fiber_session_list_reset2_pthreadsafe(FiberSessionList *list,
-                                            int error_code,
-                                            const std::string &error_text,
+                                              int error_code,
+                                              const std::string &error_text,
                                               std::mutex *mutex) {
         if (mutex == nullptr) {
             return EINVAL;
@@ -765,9 +770,9 @@ namespace turbo::fiber_internal {
     }
 
     int fiber_session_list_reset2_fibersafe(FiberSessionList *list,
-                                          int error_code,
-                                          const std::string &error_text,
-                                          FiberMutex *mutex) {
+                                            int error_code,
+                                            const std::string &error_text,
+                                            FiberMutex *mutex) {
         if (mutex == nullptr) {
             return EINVAL;
         }

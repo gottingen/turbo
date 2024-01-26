@@ -16,6 +16,7 @@
 #include "turbo/system/endpoint.h"
 #include "turbo/system/io.h"
 #include "turbo/system/internal/endpoint_internal.h"
+#include "turbo/strings/fixed_string.h"
 
 namespace turbo {
 

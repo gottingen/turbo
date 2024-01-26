@@ -364,16 +364,16 @@ namespace turbo::fiber_internal {
         std::mutex _start_mutex;
     };
 
-    EpollThread epoll_thread[turbo::FiberConfig::FIBER_EPOLL_THREAD_NUM];
+    EpollThread epoll_thread[turbo::fiber_config::FIBER_EPOLL_THREAD_NUM];
 
     static inline EpollThread &get_epoll_thread(int fd) {
-        if (turbo::FiberConfig::FIBER_EPOLL_THREAD_NUM == 1UL) {
+        if (turbo::fiber_config::FIBER_EPOLL_THREAD_NUM == 1UL) {
             EpollThread &et = epoll_thread[0];
             et.start(FIBER_DEFAULT_EPOLL_SIZE);
             return et;
         }
 
-        EpollThread &et = epoll_thread[turbo::hash_mixer4(fd) % turbo::FiberConfig::FIBER_EPOLL_THREAD_NUM];
+        EpollThread &et = epoll_thread[turbo::hash_mixer4(fd) % turbo::fiber_config::FIBER_EPOLL_THREAD_NUM];
         et.start(FIBER_DEFAULT_EPOLL_SIZE);
         return et;
     }
@@ -381,7 +381,7 @@ namespace turbo::fiber_internal {
     int stop_and_join_epoll_threads() {
         // Returns -1 if any epoll thread failed to stop.
         int rc = 0;
-        for (size_t i = 0; i < turbo::FiberConfig::FIBER_EPOLL_THREAD_NUM; ++i) {
+        for (size_t i = 0; i < turbo::fiber_config::FIBER_EPOLL_THREAD_NUM; ++i) {
             if (epoll_thread[i].stop_and_join() < 0) {
                 rc = -1;
             }

@@ -134,6 +134,14 @@ namespace turbo {
         return turbo::fiber_internal::fiber_session_error2_verbose(session, error_code, error_text, location);
     }
 
+    inline void fiber_session_status(fiber_session_t tn, std::ostream &os) {
+        return turbo::fiber_internal::fiber_session_status(tn, os);
+    }
+
+    inline void fiber_session_pool_status(std::ostream &os) {
+        return turbo::fiber_internal::fiber_session_pool_status(os);
+    }
+
 
 
 #define fiber_session_lock(id, pdata)                                      \
@@ -179,6 +187,16 @@ namespace turbo {
 
     private:
         turbo::fiber_internal::FiberSessionImpl session_{0};
+    };
+
+    template<>
+    struct formatter<turbo::fiber_session_t > {
+        constexpr auto parse(format_parse_context &ctx) { return ctx.begin(); }
+
+        template<typename FormatContext>
+        auto format(const turbo::fiber_session_t &session, FormatContext &ctx) {
+            return format_to(ctx.out(), "FiberSession{{session_id={}}}", session.value);
+        }
     };
 }  // namespace turbo
 

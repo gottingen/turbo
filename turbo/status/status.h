@@ -1270,6 +1270,15 @@ namespace turbo {
     // message-less kCancelled errors are common in the infrastructure.
     inline Status cancelled_error() { return Status(turbo::kCancelled); }
 
+    template<>
+    struct formatter<turbo::Status> {
+        constexpr auto parse(format_parse_context &ctx) { return ctx.begin(); }
+
+        template<typename FormatContext>
+        auto format(const turbo::Status &status, FormatContext &ctx) {
+            return format_to(ctx.out(), "{}", status.to_string());
+        }
+    };
 }  // namespace turbo
 
 #endif  // TURBO_STATUS_STATUS_H_

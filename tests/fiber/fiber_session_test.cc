@@ -27,7 +27,6 @@
 #include "turbo/fiber/fiber_session.h"
 
 namespace turbo::fiber_internal {
-    void session_status(turbo::fiber_session_t, std::ostream &);
     uint32_t session_value(turbo::fiber_session_t id);
 }
 
@@ -392,20 +391,20 @@ namespace {
     TEST_CASE("BthreadIdTest, status") {
         turbo::fiber_session_t id;
         turbo::fiber_session_create(&id, nullptr, nullptr);
-        turbo::fiber_internal::session_status(id, std::cout);
+        turbo::fiber_session_status(id, std::cout);
         fiber_session_lock(id, nullptr);
         fiber_session_error(id, 123);
         fiber_session_error(id, 256);
         fiber_session_error(id, 1256);
-        turbo::fiber_internal::session_status(id, std::cout);
+        turbo::fiber_session_status(id, std::cout);
         turbo::fiber_session_unlock_and_destroy(id);
         turbo::fiber_session_create(&id, nullptr, error_without_unlock);
         fiber_session_lock(id, nullptr);
-        turbo::fiber_internal::session_status(id, std::cout);
+        turbo::fiber_session_status(id, std::cout);
         fiber_session_error(id, 12);
-        turbo::fiber_internal::session_status(id, std::cout);
+        turbo::fiber_session_status(id, std::cout);
         fiber_session_unlock(id);
-        turbo::fiber_internal::session_status(id, std::cout);
+        turbo::fiber_session_status(id, std::cout);
         turbo::fiber_session_unlock_and_destroy(id);
     }
 
@@ -413,10 +412,10 @@ namespace {
         turbo::fiber_session_t id;
         REQUIRE_EQ(0, turbo::fiber_session_create(&id, nullptr, nullptr));
         REQUIRE_EQ(0, fiber_session_lock_and_reset_range(id, nullptr, 1000));
-        turbo::fiber_internal::session_status(id, std::cout);
+        turbo::fiber_session_status(id, std::cout);
         fiber_session_unlock(id);
         REQUIRE_EQ(0, fiber_session_lock_and_reset_range(id, nullptr, 300));
-        turbo::fiber_internal::session_status(id, std::cout);
+        turbo::fiber_session_status(id, std::cout);
         turbo::fiber_session_unlock_and_destroy(id);
     }
 
@@ -448,7 +447,7 @@ namespace {
         // The threads should quit soon.
         pthread_join(pth, nullptr);
         turbo::fiber_join(bth, nullptr);
-        turbo::fiber_internal::session_status(id, std::cout);
+        turbo::fiber_session_status(id, std::cout);
         REQUIRE_EQ(0, turbo::fiber_session_unlock_and_destroy(id));
     }
 
@@ -472,7 +471,7 @@ namespace {
         // The threads should quit soon.
         pthread_join(pth, nullptr);
         turbo::fiber_join(bth, nullptr);
-        turbo::fiber_internal::session_status(id, std::cout);
+        turbo::fiber_session_status(id, std::cout);
         REQUIRE_EQ(0, fiber_session_lock(id, nullptr));
         REQUIRE_EQ(0, turbo::fiber_session_unlock_and_destroy(id));
     }
@@ -495,7 +494,7 @@ namespace {
         // The threads should quit soon.
         pthread_join(pth, nullptr);
         turbo::fiber_join(bth, nullptr);
-        turbo::fiber_internal::session_status(id, std::cout);
+        turbo::fiber_session_status(id, std::cout);
         REQUIRE_EQ(0, turbo::fiber_session_unlock_and_destroy(id));
     }
 

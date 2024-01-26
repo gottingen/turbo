@@ -142,6 +142,10 @@ namespace turbo::fiber_internal {
             fiber_keytable_pool_t *pool, size_t nfree,
             fiber_local_key key, const key_pool_ctor_t &ctor, const void *args);
 
+    void fiber_assign_data(void *data);
+
+    void *fiber_get_assigned_data();
+
 }  // namespace turbo::fiber_internal
 
 namespace turbo {
