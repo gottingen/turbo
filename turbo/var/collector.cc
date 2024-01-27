@@ -175,7 +175,6 @@ namespace turbo {
 
         // The main loop.
         while (!_stop) {
-            TURBO_RAW_LOG(INFO, "Collector grab thread round");
             const int64_t abstime = _last_active_cpuwide_us + COLLECTOR_GRAB_INTERVAL_US;
 
             // Clear and reuse vectors in prep_map, don't clear prep_map directly.
@@ -408,18 +407,6 @@ namespace turbo {
     DisplaySamplingRatio::DisplaySamplingRatio(const char *name,
                                                const CollectorSpeedLimit *sl)
             : _var(name, get_sampling_ratio, (void *) sl) {
-    }
-
-    struct CollectorInitializer {
-        CollectorInitializer() {
-            auto ptr = Collector::get_instance();
-            TURBO_RAW_LOG(INFO, "Collector created at %p", ptr);
-        }
-    };
-
-    CollectorInitializer g_collector_initializer [[maybe_unused]];
-    Collector* g_collector (){
-        return Collector::get_instance();
     }
 
 }  // namespace turbo
