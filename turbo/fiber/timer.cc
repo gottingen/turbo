@@ -37,7 +37,7 @@ namespace turbo {
             return rs;
         }
 
-        auto tmp = turbo::fiber_internal::fiber_timer_add(abstime, std::move(on_timer), this);
+        auto tmp = turbo::fiber_internal::fiber_timer_add(abstime, std::move(on_timer), arg);
         if (TURBO_UNLIKELY(!tmp.ok())) {
             return tmp.status();
         }

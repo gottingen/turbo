@@ -108,7 +108,7 @@ namespace turbo {
         // Returns a pointer to the fully typed node (the same as operator->) this is useful when
         // iterating a list to destroy all the nodes, calling this on the end() of a list results in
         // undefined behavior.
-        pointer nodePtr() const;
+        pointer node_ptr() const;
 
         intrusive_list_iterator &operator++();
 
@@ -528,7 +528,7 @@ namespace turbo {
 
     template<typename T, typename Pointer, typename Reference>
     inline typename intrusive_list_iterator<T, Pointer, Reference>::pointer
-    intrusive_list_iterator<T, Pointer, Reference>::nodePtr() const {
+    intrusive_list_iterator<T, Pointer, Reference>::node_ptr() const {
         return static_cast<pointer>(mpNode);
     }
 

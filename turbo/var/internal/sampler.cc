@@ -20,7 +20,8 @@
 #include "turbo/times/time.h"
 #include "turbo/flags/flag.h"
 
-TURBO_FLAG(turbo::Duration , var_sampler_thread_start_delay, turbo::Duration::milliseconds(10), "var sampler thread start delay us");
+TURBO_FLAG(turbo::Duration, var_sampler_thread_start_delay, turbo::Duration::milliseconds(10),
+           "var sampler thread start delay us");
 TURBO_FLAG(bool, var_enable_sampling, true, "is enable var sampling");
 
 namespace turbo::var_internal {
@@ -55,7 +56,7 @@ namespace turbo::var_internal {
     // list of Samplers. Waking through the list and call take_sample().
     // If a Sampler needs to be deleted, we just mark it as unused and the
     // deletion is taken place in the thread as well.
-    class SamplerCollector : public turbo::Reducer<Sampler*, CombineSampler> {
+    class SamplerCollector {
     public:
         SamplerCollector()
                 : _created(false), _stop(false), _cumulated_time_us(0) {
@@ -73,6 +74,11 @@ namespace turbo::var_internal {
         static SamplerCollector *get_instance() {
             static SamplerCollector instance;
             return &instance;
+        }
+
+        void add_sampler(Sampler *sampler) {
+            std::lock_guard<std::mutex> lock(_mutex);
+            added_list.push_back(*sampler);
         }
 
     private:
@@ -122,12 +128,16 @@ namespace turbo::var_internal {
         bool _stop;
         int64_t _cumulated_time_us;
         pthread_t _tid;
+        std::mutex _mutex;
+        turbo::intrusive_list<Sampler> added_list TURBO_GUARDED_BY(_mutex);
+        turbo::intrusive_list<Sampler> doing_list;
     };
+
 #ifndef UNIT_TEST
-    /*
+
     static PassiveStatus<double> *s_cumulated_time_var = nullptr;
-    static turbo::PerSecond <turbo::PassiveStatus<double>> *s_sampling_thread_usage_bvar = nullptr;
-     */
+    static turbo::PerSecond<turbo::PassiveStatus<double>> *s_sampling_thread_usage_bvar = nullptr;
+
 #endif
 
 
@@ -140,42 +150,36 @@ namespace turbo::var_internal {
         //   may be abandoned at any time after forking.
         // * They can't created inside the constructor of SamplerCollector as well,
         //   which results in deadlock.
-        /*
+
         if (s_cumulated_time_var == nullptr) {
             s_cumulated_time_var =
                     new turbo::PassiveStatus<double>(get_cumulated_time, this);
         }
         if (s_sampling_thread_usage_bvar == nullptr) {
             s_sampling_thread_usage_bvar =
-                    new turbo::PerSecond <turbo::PassiveStatus<double>>(
+                    new turbo::PerSecond<turbo::PassiveStatus<double>>(
                             "var_sampler_collector_usage", s_cumulated_time_var, 10);
         }
-         */
-#endif
 
-        turbo::intrusive_list_node root;
+#endif
         int consecutive_nosleep = 0;
         while (!_stop) {
-
-            int64_t abstime = turbo::get_current_time_micros();
-            Sampler *s = this->reset();
-            if (s) {
-                s->insert_before_as_list(&root);
+            {
+                std::lock_guard<std::mutex> lock(_mutex);
+                doing_list.splice(doing_list.end(), added_list);
             }
-            for (turbo::intrusive_list_node *p = root.next; p != &root;) {
-                // We may remove p from the list, save next first.
-                turbo::intrusive_list_node *saved_next = p->next;
-                auto *ss = static_cast<Sampler*>(p);
-                ss->_mutex.lock();
-                if (!ss->_used) {
-                    ss->remove_from_list();
-                    ss->_mutex.unlock();
-                    delete ss;
+            int64_t abstime = turbo::get_current_time_micros();
+            for (auto it = doing_list.begin(); it != doing_list.end();) {
+                auto sit = it++;
+                sit->_mutex.lock();
+                if (!sit->_used) {
+                    doing_list.erase(sit);
+                    sit->_mutex.unlock();
+                    delete sit.node_ptr();
                 } else {
-                    ss->take_sample();
-                    ss->_mutex.unlock();
+                    sit->take_sample();
+                    sit->_mutex.unlock();
                 }
-                p = saved_next;
             }
             bool slept = false;
             int64_t now = turbo::get_current_time_micros();
@@ -203,10 +207,9 @@ namespace turbo::var_internal {
     Sampler::~Sampler() {}
 
 
-
     void Sampler::schedule() {
         if (get_flag(FLAGS_var_enable_sampling)) {
-            (*SamplerCollector::get_instance())<< this;
+            SamplerCollector::get_instance()->add_sampler(this);
         }
     }
 

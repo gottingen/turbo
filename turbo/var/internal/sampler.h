@@ -135,7 +135,7 @@ namespace turbo::var_internal {
             std::unique_lock l(_mutex);
             if (_q.size() <= 1UL) {
                 // We need more samples to get reasonable result.
-                TURBO_RAW_LOG(WARNING, "Not enough samples, size=%ld", _q.size());
+                TURBO_RAW_LOG(WARNING, "Not enough samples, size=%ld, %p", _q.size(), this);
                 return false;
             }
             Sample<T> *oldest = _q.bottom(window_size);
@@ -149,7 +149,6 @@ namespace turbo::var_internal {
                 for (int i = 1; true; ++i) {
                     Sample<T> *e = _q.bottom(i);
                     if (e == oldest) {
-                        TURBO_RAW_LOG(INFO, "ReducerSampler loop i=%d",i);
                         break;
                     }
                     _reducer->op()(result->data, e->data);
