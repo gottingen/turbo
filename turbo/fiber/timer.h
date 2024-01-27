@@ -31,14 +31,10 @@ namespace turbo {
 
         ~FiberTimer();
 
-        turbo::Status run_at(const turbo::Time &abstime,
-                             const turbo::timer_task_fn_t &on_timer, void *arg);
+        turbo::Status run_at(const turbo::Time &abstime, turbo::timer_task_fn_t &&on_timer, void *arg);
 
         turbo::Status run_after(const turbo::Duration &duration,
-                                const turbo::timer_task_fn_t &on_timer, void *arg);
-
-        turbo::Status run_every(const turbo::Duration &duration,
-                                const turbo::timer_task_fn_t &on_timer, void *arg);
+                                turbo::timer_task_fn_t &&on_timer, void *arg);
 
         void cancel();
 
@@ -48,23 +44,9 @@ namespace turbo {
             _timer_id = INVALID_TIMER_ID;
         }
 
-        const turbo::Duration & duration() const { return _duration; }
-
-        size_t repeat() const { return _repeat; }
-
-        bool  triggered() const { return _triggered; }
-
-        bool is_repeated() const { return _duration != turbo::Duration::zero(); }
     private:
         turbo::Status check_duration_possible(const turbo::Duration &duration) const;
 
-        static void on_timer_call(void *arg);
-
-        void *_arg{nullptr};
-        bool _triggered{false};
-        timer_task_fn_t _on_timer;
-        turbo::Duration _duration;
-        size_t _repeat{0};
         TimerId _timer_id{INVALID_TIMER_ID};
     };
 
