@@ -162,12 +162,14 @@ namespace turbo::var_internal {
                 // We may remove p from the list, save next first.
                 turbo::intrusive_list_node *saved_next = p->next;
                 auto *ss = static_cast<Sampler*>(p);
-                std::unique_lock l(ss->_mutex);
+                ss->_mutex.lock();
                 if (!ss->_used) {
                     ss->remove_from_list();
+                    ss->_mutex.unlock();
                     delete ss;
                 } else {
                     ss->take_sample();
+                    ss->_mutex.unlock();
                 }
                 p = saved_next;
             }

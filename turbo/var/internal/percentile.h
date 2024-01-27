@@ -487,12 +487,8 @@ namespace turbo::var_internal {
         };
 
         typedef GlobalPercentileSamples value_type;
-        typedef ReducerSampler<Percentile,
-                GlobalPercentileSamples,
-                AddPercentileSamples, VoidOp> sampler_type;
-        typedef AgentCombiner<GlobalPercentileSamples,
-                ThreadLocalPercentileSamples,
-                AddPercentileSamples> combiner_type;
+        typedef ReducerSampler<Percentile, GlobalPercentileSamples,AddPercentileSamples, VoidOp> sampler_type;
+        typedef AgentCombiner<GlobalPercentileSamples, ThreadLocalPercentileSamples, AddPercentileSamples> combiner_type;
         typedef combiner_type::Agent agent_type;
 
         Percentile();
