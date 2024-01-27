@@ -124,8 +124,10 @@ namespace turbo::var_internal {
         pthread_t _tid;
     };
 #ifndef UNIT_TEST
+    /*
     static PassiveStatus<double> *s_cumulated_time_var = nullptr;
     static turbo::PerSecond <turbo::PassiveStatus<double>> *s_sampling_thread_usage_bvar = nullptr;
+     */
 #endif
 
 
@@ -138,6 +140,7 @@ namespace turbo::var_internal {
         //   may be abandoned at any time after forking.
         // * They can't created inside the constructor of SamplerCollector as well,
         //   which results in deadlock.
+        /*
         if (s_cumulated_time_var == nullptr) {
             s_cumulated_time_var =
                     new turbo::PassiveStatus<double>(get_cumulated_time, this);
@@ -147,6 +150,7 @@ namespace turbo::var_internal {
                     new turbo::PerSecond <turbo::PassiveStatus<double>>(
                             "var_sampler_collector_usage", s_cumulated_time_var, 10);
         }
+         */
 #endif
 
         turbo::intrusive_list_node root;
