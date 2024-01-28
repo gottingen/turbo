@@ -60,7 +60,7 @@ namespace turbo::var_internal {
     public:
         SamplerCollector()
                 : _created(false), _stop(false), _cumulated_time_us(0) {
-            create_sampling_thread();
+           // create_sampling_thread();
         }
 
         ~SamplerCollector() {
@@ -108,7 +108,7 @@ namespace turbo::var_internal {
 
         void after_forked_as_child() {
             _created = false;
-            create_sampling_thread();
+            //create_sampling_thread();
         }
 
         void run();
