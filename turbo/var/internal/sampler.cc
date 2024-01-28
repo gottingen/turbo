@@ -214,9 +214,9 @@ namespace turbo::var_internal {
     }
 
     void Sampler::destroy() {
-        _mutex.lock();
+        //_mutex.lock();
         _used = false;
-        _mutex.unlock();
+        //_mutex.unlock();
     }
 
 }  // namespace namespace turbo::var_internal
