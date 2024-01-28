@@ -77,8 +77,8 @@ namespace turbo::var_internal {
         }
 
         void add_sampler(Sampler *sampler) {
-            std::lock_guard<std::mutex> lock(_mutex);
-            added_list.push_back(*sampler);
+            //std::lock_guard<std::mutex> lock(_mutex);
+            //added_list.push_back(*sampler);
         }
 
     private:
