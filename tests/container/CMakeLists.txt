@@ -215,7 +215,6 @@ carbin_cc_test(
         ${GTEST_MAIN_LIB}
 )
 
-
 carbin_cc_test(
         NAME
         node_hash_set_test
@@ -665,6 +664,15 @@ carbin_cc_test(
         NAME tf_serializer_test
         SOURCES
         serializer_test.cc
+        COPTS ${CARBIN_CXX_OPTIONS}
+        DEPS
+        ${CARBIN_DEPS_LINK}
+        turbo::turbo
+)
+carbin_cc_test(
+        NAME container_batch_test
+        SOURCES
+        batch_test.cc
         COPTS ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}

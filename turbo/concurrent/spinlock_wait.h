@@ -23,7 +23,7 @@
 #include "turbo/times/clock.h"
 #include "turbo/platform/internal/scheduling_mode.h"
 #include "turbo/concurrent/internal/futex.h"
-#include "turbo/base/status.h"
+#include "turbo/status/status.h"
 
 namespace turbo {
 
@@ -182,7 +182,7 @@ namespace turbo {
             if(deadline <= time_now()) {
                 return deadline_exceeded_error("duration is negative");
             }
-            auto spec = turbo::to_timespec(deadline - time_now());
+            auto spec = (deadline - time_now()).to_timespec();
             auto ret = turbo::concurrent_internal::futex_wait_private(&_waiter, expected, &spec);
             if(ret != 0) {
                 return deadline_exceeded_error("wait_until timeout");
@@ -191,10 +191,10 @@ namespace turbo {
         }
 
         turbo::Status wait_for(int expected, const turbo::Duration& duration) {
-            if(duration <= turbo::zero_duration()) {
+            if(duration <= turbo::Duration::zero()) {
                 return deadline_exceeded_error("duration is negative");
             }
-            auto spec = turbo::to_timespec(duration);
+            auto spec = duration.to_timespec();
             auto ret =turbo::concurrent_internal::futex_wait_private(&_waiter, expected, &spec);
             if(ret != 0) {
                 return deadline_exceeded_error("wait_for timeout");

@@ -21,7 +21,7 @@
 #include "turbo/log/details/os.h"
 #include <turbo/format/format.h>
 #include "turbo/log/formatter.h"
-#include "turbo/base/sysinfo.h"
+#include "turbo/system/sysinfo.h"
 
 #include <algorithm>
 #include <array>
@@ -104,7 +104,7 @@ namespace turbo::tlog {
             explicit name_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &msg, const std::tm &, memory_buf_t &dest) override {
+            void format(const details::log_msg &msg, const turbo::CivilInfo&, memory_buf_t &dest) override {
                 ScopedPadder p(msg.logger_name.size(), padinfo_, dest);
                 fmt_helper::append_string_view(msg.logger_name, dest);
             }
@@ -117,7 +117,7 @@ namespace turbo::tlog {
             explicit level_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &msg, const std::tm &, memory_buf_t &dest) override {
+            void format(const details::log_msg &msg, const turbo::CivilInfo&, memory_buf_t &dest) override {
                 const std::string_view &level_name = level::to_string_view(msg.level);
                 ScopedPadder p(level_name.size(), padinfo_, dest);
                 fmt_helper::append_string_view(level_name, dest);
@@ -131,7 +131,7 @@ namespace turbo::tlog {
             explicit short_level_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &msg, const std::tm &, memory_buf_t &dest) override {
+            void format(const details::log_msg &msg, const turbo::CivilInfo&, memory_buf_t &dest) override {
                 std::string_view level_name{level::to_short_c_str(msg.level)};
                 ScopedPadder p(level_name.size(), padinfo_, dest);
                 fmt_helper::append_string_view(level_name, dest);
@@ -142,14 +142,6 @@ namespace turbo::tlog {
         // Date time pattern appenders
         ///////////////////////////////////////////////////////////////////////
 
-        static const char *ampm(const tm &t) {
-            return t.tm_hour >= 12 ? "PM" : "AM";
-        }
-
-        static int to12h(const tm &t) {
-            return t.tm_hour > 12 ? t.tm_hour - 12 : t.tm_hour;
-        }
-
         // Abbreviated weekday name
         static std::array<const char *, 7> days{{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}};
 
@@ -159,8 +151,8 @@ namespace turbo::tlog {
             explicit a_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &tm_time, memory_buf_t &dest) override {
-                std::string_view field_value{days[static_cast<size_t>(tm_time.tm_wday)]};
+            void format(const details::log_msg &, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
+                std::string_view field_value{days[static_cast<size_t>(tm_time.wday())]};
                 ScopedPadder p(field_value.size(), padinfo_, dest);
                 fmt_helper::append_string_view(field_value, dest);
             }
@@ -176,8 +168,8 @@ namespace turbo::tlog {
             explicit A_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &tm_time, memory_buf_t &dest) override {
-                std::string_view field_value{full_days[static_cast<size_t>(tm_time.tm_wday)]};
+            void format(const details::log_msg &, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
+                std::string_view field_value{full_days[static_cast<size_t>(tm_time.wday())]};
                 ScopedPadder p(field_value.size(), padinfo_, dest);
                 fmt_helper::append_string_view(field_value, dest);
             }
@@ -193,8 +185,8 @@ namespace turbo::tlog {
             explicit b_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &tm_time, memory_buf_t &dest) override {
-                std::string_view field_value{months[static_cast<size_t>(tm_time.tm_mon)]};
+            void format(const details::log_msg &, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
+                std::string_view field_value{months[static_cast<size_t>(tm_time.month()-1)]};
                 ScopedPadder p(field_value.size(), padinfo_, dest);
                 fmt_helper::append_string_view(field_value, dest);
             }
@@ -211,8 +203,8 @@ namespace turbo::tlog {
             explicit B_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &tm_time, memory_buf_t &dest) override {
-                std::string_view field_value{full_months[static_cast<size_t>(tm_time.tm_mon)]};
+            void format(const details::log_msg &, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
+                std::string_view field_value{full_months[static_cast<size_t>(tm_time.month()-1)]};
                 ScopedPadder p(field_value.size(), padinfo_, dest);
                 fmt_helper::append_string_view(field_value, dest);
             }
@@ -225,25 +217,25 @@ namespace turbo::tlog {
             explicit c_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &tm_time, memory_buf_t &dest) override {
+            void format(const details::log_msg &, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
                 const size_t field_size = 24;
                 ScopedPadder p(field_size, padinfo_, dest);
 
-                fmt_helper::append_string_view(days[static_cast<size_t>(tm_time.tm_wday)], dest);
+                fmt_helper::append_string_view(days[static_cast<size_t>(tm_time.wday())], dest);
                 dest.push_back(' ');
-                fmt_helper::append_string_view(months[static_cast<size_t>(tm_time.tm_mon)], dest);
+                fmt_helper::append_string_view(months[static_cast<size_t>(tm_time.month()-1)], dest);
                 dest.push_back(' ');
-                fmt_helper::append_int(tm_time.tm_mday, dest);
+                fmt_helper::append_int(tm_time.mday(), dest);
                 dest.push_back(' ');
                 // time
 
-                fmt_helper::pad2(tm_time.tm_hour, dest);
+                fmt_helper::pad2(tm_time.hour(), dest);
                 dest.push_back(':');
-                fmt_helper::pad2(tm_time.tm_min, dest);
+                fmt_helper::pad2(tm_time.minute(), dest);
                 dest.push_back(':');
-                fmt_helper::pad2(tm_time.tm_sec, dest);
+                fmt_helper::pad2(tm_time.second(), dest);
                 dest.push_back(' ');
-                fmt_helper::append_int(tm_time.tm_year + 1900, dest);
+                fmt_helper::append_int(tm_time.year(), dest);
             }
         };
 
@@ -254,10 +246,10 @@ namespace turbo::tlog {
             explicit C_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &tm_time, memory_buf_t &dest) override {
+            void format(const details::log_msg &, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
                 const size_t field_size = 2;
                 ScopedPadder p(field_size, padinfo_, dest);
-                fmt_helper::pad2(tm_time.tm_year % 100, dest);
+                fmt_helper::pad2(tm_time.year() % 100, dest);
             }
         };
 
@@ -268,15 +260,15 @@ namespace turbo::tlog {
             explicit D_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &tm_time, memory_buf_t &dest) override {
+            void format(const details::log_msg &, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
                 const size_t field_size = 10;
                 ScopedPadder p(field_size, padinfo_, dest);
 
-                fmt_helper::pad2(tm_time.tm_mon + 1, dest);
+                fmt_helper::pad2(tm_time.month(), dest);
                 dest.push_back('/');
-                fmt_helper::pad2(tm_time.tm_mday, dest);
+                fmt_helper::pad2(tm_time.mday(), dest);
                 dest.push_back('/');
-                fmt_helper::pad2(tm_time.tm_year % 100, dest);
+                fmt_helper::pad2(tm_time.year() % 100, dest);
             }
         };
 
@@ -287,10 +279,10 @@ namespace turbo::tlog {
             explicit Y_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &tm_time, memory_buf_t &dest) override {
+            void format(const details::log_msg &, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
                 const size_t field_size = 4;
                 ScopedPadder p(field_size, padinfo_, dest);
-                fmt_helper::append_int(tm_time.tm_year + 1900, dest);
+                fmt_helper::append_int(tm_time.year() + 1900, dest);
             }
         };
 
@@ -301,52 +293,52 @@ namespace turbo::tlog {
             explicit m_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &tm_time, memory_buf_t &dest) override {
+            void format(const details::log_msg &, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
                 const size_t field_size = 2;
                 ScopedPadder p(field_size, padinfo_, dest);
-                fmt_helper::pad2(tm_time.tm_mon + 1, dest);
+                fmt_helper::pad2(tm_time.month(), dest);
             }
         };
 
-// day of month 1-31
+        // day of month 1-31
         template<typename ScopedPadder>
         class d_formatter final : public flag_formatter {
         public:
             explicit d_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &tm_time, memory_buf_t &dest) override {
+            void format(const details::log_msg &, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
                 const size_t field_size = 2;
                 ScopedPadder p(field_size, padinfo_, dest);
-                fmt_helper::pad2(tm_time.tm_mday, dest);
+                fmt_helper::pad2(tm_time.mday(), dest);
             }
         };
 
-// hours in 24 format 0-23
+        // hours in 24 format 0-23
         template<typename ScopedPadder>
         class H_formatter final : public flag_formatter {
         public:
             explicit H_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &tm_time, memory_buf_t &dest) override {
+            void format(const details::log_msg &, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
                 const size_t field_size = 2;
                 ScopedPadder p(field_size, padinfo_, dest);
-                fmt_helper::pad2(tm_time.tm_hour, dest);
+                fmt_helper::pad2(tm_time.hour(), dest);
             }
         };
 
-// hours in 12 format 1-12
+        // hours in 12 format 1-12
         template<typename ScopedPadder>
         class I_formatter final : public flag_formatter {
         public:
             explicit I_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &tm_time, memory_buf_t &dest) override {
+            void format(const details::log_msg &, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
                 const size_t field_size = 2;
                 ScopedPadder p(field_size, padinfo_, dest);
-                fmt_helper::pad2(to12h(tm_time), dest);
+                fmt_helper::pad2(tm_time.hour12(), dest);
             }
         };
 
@@ -357,10 +349,10 @@ namespace turbo::tlog {
             explicit M_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &tm_time, memory_buf_t &dest) override {
+            void format(const details::log_msg &, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
                 const size_t field_size = 2;
                 ScopedPadder p(field_size, padinfo_, dest);
-                fmt_helper::pad2(tm_time.tm_min, dest);
+                fmt_helper::pad2(tm_time.minute(), dest);
             }
         };
 
@@ -371,72 +363,71 @@ namespace turbo::tlog {
             explicit S_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &tm_time, memory_buf_t &dest) override {
+            void format(const details::log_msg &, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
                 const size_t field_size = 2;
                 ScopedPadder p(field_size, padinfo_, dest);
-                fmt_helper::pad2(tm_time.tm_sec, dest);
+                fmt_helper::pad2(tm_time.second(), dest);
             }
         };
 
-// milliseconds
+        // milliseconds
         template<typename ScopedPadder>
         class e_formatter final : public flag_formatter {
         public:
             explicit e_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &msg, const std::tm &, memory_buf_t &dest) override {
-                auto millis = fmt_helper::time_fraction<std::chrono::milliseconds>(msg.time);
+            void format(const details::log_msg &msg, const turbo::CivilInfo&, memory_buf_t &dest) override {
+                auto millis = msg.time.fraction(turbo::Duration::seconds(1));
                 const size_t field_size = 3;
                 ScopedPadder p(field_size, padinfo_, dest);
-                fmt_helper::pad3(static_cast<uint32_t>(millis.count()), dest);
+                fmt_helper::pad3(static_cast<uint32_t>(millis.to_milliseconds()), dest);
             }
         };
 
-// microseconds
+        // microseconds
         template<typename ScopedPadder>
         class f_formatter final : public flag_formatter {
         public:
             explicit f_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &msg, const std::tm &, memory_buf_t &dest) override {
-                auto micros = fmt_helper::time_fraction<std::chrono::microseconds>(msg.time);
+            void format(const details::log_msg &msg, const turbo::CivilInfo&, memory_buf_t &dest) override {
+                auto micros = msg.time.fraction(turbo::Duration::milliseconds(1));
 
                 const size_t field_size = 6;
                 ScopedPadder p(field_size, padinfo_, dest);
-                fmt_helper::pad6(static_cast<size_t>(micros.count()), dest);
+                fmt_helper::pad6(static_cast<size_t>(micros.to_microseconds()), dest);
             }
         };
 
-// nanoseconds
+        // nanoseconds
         template<typename ScopedPadder>
         class F_formatter final : public flag_formatter {
         public:
             explicit F_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &msg, const std::tm &, memory_buf_t &dest) override {
-                auto ns = fmt_helper::time_fraction<std::chrono::nanoseconds>(msg.time);
+            void format(const details::log_msg &msg, const turbo::CivilInfo&, memory_buf_t &dest) override {
+                auto ns = msg.time.fraction(turbo::Duration::microseconds(1));
                 const size_t field_size = 9;
                 ScopedPadder p(field_size, padinfo_, dest);
-                fmt_helper::pad9(static_cast<size_t>(ns.count()), dest);
+                fmt_helper::pad9(static_cast<size_t>(ns.to_nanoseconds()), dest);
             }
         };
 
-// seconds since epoch
+        // seconds since epoch
         template<typename ScopedPadder>
         class E_formatter final : public flag_formatter {
         public:
             explicit E_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &msg, const std::tm &, memory_buf_t &dest) override {
+            void format(const details::log_msg &msg, const turbo::CivilInfo&, memory_buf_t &dest) override {
                 const size_t field_size = 10;
                 ScopedPadder p(field_size, padinfo_, dest);
-                auto duration = msg.time.time_since_epoch();
-                auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration).count();
-                fmt_helper::append_int(seconds, dest);
+                auto duration = msg.time.to_seconds();
+                fmt_helper::append_int(duration, dest);
             }
         };
 
@@ -447,10 +438,10 @@ namespace turbo::tlog {
             explicit p_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &tm_time, memory_buf_t &dest) override {
+            void format(const details::log_msg &, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
                 const size_t field_size = 2;
                 ScopedPadder p(field_size, padinfo_, dest);
-                fmt_helper::append_string_view(ampm(tm_time), dest);
+                fmt_helper::append_string_view(tm_time.ampm(), dest);
             }
         };
 
@@ -461,57 +452,57 @@ namespace turbo::tlog {
             explicit r_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &tm_time, memory_buf_t &dest) override {
+            void format(const details::log_msg &, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
                 const size_t field_size = 11;
                 ScopedPadder p(field_size, padinfo_, dest);
 
-                fmt_helper::pad2(to12h(tm_time), dest);
+                fmt_helper::pad2(tm_time.hour12(), dest);
                 dest.push_back(':');
-                fmt_helper::pad2(tm_time.tm_min, dest);
+                fmt_helper::pad2(tm_time.minute(), dest);
                 dest.push_back(':');
-                fmt_helper::pad2(tm_time.tm_sec, dest);
+                fmt_helper::pad2(tm_time.second(), dest);
                 dest.push_back(' ');
-                fmt_helper::append_string_view(ampm(tm_time), dest);
+                fmt_helper::append_string_view(tm_time.ampm(), dest);
             }
         };
 
-// 24-hour HH:MM time, equivalent to %H:%M
+        // 24-hour HH:MM time, equivalent to %H:%M
         template<typename ScopedPadder>
         class R_formatter final : public flag_formatter {
         public:
             explicit R_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &tm_time, memory_buf_t &dest) override {
+            void format(const details::log_msg &, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
                 const size_t field_size = 5;
                 ScopedPadder p(field_size, padinfo_, dest);
 
-                fmt_helper::pad2(tm_time.tm_hour, dest);
+                fmt_helper::pad2(tm_time.hour(), dest);
                 dest.push_back(':');
-                fmt_helper::pad2(tm_time.tm_min, dest);
+                fmt_helper::pad2(tm_time.minute(), dest);
             }
         };
 
-// ISO 8601 time format (HH:MM:SS), equivalent to %H:%M:%S
+        // ISO 8601 time format (HH:MM:SS), equivalent to %H:%M:%S
         template<typename ScopedPadder>
         class T_formatter final : public flag_formatter {
         public:
             explicit T_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &tm_time, memory_buf_t &dest) override {
+            void format(const details::log_msg &, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
                 const size_t field_size = 8;
                 ScopedPadder p(field_size, padinfo_, dest);
 
-                fmt_helper::pad2(tm_time.tm_hour, dest);
+                fmt_helper::pad2(tm_time.hour(), dest);
                 dest.push_back(':');
-                fmt_helper::pad2(tm_time.tm_min, dest);
+                fmt_helper::pad2(tm_time.minute(), dest);
                 dest.push_back(':');
-                fmt_helper::pad2(tm_time.tm_sec, dest);
+                fmt_helper::pad2(tm_time.second(), dest);
             }
         };
 
-// ISO 8601 offset from UTC in timezone (+-HH:MM)
+        // ISO 8601 offset from UTC in timezone (+-HH:MM)
         template<typename ScopedPadder>
         class z_formatter final : public flag_formatter {
         public:
@@ -524,7 +515,7 @@ namespace turbo::tlog {
 
             z_formatter &operator=(const z_formatter &) = delete;
 
-            void format(const details::log_msg &msg, const std::tm &tm_time, memory_buf_t &dest) override {
+            void format(const details::log_msg &msg, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
                 const size_t field_size = 6;
                 ScopedPadder p(field_size, padinfo_, dest);
 
@@ -543,41 +534,41 @@ namespace turbo::tlog {
             }
 
         private:
-            log_clock::time_point last_update_{std::chrono::seconds(0)};
+            turbo::Time last_update_;
             int offset_minutes_{0};
 
-            int get_cached_offset(const log_msg &msg, const std::tm &tm_time) {
+            int get_cached_offset(const log_msg &msg, const turbo::CivilInfo&tm_time) {
                 // refresh every 10 seconds
-                if (msg.time - last_update_ >= std::chrono::seconds(10)) {
-                    offset_minutes_ = os::utc_minutes_offset(tm_time);
+                if (msg.time - last_update_ >= turbo::Duration::seconds(10)) {
+                    offset_minutes_ = tm_time.offset/60;
                     last_update_ = msg.time;
                 }
                 return offset_minutes_;
             }
         };
 
-// Thread id
+        // Thread id
         template<typename ScopedPadder>
         class t_formatter final : public flag_formatter {
         public:
             explicit t_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &msg, const std::tm &, memory_buf_t &dest) override {
+            void format(const details::log_msg &msg, const turbo::CivilInfo&, memory_buf_t &dest) override {
                 const auto field_size = ScopedPadder::count_digits(msg.thread_id);
                 ScopedPadder p(field_size, padinfo_, dest);
                 fmt_helper::append_int(msg.thread_id, dest);
             }
         };
 
-// Current pid
+        // Current pid
         template<typename ScopedPadder>
         class pid_formatter final : public flag_formatter {
         public:
             explicit pid_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &, const std::tm &, memory_buf_t &dest) override {
+            void format(const details::log_msg &, const turbo::CivilInfo&, memory_buf_t &dest) override {
                 const auto pid = static_cast<uint32_t>(turbo::pid());
                 auto field_size = ScopedPadder::count_digits(pid);
                 ScopedPadder p(field_size, padinfo_, dest);
@@ -591,7 +582,7 @@ namespace turbo::tlog {
             explicit v_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &msg, const std::tm &, memory_buf_t &dest) override {
+            void format(const details::log_msg &msg, const turbo::CivilInfo&, memory_buf_t &dest) override {
                 ScopedPadder p(msg.payload.size(), padinfo_, dest);
                 fmt_helper::append_string_view(msg.payload, dest);
             }
@@ -602,7 +593,7 @@ namespace turbo::tlog {
             explicit ch_formatter(char ch)
                     : ch_(ch) {}
 
-            void format(const details::log_msg &, const std::tm &, memory_buf_t &dest) override {
+            void format(const details::log_msg &, const turbo::CivilInfo&, memory_buf_t &dest) override {
                 dest.push_back(ch_);
             }
 
@@ -619,7 +610,7 @@ namespace turbo::tlog {
                 str_ += ch;
             }
 
-            void format(const details::log_msg &, const std::tm &, memory_buf_t &dest) override {
+            void format(const details::log_msg &, const turbo::CivilInfo&, memory_buf_t &dest) override {
                 fmt_helper::append_string_view(str_, dest);
             }
 
@@ -633,7 +624,7 @@ namespace turbo::tlog {
             explicit color_start_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &msg, const std::tm &, memory_buf_t &dest) override {
+            void format(const details::log_msg &msg, const turbo::CivilInfo&, memory_buf_t &dest) override {
                 msg.color_range_start = dest.size();
             }
         };
@@ -643,7 +634,7 @@ namespace turbo::tlog {
             explicit color_stop_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &msg, const std::tm &, memory_buf_t &dest) override {
+            void format(const details::log_msg &msg, const turbo::CivilInfo&, memory_buf_t &dest) override {
                 msg.color_range_end = dest.size();
             }
         };
@@ -655,7 +646,7 @@ namespace turbo::tlog {
             explicit source_location_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &msg, const std::tm &, memory_buf_t &dest) override {
+            void format(const details::log_msg &msg, const turbo::CivilInfo&, memory_buf_t &dest) override {
                 if (msg.source.empty()) {
                     ScopedPadder p(0, padinfo_, dest);
                     return;
@@ -684,7 +675,7 @@ namespace turbo::tlog {
             explicit source_filename_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &msg, const std::tm &, memory_buf_t &dest) override {
+            void format(const details::log_msg &msg, const turbo::CivilInfo&, memory_buf_t &dest) override {
                 if (msg.source.empty()) {
                     ScopedPadder p(0, padinfo_, dest);
                     return;
@@ -726,7 +717,7 @@ namespace turbo::tlog {
 #    pragma warning(pop)
 #endif // _MSC_VER
 
-            void format(const details::log_msg &msg, const std::tm &, memory_buf_t &dest) override {
+            void format(const details::log_msg &msg, const turbo::CivilInfo&, memory_buf_t &dest) override {
                 if (msg.source.empty()) {
                     ScopedPadder p(0, padinfo_, dest);
                     return;
@@ -744,7 +735,7 @@ namespace turbo::tlog {
             explicit source_linenum_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &msg, const std::tm &, memory_buf_t &dest) override {
+            void format(const details::log_msg &msg, const turbo::CivilInfo&, memory_buf_t &dest) override {
                 if (msg.source.empty()) {
                     ScopedPadder p(0, padinfo_, dest);
                     return;
@@ -763,7 +754,7 @@ namespace turbo::tlog {
             explicit source_funcname_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &msg, const std::tm &, memory_buf_t &dest) override {
+            void format(const details::log_msg &msg, const turbo::CivilInfo&, memory_buf_t &dest) override {
                 if (msg.source.empty()) {
                     ScopedPadder p(0, padinfo_, dest);
                     return;
@@ -774,72 +765,69 @@ namespace turbo::tlog {
             }
         };
 
-// print elapsed time since last message
-        template<typename ScopedPadder, typename Units>
+        // print elapsed time since last message
+        template<typename ScopedPadder, typename Converter>
         class elapsed_formatter final : public flag_formatter {
         public:
-            using DurationUnits = Units;
+            Converter converter_;
 
             explicit elapsed_formatter(padding_info padinfo)
-                    : flag_formatter(padinfo), last_message_time_(log_clock::now()) {}
+                    : flag_formatter(padinfo), last_message_time_(turbo::Time::time_now()) {}
 
-            void format(const details::log_msg &msg, const std::tm &, memory_buf_t &dest) override {
-                auto delta = (std::max)(msg.time - last_message_time_, log_clock::duration::zero());
-                auto delta_units = std::chrono::duration_cast<DurationUnits>(delta);
+            void format(const details::log_msg &msg, const turbo::CivilInfo&, memory_buf_t &dest) override {
+                auto delta = (std::max)(msg.time - last_message_time_, turbo::Duration::zero());
+                auto delta_count = converter_(delta);
                 last_message_time_ = msg.time;
-                auto delta_count = static_cast<size_t>(delta_units.count());
                 auto n_digits = static_cast<size_t>(ScopedPadder::count_digits(delta_count));
                 ScopedPadder p(n_digits, padinfo_, dest);
                 fmt_helper::append_int(delta_count, dest);
             }
 
         private:
-            log_clock::time_point last_message_time_;
+            turbo::Time last_message_time_;
         };
 
-// Full info formatter
-// pattern: [%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%s:%#] %v
+        // Full info formatter
+        // pattern: [%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%s:%#] %v
         class full_formatter final : public flag_formatter {
         public:
             explicit full_formatter(padding_info padinfo)
                     : flag_formatter(padinfo) {}
 
-            void format(const details::log_msg &msg, const std::tm &tm_time, memory_buf_t &dest) override {
+            void format(const details::log_msg &msg, const turbo::CivilInfo&tm_time, memory_buf_t &dest) override {
                 using std::chrono::duration_cast;
                 using std::chrono::milliseconds;
                 using std::chrono::seconds;
 
-                // cache the date/time part for the next second.
-                auto duration = msg.time.time_since_epoch();
-                auto secs = duration_cast<seconds>(duration);
+                auto secs = msg.time.to_seconds();
 
                 if (cache_timestamp_ != secs || cached_datetime_.size() == 0) {
                     cached_datetime_.clear();
                     cached_datetime_.push_back('[');
-                    fmt_helper::append_int(tm_time.tm_year + 1900, cached_datetime_);
+                    fmt_helper::append_int(tm_time.year(), cached_datetime_);
                     cached_datetime_.push_back('-');
 
-                    fmt_helper::pad2(tm_time.tm_mon + 1, cached_datetime_);
+                    fmt_helper::pad2(tm_time.month(), cached_datetime_);
                     cached_datetime_.push_back('-');
 
-                    fmt_helper::pad2(tm_time.tm_mday, cached_datetime_);
+                    fmt_helper::pad2(tm_time.mday(), cached_datetime_);
                     cached_datetime_.push_back(' ');
 
-                    fmt_helper::pad2(tm_time.tm_hour, cached_datetime_);
+                    fmt_helper::pad2(tm_time.hour(), cached_datetime_);
                     cached_datetime_.push_back(':');
 
-                    fmt_helper::pad2(tm_time.tm_min, cached_datetime_);
+                    fmt_helper::pad2(tm_time.minute(), cached_datetime_);
                     cached_datetime_.push_back(':');
 
-                    fmt_helper::pad2(tm_time.tm_sec, cached_datetime_);
+                    fmt_helper::pad2(tm_time.second(), cached_datetime_);
                     cached_datetime_.push_back('.');
 
                     cache_timestamp_ = secs;
                 }
                 dest.append(cached_datetime_.begin(), cached_datetime_.end());
 
-                auto millis = fmt_helper::time_fraction<milliseconds>(msg.time);
-                fmt_helper::pad3(static_cast<uint32_t>(millis.count()), dest);
+                auto millis = msg.time.fraction(turbo::Duration::seconds(1));
+                fmt_helper::pad3(static_cast<uint32_t>(millis.to_milliseconds()), dest);
                 dest.push_back(']');
                 dest.push_back(' ');
 
@@ -876,7 +864,7 @@ namespace turbo::tlog {
             }
 
         private:
-            std::chrono::seconds cache_timestamp_{0};
+            int64_t cache_timestamp_{0};
             memory_buf_t cached_datetime_;
         };
 
@@ -884,17 +872,15 @@ namespace turbo::tlog {
 
     pattern_formatter::pattern_formatter(
             std::string pattern, pattern_time_type time_type, std::string eol, custom_flags custom_user_flags)
-            : pattern_(std::move(pattern)), eol_(std::move(eol)), pattern_time_type_(time_type), need_localtime_(false),
+            : pattern_(std::move(pattern)), eol_(std::move(eol)), pattern_time_type_(time_type), need_localtime_(false),cached_tm_(),
               last_log_secs_(0), custom_handlers_(std::move(custom_user_flags)) {
-        std::memset(&cached_tm_, 0, sizeof(cached_tm_));
         compile_pattern_(pattern_);
     }
 
 // use by default full formatter for if pattern is not given
     pattern_formatter::pattern_formatter(pattern_time_type time_type, std::string eol)
-            : pattern_("%+"), eol_(std::move(eol)), pattern_time_type_(time_type), need_localtime_(true),
+            : pattern_("%+"), eol_(std::move(eol)), pattern_time_type_(time_type), need_localtime_(true),cached_tm_(),
               last_log_secs_(0) {
-        std::memset(&cached_tm_, 0, sizeof(cached_tm_));
         formatters_.push_back(details::make_unique<details::full_formatter>(details::padding_info{}));
     }
 
@@ -915,7 +901,7 @@ namespace turbo::tlog {
 
     void pattern_formatter::format(const details::log_msg &msg, memory_buf_t &dest) {
         if (need_localtime_) {
-            const auto secs = std::chrono::duration_cast<std::chrono::seconds>(msg.time.time_since_epoch());
+            const auto secs = msg.time.to_seconds();
             if (secs != last_log_secs_) {
                 cached_tm_ = get_time_(msg);
                 last_log_secs_ = secs;
@@ -939,11 +925,11 @@ namespace turbo::tlog {
         need_localtime_ = need;
     }
 
-    std::tm pattern_formatter::get_time_(const details::log_msg &msg) {
+    turbo::CivilInfo pattern_formatter::get_time_(const details::log_msg &msg) {
         if (pattern_time_type_ == pattern_time_type::local) {
-            return details::os::localtime(log_clock::to_time_t(msg.time));
+            return msg.time.to_local_civil();
         }
-        return details::os::gmtime(log_clock::to_time_t(msg.time));
+        return msg.time.to_utc_civil();
     }
 
     template<typename Padder>
@@ -1136,22 +1122,22 @@ namespace turbo::tlog {
 
             case ('u'): // elapsed time since last log message in nanos
                 formatters_.push_back(
-                        details::make_unique<details::elapsed_formatter<Padder, std::chrono::nanoseconds>>(padding));
+                        details::make_unique<details::elapsed_formatter<Padder, turbo::ToNanoseconds>>(padding));
                 break;
 
             case ('i'): // elapsed time since last log message in micros
                 formatters_.push_back(
-                        details::make_unique<details::elapsed_formatter<Padder, std::chrono::microseconds>>(padding));
+                        details::make_unique<details::elapsed_formatter<Padder, turbo::ToMicroseconds>>(padding));
                 break;
 
             case ('o'): // elapsed time since last log message in millis
                 formatters_.push_back(
-                        details::make_unique<details::elapsed_formatter<Padder, std::chrono::milliseconds>>(padding));
+                        details::make_unique<details::elapsed_formatter<Padder, turbo::ToMilliseconds>>(padding));
                 break;
 
             case ('O'): // elapsed time since last log message in seconds
                 formatters_.push_back(
-                        details::make_unique<details::elapsed_formatter<Padder, std::chrono::seconds>>(padding));
+                        details::make_unique<details::elapsed_formatter<Padder, turbo::ToSeconds>>(padding));
                 break;
 
             default: // Unknown flag appears as is

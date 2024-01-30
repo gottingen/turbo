@@ -34,7 +34,7 @@
 #endif
 #endif
 
-#include "turbo/base/internal/sysinfo.h"
+#include "turbo/system/internal/sysinfo.h"
 
 namespace turbo::base_internal {
 

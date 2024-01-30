@@ -23,6 +23,6 @@
  * @@defgroup turbo_fiber
  */
 namespace turbo {
-    static constexpr turbo::ModuleVersion fiber_version = turbo::ModuleVersion{0, 9, 43};
+    static constexpr turbo::ModuleVersion fiber_version = turbo::ModuleVersion{0, 9, 50};
 }  // namespace turbo
 #endif  // TURBO_FIBER_VERSION_H_

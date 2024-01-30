@@ -24,6 +24,7 @@
 #include "turbo/fiber/internal/types.h"
 #include "turbo/fiber/internal/context.h"
 #include "turbo/fiber/config.h"
+#include "turbo/flags/flag.h"
 #include "turbo/memory/object_pool.h"
 
 namespace turbo::fiber_internal {
@@ -72,18 +73,23 @@ namespace turbo::fiber_internal {
     };
 
     struct SmallStackClass {
-        static constexpr int stack_size_flag = FiberStackConfig::stack_size_small;
-        // Older gcc does not allow static const enum, use int instead.
+        static int stack_size() {
+            return turbo::get_flag(FLAGS_stack_size_small);
+        }
         static constexpr StackType stack_type = StackType::STACK_TYPE_SMALL;
     };
 
     struct NormalStackClass {
-        static constexpr int stack_size_flag = FiberStackConfig::stack_size_normal;
+        static int stack_size() {
+            return turbo::get_flag(FLAGS_stack_size_normal);
+        }
         static const StackType stack_type = StackType::STACK_TYPE_NORMAL;
     };
 
     struct LargeStackClass {
-        static constexpr int stack_size_flag = FiberStackConfig::stack_size_large;
+        static int stack_size() {
+            return turbo::get_flag(FLAGS_stack_size_large);
+        }
         static const StackType stack_type = StackType::STACK_TYPE_LARGE;
     };
 
@@ -92,8 +98,8 @@ namespace turbo::fiber_internal {
         struct Wrapper : public ContextualStack {
             Wrapper() = default;
             explicit Wrapper(void (*entry)(intptr_t)) {
-                if (allocate_stack_storage(&storage, StackClass::stack_size_flag,
-                                           FiberStackConfig::guard_page_size) != 0) {
+                if (allocate_stack_storage(&storage, StackClass::stack_size(),
+                                           turbo::get_flag(FLAGS_guard_page_size)) != 0) {
                     storage.zeroize();
                     context = nullptr;
                     return;
@@ -189,8 +195,8 @@ namespace turbo {
             return 64;
         }
 
-        static constexpr size_t free_chunk_max_items() {
-            return (FiberStackConfig::tc_stack_small <= 0 ? 0 : FiberStackConfig::tc_stack_small);
+        static size_t free_chunk_max_items() {
+            return (turbo::get_flag(FLAGS_tc_stack_small) <= 0 ? 0 : turbo::get_flag(FLAGS_tc_stack_small));
         }
 
         static bool validate(const LargeStackClassType *ptr) {
@@ -206,8 +212,8 @@ namespace turbo {
             return 64;
         }
 
-        static constexpr size_t free_chunk_max_items() {
-            return (FiberStackConfig::tc_stack_small <= 0 ? 0 : FiberStackConfig::tc_stack_small);
+        static size_t free_chunk_max_items() {
+            return (turbo::get_flag(FLAGS_tc_stack_small) <= 0 ? 0 : turbo::get_flag(FLAGS_tc_stack_small));
         }
 
         static bool validate(const NormalStackClassType *ptr) {
@@ -223,8 +229,8 @@ namespace turbo {
             return 64;
         }
 
-        static constexpr size_t free_chunk_max_items() {
-            return (FiberStackConfig::tc_stack_small <= 0 ? 0 : FiberStackConfig::tc_stack_small);
+        static size_t free_chunk_max_items() {
+            return (turbo::get_flag(FLAGS_tc_stack_small) <= 0 ? 0 : turbo::get_flag(FLAGS_tc_stack_small));
         }
 
         static bool validate(const SmallStackClassType *ptr) {

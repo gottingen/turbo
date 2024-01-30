@@ -65,14 +65,14 @@ of type T or an error.
 Example:
 
 ```c++
-turbo::Status MyFunction(absl::string_view filename, ...) {
+turbo::Status MyFunction(std::string_view filename, ...) {
   ...
   // encounter error
   if (error condition) {
     return turbo::invalid_argument_error("bad mode");
   }
   // else, return OK
-  return absl::ok_status();
+  return turbo::ok_status();
 }
 ```
 

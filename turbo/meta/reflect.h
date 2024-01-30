@@ -1067,22 +1067,22 @@ namespace turbo {
 
     } // namespace turbo::detail
 
-// Checks is nameof_type supported compiler.
+    // Checks is nameof_type supported compiler.
     inline constexpr bool is_nameof_type_supported = detail::nameof_type_supported<void>::value;
 
-// Checks is nameof_type_rtti supported compiler.
+    // Checks is nameof_type_rtti supported compiler.
     inline constexpr bool is_nameof_type_rtti_supported = detail::nameof_type_rtti_supported<void>::value;
 
-// Checks is nameof_member supported compiler.
+    // Checks is nameof_member supported compiler.
     inline constexpr bool is_nameof_member_supported = detail::nameof_member_supported<void>::value;
 
-// Checks is nameof_pointer supported compiler.
+    // Checks is nameof_pointer supported compiler.
     inline constexpr bool is_nameof_pointer_supported = detail::nameof_pointer_supported<void>::value;
 
-// Checks is nameof_enum supported compiler.
+    // Checks is nameof_enum supported compiler.
     inline constexpr bool is_nameof_enum_supported = detail::nameof_enum_supported<void>::value;
 
-// Obtains name of enum variable.
+    // Obtains name of enum variable.
     template<typename E>
     [[nodiscard]] constexpr auto nameof_enum(E value) noexcept -> detail::enable_if_enum_t<E, string_view> {
         using D = std::decay_t<E>;
@@ -1190,7 +1190,7 @@ namespace turbo {
         return name;
     }
 
-// Obtains short name of type.
+    // Obtains short name of type.
     template<typename T>
     [[nodiscard]] constexpr auto nameof_short_type() noexcept -> detail::enable_if_has_short_name_t<T, string_view> {
         static_assert(detail::nameof_type_supported<T>::value,
@@ -1202,7 +1202,7 @@ namespace turbo {
         return name;
     }
 
-// Obtains name of member.
+    // Obtains name of member.
     template<auto V>
     [[nodiscard]] constexpr auto
     nameof_member() noexcept -> std::enable_if_t<std::is_member_pointer_v<decltype(V)>, string_view> {
@@ -1214,7 +1214,7 @@ namespace turbo {
         return name;
     }
 
-// Obtains name of a function, a global or class static variable.
+    // Obtains name of a function, a global or class static variable.
     template<auto V>
     [[nodiscard]] constexpr auto
     nameof_pointer() noexcept -> std::enable_if_t<std::is_pointer_v<decltype(V)>, string_view> {

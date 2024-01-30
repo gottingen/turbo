@@ -1,26 +1,19 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
+// Copyright 2023 The Elastic-AI Authors.
+// part of Elastic AI Search
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//   http://www.apache.org/licenses/LICENSE-2.0
+//      https://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
-// fiber - A M:N threading library to make applications more concurrent.
-
-// Date: 2016/04/16 18:43:24
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 
 #include "turbo/fiber/execution_queue.h"
-#include "turbo/fiber/this_fiber.h"
 #include "turbo/memory/object_pool.h"           // turbo::get_object
 #include "turbo/memory/resource_pool.h"         // turbo::get_resource
 
@@ -83,10 +76,9 @@ namespace turbo {
             fiber_id_t tid;
             // We start the execution thread in background instead of foreground as
             // we can't determine whether the code after execute() is urgent (like
-            // unlock a pthread_mutex_t) in which case implicit context switch may
+            // unlock a std::mutex) in which case implicit context switch may
             // cause undefined behavior (e.g. deadlock)
-            if (!fiber_start_background(&tid, &_options.fiber_attr,
-                                         _execute_tasks, node).ok()) {
+            if (!turbo::fiber_start_background(&tid, &_options.fiber_attr,_execute_tasks, node).ok()) {
                 TDLOG_CRITICAL("Fail to start fiber");
                 _execute_tasks(node);
             }
@@ -124,7 +116,7 @@ namespace turbo {
             } else {
                 rc = m->_execute(head, false, nullptr);
             }
-            if (is_already_stop(rc)) {
+            if (rc.code() == kESTOP) {
                 destroy_queue = true;
             }
             // Release TaskNode until uniterated task or last task
@@ -178,7 +170,7 @@ namespace turbo {
                 break;
             }
             TDLOG_CHECK(false, "Fail to create task_node_t, {}", terror(errno));
-            TURBO_UNUSED(turbo::fiber_sleep_for(turbo::milliseconds(1)));
+            TURBO_UNUSED(turbo::Fiber::sleep_for(turbo::Duration::milliseconds(1)));
         }
     }
 
@@ -187,13 +179,14 @@ namespace turbo {
         ExecutionQueueBase *const m = turbo::address_resource(slot);
         if (m == nullptr) {
             // The queue is not created yet, this join is definitely wrong.
-            return turbo::invalid_argument_error("");
+            return turbo::make_status(kEINVAL);
         }
         int expected = _version_of_id(id);
         // acquire fence makes this thread see changes before changing _join_futex.
         while (expected == m->_join_futex->load(std::memory_order_acquire)) {
-            auto rs = turbo::fiber_internal::waitable_event_wait(m->_join_futex, expected, nullptr);
-            if (!rs.ok() && !turbo::is_unavailable(rs)) {
+            TLOG_WARN("Waiting for queue {} to be recycled {}", id, expected);
+            auto rs = turbo::fiber_internal::waitable_event_wait(m->_join_futex, expected);
+            if (!rs.ok() && rs.code()!= EWOULDBLOCK && rs.code() != EINTR) {
                 return rs;
             }
         }
@@ -203,7 +196,9 @@ namespace turbo {
     int ExecutionQueueBase::stop() {
         const uint32_t id_ver = _version_of_id(_this_id);
         uint64_t vref = _versioned_ref.load(std::memory_order_relaxed);
+        int i = 0;
         for (;;) {
+            TLOG_WARN("Stopping queue {} {}", _this_id, i++);
             if (_version_of_vref(vref) != id_ver) {
                 return EINVAL;
             }
@@ -235,7 +230,7 @@ namespace turbo {
             if (niterated) {
                 *niterated = 1;
             }
-            return already_stop_error("");
+            return make_status(kESTOP);
         }
         TaskIteratorBase iter(head, this, false, high_priority);
         if (iter) {

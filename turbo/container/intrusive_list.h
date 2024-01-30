@@ -28,8 +28,45 @@ namespace turbo {
     class intrusive_list;
 
     struct intrusive_list_node {
-        intrusive_list_node *next;
-        intrusive_list_node *prev;
+        intrusive_list_node *next{this};
+        intrusive_list_node *prev{this};
+
+        void insert_before(intrusive_list_node* e) {
+            this->next = e;
+            this->prev = e->prev;
+            e->prev->next = this;
+            e->prev = this;
+        }
+
+        void insert_after(intrusive_list_node* e) {
+            this->next = e->next;
+            this->prev = e;
+            e->next->prev = this;
+            e->next = this;
+        }
+
+        void remove_from_list() {
+            this->prev->next = this->next;
+            this->next->prev = this->prev;
+            this->next = this;
+            this->prev = this;
+        }
+
+        void insert_before_as_list(intrusive_list_node* e) {
+            intrusive_list_node* pprev = this->prev;
+            pprev->next = e;
+            this->prev = e->prev;
+            e->prev->next = this;
+            e->prev = pprev;
+        }
+
+        void insert_after_as_list(intrusive_list_node* e) {
+            intrusive_list_node* pprev = this->prev;
+            pprev->next = e->next;
+            this->prev = e;
+            e->next->prev = pprev;
+            e->next = this;
+        }
     };
 
     /// intrusive_list_iterator
@@ -71,7 +108,7 @@ namespace turbo {
         // Returns a pointer to the fully typed node (the same as operator->) this is useful when
         // iterating a list to destroy all the nodes, calling this on the end() of a list results in
         // undefined behavior.
-        pointer nodePtr() const;
+        pointer node_ptr() const;
 
         intrusive_list_iterator &operator++();
 
@@ -491,7 +528,7 @@ namespace turbo {
 
     template<typename T, typename Pointer, typename Reference>
     inline typename intrusive_list_iterator<T, Pointer, Reference>::pointer
-    intrusive_list_iterator<T, Pointer, Reference>::nodePtr() const {
+    intrusive_list_iterator<T, Pointer, Reference>::node_ptr() const {
         return static_cast<pointer>(mpNode);
     }
 

@@ -54,8 +54,8 @@
 
 namespace turbo::debugging_internal {
 
-// NOTE: this class may be used from within tcmalloc, and can not
-// use any memory allocation routines.
+    // NOTE: this class may be used from within tcmalloc, and can not
+    // use any memory allocation routines.
     class VDSOSupport {
     public:
         VDSOSupport();
@@ -104,7 +104,7 @@ namespace turbo::debugging_internal {
 
         // Computes vdso_base_ and returns it. Should be called as early as
         // possible; before any thread creation, chroot or setuid.
-        static const void *Init();
+        static const void *initialize();
 
     private:
         // image_ represents VDSO ELF image in memory.
@@ -126,20 +126,21 @@ namespace turbo::debugging_internal {
         // The 'cache' parameter may be used by some versions of the kernel,
         // and should be nullptr or point to a static buffer containing at
         // least two 'long's.
-        static long InitAndGetCPU(unsigned *cpu, void *cache,     // NOLINT 'long'.
+        static long init_and_get_cpu(unsigned *cpu, void *cache,     // NOLINT 'long'.
                                   void *unused);
 
-        static long GetCPUViaSyscall(unsigned *cpu, void *cache,  // NOLINT 'long'.
+        static long get_cpu_via_syscall(unsigned *cpu, void *cache,  // NOLINT 'long'.
                                      void *unused);
 
         typedef long (*GetCpuFn)(unsigned *cpu, void *cache,      // NOLINT 'long'.
                                  void *unused);
 
-        // This function pointer may point to InitAndGetCPU,
-        // GetCPUViaSyscall, or __vdso_getcpu at different stages of initialization.
+        // This function pointer may point to init_and_get_cpu,
+        // get_cpu_via_syscall, or __vdso_getcpu at different stages of initialization.
         TURBO_CONST_INIT static std::atomic<GetCpuFn> getcpu_fn_;
 
         friend int GetCPU(void);  // Needs access to getcpu_fn_.
+        friend int get_node_and_cpu(unsigned &cpu, unsigned &node);  // NOLINT(runtime/int)
 
         VDSOSupport(const VDSOSupport &) = delete;
 
@@ -152,6 +153,8 @@ namespace turbo::debugging_internal {
     // May return -1 with errno == ENOSYS if the kernel doesn't
     // support SYS_getcpu.
     int GetCPU();
+
+    int get_node_and_cpu(unsigned &cpu, unsigned &node);  // NOLINT(runtime/int)
 
 }  // namespace turbo::debugging_internal
 

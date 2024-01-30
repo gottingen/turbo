@@ -16,11 +16,11 @@
 #pragma once
 
 #include "turbo/log/details/log_msg.h"
-#include "turbo/base/sysinfo.h"
+#include "turbo/system/sysinfo.h"
 
 namespace turbo::tlog::details {
 
-    log_msg::log_msg(turbo::tlog::log_clock::time_point log_time, turbo::tlog::source_loc loc,
+    log_msg::log_msg(turbo::Time log_time, turbo::tlog::source_loc loc,
                      std::string_view a_logger_name,
                      turbo::tlog::level::level_enum lvl, std::string_view msg)
             : logger_name(a_logger_name), level(lvl), time(log_time)
@@ -32,10 +32,10 @@ namespace turbo::tlog::details {
     log_msg::log_msg(
             turbo::tlog::source_loc loc, std::string_view a_logger_name, turbo::tlog::level::level_enum lvl,
             std::string_view msg)
-            : log_msg(os::now(), loc, a_logger_name, lvl, msg) {}
+            : log_msg(turbo::Time::time_now(), loc, a_logger_name, lvl, msg) {}
 
     log_msg::log_msg(std::string_view a_logger_name, turbo::tlog::level::level_enum lvl,
                      std::string_view msg)
-            : log_msg(os::now(), source_loc{}, a_logger_name, lvl, msg) {}
+            : log_msg(turbo::Time::time_now(), source_loc{}, a_logger_name, lvl, msg) {}
 
 } // namespace turbo::tlog::details

@@ -20,7 +20,8 @@
 #include <cerrno>                               // users need to check errno
 #include <ctime>                                // timespec
 #include "turbo/fiber/internal/types.h"
-#include "turbo/base/status.h"
+#include "turbo/status/status.h"
+#include "turbo/times/time.h"
 
 namespace turbo::fiber_internal {
 
@@ -64,7 +65,7 @@ namespace turbo::fiber_internal {
     // About |abstime|:
     //   Different from FUTEX_WAIT, waitable_event_wait uses absolute time.
     // Returns 0 on success, -1 otherwise and errno is set.
-    turbo::Status waitable_event_wait(void *event, int expected_value, const timespec *abstime);
+    turbo::Status waitable_event_wait(void *event, int expected_value, turbo::Time abstime = turbo::Time::infinite_future());
 
 }  // namespace turbo::fiber_internal
 

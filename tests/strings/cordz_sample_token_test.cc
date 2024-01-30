@@ -198,7 +198,7 @@ TEST(CordzSampleTokenTest, MultiThreaded) {
   }
   // The threads will hammer away.  Give it a little bit of time for tsan to
   // spot errors.
-  turbo::sleep_for(turbo::seconds(3));
+  turbo::sleep_for(turbo::Duration::seconds(3));
   stop.Notify();
 }
 */

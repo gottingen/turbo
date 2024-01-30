@@ -22,13 +22,6 @@ namespace turbo {
 
     /**
      * @ingroup turbo_times_clock
-     * @brief Returns the current time, expressed as an `turbo::Time` absolute time value.
-     * @return
-     */
-    turbo::Time time_now();
-
-    /**
-     * @ingroup turbo_times_clock
      * @brief Returns the current time, expressed as a count of nanoseconds since the Unix Epoch.
      *        Prefer `turbo::time_now()` instead for all but the most performance-sensitive cases
      *        (i.e. when you are calling this function hundreds of thousands of times per second).
@@ -37,6 +30,10 @@ namespace turbo {
      * @return
      */
     int64_t get_current_time_nanos();
+
+    inline Time time_now() {
+        return Time::time_now();
+    }
 
     inline int64_t get_current_time_micros() {
         return get_current_time_nanos() / 1000;
@@ -87,7 +84,7 @@ namespace turbo {
      * @param time The time to sleep until.
      */
     inline void sleep_until(turbo::Time time) {
-        sleep_for(time - time_now());
+        sleep_for(time - Time::time_now());
     }
 
     /**
@@ -96,43 +93,47 @@ namespace turbo {
      * @return
      */
     inline turbo::Time from_now(timespec ts) {
-        return time_now() + duration_from_timespec(ts);
+        return Time::time_now() + Duration::from_timespec(ts);
+    }
+
+    inline turbo::Time from_now(Duration d) {
+        return Time::time_now() + d;
     }
 
     inline turbo::Time from_now(timeval tv) {
-        return time_now() + duration_from_timeval(tv);
+        return Time::time_now() + Duration::from_timeval(tv);
     }
 
     inline turbo::Time seconds_from_now(int64_t secs) {
-        return time_now() + turbo::seconds(secs);
+        return Time::time_now() + turbo::Duration::seconds(secs);
     }
 
     inline turbo::Time milliseconds_from_now(int64_t ms) {
-        return time_now() + turbo::milliseconds(ms);
+        return Time::time_now() + turbo::Duration::milliseconds(ms);
     }
 
     inline turbo::Time microseconds_from_now(int64_t us) {
-        return time_now() + turbo::microseconds(us);
+        return Time::time_now() + turbo::Duration::microseconds(us);
     }
 
     inline turbo::Time nanoseconds_from_now(int64_t ns) {
-        return time_now() + turbo::nanoseconds(ns);
+        return Time::time_now() + turbo::Duration::nanoseconds(ns);
     }
 
     inline turbo::Time double_seconds_from_now(double secs) {
-        return time_now() + turbo::seconds(secs);
+        return Time::time_now() + turbo::Duration::seconds(secs);
     }
 
     inline turbo::Time double_milliseconds_from_now(double ms) {
-        return time_now() + turbo::milliseconds(ms);
+        return Time::time_now() + turbo::Duration::milliseconds(ms);
     }
 
     inline turbo::Time double_microseconds_from_now(double us) {
-        return time_now() + turbo::microseconds(us);
+        return Time::time_now() + turbo::Duration::microseconds(us);
     }
 
     inline turbo::Time double_nanoseconds_from_now(double ns) {
-        return time_now() + turbo::nanoseconds(ns);
+        return Time::time_now() + turbo::Duration::nanoseconds(ns);
     }
 
 

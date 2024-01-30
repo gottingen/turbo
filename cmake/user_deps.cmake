@@ -37,6 +37,7 @@ find_package(Threads REQUIRED)
 set(CARBIN_DEPS_LINK
         #${TURBO_LIB}
         ${CARBIN_SYSTEM_DYLINK}
+        pthread
         )
 list(REMOVE_DUPLICATES CARBIN_DEPS_LINK)
 carbin_print_list_label("Denpendcies:" CARBIN_DEPS_LINK)

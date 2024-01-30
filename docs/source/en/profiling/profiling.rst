@@ -171,7 +171,7 @@ see a example usually in actual application
         auto str = Variable::dump_prometheus_all();
         // report str to prometheus server
         // or dump it when prometheus server request and response it
-        turbo::sleep_for(turbo::seconds(10));
+        turbo::sleep_for(turbo::Duration::seconds(10));
     }
     g_running = false;
     t0.join();

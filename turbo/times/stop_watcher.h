@@ -56,35 +56,35 @@ namespace turbo {
         // Get the elapse from start() to stop(), in various units.
         [[nodiscard]] turbo::Duration elapsed() const;
 
-        [[nodiscard]] int64_t elapsed_nano() const { return turbo::to_int64_nanoseconds(elapsed()); }
+        [[nodiscard]] int64_t elapsed_nano() const { return elapsed().to_nanoseconds(); }
 
-        [[nodiscard]] int64_t elapsed_micro() const { return turbo::to_int64_microseconds(elapsed()); }
+        [[nodiscard]] int64_t elapsed_micro() const { return elapsed().to_microseconds(); }
 
-        [[nodiscard]] int64_t elapsed_mill() const { return turbo::to_int64_milliseconds(elapsed()); }
+        [[nodiscard]] int64_t elapsed_mill() const { return elapsed().to_milliseconds(); }
 
-        [[nodiscard]] int64_t elapsed_sec() const { return turbo::to_int64_seconds(elapsed());; }
+        [[nodiscard]] int64_t elapsed_sec() const { return elapsed().to_seconds();; }
 
-        [[nodiscard]] double elapsed_nano(double) const { return turbo::to_double_nanoseconds(elapsed()); }
+        [[nodiscard]] double elapsed_nano(double) const { return elapsed().to_nanoseconds<double>(); }
 
-        [[nodiscard]] double elapsed_micro(double) const { return turbo::to_double_microseconds(elapsed()); }
+        [[nodiscard]] double elapsed_micro(double) const { return elapsed().to_microseconds<double>(); }
 
-        [[nodiscard]] double elapsed_mill(double) const { return turbo::to_double_milliseconds(elapsed()); }
+        [[nodiscard]] double elapsed_mill(double) const { return elapsed().to_milliseconds<double>(); }
 
-        [[nodiscard]] double elapsed_sec(double) const { return turbo::to_double_seconds(elapsed()); }
+        [[nodiscard]] double elapsed_sec(double) const { return elapsed().to_seconds<double>(); }
 
         [[nodiscard]] std::chrono::duration<double> elapsed_chrono() const {
-            return turbo::to_chrono_nanoseconds(elapsed());
+            return elapsed().to_chrono_nanoseconds();
         }
 
         /// This prints out a time string from a time
         std::string make_time_str(turbo::Duration span) const {  // NOLINT(modernize-use-nodiscard)
-            if (span < turbo::microseconds(1))
-                return turbo::format("{}ns", turbo::to_double_nanoseconds(span));
-            if (span < turbo::milliseconds(1))
-                return turbo::format("{}us", turbo::to_double_microseconds(span));
-            if (span < turbo::seconds(1))
-                return turbo::format("{}us", turbo::to_double_milliseconds(span));
-            return turbo::format("{}us", turbo::to_double_seconds(span));
+            if (span < turbo::Duration::microseconds(1))
+                return turbo::format("{}ns", span.to_nanoseconds<double>());
+            if (span < turbo::Duration::milliseconds(1))
+                return turbo::format("{}us", span.to_microseconds<double>());
+            if (span < turbo::Duration::seconds(1))
+                return turbo::format("{}ms", span.to_milliseconds<double>());
+            return turbo::format("{}s", span.to_seconds<double>());
         }
 
         std::string to_string() const {
@@ -92,7 +92,7 @@ namespace turbo {
         }
 
     private:
-        static constexpr turbo::Duration kZero = turbo::nanoseconds(0);
+        static constexpr turbo::Duration kZero = turbo::Duration::nanoseconds(0);
         turbo::Time _start;
         std::string _title;
         time_print_t _time_print;

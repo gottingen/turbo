@@ -70,30 +70,28 @@ using Elf32_auxv_t = Elf32_Auxinfo;
 namespace turbo::debugging_internal {
 
     TURBO_CONST_INIT
-    std::atomic<const void *> VDSOSupport::vdso_base_(
-            debugging_internal::ElfMemImage::kInvalidBase);
+    std::atomic<const void *> VDSOSupport::vdso_base_(debugging_internal::ElfMemImage::kInvalidBase);
 
-    TURBO_CONST_INIT std::atomic<VDSOSupport::GetCpuFn> VDSOSupport::getcpu_fn_(
-            &InitAndGetCPU);
+    TURBO_CONST_INIT std::atomic<VDSOSupport::GetCpuFn> VDSOSupport::getcpu_fn_(&init_and_get_cpu);
 
     VDSOSupport::VDSOSupport()
     // If vdso_base_ is still set to kInvalidBase, we got here
     // before VDSOSupport::Init has been called. Call it now.
             : image_(vdso_base_.load(std::memory_order_relaxed) ==
                      debugging_internal::ElfMemImage::kInvalidBase
-                     ? Init()
+                     ? initialize()
                      : vdso_base_.load(std::memory_order_relaxed)) {}
 
-// NOTE: we can't use GoogleOnceInit() below, because we can be
-// called by tcmalloc, and none of the *once* stuff may be functional yet.
-//
-// In addition, we hope that the VDSOSupportHelper constructor
-// causes this code to run before there are any threads, and before
-// InitGoogle() has executed any chroot or setuid calls.
-//
-// Finally, even if there is a race here, it is harmless, because
-// the operation should be idempotent.
-    const void *VDSOSupport::Init() {
+    // NOTE: we can't use OnceInit() below, because we can be
+    // called by tcmalloc, and none of the *once* stuff may be functional yet.
+    //
+    // In addition, we hope that the VDSOSupportHelper constructor
+    // causes this code to run before there are any threads, and before
+    // InitGoogle() has executed any chroot or setuid calls.
+    //
+    // Finally, even if there is a race here, it is harmless, because
+    // the operation should be idempotent.
+    const void *VDSOSupport::initialize() {
         const auto kInvalidBase = debugging_internal::ElfMemImage::kInvalidBase;
 #ifdef TURBO_HAVE_GETAUXVAL
         if (vdso_base_.load(std::memory_order_relaxed) == kInvalidBase) {
@@ -110,7 +108,7 @@ namespace turbo::debugging_internal {
             if (fd == -1) {
                 // Kernel too old to have a VDSO.
                 vdso_base_.store(nullptr, std::memory_order_relaxed);
-                getcpu_fn_.store(&GetCPUViaSyscall, std::memory_order_relaxed);
+                getcpu_fn_.store(&get_cpu_via_syscall, std::memory_order_relaxed);
                 return nullptr;
             }
             ElfW(auxv_t) aux;
@@ -126,13 +124,13 @@ namespace turbo::debugging_internal {
                     break;
                 }
             }
-            close(fd);
+            ::close(fd);
             if (vdso_base_.load(std::memory_order_relaxed) == kInvalidBase) {
                 // Didn't find AT_SYSINFO_EHDR in auxv[].
                 vdso_base_.store(nullptr, std::memory_order_relaxed);
             }
         }
-        GetCpuFn fn = &GetCPUViaSyscall;  // default if VDSO not present.
+        GetCpuFn fn = &get_cpu_via_syscall;  // default if VDSO not present.
         if (vdso_base_.load(std::memory_order_relaxed)) {
             VDSOSupport vdso;
             SymbolInfo info;
@@ -153,7 +151,7 @@ namespace turbo::debugging_internal {
         vdso_base_.store(base, std::memory_order_relaxed);
         image_.Init(base);
         // Also reset getcpu_fn_, so GetCPU could be tested with simulated VDSO.
-        getcpu_fn_.store(&InitAndGetCPU, std::memory_order_relaxed);
+        getcpu_fn_.store(&init_and_get_cpu, std::memory_order_relaxed);
         return old_base;
     }
 
@@ -169,8 +167,8 @@ namespace turbo::debugging_internal {
         return image_.LookupSymbolByAddress(address, info_out);
     }
 
-// NOLINT on 'long' because this routine mimics kernel api.
-    long VDSOSupport::GetCPUViaSyscall(unsigned *cpu,  // NOLINT(runtime/int)
+    // NOLINT on 'long' because this routine mimics kernel api.
+    long VDSOSupport::get_cpu_via_syscall(unsigned *cpu,  // NOLINT(runtime/int)
                                        void *, void *) {
 #ifdef SYS_getcpu
         return syscall(SYS_getcpu, cpu, nullptr, nullptr);
@@ -183,11 +181,11 @@ namespace turbo::debugging_internal {
     }
 
     // Use fast __vdso_getcpu if available.
-    long VDSOSupport::InitAndGetCPU(unsigned *cpu,  // NOLINT(runtime/int)
+    long VDSOSupport::init_and_get_cpu(unsigned *cpu,  // NOLINT(runtime/int)
                                     void *x, void *y) {
-        Init();
+        initialize();
         GetCpuFn fn = getcpu_fn_.load(std::memory_order_relaxed);
-        TURBO_RAW_CHECK(fn != &InitAndGetCPU, "Init() did not set getcpu_fn_");
+        TURBO_RAW_CHECK(fn != &init_and_get_cpu, "Init() did not set getcpu_fn_");
         return (*fn)(cpu, x, y);
     }
 
@@ -201,6 +199,12 @@ namespace turbo::debugging_internal {
                 (*VDSOSupport::getcpu_fn_)(&cpu, nullptr, nullptr);
         return ret_code == 0 ? static_cast<int>(cpu) : static_cast<int>(ret_code);
     }
+
+    int get_node_and_cpu(unsigned &cpu, unsigned &node) {
+        long ret_code =  // NOLINT(runtime/int)
+                (*VDSOSupport::getcpu_fn_)(&cpu, &node, nullptr);
+        return ret_code;
+    }  // NOLINT(runtime/int)
 
 }  // namespace turbo::debugging_internal
 

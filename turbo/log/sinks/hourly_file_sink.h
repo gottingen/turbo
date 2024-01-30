@@ -16,14 +16,13 @@
 #pragma once
 
 #include "turbo/log/common.h"
-#include "turbo/files/sequential_write_file.h"
+#include "turbo/files/filesystem.h"
 #include "turbo/log/details/null_mutex.h"
 #include <turbo/format/format.h>
 #include <turbo/log/sinks/base_sink.h>
 #include "turbo/log/details/os.h"
 #include <turbo/log/details/circular_q.h>
 #include "turbo/log/details/synchronous_factory.h"
-#include "turbo/files/utility.h"
 #include <chrono>
 #include <cstdio>
 #include <ctime>
@@ -40,8 +39,8 @@ namespace turbo::tlog {
             // Create filename for the form basename.YYYY-MM-DD-H
             static filename_t calc_filename(const filename_t &filename, const tm &now_tm) {
                 filename_t basename, ext;
-                std::tie(basename, ext) = turbo::FileUtility::split_by_extension(filename);
-                return fmt_lib::format(TLOG_FILENAME_T("{}_{:04d}-{:02d}-{:02d}_{:02d}{}"), basename,
+                std::tie(basename, ext) = turbo::split_by_extension(filename);
+                return turbo::format(TLOG_FILENAME_T("{}_{:04d}-{:02d}-{:02d}_{:02d}{}"), basename,
                                        now_tm.tm_year + 1900, now_tm.tm_mon + 1,
                                        now_tm.tm_mday, now_tm.tm_hour, ext);
             }
@@ -63,8 +62,7 @@ namespace turbo::tlog {
                       max_files_(max_files), filenames_q_() {
                 auto now = log_clock::now();
                 auto filename = FileNameCalc::calc_filename(base_filename_, now_tm(now));
-                file_writer_.set_option(kLogFileOption);
-                auto r = file_writer_.open(filename, truncate_);
+                auto r = file_writer_.open(filename, truncate_, kLogFileOption);
                 if (!r.ok()) {
                     throw_tlog_ex(r.ToString());
                 }
@@ -89,7 +87,7 @@ namespace turbo::tlog {
                 if (should_rotate) {
                     if (remove_init_file_) {
                         file_writer_.close();
-                        details::os::remove(file_writer_.file_path().native());
+                        turbo::filesystem::remove(file_writer_.file_path());
                     }
                     auto filename = FileNameCalc::calc_filename(base_filename_, now_tm(time));
                     auto r = file_writer_.open(filename, truncate_);
@@ -103,7 +101,7 @@ namespace turbo::tlog {
                 base_sink<Mutex>::formatter_->format(msg, formatted);
                 auto r = file_writer_.write(formatted);
                 if (!r.ok()) {
-                    throw_tlog_ex(r.ToString());
+                    throw_tlog_ex(r.to_string());
                 }
                 // Do the cleaning only at the end because it might throw on failure.
                 if (should_rotate && max_files_ > 0) {
@@ -114,14 +112,12 @@ namespace turbo::tlog {
             void flush_() override {
                 auto r = file_writer_.flush();
                 if (!r.ok()) {
-                    throw_tlog_ex(r.ToString());
+                    throw_tlog_ex(r.to_string());
                 }
             }
 
         private:
             void init_filenames_q_() {
-                using details::os::path_exists;
-
                 filenames_q_ = details::circular_q<filename_t>(static_cast<size_t>(max_files_));
                 std::vector<filename_t> filenames;
                 auto now = log_clock::now();
@@ -158,17 +154,23 @@ namespace turbo::tlog {
             // Delete the file N rotations ago.
             // Throw tlog_ex on failure to delete the old file.
             void delete_old_() {
-                using details::os::filename_to_str;
-                using details::os::remove_if_exists;
 
                 filename_t current_file = file_writer_.file_path().native();
                 if (filenames_q_.full()) {
                     auto old_filename = std::move(filenames_q_.front());
                     filenames_q_.pop_front();
-                    bool ok = remove_if_exists(old_filename) == 0;
-                    if (!ok) {
-                        filenames_q_.push_back(std::move(current_file));
-                        TLOG_THROW(tlog_ex("Failed removing hourly file " + filename_to_str(old_filename), errno));
+                    std::error_code ec;
+                    if(turbo::filesystem::exists(old_filename, ec)) {
+                        if(ec) {
+                            filenames_q_.push_back(std::move(current_file));
+                            throw_tlog_ex(ec.message());
+                        }
+                        auto r = turbo::filesystem::remove(old_filename, ec);
+                        TURBO_UNUSED(r);
+                        if (ec) {
+                            filenames_q_.push_back(std::move(current_file));
+                            throw_tlog_ex(ec.message());
+                        }
                     }
                 }
                 filenames_q_.push_back(std::move(current_file));

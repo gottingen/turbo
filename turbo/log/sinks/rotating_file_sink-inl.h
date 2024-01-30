@@ -18,8 +18,7 @@
 #include <turbo/log/sinks/rotating_file_sink.h>
 
 #include "turbo/log/common.h"
-#include "turbo/files/utility.h"
-#include "turbo/files/sequential_write_file.h"
+#include "turbo/files/filesystem.h"
 #include "turbo/log/details/null_mutex.h"
 #include <turbo/format/format.h>
 
@@ -46,8 +45,7 @@ namespace turbo::tlog {
             if (max_files > 200000) {
                 throw_tlog_ex("rotating sink constructor: max_files arg cannot exceed 200000");
             }
-            file_writer_.set_option(kLogFileOption);
-            auto r = file_writer_.open(calc_filename(base_filename_, 0));
+            auto r = file_writer_.open(calc_filename(base_filename_, 0), kLogTruncateOpenOption);
             if (!r.ok()) {
                 throw_tlog_ex(r.to_string());
             }
@@ -62,8 +60,8 @@ namespace turbo::tlog {
             }
         }
 
-// calc filename according to index and file extension if exists.
-// e.g. calc_filename("logs/mylog.txt, 3) => "logs/mylog.3.txt".
+        // calc filename according to index and file extension if exists.
+        // e.g. calc_filename("logs/mylog.txt, 3) => "logs/mylog.3.txt".
         template<typename Mutex>
         filename_t rotating_file_sink<Mutex>::calc_filename(const filename_t &filename, std::size_t index) {
             if (index == 0u) {
@@ -71,8 +69,8 @@ namespace turbo::tlog {
             }
 
             filename_t basename, ext;
-            std::tie(basename, ext) = turbo::FileUtility::split_by_extension(filename);
-            return fmt_lib::format(TLOG_FILENAME_T("{}.{}{}"), basename, index, ext);
+            std::tie(basename, ext) = turbo::split_by_extension(filename);
+            return turbo::format(TLOG_FILENAME_T("{}.{}{}"), basename, index, ext);
         }
 
         template<typename Mutex>
@@ -137,7 +135,7 @@ namespace turbo::tlog {
                     // if failed try again after a small delay.
                     // this is a workaround to a windows issue, where very high rotation
                     // rates can cause the rename to fail with permission denied (because of antivirus?).
-                    turbo::sleep_for(turbo::milliseconds(100));
+                    turbo::sleep_for(turbo::Duration::milliseconds(100));
                     if (!rename_file_(src, target)) {
                         auto r = file_writer_.reopen(
                                 true); // truncate the log file anyway to prevent it to grow beyond its limit!

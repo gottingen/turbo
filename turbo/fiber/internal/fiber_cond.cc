@@ -20,6 +20,7 @@
 #include "turbo/fiber/internal/fiber_cond.h"
 #include "turbo/fiber/internal/waitable_event.h"
 #include "turbo/fiber/internal/types.h"                       // fiber_cond_t
+#include "turbo/base/internal/raw_logging.h"
 
 namespace turbo::fiber_internal {
     struct CondInternal {
@@ -42,7 +43,7 @@ namespace turbo::fiber_internal {
                         const fiber_condattr_t *) {
         c->m = nullptr;
         c->seq = turbo::fiber_internal::waitable_event_create_checked<int>();
-        TLOG_CHECK(c->seq != nullptr, "fiber_cond_init: waitable_event_create_checked failed");
+        TURBO_RAW_CHECK(c->seq != nullptr, "fiber_cond_init: waitable_event_create_checked failed");
         *c->seq = 0;
         return ok_status();
     }
@@ -84,12 +85,13 @@ namespace turbo::fiber_internal {
             fiber_mutex_t *expected_m = nullptr;
             if (!ic->m.compare_exchange_strong(
                     expected_m, m, std::memory_order_relaxed)) {
-                return turbo::invalid_argument_error("");
+                return turbo::make_status(kEINVAL);
             }
         }
         fiber_mutex_unlock(m);
-        auto rs = turbo::fiber_internal::waitable_event_wait(ic->seq, expected_seq, nullptr);
-        if (turbo::is_unavailable(rs)) {
+        turbo::Status rc;
+        auto rs = turbo::fiber_internal::waitable_event_wait(ic->seq, expected_seq);
+        if (!rs.ok() && rs.code() != EWOULDBLOCK && rs.code() != kEINTR) {
             // EINTR should not be returned by cond_*wait according to docs on
             // pthread, however spurious wake-up is OK, just as we do here
             // so that users can check flags in the loop often companioning
@@ -101,15 +103,14 @@ namespace turbo::fiber_internal {
             //   mutex.unlock();
             // After interruption, above code should wake up from the cond_wait
             // soon and check the `stop' flag and other predicates.
-            rs = ok_status();
+            rc = rs;
         }
         const auto rc2 = fiber_mutex_lock_contended(m);
-        return (!rc2.ok() ? rc2 : rs);
+        return (!rc2.ok() ? rc2 : rc);
     }
 
     turbo::Status fiber_cond_timedwait(fiber_cond_t *TURBO_RESTRICT c,
-                                       fiber_mutex_t *TURBO_RESTRICT m,
-                                       const struct timespec *TURBO_RESTRICT abstime) {
+                                       fiber_mutex_t *TURBO_RESTRICT m,turbo::Time abstime) {
         turbo::fiber_internal::CondInternal *ic = reinterpret_cast<turbo::fiber_internal::CondInternal *>(c);
         const int expected_seq = ic->seq->load(std::memory_order_relaxed);
         if (ic->m.load(std::memory_order_relaxed) != m) {
@@ -117,17 +118,18 @@ namespace turbo::fiber_internal {
             fiber_mutex_t *expected_m = nullptr;
             if (!ic->m.compare_exchange_strong(
                     expected_m, m, std::memory_order_relaxed)) {
-                return turbo::invalid_argument_error("");
+                return turbo::make_status(kEINVAL);
             }
         }
         fiber_mutex_unlock(m);
+        turbo::Status rc;
         auto rs = turbo::fiber_internal::waitable_event_wait(ic->seq, expected_seq, abstime);
-        if (turbo::is_unavailable(rs)) {
+        if (!rs.ok() && rs.code() != EWOULDBLOCK && rs.code() != kEINTR) {
             // note: see comments in fiber_cond_wait on EINTR.
-            rs = ok_status();
+            rc = rs;
         }
         const auto rc2 = fiber_mutex_lock_contended(m);
-        return (!rc2.ok() ? rc2 : rs);
+        return (!rc2.ok() ? rc2 : rc);
     }
 
 }  // namespace turbo::fiber_internal

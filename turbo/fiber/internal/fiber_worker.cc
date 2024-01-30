@@ -26,10 +26,10 @@
 #include "turbo/base/processor.h"
 #include "turbo/fiber/internal/schedule_group.h"
 #include "turbo/fiber/internal/fiber_worker.h"
-#include "turbo/times/timer_thread.h"
+#include "turbo/fiber/internal/timer.h"
 #include "turbo/fiber/internal/offset_table.h"
 #include "turbo/log/logging.h"
-#include "turbo/base/sysinfo.h"
+#include "turbo/system/sysinfo.h"
 
 namespace turbo::fiber_internal {
 
@@ -39,7 +39,7 @@ namespace turbo::fiber_internal {
     // Sync with FiberEntity::local_storage when a fiber is created or destroyed.
     // During running, the two fields may be inconsistent, use tls_bls as the
     // groundtruth.
-    thread_local fiber_local_storage tls_bls = FIBER_LOCAL_STORAGE_INITIALIZER;
+    thread_local fiber_local_storage tls_bls = LOCAL_STORAGE_INIT;
 
     // defined in fiber/key.cpp
     extern void return_keytable(fiber_keytable_pool_t *, KeyTable *);
@@ -90,6 +90,20 @@ namespace turbo::fiber_internal {
         return true;
     }
 
+    FiberWorker *FiberWorker::get_current_worker() {
+        return tls_task_group;
+    }
+
+    bool FiberWorker::is_running_on_fiber() {
+        auto *g = tls_task_group;
+        return g != nullptr && !g->is_current_pthread_task();
+    }
+
+    bool FiberWorker::is_running_on_pthread() {
+        auto *g = tls_task_group;
+        return g == nullptr || g->is_current_pthread_task();
+    }
+
     bool FiberWorker::wait_task(fiber_id_t *tid) {
         do {
 #ifndef FIBER_DONT_SAVE_PARKING_STATE
@@ -129,7 +143,7 @@ namespace turbo::fiber_internal {
             }
         }
         // Don't forget to add elapse of last wait_task.
-        current_task()->stat.cputime_ns += turbo::get_current_time_nanos() - _last_run_ns;
+        current_fiber()->stat.cputime_ns += turbo::get_current_time_nanos() - _last_run_ns;
     }
 
     FiberWorker::FiberWorker(ScheduleGroup *c)
@@ -297,14 +311,14 @@ namespace turbo::fiber_internal {
                                        std::function<void *(void *)> &&fn,
                                        void *__restrict arg) {
         if (TURBO_UNLIKELY(!fn)) {
-            return turbo::invalid_argument_error("");
+            return turbo::make_status(kEINVAL);
         }
         const int64_t start_ns = turbo::get_current_time_nanos();
         const FiberAttribute using_attr = (attr ? *attr : FIBER_ATTR_NORMAL);
         turbo::ResourceId<FiberEntity> slot;
         FiberEntity *m = turbo::get_resource(&slot);
         if (TURBO_UNLIKELY(!m)) {
-            return turbo::resource_exhausted_error("");
+            return turbo::make_status(kENOMEM);
         }
         TDLOG_CHECK(m->current_waiter.load(std::memory_order_relaxed) == nullptr);
         m->stop = false;
@@ -315,6 +329,9 @@ namespace turbo::fiber_internal {
         TDLOG_CHECK(m->stack == nullptr);
         m->attr = using_attr;
         m->local_storage = LOCAL_STORAGE_INIT;
+        if (is_inherit(using_attr)) {
+            m->local_storage.parent_span = tls_bls.parent_span;
+        }
         m->cpuwide_start_ns = start_ns;
         m->stat = EMPTY_STAT;
         m->tid = make_tid(*m->version_futex, slot);
@@ -329,17 +346,17 @@ namespace turbo::fiber_internal {
             g->ready_to_run(m->tid, is_nosignal(using_attr));
         } else {
             // NOSIGNAL affects current task, not the new task.
-            RemainedFn fn = nullptr;
-            if (g->current_task()->about_to_quit) {
-                fn = ready_to_run_in_worker_ignoresignal;
+            RemainedFn functor = nullptr;
+            if (g->current_fiber()->about_to_quit) {
+                functor = ready_to_run_in_worker_ignoresignal;
             } else {
-                fn = ready_to_run_in_worker;
+                functor = ready_to_run_in_worker;
             }
             ReadyToRunArgs args = {
                     g->current_fid(),
                     is_nosignal(using_attr)
             };
-            g->set_remained(fn, &args);
+            g->set_remained(functor, &args);
             FiberWorker::sched_to(pg, m->tid);
         }
         return turbo::ok_status();
@@ -351,14 +368,14 @@ namespace turbo::fiber_internal {
                                        std::function<void *(void *)> &&fn,
                                        void *__restrict arg) {
         if (TURBO_UNLIKELY(!fn)) {
-            return turbo::invalid_argument_error("");
+            return turbo::make_status(kEINVAL);
         }
         const int64_t start_ns = turbo::get_current_time_nanos();
         const FiberAttribute using_attr = (attr ? *attr : FIBER_ATTR_NORMAL);
         turbo::ResourceId<FiberEntity> slot;
         FiberEntity *m = turbo::get_resource(&slot);
         if (TURBO_UNLIKELY(!m)) {
-            return turbo::resource_exhausted_error("");
+            return turbo::make_status(kENOMEM);
         }
         TDLOG_CHECK(m->current_waiter.load(std::memory_order_relaxed) == nullptr);
         m->stop = false;
@@ -369,6 +386,9 @@ namespace turbo::fiber_internal {
         TDLOG_CHECK(m->stack == nullptr);
         m->attr = using_attr;
         m->local_storage = LOCAL_STORAGE_INIT;
+        if (is_inherit(using_attr)) {
+            m->local_storage.parent_span = tls_bls.parent_span;
+        }
         m->cpuwide_start_ns = start_ns;
         m->stat = EMPTY_STAT;
         m->tid = make_tid(*m->version_futex, slot);
@@ -399,22 +419,25 @@ namespace turbo::fiber_internal {
 
     turbo::Status FiberWorker::join(fiber_id_t tid, void **return_value) {
         if (TURBO_UNLIKELY(!tid)) {  // tid of fiber is never 0.
-            return turbo::invalid_argument_error("");
+            errno = EINVAL;
+            return turbo::make_status();
         }
         FiberEntity *m = address_meta(tid);
         if (TURBO_UNLIKELY(!m)) {
             // The fiber is not created yet, this join is definitely wrong.
-            return turbo::invalid_argument_error("");
+            errno = EINVAL;
+            return turbo::make_status();
         }
         FiberWorker *g = tls_task_group;
         if (g != nullptr && g->current_fid() == tid) {
             // joining self causes indefinite waiting.
-            return turbo::invalid_argument_error("");
+            errno = EINVAL;
+            return turbo::make_status();
         }
         const uint32_t expected_version = get_version(tid);
         while (*m->version_futex == expected_version) {
-            auto rs = waitable_event_wait(m->version_futex, expected_version, nullptr);
-            if (!rs.ok() && !is_unavailable(rs)) {
+            auto rs = waitable_event_wait(m->version_futex, expected_version);
+            if (!rs.ok() && rs.code() != EWOULDBLOCK && rs.code() != kEINTR) {
                 return rs;
             }
         }
@@ -598,7 +621,7 @@ namespace turbo::fiber_internal {
         while (!_remote_rq.push_locked(tid)) {
             flush_nosignal_tasks_remote_locked(_remote_rq._mutex);
             TLOG_ERROR_EVERY_SEC("_remote_rq is full, capacity={}", _remote_rq.capacity());
-            turbo::sleep_for(turbo::milliseconds(1));
+            turbo::sleep_for(turbo::Duration::milliseconds(1));
             _remote_rq._mutex.lock();
         }
         if (nosignal) {
@@ -669,8 +692,8 @@ namespace turbo::fiber_internal {
         SleepArgs e = *static_cast<SleepArgs *>(void_args);
         FiberWorker *g = e.group;
 
-        TimerThread::TaskId sleep_id;
-        sleep_id = get_global_timer_thread()->schedule(ready_to_run_from_timer_thread, void_args,
+        TimerId sleep_id;
+        sleep_id = get_fiber_timer_thread()->schedule(ready_to_run_from_timer_thread, void_args,
                 turbo::microseconds_from_now(e.timeout_us));
 
         if (!sleep_id) {
@@ -691,7 +714,7 @@ namespace turbo::fiber_internal {
         // The thread is stopped or interrupted.
         // interrupt() always sees that current_sleep == 0. It will not schedule
         // the calling thread. The race is between current thread and timer thread.
-        if (get_global_timer_thread()->unschedule(sleep_id).ok()) {
+        if (get_fiber_timer_thread()->unschedule(sleep_id).ok()) {
             // added to timer, previous thread may be already woken up by timer and
             // even stopped. It's safe to schedule previous thread when unschedule()
             // returns 0 which means "the not-run-yet sleep_id is removed". If the
@@ -712,7 +735,7 @@ namespace turbo::fiber_internal {
         FiberWorker *g = *pg;
         // We have to schedule timer after we switched to next fiber otherwise
         // the timer may wake up(jump to) current still-running context.
-        SleepArgs e = {timeout_us, g->current_fid(), g->current_task(), g};
+        SleepArgs e = {timeout_us, g->current_fid(), g->current_fiber(), g};
         g->set_remained(_add_sleep_event, &e);
         sched(pg);
         g = *pg;
@@ -741,14 +764,14 @@ namespace turbo::fiber_internal {
     }
 
     turbo::Status FiberWorker::sleep(FiberWorker **pg, const turbo::Duration & span) {
-        if (turbo::zero_duration() == span) {
+        if (turbo::Duration::zero() == span) {
             yield(pg);
             return turbo::ok_status();
         }
         FiberWorker *g = *pg;
         // We have to schedule timer after we switched to next fiber otherwise
         // the timer may wake up(jump to) current still-running context.
-        SleepArgs e = {static_cast<uint64_t>(turbo::to_int64_microseconds(span)), g->current_fid(), g->current_task(), g};
+        SleepArgs e = {static_cast<uint64_t>(span.to_microseconds()), g->current_fid(), g->current_fiber(), g};
         g->set_remained(_add_sleep_event, &e);
         sched(pg);
         g = *pg;
@@ -761,7 +784,8 @@ namespace turbo::fiber_internal {
             // errno to ESTOP when the thread is stopping, and print FATAL
             // otherwise. To make smooth transitions, ESTOP is still set instead
             // of EINTR when the thread is stopping.
-            return e.meta->stop ? turbo::already_stop_error("") : turbo::unavailable_error("");
+            errno =  e.meta->stop ? ESTOP : EINTR;
+            return turbo::make_status();
         }
         return turbo::ok_status();
     }
@@ -772,7 +796,7 @@ namespace turbo::fiber_internal {
             fiber_id_t tid, EventWaiterNode **pw, uint64_t *sleep_id) {
         FiberEntity *const m = FiberWorker::address_meta(tid);
         if (m == nullptr) {
-            return turbo::invalid_argument_error("");
+            return turbo::make_status(kEINVAL);
         }
         const uint32_t given_ver = get_version(tid);
         SpinLockHolder l(&m->version_lock);
@@ -783,7 +807,7 @@ namespace turbo::fiber_internal {
             m->interrupted = true;
             return turbo::ok_status();
         }
-        return turbo::invalid_argument_error("");
+        return turbo::make_status(kEINVAL);
     }
 
     static turbo::Status set_event_waiter(fiber_id_t tid, EventWaiterNode *w) {
@@ -797,7 +821,7 @@ namespace turbo::fiber_internal {
                 return turbo::ok_status();
             }
         }
-        return turbo::invalid_argument_error("");
+        return turbo::make_status(kEINVAL);
     }
 
     // The interruption is "persistent" compared to the ones caused by signals,
@@ -827,13 +851,13 @@ namespace turbo::fiber_internal {
                 return rc;
             }
         } else if (sleep_id != 0) {
-            if (get_global_timer_thread()->unschedule(sleep_id).ok()) {
+            if (get_fiber_timer_thread()->unschedule(sleep_id).ok()) {
                 turbo::fiber_internal::FiberWorker *g = turbo::fiber_internal::tls_task_group;
                 if (g) {
                     g->ready_to_run(tid);
                 } else {
                     if (!c) {
-                        return turbo::invalid_argument_error("");
+                        return turbo::make_status(kEINVAL);
                     }
                     c->choose_one_group()->ready_to_run_remote(tid);
                 }
@@ -849,7 +873,7 @@ namespace turbo::fiber_internal {
         sched(pg);
     }
 
-    void print_task(std::ostream &os, fiber_id_t tid) {
+    void FiberWorker::print_fiber(std::ostream &os, fiber_id_t tid) {
         FiberEntity *const m = FiberWorker::address_meta(tid);
         if (m == nullptr) {
             os << "fiber=" << tid << " : never existed";
@@ -896,6 +920,52 @@ namespace turbo::fiber_internal {
                << "\nuptime_ns=" << turbo::get_current_time_nanos() - cpuwide_start_ns
                << "\ncputime_ns=" << stat.cputime_ns
                << "\nnswitch=" << stat.nswitch;
+        }
+    }
+    void FiberWorker::print_fiber(memory_buffer &buffer, fiber_id_t tid){
+        FiberEntity *const m = FiberWorker::address_meta(tid);
+        if (m == nullptr) {
+            format_to(std::back_inserter(buffer), "fiber={} : never existed", tid);
+            return;
+        }
+        const uint32_t given_ver = get_version(tid);
+        bool matched = false;
+        bool stop = false;
+        bool interrupted = false;
+        bool about_to_quit = false;
+        std::function<void *(void *)> *fn = nullptr;
+        void *arg = nullptr;
+        FiberAttribute attr = FIBER_ATTR_NORMAL;
+        bool has_tls = false;
+        int64_t cpuwide_start_ns = 0;
+        FiberStatistics stat = {0, 0};
+        {
+            SpinLockHolder l(&m->version_lock);
+            if (given_ver == *m->version_futex) {
+                matched = true;
+                stop = m->stop;
+                interrupted = m->interrupted;
+                about_to_quit = m->about_to_quit;
+                fn = &m->fn;
+                arg = m->arg;
+                attr = m->attr;
+                has_tls = m->local_storage.keytable;
+                cpuwide_start_ns = m->cpuwide_start_ns;
+                stat = m->stat;
+            }
+        }
+        if (!matched) {
+            format_to(std::back_inserter(buffer), "fiber={} : not exist now", tid);
+        } else {
+            format_to(std::back_inserter(buffer), "fiber={} :\nstop={}\ninterrupted={}\nabout_to_quit={}\nfn={}\narg={}\nattr={stack_type={}"
+               " flags={}"
+               " keytable_pool={}}\nhas_tls={}\nuptime_ns={}\ncputime_ns={}\nnswitch={}", tid, stop, interrupted, about_to_quit, (void *) fn, (void *) arg, attr.stack_type
+               , attr.flags
+               , turbo::ptr(attr.keytable_pool)
+               , has_tls
+               , turbo::get_current_time_nanos() - cpuwide_start_ns
+               , stat.cputime_ns
+               , stat.nswitch);
         }
     }
 

@@ -19,7 +19,8 @@
 
 #include <cstddef>
 #include <memory>
-#include "turbo/base/status.h"
+#include <type_traits>
+#include "turbo/status/status.h"
 #include "turbo/platform/port.h"
 
 namespace turbo {
@@ -67,18 +68,18 @@ namespace turbo {
         }
 
         static constexpr size_t free_chunk_max_items() {
-            return kFreeChunkMaxItem;
+            return block_max_size() / sizeof(T) >= kFreeChunkMaxItem ? kFreeChunkMaxItem
+                                                                     : block_max_size() / sizeof(T);
         }
 
         static constexpr bool validate(const T *ptr) {
             return true;
         }
+
     private:
         static_assert(kBlockMaxSize >= sizeof(T), "kBlockMaxSize must be greater than sizeof(T)");
         static_assert(kBlockMaxItems > 0, "kBlockMaxItems must be greater than 0");
         static_assert(kFreeChunkMaxItem >= 0, "kFreeChunkMaxSize must be greater than 0");
-        static_assert(kBlockMaxSize / sizeof(T) >= kBlockMaxItems,
-                      "kBlockMaxSize must be greater than kBlockMaxItems * sizeof(T)");
     };
 
     /**
@@ -107,7 +108,7 @@ namespace turbo {
      * @tparam T the type of object
      */
     template<typename T>
-    struct ResourcePoolTraits : public ResourcePoolTraitsBase<T>{
+    struct ResourcePoolTraits : public ResourcePoolTraitsBase<T> {
 
     };
 
@@ -137,7 +138,8 @@ namespace turbo {
      * @param id [output]the identifier of object
      * @return the object
      */
-    template <typename T> inline T* get_resource(ResourceId<T>* id) {
+    template<typename T>
+    inline T *get_resource(ResourceId<T> *id) {
         return ResourcePool<T>::singleton()->get_resource(id);
     }
 
@@ -161,8 +163,8 @@ namespace turbo {
      * @param id [output]the identifier of object
      * @return the object
      */
-    template <typename T, typename ...Args>
-    inline T* get_resource(ResourceId<T>* id, const Args& ...args) {
+    template<typename T, typename ...Args>
+    inline T *get_resource(ResourceId<T> *id, const Args &...args) {
         return ResourcePool<T>::singleton()->get_resource(id, args...);
     }
 
@@ -188,8 +190,8 @@ namespace turbo {
      * @param id [output]the identifier of object
      * @return the object
      */
-    template <typename T,  typename ...Args>
-    inline T* get_resource(ResourceId<T>* id, Args&& ...arg) {
+    template<typename T, typename ...Args>
+    inline T *get_resource(ResourceId<T> *id, Args &&...arg) {
         return ResourcePool<T>::singleton()->get_resource(id, std::forward<Args>(arg)...);
     }
 
@@ -203,7 +205,8 @@ namespace turbo {
      * @param id the identifier of object
      * @return int 0 when successful, -1 otherwise.
      */
-    template <typename T> inline int return_resource(ResourceId<T> id) {
+    template<typename T>
+    inline int return_resource(ResourceId<T> id) {
         return ResourcePool<T>::singleton()->return_resource(id);
     }
 
@@ -228,7 +231,8 @@ namespace turbo {
      * @param id the identifier of object
      * @return the object
      */
-    template <typename T> inline T* address_resource(ResourceId<T> id) {
+    template<typename T>
+    inline T *address_resource(ResourceId<T> id) {
         return ResourcePool<T>::address_resource(id);
     }
 
@@ -239,7 +243,8 @@ namespace turbo {
      *        manually because it's called automatically when each thread quits.
      * @tparam T the type of object
      */
-    template <typename T> inline void clear_resources() {
+    template<typename T>
+    inline void clear_resources() {
         ResourcePool<T>::singleton()->clear_resources();
     }
 
@@ -251,10 +256,20 @@ namespace turbo {
      * @tparam T the type of object
      * @return ResourcePoolInfo
      */
-    template <typename T> ResourcePoolInfo describe_resources() {
+    template<typename T>
+    ResourcePoolInfo describe_resources() {
         return ResourcePool<T>::singleton()->describe_resources();
     }
 
+    template<typename T>
+    uint64_t make_resource_id(uint32_t index, ResourceId<T> rid) {
+        return (static_cast<uint64_t>(index) << 32) | rid.value;
+    }
+
+    template<typename T>
+    ResourceId<T> get_resource_id(uint64_t id) {
+        return ResourceId<T>{static_cast<uint32_t>(id & 0xFFFFFFFF)};
+    }
 
 }  // namespace turbo
 

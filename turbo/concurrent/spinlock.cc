@@ -23,7 +23,7 @@
 #include "turbo/platform/internal/atomic_hook.h"
 #include "turbo/platform/internal/cycleclock.h"
 #include "turbo/concurrent/spinlock_wait.h"
-#include "turbo/base/sysinfo.h" /* For NumCPUs() */
+#include "turbo/system/sysinfo.h" /* For NumCPUs() */
 
 // Description of lock-word:
 //  31..00: [............................3][2][1][0]

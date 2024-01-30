@@ -1,6 +1,49 @@
 Release
 ==================================
 
+v0.9.43 -
+================================
+
+addition
+--------------------------------
+
+* add test for atexit, thread_atexit.
+* add temp file for temporary file operation.
+* add iobuf for io buffer operation, which is a buffer for file and network io.
+* add virtual zero copy stream for zero copy operation.
+* add zero copy stream for zero copy operation.
+* add zero copy iobuf for io operations, both network and file.
+* add temp file for temporary file operation.
+* add Filesystem Adaptor for file system operation. using can define it own tag Adaptors, and 
+  using Filesystem<Tag> for a unified interface. default tag is system filesystem, eg some case, user
+  may define the it based on rocksdb with kv, my define  a rocks_kv_tag, and using Filesystem<rocks_kv_tag>
+  to access.
+
+feature improvement
+--------------------------------
+* tidy file descriptor operation to file io module.
+* promote the sequential write file io, avoid c-style file cache.
+* add ignore case hash set/map
+* promote inline function for turbo time module to constexpr function.
+* Function semantic enhancement for turbo time module. make global  function to member function as
+    possible as it can to avoid namespace pollution and make the semantics clear.
+* promote performance of log module by using zero copy iobuf io and turbo times.
+* improve poll api for fiber io operation.
+* add inheritable for fiber, which can inherit the fiber context from parent fiber.
+  with the api Fiber::start_span, Fiber::end_span, Fiber::get_span.
+
+bug fix
+--------------------------------
+
+* atexit and thread_atexit will cause a crash when main thread and the variable already destructed.
+* fix gcc12 compile error for <string> not directly included in hash engine
+* fix gcc12 compile error for <cstddef> not directly included in compress tuple
+* fix global operator `%` `+` `-` `*` `/` for Duration will modify rhs or lhs value.
+* fix bug for turbo::fiber io, when the process is killed, the fiber io will not exit hang by epoll_wait.
+* fix timer cpu high usage bug, when the timer is empty, it will cause cpu high usage.
+
+
+
 v0.9.39 - v0.9.43
 ================================
 

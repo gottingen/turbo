@@ -46,7 +46,7 @@ public:
     {}
     catch (const std::exception &e)
     {
-        throw_tlog_ex(fmt_lib::format("Error opening database: {}", e.what()));
+        throw_tlog_ex(turbo::format("Error opening database: {}", e.what()));
     }
 
     mongo_sink(std::shared_ptr<mongocxx::instance> instance, const std::string &db_name, const std::string &collection_name,
@@ -61,7 +61,7 @@ public:
         }
         catch (const std::exception &e)
         {
-            throw_tlog_ex(fmt_lib::format("Error opening database: {}", e.what()));
+            throw_tlog_ex(turbo::format("Error opening database: {}", e.what()));
         }
     }
 

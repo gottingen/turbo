@@ -34,8 +34,7 @@ namespace turbo::fiber_internal {
     struct fiber_condattr_t{
     };
 
-    turbo::Status fiber_cond_init(fiber_cond_t *TURBO_RESTRICT cond,
-                        const fiber_condattr_t *TURBO_RESTRICT cond_attr);
+    turbo::Status fiber_cond_init(fiber_cond_t *TURBO_RESTRICT cond, const fiber_condattr_t *TURBO_RESTRICT cond_attr);
 
     void fiber_cond_destroy(fiber_cond_t *cond);
 
@@ -43,13 +42,9 @@ namespace turbo::fiber_internal {
 
     void fiber_cond_broadcast(fiber_cond_t *cond);
 
-    turbo::Status fiber_cond_wait(fiber_cond_t *TURBO_RESTRICT cond,
-                        fiber_mutex_t *TURBO_RESTRICT mutex);
+    turbo::Status fiber_cond_wait(fiber_cond_t *TURBO_RESTRICT cond, fiber_mutex_t *TURBO_RESTRICT mutex);
 
-    turbo::Status fiber_cond_timedwait(
-            fiber_cond_t *TURBO_RESTRICT cond,
-            fiber_mutex_t *TURBO_RESTRICT mutex,
-            const struct timespec *TURBO_RESTRICT abstime);
+    turbo::Status fiber_cond_timedwait(fiber_cond_t *TURBO_RESTRICT cond, fiber_mutex_t *TURBO_RESTRICT mutex,turbo::Time abstime);
 }  // namespace turbo::fiber_internal
 
 #endif  // TURBO_FIBER_INTERNAL_FIBER_COND_H_

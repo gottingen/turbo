@@ -63,12 +63,12 @@ TEST_CASE("bactrace-async [bactrace]")
     for (int i = 0; i < 100; i++)
         logger->debug("debug message {}", i);
 
-    turbo::sleep_for(turbo::milliseconds(100));
+    turbo::sleep_for(turbo::Duration::milliseconds(100));
     REQUIRE(test_sink->lines().size() == 1);
     REQUIRE(test_sink->lines()[0] == "info message");
 
     logger->dump_backtrace();
-    turbo::sleep_for(turbo::milliseconds(100)); //  give time for the async dump to complete
+    turbo::sleep_for(turbo::Duration::milliseconds(100)); //  give time for the async dump to complete
     REQUIRE(test_sink->lines().size() == backtrace_size + 3);
     REQUIRE(test_sink->lines()[1] == "****************** Backtrace Start ******************");
     REQUIRE(test_sink->lines()[2] == "debug message 95");

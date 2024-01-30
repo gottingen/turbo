@@ -60,7 +60,7 @@ TEST_CASE_FIXTURE(TApp, "OneFlagShortValuesAs [app]") {
     flg->take_last();
     CHECK_EQ(2 , opt->as<int>());
     flg->multi_option_policy(turbo::MultiOptionPolicy::Throw);
-    CHECK_THROWS_AS(opt->as<int>(), turbo::ArgumentMismatch);
+    CHECK_THROWS_AS((void)opt->as<int>(), turbo::ArgumentMismatch);
     flg->multi_option_policy(turbo::MultiOptionPolicy::TakeAll);
     auto vec = opt->as<std::vector<int>>();
     CHECK_EQ(1 , vec[0]);
@@ -106,7 +106,7 @@ TEST_CASE_FIXTURE(TApp, "CountNonExist [app]") {
     app.add_flag("-c,--count");
     args = {"-c"};
     run();
-    CHECK_THROWS_AS(app.count("--nonexist"), turbo::OptionNotFound);
+    CHECK_THROWS_AS((void)app.count("--nonexist"), turbo::OptionNotFound);
 }
 
 TEST_CASE_FIXTURE(TApp, "OneFlagLong [app]") {
@@ -2420,13 +2420,13 @@ TEST_CASE_FIXTURE(TApp, "logFormSingleDash [app]") {
     app.final_callback([&]() {
         auto rem = app.remaining();
         for (auto &arg: rem) {
-            if (arg , "-v") {
+            if (arg == "-v") {
                 verbose = true;
             }
-            if (arg , "-vv") {
+            if (arg == "-vv") {
                 veryverbose = true;
             }
-            if (arg , "-vvv") {
+            if (arg == "-vvv") {
                 veryveryverbose = true;
             }
         }

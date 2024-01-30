@@ -16,8 +16,7 @@
 #pragma once
 
 #include "turbo/log/common.h"
-#include "turbo/files/sequential_write_file.h"
-#include "turbo/files/utility.h"
+#include "turbo/files/filesystem.h"
 #include "turbo/log/details/null_mutex.h"
 #include <turbo/format/format.h>
 #include <turbo/format/fmt/chrono.h>
@@ -43,8 +42,8 @@ namespace turbo::tlog {
             // Create filename for the form basename.YYYY-MM-DD
             static filename_t calc_filename(const filename_t &filename, const tm &now_tm) {
                 filename_t basename, ext;
-                std::tie(basename, ext) = turbo::FileUtility::split_by_extension(filename);
-                return fmt_lib::format(FMT_STRING(TLOG_FILENAME_T("{}_{:04d}-{:02d}-{:02d}{}")), basename,
+                std::tie(basename, ext) = turbo::split_by_extension(filename);
+                return turbo::format(FMT_STRING(TLOG_FILENAME_T("{}_{:04d}-{:02d}-{:02d}{}")), basename,
                                        now_tm.tm_year + 1900,
                                        now_tm.tm_mon + 1, now_tm.tm_mday, ext);
             }
@@ -104,10 +103,10 @@ namespace turbo::tlog {
                     throw_tlog_ex("daily_file_sink: Invalid rotation time in ctor");
                 }
 
-                auto now = log_clock::now();
-                auto filename = FileNameCalc::calc_filename(base_filename_, now_tm(now));
-                file_writer_.set_option(kLogFileOption);
-                auto r = file_writer_.open(filename, truncate_);
+                auto now = turbo::Time::time_now();
+                auto filename = FileNameCalc::calc_filename(base_filename_, now.to_local_tm());
+                auto & open_option = truncate ? kLogTruncateOpenOption : kLogAppendOpenOption;
+                auto r = file_writer_.open(filename, open_option);
                 if(!r.ok()) {
                     throw_tlog_ex(r.to_string());
                 }
@@ -128,9 +127,9 @@ namespace turbo::tlog {
                 auto time = msg.time;
                 bool should_rotate = time >= rotation_tp_;
                 if (should_rotate) {
-                    auto filename = FileNameCalc::calc_filename(base_filename_, now_tm(time));
-                    file_writer_.set_option(kLogFileOption);
-                    auto r = file_writer_.open(filename, truncate_);
+                    auto filename = FileNameCalc::calc_filename(base_filename_, time.to_local_tm());
+                    auto & operation = truncate_ ? kLogTruncateOpenOption : kLogAppendOpenOption;
+                    auto r = file_writer_.open(filename, operation);
                     if(!r.ok()) {
                         throw_tlog_ex(r.to_string());
                     }
@@ -160,36 +159,31 @@ namespace turbo::tlog {
             void init_filenames_q_() {
                 filenames_q_ = details::circular_q<filename_t>(static_cast<size_t>(max_files_));
                 std::vector<filename_t> filenames;
-                auto now = log_clock::now();
+                auto now = turbo::Time::time_now();
                 while (filenames.size() < max_files_) {
-                    auto filename = FileNameCalc::calc_filename(base_filename_, now_tm(now));
+                    auto filename = FileNameCalc::calc_filename(base_filename_, now.to_local_tm());
                     if (!turbo::filesystem::exists(filename)) {
                         break;
                     }
                     filenames.emplace_back(filename);
-                    now -= std::chrono::hours(24);
+                    now -= turbo::Duration::hours(24);
                 }
                 for (auto iter = filenames.rbegin(); iter != filenames.rend(); ++iter) {
                     filenames_q_.push_back(std::move(*iter));
                 }
             }
 
-            tm now_tm(log_clock::time_point tp) {
-                time_t tnow = log_clock::to_time_t(tp);
-                return turbo::tlog::details::os::localtime(tnow);
-            }
-
-            log_clock::time_point next_rotation_tp_() {
-                auto now = log_clock::now();
-                tm date = now_tm(now);
+            turbo::Time next_rotation_tp_() {
+                auto now = turbo::Time::time_now();
+                auto date = now.to_local_tm();
                 date.tm_hour = rotation_h_;
                 date.tm_min = rotation_m_;
                 date.tm_sec = 0;
-                auto rotation_time = log_clock::from_time_t(std::mktime(&date));
+                auto rotation_time = turbo::Time::from_tm(date, turbo::local_time_zone());
                 if (rotation_time > now) {
                     return rotation_time;
                 }
-                return {rotation_time + std::chrono::hours(24)};
+                return rotation_time + turbo::Duration::hours(24);
             }
 
             // Delete the file N rotations ago.
@@ -220,7 +214,7 @@ namespace turbo::tlog {
             filename_t base_filename_;
             int rotation_h_;
             int rotation_m_;
-            log_clock::time_point rotation_tp_;
+            turbo::Time rotation_tp_;
             turbo::SequentialWriteFile file_writer_;
             bool truncate_;
             uint16_t max_files_;

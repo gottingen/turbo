@@ -22,8 +22,8 @@ namespace turbo::tlog {
 namespace details {
 namespace os {
 
-TURBO_DLL turbo::tlog::log_clock::time_point now() noexcept;
-
+//TURBO_DLL turbo::tlog::log_clock::time_point now() noexcept;
+/*
 TURBO_DLL std::tm localtime(const std::time_t &time_tt) noexcept;
 
 TURBO_DLL std::tm localtime() noexcept;
@@ -31,7 +31,7 @@ TURBO_DLL std::tm localtime() noexcept;
 TURBO_DLL std::tm gmtime(const std::time_t &time_tt) noexcept;
 
 TURBO_DLL std::tm gmtime() noexcept;
-
+*/
 // eol definition
 #if !defined(TLOG_EOL)
 #    ifdef _WIN32
@@ -56,7 +56,7 @@ constexpr static const char folder_seps[] = TLOG_FOLDER_SEPS;
 constexpr static const filename_t::value_type folder_seps_filename[] = TLOG_FILENAME_T(TLOG_FOLDER_SEPS);
 
 // Return utc offset in minutes or throw tlog_ex on failure
-TURBO_DLL int utc_minutes_offset(const std::tm &tm = details::os::localtime());
+//TURBO_DLL int utc_minutes_offset(const std::tm &tm = details::os::localtime());
 
 TURBO_DLL std::string filename_to_str(const filename_t &filename);
 

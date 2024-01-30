@@ -19,7 +19,7 @@
 
 #include <cstddef>
 #include <memory>
-#include "turbo/base/status.h"
+#include "turbo/status/status.h"
 #include "turbo/platform/port.h"
 
 /**
@@ -57,7 +57,8 @@ namespace turbo {
         }
 
         static constexpr size_t free_chunk_max_items() {
-            return kFreeChunkMaxItem;
+            return block_max_size() / sizeof(T) >= kFreeChunkMaxItem ? kFreeChunkMaxItem
+                                                                     : block_max_size() / sizeof(T);
         }
 
         static constexpr bool validate(const T *ptr) {
@@ -67,8 +68,6 @@ namespace turbo {
         static_assert(kBlockMaxSize >= sizeof(T), "kBlockMaxSize must be greater than sizeof(T)");
         static_assert(kBlockMaxItems > 0, "kBlockMaxItems must be greater than 0");
         static_assert(kFreeChunkMaxItem >= 0, "kFreeChunkMaxSize must be greater than 0");
-        static_assert(kBlockMaxSize / sizeof(T) >= kBlockMaxItems,
-                      "kBlockMaxSize must be greater than kBlockMaxItems * sizeof(T)");
     };
 
     /**

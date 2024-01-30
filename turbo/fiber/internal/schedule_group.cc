@@ -20,15 +20,15 @@
 #include "turbo/log/logging.h"
 #include "turbo/hash/hash.h"
 #include "turbo/concurrent/spinlock_wait.h"
-#include "turbo/base/threading.h"
+#include "turbo/system/threading.h"
 #include "turbo/base/processor.h"            // cpu_relax
 #include "turbo/fiber/internal/fiber_worker.h"           // FiberWorker
 #include "turbo/fiber/internal/schedule_group.h"
-#include "turbo/times/timer_thread.h"         // global_timer_thread
+#include "turbo/fiber/internal/timer.h"         // global_timer_thread
 #include "turbo/log/logging.h"
-#include "turbo/base/turbo_error.h"
+#include "turbo/status/error.h"
 #include "turbo/random/random.h"
-#include "turbo/base/sysinfo.h"
+#include "turbo/system/sysinfo.h"
 #include <mutex>
 
 
@@ -49,7 +49,7 @@ namespace turbo::fiber_internal {
     void *ScheduleGroup::worker_thread(void *arg) {
         run_worker_startfn();
 
-        auto *c = static_cast<ScheduleGroup*>(arg);
+        auto *c = static_cast<ScheduleGroup *>(arg);
         auto *g = c->create_group();
         FiberStatistics stat;
         if (nullptr == g) {
@@ -64,7 +64,7 @@ namespace turbo::fiber_internal {
 
         stat = g->main_stat();
         TDLOG_INFO("Destroying worker={} fiber={} idle={}ms uptime={}ms", pthread_self(), g->main_tid(),
-                  stat.cputime_ns / 1000000.0, g->current_uptime_ns() / 1000000.0);
+                   stat.cputime_ns / 1000000.0, g->current_uptime_ns() / 1000000.0);
         tls_task_group = nullptr;
         g->destroy_self();
         return nullptr;
@@ -76,7 +76,7 @@ namespace turbo::fiber_internal {
             TLOG_CRITICAL("Fail to new FiberWorker");
             return nullptr;
         }
-        if (g->init(FiberConfig::get_instance().task_group_runqueue_capacity) != 0) {
+        if (g->init(turbo::get_flag(FLAGS_task_group_runqueue_capacity)) != 0) {
             TLOG_CRITICAL("Fail to init FiberWorker");
             delete g;
             return nullptr;
@@ -107,7 +107,8 @@ namespace turbo::fiber_internal {
 
     ScheduleGroup::ScheduleGroup()
     // NOTE: all fileds must be initialized before the vars.
-            : _ngroup(0), _groups((FiberWorker **) calloc(turbo::FiberConfig::FIBER_MAX_CONCURRENCY, sizeof(FiberWorker *))),
+            : _ngroup(0),
+              _groups((FiberWorker **) calloc(turbo::fiber_config::FIBER_MAX_CONCURRENCY, sizeof(FiberWorker *))),
               _stop(false), _concurrency(0) {
         // calloc shall set memory to zero
         TLOG_CHECK(_groups, "Fail to create array of groups");
@@ -125,7 +126,7 @@ namespace turbo::fiber_internal {
         _concurrency = concurrency;
 
         // Make sure TimerThread is ready.
-        if (get_or_create_global_timer_thread() == nullptr) {
+        if (!init_fiber_timer_thread().ok()) {
             TLOG_ERROR("Fail to get global_timer_thread");
             return -1;
         }
@@ -226,7 +227,7 @@ namespace turbo::fiber_internal {
             return -1;
         }
         size_t ngroup = _ngroup.load(std::memory_order_relaxed);
-        if (ngroup < (size_t) turbo::FiberConfig::FIBER_MAX_CONCURRENCY) {
+        if (ngroup < (size_t) turbo::fiber_config::FIBER_MAX_CONCURRENCY) {
             _groups[ngroup] = g;
             _ngroup.store(ngroup + 1, std::memory_order_release);
         }
@@ -280,9 +281,9 @@ namespace turbo::fiber_internal {
         // access the removed group concurrently. We use simple strategy here:
         // Schedule a function which deletes the FiberWorker after
         if (erased) {
-            auto rs = get_global_timer_thread()->schedule(delete_task_group, g,
-                                                turbo::seconds_from_now(
-                                                        FiberConfig::get_instance().task_group_delete_delay));
+            auto rs = get_fiber_timer_thread()->schedule(delete_task_group, g,
+                                                         turbo::seconds_from_now(
+                                                                 turbo::get_flag(FLAGS_task_group_delete_delay)));
             TURBO_UNUSED(rs);
         }
         return 0;
@@ -339,11 +340,11 @@ namespace turbo::fiber_internal {
             }
         }
         if (num_task > 0 &&
-            FiberConfig::get_instance().fiber_min_concurrency > 0 &&    // test min_concurrency for performance
-            _concurrency.load(std::memory_order_relaxed) < FiberConfig::get_instance().fiber_concurrency) {
+            turbo::get_flag(FLAGS_fiber_min_concurrency) > 0 &&    // test min_concurrency for performance
+            _concurrency.load(std::memory_order_relaxed) < turbo::get_flag(FLAGS_fiber_concurrency)) {
             // TODO: Reduce this lock
             std::unique_lock l(g_task_control_mutex);
-            if (_concurrency.load(std::memory_order_acquire) < FiberConfig::get_instance().fiber_concurrency) {
+            if (_concurrency.load(std::memory_order_acquire) < turbo::get_flag(FLAGS_fiber_concurrency)) {
                 add_workers(1);
             }
         }

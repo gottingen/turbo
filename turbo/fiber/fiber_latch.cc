@@ -42,8 +42,8 @@ namespace turbo {
             if (seen_counter <= 0) {
                 return 0;
             }
-            auto rs = turbo::fiber_internal::waitable_event_wait(_event, seen_counter, nullptr);
-            if (!rs.ok() && !turbo::is_unavailable(rs)) {
+            auto rs = turbo::fiber_internal::waitable_event_wait(_event, seen_counter);
+            if (!rs.ok() && rs.code() != EWOULDBLOCK && rs.code() != EINTR) {
                 return errno;
             }
         }
@@ -71,7 +71,7 @@ namespace turbo {
         _wait_was_invoked = false;
     }
 
-    int FiberLatch::timed_wait(const timespec *duetime) {
+    int FiberLatch::timed_wait(turbo::Time duetime) {
         _wait_was_invoked = true;
         for (;;) {
             const int seen_counter =
@@ -80,7 +80,7 @@ namespace turbo {
                 return 0;
             }
             auto rs = turbo::fiber_internal::waitable_event_wait(_event, seen_counter, duetime);
-            if (!rs.ok() && !turbo::is_unavailable(rs)) {
+            if (!rs.ok() && rs.code() != EWOULDBLOCK && rs.code() != EINTR) {
                 return errno;
             }
         }

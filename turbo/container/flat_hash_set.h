@@ -34,6 +34,7 @@
 
 #include "turbo/container/internal/container_memory.h"
 #include "turbo/container/internal/hash_function_defaults.h" // IWYU pragma: export
+#include "turbo/container/internal/ignore_case_hash_function.h" // IWYU pragma: export
 #include "turbo/container/internal/raw_hash_set.h" // IWYU pragma: export
 #include "turbo/memory/memory.h"
 #include "turbo/meta/container.h"
@@ -453,6 +454,11 @@ namespace turbo {
             flat_hash_set<T, H, E, A> &c, Predicate pred) {
         return container_internal::EraseIf(pred, &c);
     }
+
+    template<class T, class Hash = turbo::container_internal::hash_default_ignore_case_hash<T>,
+            class Eq = turbo::container_internal::hash_default_ignore_case_eq<T>,
+            class Allocator = std::allocator<T>>
+    using  flat_ignore_case_hash_set = flat_hash_set<T, Hash, Eq, Allocator>;
 
     namespace container_internal {
 

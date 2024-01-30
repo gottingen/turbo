@@ -78,7 +78,7 @@ namespace turbo::tlog {
                     dest.push_back(static_cast<char>('0' + n % 10));
                 } else // unlikely, but just in case, let fmt deal with it
                 {
-                    fmt_lib::format_to(std::back_inserter(dest), FMT_STRING("{:02}"), n);
+                    turbo::format_to(std::back_inserter(dest), FMT_STRING("{:02}"), n);
                 }
             }
 
@@ -112,18 +112,6 @@ namespace turbo::tlog {
             template<typename T>
             inline void pad9(T n, memory_buf_t &dest) {
                 pad_uint(n, 9, dest);
-            }
-
-        // return fraction of a second of the given time_point.
-        // e.g.
-        // fraction<std::milliseconds>(tp) -> will return the millis part of the second
-            template<typename ToDuration>
-            inline ToDuration time_fraction(log_clock::time_point tp) {
-                using std::chrono::duration_cast;
-                using std::chrono::seconds;
-                auto duration = tp.time_since_epoch();
-                auto secs = duration_cast<seconds>(duration);
-                return duration_cast<ToDuration>(duration) - duration_cast<ToDuration>(secs);
             }
 
         } // namespace fmt_helper

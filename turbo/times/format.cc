@@ -71,32 +71,30 @@ namespace turbo {
 
     }  // namespace
 
-    std::string format_time(std::string_view format, turbo::Time t,
-                           turbo::TimeZone tz) {
-        if (t == turbo::infinite_future()) return std::string(kInfiniteFutureStr);
-        if (t == turbo::infinite_past()) return std::string(kInfinitePastStr);
-        const auto parts = Split(t);
+    std::string Time::to_string(std::string_view format, turbo::TimeZone tz) const {
+        if (*this == turbo::Time::infinite_future()) return std::string(kInfiniteFutureStr);
+        if (*this == turbo::Time::infinite_past()) return std::string(kInfinitePastStr);
+        const auto parts = Split(*this);
         return cctz::detail::format(std::string(format), parts.sec, parts.fem,
                                     cctz::time_zone(tz));
     }
 
-    std::string format_time(turbo::Time t, turbo::TimeZone tz) {
-        return format_time(RFC3339_full, t, tz);
+    std::string Time::to_string(turbo::TimeZone tz) const {
+        return to_string(RFC3339_full, tz);
     }
 
-    std::string format_time(turbo::Time t) {
-        return turbo::format_time(RFC3339_full, t, turbo::local_time_zone());
+    std::string Time::to_string() const {
+        return to_string(RFC3339_full, turbo::local_time_zone());
     }
 
-    bool parse_time(std::string_view format, std::string_view input,
-                   turbo::Time *time, std::string *err) {
-        return turbo::parse_time(format, input, turbo::utc_time_zone(), time, err);
+    bool Time::parse_time(std::string_view format, std::string_view input, std::string *err) {
+        return parse_time(format, input, turbo::utc_time_zone(), err);
     }
 
-// If the input string does not contain an explicit UTC offset, interpret
-// the fields with respect to the given TimeZone.
-    bool parse_time(std::string_view format, std::string_view input,
-                   turbo::TimeZone tz, turbo::Time *time, std::string *err) {
+    // If the input string does not contain an explicit UTC offset, interpret
+    // the fields with respect to the given TimeZone.
+    bool Time::parse_time(std::string_view format, std::string_view input,
+                          turbo::TimeZone tz, std::string *err) {
         auto strip_leading_space = [](std::string_view *sv) {
             while (!sv->empty()) {
                 if (!std::isspace(sv->front())) return;
@@ -121,7 +119,7 @@ namespace turbo {
                 tail.remove_prefix(lit.size);
                 strip_leading_space(&tail);
                 if (tail.empty()) {
-                    *time = lit.value;
+                    *this = lit.value;
                     return true;
                 }
             }
@@ -133,11 +131,19 @@ namespace turbo {
                 cctz::detail::parse(std::string(format), std::string(input),
                                     cctz::time_zone(tz), &parts.sec, &parts.fem, &error);
         if (b) {
-            *time = Join(parts);
+            *this = Join(parts);
         } else if (err != nullptr) {
             *err = error;
         }
         return b;
     }
 
+    // Functions required to support turbo::Time flags.
+    bool turbo_parse_flag(std::string_view text, turbo::Time *t, std::string *error) {
+        return t->parse_time(RFC3339_full, text, turbo::utc_time_zone(), error);
+    }
+
+    std::string turbo_unparse_flag(turbo::Time t) {
+        return t.to_string(RFC3339_full, turbo::utc_time_zone());
+    }
 }  // namespace turbo

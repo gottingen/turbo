@@ -24,9 +24,46 @@
 
 namespace turbo {
 
-    template <typename T>
+    using turbo::fiber_internal::fiber_keytable_pool_t;
+    using turbo::fiber_internal::fiber_keytable_pool_stat_t;
+    using turbo::fiber_internal::fiber_local_key;
+    using turbo::fiber_internal::key_pool_ctor_t;
+
+    inline int fiber_keytable_pool_init(fiber_keytable_pool_t *pool) {
+        return turbo::fiber_internal::fiber_keytable_pool_init(pool);
+    }
+
+    inline int fiber_keytable_pool_destroy(fiber_keytable_pool_t *pool) {
+        return turbo::fiber_internal::fiber_keytable_pool_destroy(pool);
+    }
+
+    inline int fiber_keytable_pool_getstat(fiber_keytable_pool_t *pool,
+                                           fiber_keytable_pool_stat_t *stat) {
+        return turbo::fiber_internal::fiber_keytable_pool_getstat(pool, stat);
+    }
+
+    inline void fiber_keytable_pool_reserve(
+            fiber_keytable_pool_t *pool, size_t nfree,
+            fiber_local_key key, const key_pool_ctor_t &ctor, const void *args) {
+        turbo::fiber_internal::fiber_keytable_pool_reserve(pool, nfree, key, ctor, args);
+
+    }
+
+    inline void fiber_assign_data(void *data) {
+        turbo::fiber_internal::fiber_assign_data(data);
+    }
+
+    inline void *fiber_get_assigned_data() {
+        return turbo::fiber_internal::fiber_get_assigned_data();
+    }
+
+}
+
+namespace turbo {
+
+    template<typename T>
     inline void local_dtor(void *data, const void *args) {
-        delete static_cast<T*>(data);
+        delete static_cast<T *>(data);
     }
 
     /**
@@ -63,7 +100,7 @@ namespace turbo {
         }
 
     private:
-        turbo::fiber_internal::fiber_local_key _key;
+        fiber_local_key _key;
     };
 
 }  // namespace turbo

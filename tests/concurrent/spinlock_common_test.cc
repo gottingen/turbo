@@ -27,7 +27,7 @@
 #include "turbo/platform/internal/low_level_scheduling.h"
 #include "turbo/platform/internal/scheduling_mode.h"
 #include "turbo/concurrent/spinlock.h"
-#include "turbo/base/internal/sysinfo.h"
+#include "turbo/system/internal/sysinfo.h"
 #include "turbo/concurrent/latch.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN

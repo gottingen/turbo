@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include "turbo/files/sequential_write_file.h"
+#include "turbo/files/filesystem.h"
 #include "turbo/log/details/null_mutex.h"
 #include <turbo/log/sinks/base_sink.h>
 #include "turbo/log/details/synchronous_factory.h"
@@ -25,9 +25,9 @@
 
 namespace turbo::tlog {
     namespace sinks {
-/*
- * Trivial file sink with single file as target
- */
+        /*
+         * Trivial file sink with single file as target
+         */
         template<typename Mutex>
         class basic_file_sink final : public base_sink<Mutex> {
         public:

@@ -22,9 +22,9 @@
 #include "turbo/base/processor.h"             // cpu_relax
 #include "turbo/fiber/internal/schedule_group.h"
 #include "turbo/fiber/internal/fiber_worker.h"            // FiberWorker
-#include "turbo/times/timer_thread.h"
+#include "turbo/fiber/internal/timer.h"
 #include "turbo/fiber/internal/waitable_event.h"
-#include "turbo/fiber/internal/errno.h"
+#include "turbo/status/error.h"
 #include "turbo/concurrent/lock.h"
 
 // This file implements waitable_event.h
@@ -52,7 +52,7 @@ namespace turbo::fiber_internal {
     // If a thread would suspend for less than so many microseconds, return
     // ETIMEDOUT directly.
     // Use 1: sleeping for less than 2 microsecond is inefficient and useless.
-    static const turbo::Duration MIN_SLEEP = turbo::microseconds(2);
+    static const turbo::Duration MIN_SLEEP = turbo::Duration::microseconds(2);
 
 
     enum WaiterState {
@@ -78,11 +78,12 @@ namespace turbo::fiber_internal {
     // waitable_event::waiters.
     struct FiberEventWaiterNode : public EventWaiterNode {
         FiberEntity *task_meta;
-        TimerThread::TaskId sleep_id;
+        TimerId sleep_id;
         WaiterState waiter_state;
         int expected_value;
         waitable_event *initial_event;
         ScheduleGroup *control;
+        turbo::Time   abstime;
     };
 
     // pthread_task or main_task allocates this structure on stack and queue it
@@ -116,38 +117,51 @@ namespace turbo::fiber_internal {
         // In which case, futex_wake_private() should return EFAULT.
         // If crash happens in future, `pw' can be made TLS and never destroyed
         // to solve the issue.
-        //TLOG_INFO("wakeup_pthread: {}", pw->sig.load(std::memory_order_relaxed));
         pw->sig.wake(1);
     }
 
     bool erase_from_event(EventWaiterNode *, bool, WaiterState);
 
-    turbo::Status wait_pthread(PthreadEventWaiterNode &pw, timespec *ptimeout) {
+    turbo::Status wait_pthread(PthreadEventWaiterNode &pw, turbo::Time abstime) {
+        timespec *ptimeout;
+        timespec timeout;
+        turbo::Duration delta;
+        int rc = 0;
         while (true) {
-            const int rc = turbo::concurrent_internal::futex_wait_private(&pw.sig, PTHREAD_NOT_SIGNALLED, ptimeout);
-            if (PTHREAD_NOT_SIGNALLED != pw.sig.load(std::memory_order_acquire)) {
-                // If `sig' is changed, wakeup_pthread() must be called and `pw'
-                // is already removed from the event.
-                // Acquire fence makes this thread sees changes before wakeup.
-                //return rc == 0 ? turbo::ok_status() : turbo::internal_error("{}: {}", rc, errno);
-                return turbo::ok_status();
+            ptimeout = nullptr;
+            if (abstime != turbo::Time::infinite_future()) {
+                delta = abstime - turbo::time_now();
+                timeout = delta.to_timespec();
+                ptimeout = &timeout;
+            }
+
+            if (abstime == turbo::Time::infinite_future() || delta > MIN_SLEEP) {
+                errno = 0;
+                rc = turbo::concurrent_internal::futex_wait_private(&pw.sig, PTHREAD_NOT_SIGNALLED, ptimeout);
+                if (PTHREAD_NOT_SIGNALLED != pw.sig.load(std::memory_order_acquire)) {
+                    // If `sig' is changed, wakeup_pthread() must be called and `pw'
+                    // is already removed from the event.
+                    // Acquire fence makes this thread sees changes before wakeup.
+                    return turbo::make_status();
+                }
+            } else {
+                errno = ETIMEDOUT;
+                rc = -1;
             }
             if (rc != 0 && errno == ETIMEDOUT) {
                 // Note that we don't handle the EINTR from futex_wait here since
                 // pthreads waiting on a event should behave similarly as fibers
                 // which are not able to be woken-up by signals.
                 // EINTR on event is only producible by FiberWorker::interrupt().
-
                 // `pw' is still in the queue, remove it.
                 if (!erase_from_event(&pw, false, WAITER_STATE_TIMEDOUT)) {
                     // Another thread is erasing `pw' as well, wait for the signal.
                     // Acquire fence makes this thread sees changes before wakeup.
                     if (pw.sig.load(std::memory_order_acquire) == PTHREAD_NOT_SIGNALLED) {
-                        ptimeout = nullptr; // already timedout, ptimeout is expired.
                         continue;
                     }
                 }
-                return turbo::deadline_exceeded_error("");
+                return turbo::make_status();
             }
         }
     }
@@ -161,7 +175,7 @@ namespace turbo::fiber_internal {
         if (!w->sleep_id) {
             return 0;
         }
-        if (turbo::is_resource_busy(timer_thread->unschedule(w->sleep_id))) {
+        if (timer_thread->unschedule(w->sleep_id).code() == kEBUSY) {
             // the callback is running.
             return -1;
         }
@@ -264,7 +278,7 @@ namespace turbo::fiber_internal {
             return 1;
         }
         FiberEventWaiterNode *bbw = reinterpret_cast<FiberEventWaiterNode *>(&(*front));
-        unsleep_if_necessary(bbw, get_global_timer_thread());
+        unsleep_if_necessary(bbw, get_fiber_timer_thread());
         FiberWorker *g = tls_task_group;
         if (g) {
             FiberWorker::exchange(&g, bbw->tid);
@@ -306,7 +320,7 @@ namespace turbo::fiber_internal {
         // We will exchange with first waiter in the end.
         FiberEventWaiterNode *next = reinterpret_cast<FiberEventWaiterNode *>(&(*fiber_waiters.begin()));
         fiber_waiters.remove(*next);
-        unsleep_if_necessary(next, get_global_timer_thread());
+        unsleep_if_necessary(next, get_fiber_timer_thread());
         ++nwakeup;
         FiberWorker *g = get_task_group(next->control);
         const int saved_nwakeup = nwakeup;
@@ -314,7 +328,7 @@ namespace turbo::fiber_internal {
             // pop reversely
             FiberEventWaiterNode *w = reinterpret_cast<FiberEventWaiterNode *>(&(*fiber_waiters.rbegin()));
             fiber_waiters.remove(*w);
-            unsleep_if_necessary(w, get_global_timer_thread());
+            unsleep_if_necessary(w, get_fiber_timer_thread());
             g->ready_to_run_general(w->tid, true);
             ++nwakeup;
         }
@@ -378,7 +392,7 @@ namespace turbo::fiber_internal {
             // pop reversely
             FiberEventWaiterNode *w = reinterpret_cast<FiberEventWaiterNode *>(&(*fiber_waiters.rbegin()));
             fiber_waiters.remove(*w);
-            unsleep_if_necessary(w, get_global_timer_thread());
+            unsleep_if_necessary(w, get_fiber_timer_thread());
             g->ready_to_run_general(w->tid, true);
             ++nwakeup;
         } while (!fiber_waiters.empty());
@@ -418,7 +432,7 @@ namespace turbo::fiber_internal {
             return 1;
         }
         FiberEventWaiterNode *bbw = static_cast<FiberEventWaiterNode *>(front);
-        unsleep_if_necessary(bbw, get_global_timer_thread());
+        unsleep_if_necessary(bbw, get_fiber_timer_thread());
         FiberWorker *g = tls_task_group;
         if (g) {
             FiberWorker::exchange(&g, front->tid);
@@ -496,6 +510,11 @@ namespace turbo::fiber_internal {
                        !bw->task_meta->interrupted) {
                 b->waiters.push_back(*bw);
                 bw->container.store(b, std::memory_order_relaxed);
+                bw->sleep_id = get_fiber_timer_thread()->schedule(
+                        erase_from_event_and_wakeup, bw, bw->abstime);
+                if (!bw->sleep_id) {  // TimerThread stopped.
+                    erase_from_event_and_wakeup(bw);
+                }
                 return;
             }
         }
@@ -504,7 +523,7 @@ namespace turbo::fiber_internal {
         // FiberWorker::interrupt() no-op, there's no race between following code and
         // the two functions. The on-stack FiberEventWaiterNode is safe to use and
         // bw->waiter_state will not change again.
-        unsleep_if_necessary(bw, get_global_timer_thread());
+        unsleep_if_necessary(bw, get_fiber_timer_thread());
         tls_task_group->ready_to_run(bw->tid);
         // FIXME: jump back to original thread is buggy.
 
@@ -518,21 +537,8 @@ namespace turbo::fiber_internal {
         // FiberWorker::sched_to(&g, bw->tid, false/*2*/);
     }
 
-    static turbo::Status event_wait_from_pthread(FiberWorker *g, waitable_event *b, int expected_value,
-                                       const timespec *abstime) {
-        // sys futex needs relative timeout.
-        // Compute diff between abstime and now.
-        timespec *ptimeout = nullptr;
-        timespec timeout;
-        if (abstime != nullptr) {
-            const auto timeout_duration = turbo::time_from_timespec(*abstime) - turbo::time_now();
-            if (timeout_duration < MIN_SLEEP) {
-                return turbo::deadline_exceeded_error("");
-            }
-            timeout = turbo::to_timespec(timeout_duration);
-            ptimeout = &timeout;
-        }
-
+    static turbo::Status
+    event_wait_from_pthread(FiberWorker *g, waitable_event *b, int expected_value, turbo::Time abstime) {
         FiberEntity *task = nullptr;
         PthreadEventWaiterNode pw;
         pw.tid = 0;
@@ -540,45 +546,57 @@ namespace turbo::fiber_internal {
         turbo::Status rc;
 
         if (g) {
-            task = g->current_task();
+            task = g->current_fiber();
             task->current_waiter.store(&pw, std::memory_order_release);
         }
         b->waiter_lock.lock();
         if (b->value.load(std::memory_order_relaxed) != expected_value) {
             b->waiter_lock.unlock();
-            rc = turbo::unavailable_error("");
+            errno = EWOULDBLOCK;
+            return turbo::make_status();
         } else if (task != nullptr && task->interrupted) {
             b->waiter_lock.unlock();
             // Race with set and may consume multiple interruptions, which are OK.
             task->interrupted = false;
-            rc = turbo::unavailable_error("");
+            errno = EINTR;
+            return turbo::make_status();
         } else {
             b->waiters.push_back(pw);
             pw.container.store(b, std::memory_order_relaxed);
             b->waiter_lock.unlock();
-            rc = wait_pthread(pw, ptimeout);
+            rc = wait_pthread(pw, abstime);
         }
         if (task) {
             // If current_waiter is nullptr, FiberWorker::interrupt() is running and
             // using pw, spin until current_waiter != nullptr.
             TURBO_LOOP_WHEN(task->current_waiter.exchange(
-                    nullptr, std::memory_order_acquire) == nullptr,
-                            30/*nops before sched_yield*/);
+                    nullptr, std::memory_order_acquire) == nullptr,30/*nops before sched_yield*/);
             if (task->interrupted) {
                 task->interrupted = false;
                 if (rc.ok()) {
-                    return turbo::unavailable_error("");
+                    errno = EINTR;
+                    return make_status();
                 }
             }
         }
         return rc;
     }
 
-    turbo::Status waitable_event_wait(void *arg, int expected_value, const timespec *abstime) {
+    turbo::Status waitable_event_wait(void *arg, int expected_value, turbo::Time abstime) {
+
+        if (abstime != turbo::Time::infinite_future()) {
+            const auto timeout_duration = abstime - turbo::time_now();
+            if (timeout_duration <= MIN_SLEEP) {
+                errno = ETIMEDOUT;
+                return turbo::make_status();
+            }
+        }
+
         waitable_event *b = static_cast<waitable_event *>(arg);
         if (b->value.load(std::memory_order_relaxed) != expected_value) {
             std::atomic_thread_fence(std::memory_order_acquire);
-            return turbo::unavailable_error("");
+            errno = EWOULDBLOCK;
+            turbo::make_status();
         }
         FiberWorker *g = tls_task_group;
         if (nullptr == g || g->is_current_pthread_task()) {
@@ -588,27 +606,13 @@ namespace turbo::fiber_internal {
         // tid is 0 iff the thread is non-fiber
         bbw.tid = g->current_fid();
         bbw.container.store(nullptr, std::memory_order_relaxed);
-        bbw.task_meta = g->current_task();
+        bbw.task_meta = g->current_fiber();
         bbw.sleep_id = 0;
         bbw.waiter_state = WAITER_STATE_READY;
         bbw.expected_value = expected_value;
         bbw.initial_event = b;
         bbw.control = g->control();
-
-        if (abstime != nullptr) {
-            // Schedule timer before queueing. If the timer is triggered before
-            // queueing, cancel queueing. This is a kind of optimistic locking.
-            auto abs_time = turbo::time_from_timespec(*abstime);
-            if (abs_time < (turbo::time_now() + MIN_SLEEP)) {
-                return turbo::deadline_exceeded_error("");
-            }
-            bbw.sleep_id = get_global_timer_thread()->schedule(
-                    erase_from_event_and_wakeup, &bbw, abs_time);
-            if (!bbw.sleep_id) {  // TimerThread stopped.
-                return turbo::already_stop_error("");
-            }
-        }
-
+        bbw.abstime = abstime;
         // release fence matches with acquire fence in interrupt_and_consume_waiters
         // in task_group.cpp to guarantee visibility of `interrupted'.
         bbw.task_meta->current_waiter.store(&bbw, std::memory_order_release);
@@ -617,12 +621,12 @@ namespace turbo::fiber_internal {
 
         // erase_from_event_and_wakeup (called by TimerThread) is possibly still
         // running and using bbw. The chance is small, just spin until it's done.
-        TURBO_LOOP_WHEN(unsleep_if_necessary(&bbw, get_global_timer_thread()) < 0,30/*nops before sched_yield*/);
+        TURBO_LOOP_WHEN(unsleep_if_necessary(&bbw, get_fiber_timer_thread()) < 0, 30/*nops before sched_yield*/);
 
         // If current_waiter is nullptr, FiberWorker::interrupt() is running and using bbw.
         // Spin until current_waiter != nullptr.
         TURBO_LOOP_WHEN(bbw.task_meta->current_waiter.exchange(
-                nullptr, std::memory_order_acquire) == nullptr,30/*nops before sched_yield*/);
+                nullptr, std::memory_order_acquire) == nullptr, 30/*nops before sched_yield*/);
 
         bool is_interrupted = false;
         if (bbw.task_meta->interrupted) {
@@ -632,11 +636,14 @@ namespace turbo::fiber_internal {
         }
         // If timed out as well as value unmatched, return ETIMEDOUT.
         if (WAITER_STATE_TIMEDOUT == bbw.waiter_state) {
-            return turbo::deadline_exceeded_error("");
+            errno = ETIMEDOUT;
+            return turbo::make_status();
         } else if (WAITER_STATE_UNMATCHEDVALUE == bbw.waiter_state) {
-            return turbo::unavailable_error("");
+            errno = EWOULDBLOCK;
+            return turbo::make_status();
         } else if (is_interrupted) {
-            return turbo::unavailable_error("");
+            errno = EINTR;
+            return turbo::make_status();
         }
         return turbo::ok_status();
     }

@@ -23,7 +23,7 @@
 #include <limits>
 #include <cstdint>
 #include <algorithm>
-#include "turbo/base/result_status.h"
+#include "turbo/status/result_status.h"
 
 namespace turbo {
 
@@ -123,7 +123,7 @@ namespace turbo {
             } else if (_next_id < max_id) {
                 return _next_id++;
             }
-            return turbo::out_of_range_error("id overflow");
+            return turbo::make_status(kEOVERFLOW, "ReusableId overflow");
         }
 
         void free_id(IdType id) {

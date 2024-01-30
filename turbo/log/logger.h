@@ -45,7 +45,7 @@
         {                                                                                                                                  \
             if (location.filename)                                                                                                         \
             {                                                                                                                              \
-                err_handler_(fmt_lib::format(FMT_STRING("{} [{}({})]"), ex.what(), location.filename, location.line));              \
+                err_handler_(turbo::format(FMT_STRING("{} [{}({})]"), ex.what(), location.filename, location.line));              \
             }                                                                                                                              \
             else                                                                                                                           \
             {                                                                                                                              \
@@ -113,7 +113,7 @@ namespace turbo::tlog {
             log(loc, lvl, "{}", msg);
         }
 
-        void log(log_clock::time_point log_time, source_loc loc, level::level_enum lvl, std::string_view msg) {
+        void log(turbo::Time log_time, source_loc loc, level::level_enum lvl, std::string_view msg) {
             bool log_enabled = should_log(lvl);
             bool traceback_enabled = tracer_.enabled();
             if (!log_enabled && !traceback_enabled) {
@@ -376,8 +376,8 @@ namespace turbo::tlog {
                 // format to wmemory_buffer and convert to utf8
                 wmemory_buf_t wbuf;
 #    ifdef TLOG_USE_STD_FORMAT
-                fmt_lib::vformat_to(
-                    std::back_inserter(wbuf), fmt, fmt_lib::make_format_args<fmt_lib::wformat_context>(std::forward<Args>(args)...));
+                turbo::vformat_to(
+                    std::back_inserter(wbuf), fmt, turbo::make_format_args<turbo::wformat_context>(std::forward<Args>(args)...));
 #    else
                 turbo::vformat_to(std::back_inserter(wbuf), fmt, turbo::make_format_args<turbo::wformat_context>(std::forward<Args>(args)...));
 #    endif

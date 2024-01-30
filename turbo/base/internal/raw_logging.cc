@@ -192,10 +192,10 @@ namespace turbo::raw_log_internal {
             }
         }
 
-// Non-formatting version of RawLog().
-//
-// TODO(gfalcon): When std::string_view no longer depends on base, change this
-// interface to take its message as a std::string_view instead.
+        // Non-formatting version of RawLog().
+        //
+        // TODO(gfalcon): When std::string_view no longer depends on base, change this
+        // interface to take its message as a std::string_view instead.
         void DefaultInternalLog(turbo::LogSeverity severity, const char *file, int line,
                                 const std::string &message) {
             RawLog(severity, file, line, "%.*s", static_cast<int>(message.size()),

@@ -35,9 +35,9 @@ typedef void (*sig_t)(int);
 namespace {
 
     TEST_CASE("Time, Now") {
-        const turbo::Time before = turbo::from_unix_nanos(turbo::get_current_time_nanos());
+        const turbo::Time before = turbo::Time::from_nanoseconds(turbo::get_current_time_nanos());
         const turbo::Time now = turbo::time_now();
-        const turbo::Time after = turbo::from_unix_nanos(turbo::get_current_time_nanos());
+        const turbo::Time after = turbo::Time::from_nanoseconds(turbo::get_current_time_nanos());
         REQUIRE_GE(now, before);
         REQUIRE_GE(after, now);
     }
@@ -69,7 +69,7 @@ namespace {
             if (alarm_policy == AlarmPolicy::kWithAlarm) {
                 alarm_handler_invoked = false;
                 old_alarm = signal(SIGALRM, AlarmHandler);
-                alarm(turbo::to_int64_seconds(d / 2));
+                alarm((d / 2).to_seconds());
             }
 #else
             REQUIRE_EQ(alarm_policy, AlarmPolicy::kWithoutAlarm);

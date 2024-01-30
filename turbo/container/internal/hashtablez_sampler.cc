@@ -25,8 +25,8 @@
 #include "turbo/memory/memory.h"
 #include "turbo/meta/utility.h"
 #include "turbo/platform/port.h"
-#include "turbo/profiling/internal/exponential_biased.h"
-#include "turbo/profiling/internal/sample_recorder.h"
+#include "turbo/random/exponential_biased.h"
+#include "turbo/var/internal/sample_recorder.h"
 #include "turbo/times/clock.h"
 #include "turbo/base/internal/raw_logging.h"
 

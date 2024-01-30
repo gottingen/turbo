@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 #include "turbo/flags/flags.h"
-#include "turbo/files/utility.h"
+#include "turbo/files/filesystem.h"
 #include "turbo/format/print.h"
 #include <iostream>
 #include <string>
@@ -33,9 +33,9 @@ int main(int argc, char **argv) {
     turbo::ResultStatus<std::string> rs;
     int64_t file_size;
     if(sum_type  == "md5") {
-        rs = turbo::FileUtility::md5_sum_file(file, &file_size);
+        rs = turbo::md5_sum_file(file, &file_size);
     } else if (sum_type  == "sha1"){
-        rs = turbo::FileUtility::sha1_sum_file(file, &file_size);
+        rs = turbo::sha1_sum_file(file, &file_size);
     }
     if(!rs.ok()) {
         turbo::Println("{} sum file error: {}", sum_type, rs.status().message());

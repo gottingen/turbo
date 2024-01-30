@@ -208,7 +208,7 @@ namespace turbo {
             *inserter++ = '\n';
 
             if (put_positions) {
-                turbo::tlog::fmt_lib::format_to(inserter, FMT_STRING("{:04X}: "), pos);
+                turbo::format_to(inserter, FMT_STRING("{:04X}: "), pos);
             }
         }
     };

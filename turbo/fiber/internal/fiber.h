@@ -24,9 +24,8 @@
 #include <sys/socket.h>
 #include <iostream>
 #include "turbo/fiber/internal/mutex.h"
-#include "turbo/fiber/internal/token.h"
 #include "turbo/fiber/internal/types.h"
-#include "turbo/base/status.h"
+#include "turbo/status/status.h"
 #include "turbo/platform/port.h"
 
 namespace turbo::fiber_internal {
@@ -35,7 +34,7 @@ namespace turbo::fiber_internal {
     // `tid'. Switch to the new thread and schedule old thread to run. Use this
     // function when the new thread is more urgent.
     // Returns 0 on success, errno otherwise.
-    [[maybe_unused]] turbo::Status fiber_start_urgent(fiber_id_t *TURBO_RESTRICT tid,
+    [[maybe_unused]] turbo::Status fiber_start_impl(fiber_id_t *TURBO_RESTRICT tid,
                                             const FiberAttribute *TURBO_RESTRICT attr,
                                             fiber_fn_t &&fn,
                                             void *TURBO_RESTRICT args);
@@ -43,9 +42,9 @@ namespace turbo::fiber_internal {
     // Create fiber `fn(args)' with attributes `attr' and put the identifier into
     // `tid'. This function behaves closer to pthread_create: after scheduling the
     // new thread to run, it returns. In another word, the new thread may take
-    // longer time than fiber_start_urgent() to run.
+    // longer time than fiber_start() to run.
     // Return 0 on success, errno otherwise.
-    [[maybe_unused]] turbo::Status fiber_start_background(fiber_id_t *TURBO_RESTRICT tid,
+    [[maybe_unused]] turbo::Status fiber_start_background_impl(fiber_id_t *TURBO_RESTRICT tid,
                                                 const FiberAttribute *TURBO_RESTRICT attr,
                                                 fiber_fn_t &&fn,
                                                 void *TURBO_RESTRICT args);
@@ -68,7 +67,7 @@ namespace turbo::fiber_internal {
     // fiber_interrupt() guarantees that Thread2 is woken up reliably no matter
     // how the 2 threads are interleaved.
     // Returns 0 on success, errno otherwise.
-    turbo::Status fiber_interrupt(fiber_id_t tid);
+    turbo::Status fiber_interrupt_impl(fiber_id_t tid);
 
     // Make fiber_stopped() on the fiber return true and interrupt the fiber.
     // Note that current fiber_stop() solely sets the built-in "stop flag" and
@@ -76,23 +75,23 @@ namespace turbo::fiber_internal {
     // fiber, and replaceable by user-defined stop flags plus calls to
     // fiber_interrupt().
     // Returns 0 on success, errno otherwise.
-    turbo::Status fiber_stop(fiber_id_t tid);
+    turbo::Status fiber_stop_impl(fiber_id_t tid);
 
     // Returns 1 iff fiber_stop(tid) was called or the thread does not exist,
     // 0 otherwise.
-    bool fiber_stopped(fiber_id_t tid);
+    bool fiber_stopped_impl(fiber_id_t tid);
 
     // Returns identifier of caller if caller is a fiber, 0 otherwise(Id of a
     // fiber is never zero)
-    fiber_id_t fiber_self(void);
+    fiber_id_t fiber_self_impl(void);
 
     // Compare two fiber identifiers.
     // Returns a non-zero value if t1 and t2 are equal, zero otherwise.
-    int fiber_equal(fiber_id_t t1, fiber_id_t t2);
+    int fiber_equal_impl(fiber_id_t t1, fiber_id_t t2);
 
     // Terminate calling fiber/pthread and make `retval' available to any
     // successful join with the terminating thread. This function does not return.
-    void fiber_exit(void *retval) __attribute__((__noreturn__));
+    void fiber_exit_impl(void *retval) __attribute__((__noreturn__));
 
     // Make calling thread wait for termination of fiber `bt'. Return immediately
     // if `bt' is already terminated.
@@ -102,7 +101,7 @@ namespace turbo::fiber_internal {
     //    from a fiber, pass the value via the `args' created the fiber.
     //  - fiber_join() is not affected by fiber_interrupt.
     // Returns 0 on success, errno otherwise.
-    turbo::Status fiber_join(fiber_id_t bt, void **fiber_return);
+    turbo::Status fiber_join_impl(fiber_id_t bt, void **fiber_return);
 
     // Track and join many fibers.
     // Notice that all fiber_list* functions are NOT thread-safe.
@@ -137,28 +136,18 @@ namespace turbo::fiber_internal {
     // ---------------------------------------------
 
     // Get number of worker pthreads
-    int fiber_get_concurrency(void);
+    int fiber_get_concurrency_impl(void);
 
     // Set number of worker pthreads to `num'. After a successful call,
     // fiber_get_concurrency() shall return new set number, but workers may
     // take some time to quit or create.
     // NOTE: currently concurrency cannot be reduced after any fiber created.
-    turbo::Status fiber_set_concurrency(int num);
+    turbo::Status fiber_set_concurrency_impl(int num);
 
 
-    void fiber_flush();
+    void fiber_flush_impl();
 
-    int fiber_about_to_quit();
-
-    // Run `on_timer(arg)' at or after real-time `abstime'. Put identifier of the
-    // timer into *id.
-    // Return 0 on success, errno otherwise.
-    int fiber_timer_add(fiber_timer_id *id, timespec abstime,
-                        void (*on_timer)(void *), void *arg);
-
-    // Unschedule the timer associated with `id'.
-    // Returns: 0 - exist & not-run; 1 - still running; EINVAL - not exist.
-    int fiber_timer_del(fiber_timer_id id);
+    int fiber_about_to_quit_impl();
 
 
     // Add a startup function that each pthread worker will run at the beginning
@@ -169,7 +158,7 @@ namespace turbo::fiber_internal {
     // Stop all fiber and worker pthreads.
     // You should avoid calling this function which may cause fiber after main()
     // suspend indefinitely.
-    void fiber_stop_world();
+    void fiber_stop_world_impl();
 
 }  // namespace turbo::fiber_internal
 

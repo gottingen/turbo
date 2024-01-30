@@ -92,10 +92,10 @@ struct win32_error : public tlog_ex
 
         if (format_message_succeeded && format_message_result.hlocal_)
         {
-            system_message = fmt_lib::format(" ({})", (LPSTR)format_message_result.hlocal_);
+            system_message = turbo::format(" ({})", (LPSTR)format_message_result.hlocal_);
         }
 
-        return fmt_lib::format("{}: {}{}", user_message, error_code, system_message);
+        return turbo::format("{}: {}{}", user_message, error_code, system_message);
     }
 
     explicit win32_error(std::string const &func_name, DWORD error = GetLastError())

@@ -21,7 +21,7 @@
 
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/port.h"
-#include "turbo/profiling/internal/exponential_biased.h"
+#include "turbo/random/exponential_biased.h"
 
 namespace turbo::cord_internal {
     namespace {
@@ -45,7 +45,7 @@ namespace turbo::cord_internal {
 
     TURBO_NO_INLINE bool cordz_should_profile_slow() {
 
-        thread_local turbo::profiling_internal::ExponentialBiased
+        thread_local turbo::ExponentialBiased
                 exponential_biased_generator;
         int32_t mean_interval = get_cordz_mean_interval();
 

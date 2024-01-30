@@ -32,14 +32,14 @@
 
 namespace turbo {
 
-    Time time_now() {
+    Time Time::time_now() {
         // TODO(bww): Get a timespec instead so we don't have to divide.
         int64_t n = turbo::get_current_time_nanos();
         if (n >= 0) {
             return time_internal::FromUnixDuration(
                     time_internal::MakeDuration(n / 1000000000, n % 1000000000 * 4));
         }
-        return time_internal::FromUnixDuration(turbo::nanoseconds(n));
+        return time_internal::FromUnixDuration(turbo::Duration::nanoseconds(n));
     }
 
 }  // namespace turbo
@@ -549,10 +549,10 @@ namespace turbo {
         constexpr turbo::Duration MaxSleep() {
 #ifdef _WIN32
             // Windows Sleep() takes unsigned long argument in milliseconds.
-            return turbo::milliseconds(
+            return turbo::Duration::milliseconds(
                 std::numeric_limits<unsigned long>::max());  // NOLINT(runtime/int)
 #else
-            return turbo::seconds(std::numeric_limits<time_t>::max());
+            return turbo::Duration::seconds(std::numeric_limits<time_t>::max());
 #endif
         }
 
@@ -560,9 +560,9 @@ namespace turbo {
         // REQUIRES: to_sleep <= MaxSleep().
         void SleepOnce(turbo::Duration to_sleep) {
 #ifdef _WIN32
-            Sleep(static_cast<DWORD>(to_sleep / turbo::milliseconds(1)));
+            Sleep(static_cast<DWORD>(to_sleep / turbo::Duration::milliseconds(1)));
 #else
-            struct timespec sleep_time = turbo::to_timespec(to_sleep);
+            struct timespec sleep_time = to_sleep.to_timespec();
             while (nanosleep(&sleep_time, &sleep_time) != 0 && errno == EINTR) {
                 // Ignore signals and wait for the full interval to elapse.
             }
@@ -577,7 +577,7 @@ extern "C" {
 
 TURBO_WEAK void turbo_internal_sleep_for(
         turbo::Duration duration) {
-    while (duration > turbo::zero_duration()) {
+    while (duration > turbo::Duration::zero()) {
         turbo::Duration to_sleep = std::min(duration, turbo::MaxSleep());
         turbo::SleepOnce(to_sleep);
         duration -= to_sleep;

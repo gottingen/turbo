@@ -16,6 +16,7 @@
 #include "includes.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
 #include "turbo/testing/test.h"
 
 #define SIMPLE_LOG "test_logs/simple_log"
@@ -35,7 +36,8 @@ TEST_CASE("simple_file_logger [simple_logger]]")
     logger->flush();
     require_message_count(SIMPLE_LOG, 2);
     using turbo::tlog::details::os::default_eol;
-    REQUIRE(file_contents(SIMPLE_LOG) == turbo::tlog::fmt_lib::format("Test message 1{}Test message 2{}", default_eol, default_eol));
+    REQUIRE(file_contents(SIMPLE_LOG) ==
+            turbo::format("Test message 1{}Test message 2{}", default_eol, default_eol));
 }
 
 TEST_CASE("flush_on [flush_on]]")
@@ -47,8 +49,9 @@ TEST_CASE("flush_on [flush_on]]")
     logger->set_pattern("%v");
     logger->set_level(turbo::tlog::level::trace);
     logger->flush_on(turbo::tlog::level::info);
+    REQUIRE(count_lines(SIMPLE_LOG, true) == 0);
     logger->trace("Should not be flushed");
-    REQUIRE(count_lines(SIMPLE_LOG) == 0);
+    REQUIRE(count_lines(SIMPLE_LOG, true) == 1);
 
     logger->info("Test message {}", 1);
     logger->info("Test message {}", 2);
@@ -56,7 +59,8 @@ TEST_CASE("flush_on [flush_on]]")
     require_message_count(SIMPLE_LOG, 3);
     using turbo::tlog::details::os::default_eol;
     REQUIRE(file_contents(SIMPLE_LOG) ==
-            turbo::tlog::fmt_lib::format("Should not be flushed{}Test message 1{}Test message 2{}", default_eol, default_eol, default_eol));
+            turbo::format("Should not be flushed{}Test message 1{}Test message 2{}", default_eol,
+                                         default_eol, default_eol));
 }
 
 TEST_CASE("rotating_file_logger1 [rotating_logger]]")
@@ -66,8 +70,7 @@ TEST_CASE("rotating_file_logger1 [rotating_logger]]")
     turbo::tlog::filename_t basename = TLOG_FILENAME_T(ROTATING_LOG);
     auto logger = turbo::tlog::rotating_logger_mt("logger", basename, max_size, 0);
 
-    for (int i = 0; i < 10; ++i)
-    {
+    for (int i = 0; i < 10; ++i) {
         logger->info("Test message {}", i);
     }
 
@@ -84,8 +87,7 @@ TEST_CASE("rotating_file_logger2 [rotating_logger]]")
     {
         // make an initial logger to create the first output file
         auto logger = turbo::tlog::rotating_logger_mt("logger", basename, max_size, 2, true);
-        for (int i = 0; i < 10; ++i)
-        {
+        for (int i = 0; i < 10; ++i) {
             logger->info("Test message {}", i);
         }
         // drop causes the logger destructor to be called, which is required so the
@@ -94,8 +96,7 @@ TEST_CASE("rotating_file_logger2 [rotating_logger]]")
     }
 
     auto logger = turbo::tlog::rotating_logger_mt("logger", basename, max_size, 2, true);
-    for (int i = 0; i < 10; ++i)
-    {
+    for (int i = 0; i < 10; ++i) {
         logger->info("Test message {}", i);
     }
 
@@ -103,8 +104,7 @@ TEST_CASE("rotating_file_logger2 [rotating_logger]]")
 
     require_message_count(ROTATING_LOG, 10);
 
-    for (int i = 0; i < 1000; i++)
-    {
+    for (int i = 0; i < 1000; i++) {
 
         logger->info("Test message {}", i);
     }

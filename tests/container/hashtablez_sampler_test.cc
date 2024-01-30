@@ -20,7 +20,7 @@
 
 #include "turbo/concurrent/notification.h"
 #include "turbo/platform/port.h"
-#include "turbo/profiling/internal/sample_recorder.h"
+#include "turbo/var/internal/sample_recorder.h"
 #include "turbo/concurrent/internal/thread_pool.h"
 #include "turbo/times/clock.h"
 #include "turbo/times/time.h"
@@ -109,7 +109,7 @@ namespace turbo {
                 info.hashes_bitwise_and.store(1, std::memory_order_relaxed);
                 info.hashes_bitwise_xor.store(1, std::memory_order_relaxed);
                 info.max_reserve.store(1, std::memory_order_relaxed);
-                info.create_time = test_start - turbo::hours(20);
+                info.create_time = test_start - turbo::Duration::hours(20);
 
                 info.PrepareForSampling(test_stride * 2, test_element_size);
                 EXPECT_EQ(info.capacity.load(), 0);
@@ -380,11 +380,11 @@ TEST(HashtablezSamplerTest, MultiThreaded) {
             break;
           }
           case 2: {
-            turbo::Duration oldest = turbo::zero_duration();
+            turbo::Duration oldest = turbo::Duration::zero();
             sampler.Iterate([&](const HashtablezInfo& info) {
               oldest = std::max(oldest, turbo::time_now() - info.create_time);
             });
-            ASSERT_GE(oldest, turbo::zero_duration());
+            ASSERT_GE(oldest, turbo::Duration::zero());
             break;
           }
         }
@@ -393,7 +393,7 @@ TEST(HashtablezSamplerTest, MultiThreaded) {
   }
   // The threads will hammer away.  Give it a little bit of time for tsan to
   // spot errors.
-  turbo::sleep_for(turbo::seconds(3));
+  turbo::sleep_for(turbo::Duration::seconds(3));
   stop.Notify();
 }
  */

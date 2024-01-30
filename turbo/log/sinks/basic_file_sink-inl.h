@@ -16,7 +16,6 @@
 #pragma once
 
 #include <turbo/log/sinks/basic_file_sink.h>
-
 #include "turbo/log/common.h"
 #include "turbo/log/details/os.h"
 
@@ -24,11 +23,11 @@ namespace turbo::tlog {
     namespace sinks {
 
         template<typename Mutex>
-        basic_file_sink<Mutex>::basic_file_sink(const filename_t &filename, bool truncate,
+        basic_file_sink<Mutex>::basic_file_sink(const filename_t &filename,bool truncate,
                                                 const turbo::FileEventListener &event_handlers)
-                : file_writer_{event_handlers} {
-            file_writer_.set_option(turbo::tlog::kLogFileOption);
-            auto r = file_writer_.open(filename, truncate);
+                : file_writer_(event_handlers) {
+            auto &open_option = truncate ? kLogTruncateOpenOption : kLogAppendOpenOption;
+            auto r = file_writer_.open(filename, open_option);
             if (!r.ok()) {
                 throw_tlog_ex(r.to_string());
             }

@@ -24,7 +24,7 @@ void prepare_logdir();
 
 std::string file_contents(const std::string &filename);
 
-std::size_t count_lines(const std::string &filename);
+std::size_t count_lines(const std::string &filename, bool dump = false);
 
 void require_message_count(const std::string &filename, const std::size_t messages);
 

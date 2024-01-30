@@ -72,6 +72,7 @@
 #include "turbo/strings/string_view.h"
 #include "turbo/strings/str_strip.h"
 #include "turbo/times/time.h"
+#include "turbo/times/duration.h"
 
 namespace turbo {
 
@@ -139,7 +140,7 @@ namespace turbo {
             return u128;
         }
 
-// Breaks a uint128 of ticks into a Duration.
+        // Breaks a uint128 of ticks into a Duration.
         inline Duration MakeDurationFromU128(uint128 u128, bool is_neg) {
             int64_t rep_hi;
             uint32_t rep_lo;
@@ -161,7 +162,7 @@ namespace turbo {
                         // Avoid trying to represent -kint64min below.
                         return time_internal::MakeDuration(kint64min);
                     }
-                    return is_neg ? -infinite_duration() : infinite_duration();
+                    return is_neg ? -Duration::infinite() : Duration::infinite();
                 }
                 const uint128 kTicksPerSecond128 = static_cast<uint64_t>(kTicksPerSecond);
                 const uint128 hi = u128 / kTicksPerSecond128;
@@ -202,11 +203,11 @@ namespace turbo {
         inline bool SafeAddRepHi(double a_hi, double b_hi, Duration *d) {
             double c = a_hi + b_hi;
             if (c >= static_cast<double>(kint64max)) {
-                *d = infinite_duration();
+                *d = Duration::infinite();
                 return false;
             }
             if (c <= static_cast<double>(kint64min)) {
-                *d = -infinite_duration();
+                *d = -Duration::infinite();
                 return false;
             }
             *d = time_internal::MakeDuration(c, time_internal::GetRepLo(*d));
@@ -278,8 +279,8 @@ namespace turbo {
         inline bool IDivFastPath(const Duration num, const Duration den, int64_t *q,
                                  Duration *rem) {
             // Bail if num or den is an infinity.
-            if (time_internal::IsInfiniteDuration(num) ||
-                time_internal::IsInfiniteDuration(den))
+            if (num.is_infinite() ||
+                den.is_infinite())
                 return false;
 
             int64_t num_hi = time_internal::GetRepHi(num);
@@ -362,15 +363,15 @@ namespace turbo {
                 return q;
             }
 
-            const bool num_neg = num < zero_duration();
-            const bool den_neg = den < zero_duration();
+            const bool num_neg = num < Duration::zero();
+            const bool den_neg = den < Duration::zero();
             const bool quotient_neg = num_neg != den_neg;
 
-            if (time_internal::IsInfiniteDuration(num) || den == zero_duration()) {
-                *rem = num_neg ? -infinite_duration() : infinite_duration();
+            if (num.is_infinite() || den == Duration::zero()) {
+                *rem = num_neg ? -Duration::infinite() : Duration::infinite();
                 return quotient_neg ? kint64min : kint64max;
             }
-            if (time_internal::IsInfiniteDuration(den)) {
+            if (den.is_infinite()) {
                 *rem = num;
                 return 0;
             }
@@ -405,8 +406,8 @@ namespace turbo {
     //
 
     Duration &Duration::operator+=(Duration rhs) {
-        if (time_internal::IsInfiniteDuration(*this)) return *this;
-        if (time_internal::IsInfiniteDuration(rhs)) return *this = rhs;
+        if (this->is_infinite()) return *this;
+        if (rhs.is_infinite()) return *this = rhs;
         const int64_t orig_rep_hi = rep_hi_;
         rep_hi_ =
                 DecodeTwosComp(EncodeTwosComp(rep_hi_) + EncodeTwosComp(rhs.rep_hi_));
@@ -416,15 +417,15 @@ namespace turbo {
         }
         rep_lo_ += rhs.rep_lo_;
         if (rhs.rep_hi_ < 0 ? rep_hi_ > orig_rep_hi : rep_hi_ < orig_rep_hi) {
-            return *this = rhs.rep_hi_ < 0 ? -infinite_duration() : infinite_duration();
+            return *this = rhs.rep_hi_ < 0 ? -Duration::infinite() : Duration::infinite();
         }
         return *this;
     }
 
     Duration &Duration::operator-=(Duration rhs) {
-        if (time_internal::IsInfiniteDuration(*this)) return *this;
-        if (time_internal::IsInfiniteDuration(rhs)) {
-            return *this = rhs.rep_hi_ >= 0 ? -infinite_duration() : infinite_duration();
+        if (is_infinite()) return *this;
+        if (rhs.is_infinite()) {
+            return *this = rhs.rep_hi_ >= 0 ? -Duration::infinite() : Duration::infinite();
         }
         const int64_t orig_rep_hi = rep_hi_;
         rep_hi_ =
@@ -435,7 +436,7 @@ namespace turbo {
         }
         rep_lo_ -= rhs.rep_lo_;
         if (rhs.rep_hi_ < 0 ? rep_hi_ < orig_rep_hi : rep_hi_ > orig_rep_hi) {
-            return *this = rhs.rep_hi_ >= 0 ? -infinite_duration() : infinite_duration();
+            return *this = rhs.rep_hi_ >= 0 ? -Duration::infinite() : Duration::infinite();
         }
         return *this;
     }
@@ -445,33 +446,33 @@ namespace turbo {
     //
 
     Duration &Duration::operator*=(int64_t r) {
-        if (time_internal::IsInfiniteDuration(*this)) {
+        if (is_infinite()) {
             const bool is_neg = (r < 0) != (rep_hi_ < 0);
-            return *this = is_neg ? -infinite_duration() : infinite_duration();
+            return *this = is_neg ? -Duration::infinite() : Duration::infinite();
         }
         return *this = ScaleFixed<SafeMultiply>(*this, r);
     }
 
     Duration &Duration::operator*=(double r) {
-        if (time_internal::IsInfiniteDuration(*this) || !IsFinite(r)) {
+        if (is_infinite() || !IsFinite(r)) {
             const bool is_neg = (std::signbit(r) != 0) != (rep_hi_ < 0);
-            return *this = is_neg ? -infinite_duration() : infinite_duration();
+            return *this = is_neg ? -Duration::infinite() : Duration::infinite();
         }
         return *this = ScaleDouble<std::multiplies>(*this, r);
     }
 
     Duration &Duration::operator/=(int64_t r) {
-        if (time_internal::IsInfiniteDuration(*this) || r == 0) {
+        if (is_infinite() || r == 0) {
             const bool is_neg = (r < 0) != (rep_hi_ < 0);
-            return *this = is_neg ? -infinite_duration() : infinite_duration();
+            return *this = is_neg ? -Duration::infinite() : Duration::infinite();
         }
         return *this = ScaleFixed<std::divides>(*this, r);
     }
 
     Duration &Duration::operator/=(double r) {
-        if (time_internal::IsInfiniteDuration(*this) || !IsValidDivisor(r)) {
+        if (is_infinite() || !IsValidDivisor(r)) {
             const bool is_neg = (std::signbit(r) != 0) != (rep_hi_ < 0);
-            return *this = is_neg ? -infinite_duration() : infinite_duration();
+            return *this = is_neg ? -Duration::infinite() : Duration::infinite();
         }
         return *this = ScaleDouble<std::divides>(*this, r);
     }
@@ -481,217 +482,23 @@ namespace turbo {
         return *this;
     }
 
-    double safe_float_mod(Duration num, Duration den) {
-        // Arithmetic with infinity is sticky.
-        if (time_internal::IsInfiniteDuration(num) || den == zero_duration()) {
-            return (num < zero_duration()) == (den < zero_duration())
-                   ? std::numeric_limits<double>::infinity()
-                   : -std::numeric_limits<double>::infinity();
-        }
-        if (time_internal::IsInfiniteDuration(den)) return 0.0;
-
-        double a =
-                static_cast<double>(time_internal::GetRepHi(num)) * kTicksPerSecond +
-                time_internal::GetRepLo(num);
-        double b =
-                static_cast<double>(time_internal::GetRepHi(den)) * kTicksPerSecond +
-                time_internal::GetRepLo(den);
-        return a / b;
-    }
-
     //
     // trunc/floor/ceil.
     //
 
-    Duration trunc(Duration d, Duration unit) {
-        return d - (d % unit);
+    Duration Duration::trunc(Duration unit) const {
+        return *this - (*this % unit);
     }
 
-    Duration floor(const Duration d, const Duration unit) {
-        const turbo::Duration td = trunc(d, unit);
-        return td <= d ? td : td - abs_duration(unit);
+    Duration Duration::floor(const Duration unit) const {
+        const turbo::Duration td = trunc(unit);
+        return td <= *this ? td : td - unit.abs();
     }
 
-    Duration ceil(const Duration d, const Duration unit) {
-        const turbo::Duration td = trunc(d, unit);
-        return td >= d ? td : td + abs_duration(unit);
-    }
 
-    //
-    // Factory functions.
-    //
-
-    Duration duration_from_timespec(timespec ts) {
-        if (static_cast<uint64_t>(ts.tv_nsec) < 1000 * 1000 * 1000) {
-            int64_t ticks = ts.tv_nsec * kTicksPerNanosecond;
-            return time_internal::MakeDuration(ts.tv_sec, ticks);
-        }
-        return seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec);
-    }
-
-    Duration duration_from_timeval(timeval tv) {
-        if (static_cast<uint64_t>(tv.tv_usec) < 1000 * 1000) {
-            int64_t ticks = tv.tv_usec * 1000 * kTicksPerNanosecond;
-            return time_internal::MakeDuration(tv.tv_sec, ticks);
-        }
-        return seconds(tv.tv_sec) + microseconds(tv.tv_usec);
-    }
-
-    //
-    // Conversion to other duration types.
-    //
-
-    int64_t to_int64_nanoseconds(Duration d) {
-        if (time_internal::GetRepHi(d) >= 0 &&
-            time_internal::GetRepHi(d) >> 33 == 0) {
-            return (time_internal::GetRepHi(d) * 1000 * 1000 * 1000) +
-                   (time_internal::GetRepLo(d) / kTicksPerNanosecond);
-        }
-        return d / nanoseconds(1);
-    }
-
-    int64_t to_int64_microseconds(Duration d) {
-        if (time_internal::GetRepHi(d) >= 0 &&
-            time_internal::GetRepHi(d) >> 43 == 0) {
-            return (time_internal::GetRepHi(d) * 1000 * 1000) +
-                   (time_internal::GetRepLo(d) / (kTicksPerNanosecond * 1000));
-        }
-        return d / microseconds(1);
-    }
-
-    int64_t to_int64_milliseconds(Duration d) {
-        if (time_internal::GetRepHi(d) >= 0 &&
-            time_internal::GetRepHi(d) >> 53 == 0) {
-            return (time_internal::GetRepHi(d) * 1000) +
-                   (time_internal::GetRepLo(d) / (kTicksPerNanosecond * 1000 * 1000));
-        }
-        return d / milliseconds(1);
-    }
-
-    int64_t to_int64_seconds(Duration d) {
-        int64_t hi = time_internal::GetRepHi(d);
-        if (time_internal::IsInfiniteDuration(d)) return hi;
-        if (hi < 0 && time_internal::GetRepLo(d) != 0) ++hi;
-        return hi;
-    }
-
-    int64_t to_int64_minutes(Duration d) {
-        int64_t hi = time_internal::GetRepHi(d);
-        if (time_internal::IsInfiniteDuration(d)) return hi;
-        if (hi < 0 && time_internal::GetRepLo(d) != 0) ++hi;
-        return hi / 60;
-    }
-
-    int64_t to_int64_hours(Duration d) {
-        int64_t hi = time_internal::GetRepHi(d);
-        if (time_internal::IsInfiniteDuration(d)) return hi;
-        if (hi < 0 && time_internal::GetRepLo(d) != 0) ++hi;
-        return hi / (60 * 60);
-    }
-
-    double to_double_nanoseconds(Duration d) {
-        return safe_float_mod(d, nanoseconds(1));
-    }
-
-    double to_double_microseconds(Duration d) {
-        return safe_float_mod(d, microseconds(1));
-    }
-
-    double to_double_milliseconds(Duration d) {
-        return safe_float_mod(d, milliseconds(1));
-    }
-
-    double to_double_seconds(Duration d) {
-        return safe_float_mod(d, seconds(1));
-    }
-
-    double to_double_minutes(Duration d) {
-        return safe_float_mod(d, minutes(1));
-    }
-
-    double to_double_hours(Duration d) {
-        return safe_float_mod(d, hours(1));
-    }
-
-    timespec to_timespec(Duration d) {
-        timespec ts;
-        if (!time_internal::IsInfiniteDuration(d)) {
-            int64_t rep_hi = time_internal::GetRepHi(d);
-            uint32_t rep_lo = time_internal::GetRepLo(d);
-            if (rep_hi < 0) {
-                // Tweak the fields so that unsigned division of rep_lo
-                // maps to truncation (towards zero) for the timespec.
-                rep_lo += kTicksPerNanosecond - 1;
-                if (rep_lo >= kTicksPerSecond) {
-                    rep_hi += 1;
-                    rep_lo -= kTicksPerSecond;
-                }
-            }
-            ts.tv_sec = static_cast<decltype(ts.tv_sec)>(rep_hi);
-            if (ts.tv_sec == rep_hi) {  // no time_t narrowing
-                ts.tv_nsec = rep_lo / kTicksPerNanosecond;
-                return ts;
-            }
-        }
-        if (d >= zero_duration()) {
-            ts.tv_sec = std::numeric_limits<time_t>::max();
-            ts.tv_nsec = 1000 * 1000 * 1000 - 1;
-        } else {
-            ts.tv_sec = std::numeric_limits<time_t>::min();
-            ts.tv_nsec = 0;
-        }
-        return ts;
-    }
-
-    timeval to_timeval(Duration d) {
-        timeval tv;
-        timespec ts = to_timespec(d);
-        if (ts.tv_sec < 0) {
-            // Tweak the fields so that positive division of tv_nsec
-            // maps to truncation (towards zero) for the timeval.
-            ts.tv_nsec += 1000 - 1;
-            if (ts.tv_nsec >= 1000 * 1000 * 1000) {
-                ts.tv_sec += 1;
-                ts.tv_nsec -= 1000 * 1000 * 1000;
-            }
-        }
-        tv.tv_sec = static_cast<decltype(tv.tv_sec)>(ts.tv_sec);
-        if (tv.tv_sec != ts.tv_sec) {  // narrowing
-            if (ts.tv_sec < 0) {
-                tv.tv_sec = std::numeric_limits<decltype(tv.tv_sec)>::min();
-                tv.tv_usec = 0;
-            } else {
-                tv.tv_sec = std::numeric_limits<decltype(tv.tv_sec)>::max();
-                tv.tv_usec = 1000 * 1000 - 1;
-            }
-            return tv;
-        }
-        tv.tv_usec = static_cast<int>(ts.tv_nsec / 1000);  // suseconds_t
-        return tv;
-    }
-
-    std::chrono::nanoseconds to_chrono_nanoseconds(Duration d) {
-        return time_internal::ToChronoDuration<std::chrono::nanoseconds>(d);
-    }
-
-    std::chrono::microseconds to_chrono_microseconds(Duration d) {
-        return time_internal::ToChronoDuration<std::chrono::microseconds>(d);
-    }
-
-    std::chrono::milliseconds to_chrono_milliseconds(Duration d) {
-        return time_internal::ToChronoDuration<std::chrono::milliseconds>(d);
-    }
-
-    std::chrono::seconds to_chrono_seconds(Duration d) {
-        return time_internal::ToChronoDuration<std::chrono::seconds>(d);
-    }
-
-    std::chrono::minutes to_chrono_minutes(Duration d) {
-        return time_internal::ToChronoDuration<std::chrono::minutes>(d);
-    }
-
-    std::chrono::hours to_chrono_hours(Duration d) {
-        return time_internal::ToChronoDuration<std::chrono::hours>(d);
+    Duration Duration::ceil(const Duration unit) const {
+        const turbo::Duration td = trunc(unit);
+        return td >= *this ? td : td + unit.abs();
     }
 
     //
@@ -780,7 +587,8 @@ namespace turbo {
     //   (milli-, micro-, or nanoseconds) to ensure that the leading digit
     //   is non-zero.
     // Unlike Go, we format the zero duration as 0, with no unit.
-    std::string format_duration(Duration d) {
+    std::string Duration::to_string() const {
+        Duration d = *this;
         constexpr Duration kMinDuration = seconds(kint64min);
         std::string s;
         if (d == kMinDuration) {
@@ -789,26 +597,26 @@ namespace turbo {
             s = "-2562047788015215h30m8s";
             return s;
         }
-        if (d < zero_duration()) {
+        if (d< Duration::zero()) {
             s.append("-");
             d = -d;
         }
-        if (d == infinite_duration()) {
+        if (d == Duration::infinite()) {
             s.append("inf");
         } else if (d < seconds(1)) {
             // Special case for durations with a magnitude < 1 second.  The duration
             // is printed as a fraction of a single unit, e.g., "1.2ms".
             if (d < microseconds(1)) {
-                AppendNumberUnit(&s, safe_float_mod(d, nanoseconds(1)), kDisplayNano);
+                AppendNumberUnit(&s, d.safe_float_mod(nanoseconds(1)), kDisplayNano);
             } else if (d < milliseconds(1)) {
-                AppendNumberUnit(&s, safe_float_mod(d, microseconds(1)), kDisplayMicro);
+                AppendNumberUnit(&s, d.safe_float_mod( microseconds(1)), kDisplayMicro);
             } else {
-                AppendNumberUnit(&s, safe_float_mod(d, milliseconds(1)), kDisplayMilli);
+                AppendNumberUnit(&s, d.safe_float_mod(milliseconds(1)), kDisplayMilli);
             }
         } else {
             AppendNumberUnit(&s, safe_int_mod(d, hours(1), &d), kDisplayHour);
             AppendNumberUnit(&s, safe_int_mod(d, minutes(1), &d), kDisplayMin);
-            AppendNumberUnit(&s, safe_float_mod(d, seconds(1)), kDisplaySec);
+            AppendNumberUnit(&s, d.safe_float_mod(seconds(1)), kDisplaySec);
         }
         if (s.empty() || s == "-") {
             s = "0";
@@ -865,21 +673,21 @@ namespace turbo {
                         case 'n':
                             if (*(*start + 1) == 's') {
                                 *start += 2;
-                                *unit = nanoseconds(1);
+                                *unit = Duration::nanoseconds(1);
                                 return true;
                             }
                             break;
                         case 'u':
                             if (*(*start + 1) == 's') {
                                 *start += 2;
-                                *unit = microseconds(1);
+                                *unit = Duration::microseconds(1);
                                 return true;
                             }
                             break;
                         case 'm':
                             if (*(*start + 1) == 's') {
                                 *start += 2;
-                                *unit = milliseconds(1);
+                                *unit = Duration::milliseconds(1);
                                 return true;
                             }
                             break;
@@ -890,15 +698,15 @@ namespace turbo {
                 case 1:
                     switch (**start) {
                         case 's':
-                            *unit = seconds(1);
+                            *unit = Duration::seconds(1);
                             *start += 1;
                             return true;
                         case 'm':
-                            *unit = minutes(1);
+                            *unit = Duration::minutes(1);
                             *start += 1;
                             return true;
                         case 'h':
-                            *unit = hours(1);
+                            *unit = Duration::hours(1);
                             *start += 1;
                             return true;
                         default:
@@ -914,7 +722,7 @@ namespace turbo {
     //   a possibly signed sequence of decimal numbers, each with optional
     //   fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
     //   Valid time units are "ns", "us" "ms", "s", "m", "h".
-    bool parse_duration(std::string_view dur_sv, Duration *d) {
+    bool Duration::parse_duration(std::string_view dur_sv) {
         int sign = 1;
         if (turbo::consume_prefix(&dur_sv, "-")) {
             sign = -1;
@@ -925,12 +733,12 @@ namespace turbo {
 
         // Special case for a string of "0".
         if (dur_sv == "0") {
-            *d = zero_duration();
+            *this = Duration::zero();
             return true;
         }
 
         if (dur_sv == "inf") {
-            *d = sign * infinite_duration();
+            *this = sign * Duration::infinite();
             return true;
         }
 
@@ -951,8 +759,13 @@ namespace turbo {
             if (int_part != 0) dur += sign * int_part * unit;
             if (frac_part != 0) dur += sign * frac_part * unit / frac_scale;
         }
-        *d = dur;
+        *this = dur;
         return true;
     }
 
+
+    bool turbo_parse_flag(std::string_view text, Duration* dst, std::string*) {
+        return dst->parse_duration(text);
+    }
+    std::string turbo_unparse_flag(Duration d) { return d.to_string(); }
 }  // namespace turbo

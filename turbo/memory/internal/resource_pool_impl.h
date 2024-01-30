@@ -24,7 +24,7 @@
 #include <memory>
 #include <mutex>
 #include <vector>
-#include "turbo/base/atexit.h"
+#include "turbo/system/atexit.h"
 #include <vector>
 #include "turbo/platform/port.h"
 
@@ -51,13 +51,12 @@ namespace turbo {
         size_t nfree;
         ResourceId<T> ids[NITEM];
     };
-// for gcc 3.4.5
+
     template<typename T>
     struct ResourcePoolFreeChunk<T, 0> {
         size_t nfree;
         ResourceId<T> ids[0];
     };
-
 
     static const size_t RP_MAX_BLOCK_NGROUP = 65536;
     static const size_t RP_GROUP_NBLOCK_NBIT = 16;

@@ -512,8 +512,8 @@ namespace turbo::time_internal::cctz {
             fields f_;
         };
 
-// Disallows difference between differently aligned types.
-// auto n = civil_day(...) - civil_hour(...);  // would be confusing.
+        // Disallows difference between differently aligned types.
+        // auto n = civil_day(...) - civil_hour(...);  // would be confusing.
         template<typename T, typename U>
         constexpr diff_t operator-(civil_time<T>, civil_time<U>) = delete;
 
@@ -524,10 +524,10 @@ namespace turbo::time_internal::cctz {
         using civil_minute = civil_time<minute_tag>;
         using civil_second = civil_time<second_tag>;
 
-////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
 
-// Relational operators that work with differently aligned objects.
-// Always compares all six fields.
+        // Relational operators that work with differently aligned objects.
+        // Always compares all six fields.
         template<typename T1, typename T2>
         constexpr bool operator<(const civil_time<T1> &lhs,
                                  const civil_time<T2> &rhs) noexcept {

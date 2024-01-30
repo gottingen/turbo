@@ -69,7 +69,7 @@ namespace turbo {
         }
 
         // Implicit constructor of a `unicode_view` from NUL-terminated `str`. When
-        // accepting possibly null strings, use `absl::NullSafeStringView(str)`
+        // accepting possibly null strings, use `turbo::NullSafeStringView(str)`
         // instead (see below).
         constexpr unicode_view(const value_type *str) noexcept  // NOLINT(runtime/explicit)
                 : ptr_(str), length_(str ? (traits_type::length(str)) : 0), category_(_UNKNOWN_CATEGORY) {
@@ -321,7 +321,7 @@ namespace turbo {
         // unicode_view::compare()
         //
         // Performs a lexicographical comparison between the `unicode_view` and
-        // another `absl::unicode_view`, returning -1 if `this` is less than, 0 if
+        // another `turbo::unicode_view`, returning -1 if `this` is less than, 0 if
         // `this` is equal to, and 1 if `this` is greater than the passed std::string
         // view. Note that in the case of data equality, a further comparison is made
         // on the respective sizes of the two `unicode_view`s to determine which is
@@ -336,13 +336,13 @@ namespace turbo {
         }
 
         // Overload of `unicode_view::compare()` for comparing a substring of the
-        // 'unicode_view` and another `absl::unicode_view`.
+        // 'unicode_view` and another `turbo::unicode_view`.
         int compare(size_type pos1, size_type count1, unicode_view v) const {
             return substr(pos1, count1).compare(v);
         }
 
         // Overload of `unicode_view::compare()` for comparing a substring of the
-        // `unicode_view` and a substring of another `absl::unicode_view`.
+        // `unicode_view` and a substring of another `turbo::unicode_view`.
         int compare(
                 size_type pos1, size_type count1, unicode_view v, size_type pos2, size_type count2) const {
             return substr(pos1, count1).compare(v.substr(pos2, count2));

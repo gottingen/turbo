@@ -148,8 +148,6 @@
 // macOS < 10.13 and iOS < 11 don't let you use <any>, <optional>, or <variant>
 // even though the headers exist and are publicly noted to work, because the
 // libc++ shared library shipped on the system doesn't have the requisite
-// exported symbols.  See https://github.com/abseil/abseil-cpp/issues/207 and
-// https://developer.apple.com/documentation/xcode_release_notes/xcode_10_release_notes
 //
 // libc++ spells out the availability requirements in the file
 // llvm-project/libcxx/include/__config via the #define

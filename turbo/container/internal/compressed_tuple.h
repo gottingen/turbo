@@ -36,6 +36,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <cstddef>
 
 namespace turbo::container_internal {
 
@@ -80,9 +81,9 @@ namespace turbo::container_internal {
                    !std::is_base_of<uses_inheritance, T>::value;
         }
 
-// The storage class provides two specializations:
-//  - For empty classes, it stores T as a base class.
-//  - For everything else, it stores T as a member.
+        // The storage class provides two specializations:
+        //  - For empty classes, it stores T as a base class.
+        //  - For everything else, it stores T as a member.
         template<typename T, size_t I,
 #if defined(_MSC_VER)
                 bool UseBase =

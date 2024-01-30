@@ -20,7 +20,9 @@
 #define TURBO_FIBER_INTERNAL_TYPES_H_
 
 #include <cstdint>
-#include "turbo/log/logging.h"
+#include <mutex>
+#include <ostream>
+#include <functional>
 
 namespace turbo::fiber_internal {
     typedef uint64_t fiber_id_t;
@@ -46,7 +48,8 @@ namespace turbo::fiber_internal {
         FLAG_LOG_START_AND_FINISH = 8,
         FLAG_LOG_CONTEXT_SWITCH = 16,
         FLAG_NOSIGNAL = 32,
-        FLAG_NEVER_QUIT = 64
+        FLAG_NEVER_QUIT = 64,
+        FLAG_INHERIT = 128
     };
 
     inline constexpr AttributeFlag operator|(AttributeFlag lhs, AttributeFlag rhs) {
@@ -85,9 +88,10 @@ namespace turbo::fiber_internal {
 
     // Attributes for thread creation.
     struct FiberAttribute {
-        StackType stack_type;
-        AttributeFlag flags;
-        fiber_keytable_pool_t *keytable_pool;
+        FiberAttribute() = default;
+        StackType stack_type {StackType::STACK_TYPE_NORMAL};
+        AttributeFlag flags{AttributeFlag::FLAG_NONE};
+        fiber_keytable_pool_t *keytable_pool{nullptr};
 
         void operator=(unsigned stacktype_and_flags) {
             const unsigned stack_type_int = (stacktype_and_flags & 7);
@@ -141,6 +145,10 @@ namespace turbo::fiber_internal {
         return (attr.flags & AttributeFlag::FLAG_LOG_CONTEXT_SWITCH) != AttributeFlag::FLAG_NONE;
     }
 
+    inline constexpr bool is_inherit(const FiberAttribute &attr) {
+        return (attr.flags & AttributeFlag::FLAG_INHERIT) != AttributeFlag::FLAG_NONE;
+    }
+
     // fibers started with this attribute will run on stack of worker pthread and
     // all fiber functions that would block the fiber will block the pthread.
     // The fiber will not allocate its own stack, simply occupying a little meta
@@ -162,6 +170,9 @@ namespace turbo::fiber_internal {
     static constexpr FiberAttribute FIBER_ATTR_MAIN = {
             StackType::STACK_TYPE_MAIN, AttributeFlag::FLAG_NONE, nullptr};
 
+    static constexpr FiberAttribute FIBER_ATTR_NORMAL_WITH_SPAN =
+            { StackType::STACK_TYPE_NORMAL, AttributeFlag::FLAG_INHERIT, nullptr };
+
     // fibers created with this attribute will print log when it's started,
     // context-switched, finished.
     static constexpr FiberAttribute FIBER_ATTR_DEBUG = {
@@ -181,29 +192,34 @@ namespace turbo::fiber_internal {
         unsigned conflict_size;
     } fiber_list_t;
 
-    typedef struct {
-        uint64_t value;
-    } fiber_token_t;
-
-    // fiber_token returned by fiber_token_create* can never be this value.
+    // fiber_token returned by fiber_session_create* can never be this value.
     // NOTE: don't confuse with INVALID_FIBER_ID!
-    static const fiber_token_t INVALID_FIBER_TOKEN = {0};
+    static constexpr uint64_t INVALID_FIBER_SESSION_VALUE = 0;
 
+    struct FiberSessionImpl {
+        uint64_t value{INVALID_FIBER_SESSION_VALUE};
+    };
 
-    // Overload operators for fiber_token_t
-    inline bool operator==(fiber_token_t id1, fiber_token_t id2) { return id1.value == id2.value; }
+    static constexpr FiberSessionImpl INVALID_FIBER_SESSION = {0};
 
-    inline bool operator!=(fiber_token_t id1, fiber_token_t id2) { return !(id1 == id2); }
+    typedef std::function<int(FiberSessionImpl session,void *data, int error_code) > session_on_error;
 
-    inline bool operator<(fiber_token_t id1, fiber_token_t id2) { return id1.value < id2.value; }
+    typedef std::function<int(FiberSessionImpl session,void *data, int error_code, const std::string &error_text) > session_on_error_msg;
 
-    inline bool operator>(fiber_token_t id1, fiber_token_t id2) { return id2 < id1; }
+    // Overload operators for FiberSessionImpl
+    inline bool operator==(FiberSessionImpl id1, FiberSessionImpl id2) { return id1.value == id2.value; }
 
-    inline bool operator<=(fiber_token_t id1, fiber_token_t id2) { return !(id2 < id1); }
+    inline bool operator!=(FiberSessionImpl id1, FiberSessionImpl id2) { return !(id1 == id2); }
 
-    inline bool operator>=(fiber_token_t id1, fiber_token_t id2) { return !(id1 < id2); }
+    inline bool operator<(FiberSessionImpl id1, FiberSessionImpl id2) { return id1.value < id2.value; }
 
-    inline std::ostream &operator<<(std::ostream &os, fiber_token_t id) { return os << id.value; }
+    inline bool operator>(FiberSessionImpl id1, FiberSessionImpl id2) { return id2 < id1; }
+
+    inline bool operator<=(FiberSessionImpl id1, FiberSessionImpl id2) { return !(id2 < id1); }
+
+    inline bool operator>=(FiberSessionImpl id1, FiberSessionImpl id2) { return !(id1 < id2); }
+
+    inline std::ostream &operator<<(std::ostream &os, FiberSessionImpl id) { return os << id.value; }
 
 
     typedef struct {
@@ -214,9 +230,7 @@ namespace turbo::fiber_internal {
         unsigned size;
         unsigned conflict_head;
         unsigned conflict_size;
-    } fiber_token_list_t;
-
-    typedef uint64_t fiber_timer_id;
+    } FiberSessionList;
 
 }  // namespace turbo::fiber_internal
 #endif  // TURBO_FIBER_INTERNAL_TYPES_H_

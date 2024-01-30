@@ -39,14 +39,13 @@ namespace turbo::fiber_internal {
     struct EventWaiterNode;
 
     struct fiber_local_storage {
-        KeyTable *keytable;
-        void *assigned_data;
-        void *rpcz_parent_span;
+        KeyTable *keytable{nullptr};
+        void *assigned_data{nullptr};
+        void *parent_span{nullptr};
     };
 
-#define FIBER_LOCAL_STORAGE_INITIALIZER { nullptr, nullptr, nullptr }
 
-    const static fiber_local_storage LOCAL_STORAGE_INIT = FIBER_LOCAL_STORAGE_INITIALIZER;
+    constexpr static fiber_local_storage LOCAL_STORAGE_INIT = {nullptr, nullptr, nullptr};
 
     struct FiberEntity {
         // [Not Reset]

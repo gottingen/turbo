@@ -78,7 +78,7 @@
 namespace turbo::tlog {
     namespace details {
         namespace os {
-
+            /*
             turbo::tlog::log_clock::time_point now() noexcept {
 
 #if defined __linux__ && defined TLOG_CLOCK_COARSE
@@ -90,7 +90,7 @@ namespace turbo::tlog {
 #else
                 return log_clock::now();
 #endif
-            }
+            }*/
 
             std::tm localtime(const std::time_t &time_tt) noexcept {
 
@@ -240,7 +240,7 @@ namespace turbo::tlog {
                    }
                }
 
-               throw_tlog_ex(fmt_lib::format("WideCharToMultiByte failed. Last error: {}", ::GetLastError()));
+               throw_tlog_ex(turbo::format("WideCharToMultiByte failed. Last error: {}", ::GetLastError()));
            }
 
             void utf8_to_wstrbuf(std::string_view str, wmemory_buf_t &target)
@@ -275,7 +275,7 @@ namespace turbo::tlog {
                    }
                }
 
-               throw_tlog_ex(fmt_lib::format("MultiByteToWideChar failed. Last error: {}", ::GetLastError()));
+               throw_tlog_ex(turbo::format("MultiByteToWideChar failed. Last error: {}", ::GetLastError()));
            }
 #endif // (defined(TLOG_WCHAR_TO_UTF8_SUPPORT) || defined(TLOG_WCHAR_FILENAMES)) && defined(_WIN32)
 

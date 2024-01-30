@@ -479,7 +479,7 @@ TEST(CordzInfoStatisticsTest, ThreadSafety) {
     pool.Schedule([&]() {
       while (!stop) {
         // Run every 10us (about 100K total collections).
-        turbo::sleep_for(turbo::microseconds(10));
+        turbo::sleep_for(turbo::Duration::microseconds(10));
         CordzSampleToken token;
         for (const CordzInfo& cord_info : token) {
           CordzStatistics stats = cord_info.GetCordzStatistics();
@@ -544,7 +544,7 @@ TEST(CordzInfoStatisticsTest, ThreadSafety) {
 
     // Run for 1 second to give memory and thread safety analyzers plenty of
     // time to detect any mishaps or undefined behaviors.
-    turbo::sleep_for(turbo::seconds(1));
+    turbo::sleep_for(turbo::Duration::seconds(1));
     stop = true;
   }
 

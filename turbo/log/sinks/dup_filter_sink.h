@@ -51,13 +51,12 @@ namespace turbo::tlog {
         template<typename Mutex>
         class dup_filter_sink : public dist_sink<Mutex> {
         public:
-            template<class Rep, class Period>
-            explicit dup_filter_sink(std::chrono::duration<Rep, Period> max_skip_duration)
+            explicit dup_filter_sink(turbo::Duration max_skip_duration)
                     : max_skip_duration_{max_skip_duration} {}
 
         protected:
-            std::chrono::microseconds max_skip_duration_;
-            log_clock::time_point last_msg_time_;
+            turbo::Duration max_skip_duration_;
+            turbo::Time last_msg_time_;
             std::string last_msg_payload_;
             size_t skip_counter_ = 0;
 

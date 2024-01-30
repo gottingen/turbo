@@ -95,12 +95,12 @@ namespace turbo::tlog {
         set_formatter(std::move(new_formatter));
     }
 
-// create new backtrace sink and move to it all our child sinks
+    // create new backtrace sink and move to it all our child sinks
     void logger::enable_backtrace(size_t n_messages) {
         tracer_.enable(n_messages);
     }
 
-// restore orig sinks and level and delete the backtrace sink
+    // restore orig sinks and level and delete the backtrace sink
     void logger::disable_backtrace() {
         tracer_.disable();
     }
@@ -109,7 +109,7 @@ namespace turbo::tlog {
         dump_backtrace_();
     }
 
-// flush functions
+    // flush functions
     void logger::flush() {
         flush_();
     }

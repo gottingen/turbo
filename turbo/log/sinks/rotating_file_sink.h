@@ -15,8 +15,8 @@
 
 #pragma once
 
-#include <turbo/log/sinks/base_sink.h>
-#include "turbo/files/sequential_write_file.h"
+#include "turbo/log/sinks/base_sink.h"
+#include "turbo/files/filesystem.h"
 #include "turbo/log/details/null_mutex.h"
 #include "turbo/log/details/synchronous_factory.h"
 

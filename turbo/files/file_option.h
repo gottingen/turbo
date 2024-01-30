@@ -6,6 +6,7 @@
 #define TURBO_FILES_FILE_OPTION_H_
 
 #include <cstdint>
+#include <string>
 
 namespace turbo {
 
@@ -42,12 +43,13 @@ namespace turbo {
      *        the above code will try to open the file 3 times, and the interval between each open attempt is 1 second.
      *        if the directory does not exist, it will be created.
      */
-    struct  FileOption {
-        int32_t open_tries{1};
-        uint32_t open_interval{0};
-        bool create_dir_if_miss{false};
-        bool prevent_child{true};
-        static const FileOption kDefault;
+    struct FileOption {
+        int32_t                  open_tries{1};
+        uint32_t                 open_interval{0};
+        int                      mode{0644};
+        bool                     create_dir_if_miss{false};
+        bool                     prevent_child{true};
+        static const FileOption  kDefault;
     };
 }  // namespace turbo
 

@@ -18,7 +18,7 @@
 #define TURBO_RANDOM_UNIFORM_H_
 
 #include "turbo/random/fwd.h"
-#include "turbo/log/logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/format/print.h"
 
 namespace turbo {

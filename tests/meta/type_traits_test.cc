@@ -59,7 +59,7 @@ namespace {
                 std::enable_if_t<std::is_same<T &&, StructA &>::value, int> = 0>
         ConvertibleToReturnType bar(T &&, const StructB &, StructC &&) &&;  // NOLINT
     };
-    
+
 
     struct MyTrueType {
         static constexpr bool value = true;
@@ -91,7 +91,7 @@ namespace {
         REQUIRE(
                 (std::is_same<typename turbo::remove_cvref<int &&>::type, int>::value));
         REQUIRE((
-                            std::is_same<typename turbo::remove_cvref<const int &>::type, int>::value));
+                        std::is_same<typename turbo::remove_cvref<const int &>::type, int>::value));
         REQUIRE(
                 (std::is_same<typename turbo::remove_cvref<int *>::type, int *>::value));
         // Does not remove const in this case.
@@ -211,7 +211,7 @@ namespace {
         constexpr int64_t constant = NegateIfConstantEvaluated(42);
         REQUIRE_EQ(constant, -42);
 
-        int64_t now = turbo::to_unix_seconds(turbo::time_now());
+        int64_t now = turbo::get_current_time_seconds();
         int64_t not_constant = NegateIfConstantEvaluated(now);
         REQUIRE_EQ(not_constant, now);
 
@@ -221,7 +221,6 @@ namespace {
         INFO("turbo::is_constant_evaluated is not defined");
 #endif  // TURBO_HAVE_CONSTANT_EVALUATED
     }
-
 
 
     TEST_CASE("RefWrapper" * doctest::timeout(300)) {
@@ -268,6 +267,47 @@ namespace {
                 std::reference_wrapper<int> &
         >::value, "");
 
+    }
+
+    template<typename T>
+    struct is_atomic_type : public std::false_type {
+    };
+
+    template<typename T>
+    struct is_atomic_type<std::atomic<T>> : public std::true_type {
+    };
+
+    template<typename T, bool>
+    struct atomic_traits {
+        using value_type = T;
+    };
+
+    template<typename T>
+    struct atomic_traits<T,true> {
+        using value_type = typename T::value_type;
+    };
+
+    template<typename T>
+    class WaitEvent {
+    public:
+
+        static constexpr bool is_atomic_t = is_atomic_type<T>::value;
+        using value_type = typename atomic_traits<T, is_atomic_t>::value_type;
+        static constexpr bool is_valid_type = std::is_same_v<value_type, int> ||
+                                              std::is_same_v<value_type, unsigned int> ||
+                                              std::is_same_v<value_type, uint32_t> ||
+                                              std::is_same_v<value_type, int32_t>;
+    };
+
+    TEST_CASE("ATOMIC") {
+        REQUIRE_FALSE(is_atomic_type<int>::value);
+        REQUIRE(is_atomic_type<std::atomic<int>>::value);
+        REQUIRE(std::is_same_v<std::atomic<int>::value_type, int>);
+        REQUIRE(std::is_same_v<WaitEvent<std::atomic<int>>::value_type, int>);
+        REQUIRE(std::is_same_v<WaitEvent<std::atomic<uint32_t>>::value_type, unsigned int>);
+        REQUIRE(std::is_same_v<WaitEvent<std::atomic<uint32_t>>::value_type, uint32_t>);
+        REQUIRE(std::is_same_v<atomic_traits<uint32_t, false>::value_type, uint32_t>);
+        REQUIRE(std::is_same_v<atomic_traits<std::atomic<uint32_t>, true>::value_type, uint32_t>);
     }
 
 }  // namespace

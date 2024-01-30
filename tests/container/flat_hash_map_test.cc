@@ -106,7 +106,7 @@ namespace turbo::container_internal {
             }
         }
 
-// gcc becomes unhappy if this is inside the method, so pull it out here.
+        // gcc becomes unhappy if this is inside the method, so pull it out here.
         struct balast {
         };
 
@@ -124,9 +124,9 @@ namespace turbo::container_internal {
             }
         }
 
-// Demonstration of the "Lazy Key" pattern.  This uses heterogeneous insert to
-// avoid creating expensive key elements when the item is already present in the
-// map.
+        // Demonstration of the "Lazy Key" pattern.  This uses heterogeneous insert to
+        // avoid creating expensive key elements when the item is already present in the
+        // map.
         struct LazyInt {
             explicit LazyInt(size_t value, int *tracker)
                     : value(value), tracker(tracker) {}
@@ -348,6 +348,23 @@ namespace turbo::container_internal {
             };
             RecursiveType t;
             t.m[0] = RecursiveType{};
+        }
+
+        TEST(IgoreCase, HashEq) {
+            flat_ignore_case_hash_map<std::string, std::string> m;
+            m["a"] = "a";
+            m["A"] = "A";
+            EXPECT_EQ(m.size(), 1);
+            EXPECT_EQ(m["a"], "A");
+            EXPECT_EQ(m["A"], "A");
+            m["aB"] = "aB";
+            EXPECT_EQ(m.size(), 2);
+            EXPECT_EQ(m["ab"], "aB");
+            EXPECT_EQ(m["AB"], "aB");
+            EXPECT_EQ(m["aB"], "aB");
+            m["AB"] = "AB";
+            EXPECT_EQ(m.size(), 2);
+
         }
 
     }  // namespace

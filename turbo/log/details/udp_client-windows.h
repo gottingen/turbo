@@ -51,7 +51,7 @@ namespace turbo::tlog {
                 ::FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, last_error,
                                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), buf, (sizeof(buf) / sizeof(char)), NULL);
 
-                throw_tlog_ex(fmt_lib::format("udp_sink - {}: {}", msg, buf));
+                throw_tlog_ex(turbo::format("udp_sink - {}: {}", msg, buf));
             }
 
             void cleanup_() {

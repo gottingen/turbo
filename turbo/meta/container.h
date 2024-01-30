@@ -62,14 +62,14 @@ namespace turbo::container_algorithm_internal {
     using std::begin;
     using std::end;
 
-// The type of the iterator given by begin(c) (possibly std::begin(c)).
-// ContainerIter<const vector<T>> gives vector<T>::const_iterator,
-// while ContainerIter<vector<T>> gives vector<T>::iterator.
+    // The type of the iterator given by begin(c) (possibly std::begin(c)).
+    // ContainerIter<const vector<T>> gives vector<T>::const_iterator,
+    // while ContainerIter<vector<T>> gives vector<T>::iterator.
     template<typename C>
     using ContainerIter = decltype(begin(std::declval<C &>()));
 
-// An MSVC bug involving template parameter substitution requires us to use
-// decltype() here instead of just std::pair.
+    // An MSVC bug involving template parameter substitution requires us to use
+    // decltype() here instead of just std::pair.
     template<typename C1, typename C2>
     using ContainerIterPairType =
             decltype(std::make_pair(ContainerIter<C1>(), ContainerIter<C2>()));
@@ -83,16 +83,16 @@ namespace turbo::container_algorithm_internal {
     using ContainerPointerType =
             typename std::iterator_traits<ContainerIter<C>>::pointer;
 
-// container_algorithm_internal::c_begin and
-// container_algorithm_internal::c_end are abbreviations for proper ADL
-// lookup of std::begin and std::end, i.e.
-//   using std::begin;
-//   using std::end;
-//   std::foo(begin(c), end(c));
-// becomes
-//   std::foo(container_algorithm_internal::begin(c),
-//            container_algorithm_internal::end(c));
-// These are meant for internal use only.
+    // container_algorithm_internal::c_begin and
+    // container_algorithm_internal::c_end are abbreviations for proper ADL
+    // lookup of std::begin and std::end, i.e.
+    //   using std::begin;
+    //   using std::end;
+    //   std::foo(begin(c), end(c));
+    // becomes
+    //   std::foo(container_algorithm_internal::begin(c),
+    //            container_algorithm_internal::end(c));
+    // These are meant for internal use only.
 
     template<typename C>
     ContainerIter<C> c_begin(C &c) { return begin(c); }
