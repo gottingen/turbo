@@ -126,7 +126,6 @@ set(TURBO_ALL_SRC
         "random/internal/seed_material.cc"
         "random/seed_gen_exception.cc"
         "random/seed_sequences.cc"
-        "status/internal/errno.cc"
         "status/status_code.cc"
         "status/status.cc"
         "status/error.cc"

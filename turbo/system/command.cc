@@ -27,7 +27,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include "turbo/fiber/fiber.h"
 #endif
 
 TURBO_FLAG(bool, run_command_through_clone, false, "Run command with clone syscall to avoid the costly page table duplication");
@@ -107,11 +106,7 @@ int read_command_output_through_clone(std::ostream& os, const char* cmd) {
             break;
         }
         if (wpid == 0) {
-            if (Fiber::is_running_on_fiber()) {
-                turbo::Fiber::usleep(1000);
-            } else {
                 usleep(1000);
-            }
             continue;
         }
         rc = -1;

@@ -33,7 +33,6 @@
 #include "turbo/strings/version.h"
 #include "turbo/times/version.h"
 #include "turbo/unicode/version.h"
-#include "turbo/fiber/version.h"
 #include "turbo/taskflow/version.h"
 #include "turbo/system/version.h"
 
@@ -72,7 +71,6 @@ namespace turbo {
     static_assert(kMinCompatibleVersion <= strings_version, "Turbo version is lower than strings version");
     static_assert(kMinCompatibleVersion <= times_version, "Turbo version is lower than times version");
     static_assert(kMinCompatibleVersion <= unicode_version, "Turbo version is lower than unicode version");
-    static_assert(kMinCompatibleVersion <= fiber_version, "Turbo version is lower than fiber version");
     static_assert(kMinCompatibleVersion <= tf_version, "Turbo version is lower than tf version");
     static_assert(kMinCompatibleVersion <= sys_version, "Turbo version is lower than tf version");
 

@@ -17,7 +17,6 @@
 
 
 #include "turbo/platform/port.h"
-#include "turbo/status/internal/errno.h"
 #include <string>
 #include <string_view>
 #include <array>
