@@ -29,12 +29,8 @@ outputs:
         - {{ pin_compatible('turbo', exact=True) }}
     requirements:
       build:
-        - {{ compiler('cxx') }}
-        - sysroot_linux-64 >=2.17  # [linux64]
       host:
-        - sysroot_linux-64 >=2.17  # [linux64]
       run:
-        - sysroot_linux-64 >=2.17  # [linux64]
     test:
       commands:
         - test -f $PREFIX/lib/libturbo.so              # [linux]
