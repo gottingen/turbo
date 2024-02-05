@@ -33,7 +33,6 @@ outputs:
       run:
     test:
       commands:
-        - test -f $PREFIX/lib/libturbo.so              # [linux]
-        - test -f $PREFIX/lib/libturbo.dylib           # [osx]
+        - test -f $PREFIX/lib/libturbo.a              # [linux]
       #  - conda inspect linkages -p $PREFIX $PKG_NAME  # [not win]
       #  - conda inspect objects -p $PREFIX $PKG_NAME   # [osx]
