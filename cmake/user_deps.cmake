@@ -34,15 +34,38 @@ find_package(Threads REQUIRED)
 # so you can and system pthread and rt, dl already add to
 # CARBIN_SYSTEM_DYLINK, using it for fun.
 ##########################################################
+if (WIN32)
+    list(APPEND SUB_DIR_LIST "win32")
+    #防止Windows.h包含Winsock.h
+    #Prevent Windows.h from including Winsock.h
+    add_definitions(-DWIN32_LEAN_AND_MEAN)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif ()
+
+set(ENABLE_OPENSSL ON CACHE BOOL "enable openssl")
+set(ASAN_USE_DELETE OFF CACHE BOOL "use delele[] or free when asan enabled")
+
+#查找openssl是否安装
+#Find out if openssl is installed
+find_package(OpenSSL QUIET)
+if (OPENSSL_FOUND AND ENABLE_OPENSSL)
+    message(STATUS "找到openssl库:\"${OPENSSL_INCLUDE_DIR}\",ENABLE_OPENSSL宏已打开")
+    include_directories(${OPENSSL_INCLUDE_DIR})
+    add_definitions(-DENABLE_OPENSSL)
+endif ()
+
+#是否使用delete[]替代free，用于解决开启asan后在MacOS上的卡死问题
+#use delele[] or free when asan enabled
+if(ASAN_USE_DELETE)
+    add_definitions(-DASAN_USE_DELETE)
+endif()
+
 set(CARBIN_DEPS_LINK
         #${TURBO_LIB}
         ${CARBIN_SYSTEM_DYLINK}
+        ${OPENSSL_LIBRARIES}
+        dl
         pthread
         )
 list(REMOVE_DUPLICATES CARBIN_DEPS_LINK)
 carbin_print_list_label("Denpendcies:" CARBIN_DEPS_LINK)
-
-
-
-
-

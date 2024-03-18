@@ -19,7 +19,41 @@
 ####################################################################################
 cmake_minimum_required(VERSION 3.15)
 
-project(turbo CXX)
+# 设置 C++ 编译器目录
+set(CMAKE_CXX_COMPILER "/opt/compiler/gcc-12/bin/g++")
+# 设置 C 编译器目录
+set(CMAKE_C_COMPILER "/opt/compiler/gcc-12/bin/gcc")
+
+project(turbo)
+
+include(CheckStructHasMember)
+include(CheckSymbolExists)
+
+list(APPEND CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
+check_struct_has_member("struct mmsghdr" msg_hdr sys/socket.h HAVE_MMSG_HDR)
+check_symbol_exists(sendmmsg sys/socket.h HAVE_SENDMMSG_API)
+check_symbol_exists(recvmmsg sys/socket.h HAVE_RECVMMSG_API)
+
+if (HAVE_MMSG_HDR)
+    add_definitions(-DHAVE_MMSG_HDR)
+endif ()
+if (HAVE_SENDMMSG_API)
+    add_definitions(-DHAVE_SENDMMSG_API)
+endif ()
+if (HAVE_RECVMMSG_API)
+    add_definitions(-DHAVE_RECVMMSG_API)
+endif ()
+
+# check the socket buffer size set by the upper cmake project, if it is set, use the setting of the upper cmake project, otherwise set it to 256K
+# if the socket buffer size is set to 0, it means that the socket buffer size is not set, and the kernel default value is used(just for linux)
+if(DEFINED SOCKET_DEFAULT_BUF_SIZE)
+    if (SOCKET_DEFAULT_BUF_SIZE EQUAL 0)
+        message(STATUS "Socket default buffer size is not set, use the kernel default value")
+    else()
+        message(STATUS "Socket default buffer size is set to ${SOCKET_DEFAULT_BUF_SIZE}")
+    endif ()
+    add_definitions(-DSOCKET_DEFAULT_BUF_SIZE=${SOCKET_DEFAULT_BUF_SIZE})
+endif()
 
 set(PROJECT_DESCRIPTION "Hercules is an ahead of time compiler for a subset of the Python language framework.")
 set(PROJECT_VERSION_MAJOR 0)
@@ -29,7 +63,7 @@ set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT
 set(CARBIN_VERSION 0.2.0)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/carbin_cmake)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-#################################################################
+#################################################################=
 #
 # modify the CARBIN_DEPS_PREFIX to you prefix if needed.
 # for example when you install you deps to "/opt/handsome/guy
