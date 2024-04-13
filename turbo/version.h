@@ -29,11 +29,9 @@
 #include "turbo/module/version.h"
 #include "turbo/platform/version.h"
 #include "turbo/random/version.h"
-#include "turbo/simd/version.h"
 #include "turbo/strings/version.h"
 #include "turbo/times/version.h"
 #include "turbo/unicode/version.h"
-#include "turbo/taskflow/version.h"
 #include "turbo/system/version.h"
 
 namespace turbo {
@@ -67,11 +65,9 @@ namespace turbo {
     static_assert(kMinCompatibleVersion <= platform_version, "Turbo version is lower than platform version");
     static_assert(kMinCompatibleVersion <= module_version, "Turbo version is lower than module version");
     static_assert(kMinCompatibleVersion <= random_version, "Turbo version is lower than random version");
-    static_assert(kMinCompatibleVersion <= simd_version, "Turbo version is lower than simd version");
     static_assert(kMinCompatibleVersion <= strings_version, "Turbo version is lower than strings version");
     static_assert(kMinCompatibleVersion <= times_version, "Turbo version is lower than times version");
     static_assert(kMinCompatibleVersion <= unicode_version, "Turbo version is lower than unicode version");
-    static_assert(kMinCompatibleVersion <= tf_version, "Turbo version is lower than tf version");
     static_assert(kMinCompatibleVersion <= sys_version, "Turbo version is lower than tf version");
 
     // turbo version is the most recent version of the library
@@ -89,12 +85,10 @@ namespace turbo {
     static_assert(version >= module_version, "Turbo version is lower than module version");
     static_assert(version >= platform_version, "Turbo version is lower than platform version");
     static_assert(version >= random_version, "Turbo version is lower than random version");
-    static_assert(version >= simd_version, "Turbo version is lower than simd version");
     static_assert(version >= strings_version, "Turbo version is lower than strings version");
     static_assert(version >= times_version, "Turbo version is lower than times version");
     static_assert(version >= unicode_version, "Turbo version is lower than unicode version");
     static_assert(version >= files_version, "Turbo version is lower than fiber version");
-    static_assert(version >= tf_version, "Turbo version is lower than taskflow version");
     static_assert(version >= sys_version, "Turbo version is lower than taskflow version");
 
 

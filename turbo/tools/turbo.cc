@@ -56,7 +56,6 @@ void run_version_cmd() {
     versions.add_row({"Turbo-module", turbo::module_version.to_string()});
     versions.add_row({"Turbo-platform", turbo::platform_version.to_string()});
     versions.add_row({"Turbo-random", turbo::random_version.to_string()});
-    versions.add_row({"Turbo-simd", turbo::simd_version.to_string()});
     versions.add_row({"Turbo-strings", turbo::strings_version.to_string()});
     versions.add_row({"Turbo-times", turbo::times_version.to_string()});
     versions.column(0).format().font_color(turbo::terminal_color::yellow);
