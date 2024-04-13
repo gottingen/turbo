@@ -650,26 +650,6 @@ carbin_cc_test(
 )
 
 carbin_cc_test(
-        NAME
-        small_vector_test
-        SOURCES
-        "small_vector_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
-)
-
-carbin_cc_test(
-        NAME tf_serializer_test
-        SOURCES
-        serializer_test.cc
-        COPTS ${CARBIN_CXX_OPTIONS}
-        DEPS
-        ${CARBIN_DEPS_LINK}
-        turbo::turbo
-)
-carbin_cc_test(
         NAME container_batch_test
         SOURCES
         batch_test.cc

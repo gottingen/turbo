@@ -14,17 +14,6 @@
 # limitations under the License.
 #
 
-carbin_cc_test(
-        NAME
-        reflect_test
-        SOURCES
-        "reflect_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
-)
-
 
 carbin_cc_test(
         NAME

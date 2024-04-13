@@ -21,7 +21,7 @@
 #include "turbo/testing/test.h"
 
 #include "turbo/meta/unique_generic.h"
-#include "turbo/container/algorithm.h"
+#include <collie/container/algorithm.h>
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
@@ -230,17 +230,17 @@ namespace turbo {
         TrackedIntTraits traits(&freed, &owners);
 
 #define ASSERT_OWNED(value, owner)            \
-  REQUIRE(turbo::contains(owners, value)); \
+  REQUIRE(collie::contains(owners, value)); \
   REQUIRE_EQ(&owner, owners[value]);           \
-  REQUIRE_FALSE(turbo::contains(freed, value))
+  REQUIRE_FALSE(collie::contains(freed, value))
 
 #define ASSERT_UNOWNED(value)                  \
-  REQUIRE_FALSE(turbo::contains(owners, value)); \
-  REQUIRE_FALSE(turbo::contains(freed, value))
+  REQUIRE_FALSE(collie::contains(owners, value)); \
+  REQUIRE_FALSE(collie::contains(freed, value))
 
 #define ASSERT_FREED(value)                    \
-  REQUIRE_FALSE(turbo::contains(owners, value)); \
-  REQUIRE(turbo::contains(freed, value))
+  REQUIRE_FALSE(collie::contains(owners, value)); \
+  REQUIRE(collie::contains(freed, value))
 
         // Constructor.
         {
