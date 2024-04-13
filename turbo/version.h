@@ -48,7 +48,7 @@ namespace turbo {
      *        The version is used to check if the library is compatible with the
      *        application.
      */
-    static constexpr turbo::ModuleVersion version = turbo::ModuleVersion{0, 9, 54};
+    static constexpr turbo::ModuleVersion version = turbo::ModuleVersion{0, 9, 86};
 
     // Check if the version is compatible with the submodules
     static_assert(kMinCompatibleVersion <= base_version, "Turbo version is lower than base version");
