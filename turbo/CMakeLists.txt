@@ -189,11 +189,7 @@ set(TURBO_ALL_SRC
         "times/cctz/time_zone_lookup.cc"
         "times/cctz/time_zone_posix.cc"
         "times/cctz/zone_info_source.cc"
-        "unicode/encoding_types.cc"
-        "unicode/codec/encode_utf16.cc"
-        "unicode/codec/validate_utf8.cc"
-        "unicode/codec/validate_utf16.cc"
-        "unicode/codec/validate_utf32.cc"
+        "unicode/simd_utf.cc"
         "var/internal/periodic_sampler.cc"
         )
 
@@ -208,7 +204,7 @@ if (BUILD_STATIC_LIBRARY)
             COPTS
             ${CARBIN_CXX_OPTIONS}
             DEPS
-            ${CARBIN_DEPS_LINK}
+            ${CARBIN_DEPS_LINK} turbo::collie
             PUBLIC
     )
 endif (BUILD_STATIC_LIBRARY)

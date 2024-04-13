@@ -1,4 +1,4 @@
-// Copyright 2023 The Turbo Authors.
+// Copyright 2024 The Elastic AI Search Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,13 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
 
+#pragma once
 
-#include <cstddef>
-#include <cstdint>
-
-namespace turbo::unicode {
-
-    [[nodiscard]] bool validate_utf32(const char32_t *buf, size_t len) noexcept;
-
-}  // namespace turbo::unicode
+#include <turbo/unicode/simd_utf.h>
