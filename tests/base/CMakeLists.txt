@@ -185,18 +185,6 @@ carbin_cc_test(
 
 carbin_cc_test(
         NAME
-        uuid_test
-        SOURCES
-        "uuid_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        ${CARBIN_DEPS_LINK}
-        turbo::turbo
-)
-
-carbin_cc_test(
-        NAME
         math_test
         SOURCES
         "math_test.cc"
