@@ -21,13 +21,15 @@
 #include <pthread.h>
 #include <memory>
 #include <mutex>
+#include <condition_variable>
 #include <type_traits>
 #include <vector>
 #include <atomic>
 #include <type_traits>
-#include "turbo/platform/port.h"
-#include "turbo/log/logging.h"
-#include "turbo/system/atexit.h"
+#include <turbo/platform/port.h>
+#include <turbo/base/internal/raw_logging.h>
+#include <turbo/system/atexit.h>
+#include <turbo/status/error.h>
 
 namespace turbo {
 
@@ -316,13 +318,13 @@ namespace turbo {
 
         inline static DoublyBufferedData::Wrapper *get_or_create_tls_data(WrapperTLSId id) {
             if (TURBO_UNLIKELY(id < 0)) {
-                TLOG_CHECK(false, "Invalid id={}", id);
+                TURBO_RAW_LOG(FATAL,"Invalid id=%s", id);
                 return nullptr;
             }
             if (_s_tls_blocks == nullptr) {
                 _s_tls_blocks = new(std::nothrow) std::vector<ThreadBlock *>;
                 if (TURBO_UNLIKELY(_s_tls_blocks == nullptr)) {
-                    TLOG_CRITICAL("Fail to create vector, {}", turbo::terror());
+                    TURBO_RAW_LOG(FATAL,"Fail to create vector, {}", turbo::terror());
                     return nullptr;
                 }
                 turbo::thread_atexit(_destroy_tls_blocks);
@@ -359,7 +361,7 @@ namespace turbo {
         inline static std::deque<WrapperTLSId> &_get_free_ids() {
             if (TURBO_UNLIKELY(!_s_free_ids)) {
                 _s_free_ids = new(std::nothrow) std::deque<WrapperTLSId>();
-                TLOG_CHECK(_s_free_ids != nullptr, "Fail to create deque, {}", turbo::terror());
+                TURBO_RAW_CHECK(_s_free_ids != nullptr, "Fail to create deque");
             }
             return *_s_free_ids;
         }
@@ -492,7 +494,7 @@ namespace turbo {
             return w;
         }
         if (w->_control != nullptr) {
-            TLOG_CRITICAL("Get wrapper from tls but control != this");
+            TURBO_RAW_LOG(FATAL,"Get wrapper from tls but control != this");
             return nullptr;
         }
         try {
@@ -621,7 +623,7 @@ namespace turbo {
         }
 
         const size_t ret2 = fn(_data[bg_index]);
-        TLOG_CHECK_EQ(ret2, ret, "index={}", _index.load(std::memory_order_relaxed));
+        TURBO_RAW_CHECK(ret2 == ret, "index error");
         return ret2;
     }
 

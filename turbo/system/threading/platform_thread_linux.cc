@@ -13,12 +13,12 @@
 // limitations under the License.
 //
 
-#include "turbo/system/threading.h"
-#include "turbo/platform/port.h"
+#include <turbo/system/threading.h>
+#include <turbo/platform/port.h>
 #if defined(TURBO_PLATFORM_LINUX)
-#include "turbo/base/assume.h"
-#include "turbo/log/logging.h"
-#include "turbo/system/threading/thread_name_registry.h"
+#include <turbo/base/assume.h>
+#include <turbo/base/internal/raw_logging.h>
+#include <turbo/system/threading/thread_name_registry.h>
 #if !defined(TURBO_PLATFORM_NACL)
 #include <sys/prctl.h>
 #include <sys/resource.h>
@@ -75,7 +75,7 @@ namespace turbo {
         int err = prctl(PR_SET_NAME, name);
         // We expect EPERM failures in sandboxed processes, just ignore those.
         if (err < 0 && errno != EPERM) {
-            TLOG_ERROR("prctl(PR_SET_NAME) failed with error {}", errno);
+            TURBO_RAW_LOG(ERROR,"prctl(PR_SET_NAME) failed with error %d", errno);
         }
 #endif  //  !defined(TURBO_PLATFORM_NACL)
     }
@@ -96,10 +96,10 @@ namespace turbo {
         // the 'process identifier', not affecting the rest of the threads in the
         // process. Setting this priority will only succeed if the user has been
         // granted permission to adjust nice values on the system.
-        TDLOG_CHECK_NE(handle.id_, kInvalidThreadId);
+        TURBO_RAW_CHECK(handle.id_ != kInvalidThreadId, "");
         const int kNiceSetting = ThreadNiceValue(priority);
         if (setpriority(PRIO_PROCESS, handle.id_, kNiceSetting)) {
-            TLOG_ERROR("Failed to set nice value of thread ({}) to {}",
+            TURBO_RAW_LOG(ERROR,"Failed to set nice value of thread (%ld) to %d",
                        handle.id_, kNiceSetting);
         }
 #endif  //  !defined(TURBO_PLATFORM_NACL)

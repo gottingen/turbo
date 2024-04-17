@@ -28,10 +28,10 @@
 #include <sys/un.h>
 #include <mutex>
 #include <unordered_set>
-#include "turbo/system/endpoint.h"
-#include "turbo/log/logging.h"
-#include "turbo/memory/resource_pool.h"
-#include "turbo/strings/str_trim.h"
+#include <turbo/system/endpoint.h>
+#include <turbo/base/internal/raw_logging.h>
+#include <turbo/memory/resource_pool.h>
+#include <turbo/strings/str_trim.h>
 
 namespace turbo::system_internal {
 
@@ -207,15 +207,15 @@ namespace turbo::system_internal {
                 return nullptr;
             }
             turbo::ResourceId<ExtendedEndPoint> id;
-            id.value = ep._ip.num();
+            id.value = ep.ip.num();
             ExtendedEndPoint* eep = turbo::address_resource<ExtendedEndPoint>(id);
-            TLOG_CHECK(eep, "fail to address ExtendedEndPoint from EndPoint");
+            TURBO_RAW_CHECK(eep, "fail to address ExtendedEndPoint from EndPoint");
             return eep;
         }
 
         // Check if an EndPoint has embedded ExtendedEndPoint
         static constexpr bool is_extended(const turbo::EndPoint& ep) {
-            return ep._port == EXTENDED_ENDPOINT_PORT;
+            return ep.port == EXTENDED_ENDPOINT_PORT;
         }
 
     private:
@@ -230,8 +230,8 @@ namespace turbo::system_internal {
             ExtendedEndPoint* eep = ::turbo::get_resource(&id);
             if (eep) {
                 int64_t old_ref = eep->_ref_count.load(std::memory_order_relaxed);
-                TLOG_CHECK(old_ref == 0, "new ExtendedEndPoint has reference {}", old_ref);
-                TLOG_CHECK(eep->_u.sa.sa_family == AF_UNSPEC, "new ExtendedEndPoint has family {} set", eep->_u.sa.sa_family);
+                TURBO_RAW_CHECK(old_ref == 0, "new ExtendedEndPoint has reference");
+                TURBO_RAW_CHECK(eep->_u.sa.sa_family == AF_UNSPEC, "new ExtendedEndPoint has family set");
                 eep->_ref_count.store(1, std::memory_order_relaxed);
                 eep->_id = id;
                 eep->_u.sa.sa_family = family;
@@ -240,10 +240,10 @@ namespace turbo::system_internal {
         }
 
         void embed_to(EndPoint* ep) const {
-            TLOG_CHECK(0 == _id.value >> 32,  "ResourceId beyond index");
+            TURBO_RAW_CHECK(0 == _id.value >> 32,  "ResourceId beyond index");
             ep->reset();
-            ep->_ip = ip_t{static_cast<uint32_t>(_id.value)};
-            ep->_port = EXTENDED_ENDPOINT_PORT;
+            ep->ip = ip_t{static_cast<uint32_t>(_id.value)};
+            ep->port = EXTENDED_ENDPOINT_PORT;
         }
 
         static ExtendedEndPoint* dedup(ExtendedEndPoint* eep) {
@@ -262,7 +262,7 @@ namespace turbo::system_internal {
 
         void dec_ref(void) {
             int64_t old_ref = _ref_count.fetch_sub(1, std::memory_order_relaxed);
-            TLOG_CHECK(old_ref >= 1, "ExtendedEndPoint has unexpected reference {}", old_ref);
+            TURBO_RAW_CHECK(old_ref >= 1, "ExtendedEndPoint has unexpected reference");
             if (old_ref == 1) {
                 global_set()->erase(this);
                 _u.sa.sa_family = AF_UNSPEC;
@@ -272,7 +272,7 @@ namespace turbo::system_internal {
 
         void inc_ref(void) {
             int64_t old_ref = _ref_count.fetch_add(1, std::memory_order_relaxed);
-            TLOG_CHECK(old_ref >= 1, "ExtendedEndPoint has unexpected reference {}", old_ref);
+            TURBO_RAW_CHECK(old_ref >= 1, "ExtendedEndPoint has unexpected reference");
         }
 
         sa_family_t family(void) const {
@@ -290,10 +290,10 @@ namespace turbo::system_internal {
             } else if (_u.sa.sa_family == AF_INET6) {
                 char buf[INET6_ADDRSTRLEN] = {0};
                 const char* ret = inet_ntop(_u.sa.sa_family, &_u.in6.sin6_addr, buf, sizeof(buf));
-                TLOG_CHECK(ret, "fail to do inet_ntop");
+                TURBO_RAW_CHECK(ret, "fail to do inet_ntop");
                 snprintf(ep_str->_buf, sizeof(ep_str->_buf), "[%s]:%d", buf, ntohs(_u.in6.sin6_port));
             } else {
-                TLOG_CHECK(0, "family {}  not supported", _u.sa.sa_family);
+                TURBO_RAW_CHECK(0, "family not supported");
             }
         }
 
@@ -312,7 +312,7 @@ namespace turbo::system_internal {
                 }
                 return 0;
             } else {
-                TLOG_CHECK(0, "family {}  not supported", _u.sa.sa_family);
+                TURBO_RAW_CHECK(0, "family  not supported");
                 return -1;
             }
         }

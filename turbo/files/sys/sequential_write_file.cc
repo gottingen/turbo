@@ -21,7 +21,7 @@
 #include "turbo/base/casts.h"
 #include <iostream>
 #include "turbo/platform/port.h"
-#include "turbo/log/logging.h"
+#include <turbo/base/internal/raw_logging.h>
 
 namespace turbo {
 
@@ -91,25 +91,6 @@ namespace turbo {
         if (rs < 0) {
             return make_status();
         }
-        return turbo::ok_status();
-    }
-
-    [[nodiscard]] turbo::Status SequentialWriteFile::write(const turbo::IOBuf &buff)  {
-        size_t size = buff.size();
-        IOBuf piece_data(buff);
-        ssize_t left = size;
-        while (left > 0) {
-            auto wrs = piece_data.cut_into_file_descriptor(_fd, left);
-            if (wrs.ok() && wrs.value() > 0) {
-                left -= wrs.value();
-            } else if (wrs.status().code() != EWOULDBLOCK && wrs.status().code() != EINTR) {
-                continue;
-            } else {
-                TLOG_WARN("write falied, err: {} fd: {} size: {}", wrs.status().to_string(), _fd, size);
-                return wrs.status();
-            }
-        }
-
         return turbo::ok_status();
     }
 

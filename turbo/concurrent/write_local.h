@@ -16,9 +16,9 @@
 #ifndef TURBO_CONCURRENT_LINKED_THREAD_LOCAL_H_
 #define TURBO_CONCURRENT_LINKED_THREAD_LOCAL_H_
 
-#include "turbo/container/intrusive_list.h"
-#include "turbo/meta/type_traits.h"
-#include "turbo/concurrent/internal/thread_local_storage.h"
+#include <turbo/container/intrusive_list.h>
+#include <turbo/meta/type_traits.h>
+#include <turbo/concurrent/internal/thread_local_storage.h>
 
 namespace turbo {
     template<typename T>
@@ -257,7 +257,7 @@ namespace turbo {
             if (!ptr) {
                 ptr = concurrent_internal::ThreadLocalStorage<ElementHolder>::get_or_create_resource(_id);
                 if (TURBO_UNLIKELY(!ptr)) {
-                    TLOG_CRITICAL("ThreadLocal<T>::ThreadLocal(const Args &... args) failed to allocate memory for T");
+                    TURBO_RAW_LOG(FATAL,"ThreadLocal<T>::ThreadLocal(const Args &... args) failed to allocate memory for T");
                     return nullptr;
                 }
                 {

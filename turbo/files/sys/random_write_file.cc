@@ -18,7 +18,7 @@
 
 #include "turbo/files/sys/random_write_file.h"
 #include "turbo/files/sys/sys_io.h"
-#include "turbo/log/logging.h"
+#include <turbo/base/internal/raw_logging.h>
 
 namespace turbo {
 
@@ -37,8 +37,8 @@ namespace turbo {
         _option = option;
         _file_path = fname;
         TURBO_ASSERT(!_file_path.empty());
-        auto *mode = "ab";
-        auto *trunc_mode = "wb";
+        //auto *mode = "ab";
+        //auto *trunc_mode = "wb";
 
         if (_listener.before_open) {
             _listener.before_open(_file_path);
@@ -102,37 +102,6 @@ namespace turbo {
                                                             static_cast<off_t>(offset + size)));
             }
         }
-        return turbo::ok_status();
-    }
-
-    [[nodiscard]] turbo::Status
-    RandomWriteFile::write(off_t offset, const turbo::IOBuf &buff, bool truncate) {
-        size_t size = buff.size();
-        IOBuf piece_data(buff);
-        off_t orig_offset = offset;
-        ssize_t left = size;
-        while (left > 0) {
-            auto wrs = piece_data.pcut_into_file_descriptor(_fd, offset, left);
-            if (wrs.ok() && wrs.value() >= 0) {
-                offset += wrs.value();
-                left -= wrs.value();
-            } else if (errno == EINTR) {
-                continue;
-            } else {
-                TLOG_WARN("write falied, err: {} fd: {} offset: {} size: {}", wrs.status().to_string(), _fd,
-                          orig_offset, size);
-                return wrs.status();
-            }
-        }
-
-        if (truncate) {
-            if (::ftruncate(_fd, static_cast<off_t>(offset + size)) != 0) {
-                return turbo::errno_to_status(errno,
-                                              turbo::format("Failed truncate file {} for size:{} ", _file_path.c_str(),
-                                                            static_cast<off_t>(offset + size)));
-            }
-        }
-
         return turbo::ok_status();
     }
 

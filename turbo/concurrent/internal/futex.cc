@@ -20,7 +20,8 @@
 #include <atomic>
 #include <condition_variable>
 #include <turbo/container/flat_hash_map.h>
-#include "turbo/log/logging.h"
+#include <turbo/base/internal/raw_logging.h>
+#include <turbo/times/time.h>
 #include <pthread.h>
 #include <unordered_map>
 
@@ -61,7 +62,8 @@ namespace turbo {
         try {
             std::call_once(init_futex_map_once, InitFutexMap);
         } catch (const std::system_error &e) {
-            TLOG_CRITICAL("Fail to pthread_once");
+            TURBO_INTERNAL_LOG(FATAL, "Fail to pthread_once");
+
             exit(1);
         }
         std::unique_lock mu(s_futex_map_mutex);
@@ -75,7 +77,7 @@ namespace turbo {
             if (static_cast<std::atomic<int> *>(addr1)->load() == expected) {
                 ++simu_futex.counts;
                 if (timeout) {
-                    auto timeout_c = turbo::to_chrono_time(turbo::from_now(*timeout));
+                    auto timeout_c = turbo::from_now(*timeout).to_chrono_time();
                     auto to = simu_futex.cond.wait_until(mu1, timeout_c);
                     if (to != std::cv_status::no_timeout) {
                         rc = -1;
@@ -102,7 +104,7 @@ namespace turbo {
         try {
             std::call_once(init_futex_map_once, InitFutexMap);
         } catch (const std::system_error &e) {
-            TLOG_CRITICAL("Fail to pthread_once");
+            TURBO_INTERNAL_LOG(FATAL, "Fail to pthread_once");
             exit(1);
         }
         std::unique_lock mu(s_futex_map_mutex);

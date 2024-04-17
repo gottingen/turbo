@@ -16,7 +16,7 @@
 #include "turbo/base/casts.h"
 #include "turbo/files/sys/sys_io.h"
 #include "turbo/system/io.h"
-#include "turbo/log/logging.h"
+#include <turbo/base/internal/raw_logging.h>
 #include "turbo/times/clock.h"
 #include "turbo/times/time.h"
 #include "turbo/status/result_status.h"
@@ -103,29 +103,6 @@ namespace turbo {
         }
         content->resize(pre_len + rs);
         return rs;
-    }
-
-    turbo::ResultStatus<size_t> RandomReadFile::read(off_t offset, turbo::IOBuf *buf, size_t n) {
-        INVALID_FD_RETURN(_fd);
-        size_t len = n;
-        if(len == kInfiniteFileSize) {
-            auto r = turbo::file_size(_fd);
-            if(r == -1) {
-                return turbo::make_status();
-            }
-            len = r - offset;
-            if(len <= 0) {
-                return turbo::make_status(kEINVAL, "bad offset");
-            }
-        }
-        IOPortal portal;
-        auto rs = portal.pappend_from_file_descriptor(_fd, offset, len);
-        if(!rs.ok()) {
-            return rs;
-        }
-        buf->append(std::move(portal));
-
-        return rs.value();
     }
 
     void RandomReadFile::close() {

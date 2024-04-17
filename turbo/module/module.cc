@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 #include "turbo/module/module.h"
-#include "turbo/log/logging.h"
 #include "turbo/files/filesystem.h"
+#include <turbo/base/internal/raw_logging.h>
 #include "turbo/module/constants.h"
 
 namespace turbo {
@@ -39,7 +39,7 @@ namespace turbo {
             return;
         }
 
-        TLOG_ERROR("Unable to open {}", plugin_file_name);
+        TURBO_RAW_LOG(ERROR, "Unable to open %s", plugin_file_name.c_str());
 
     }
 
@@ -86,7 +86,7 @@ namespace turbo {
             *this = std::move(m);
             return;
         }
-        TLOG_ERROR("Unable to open {}", plugin_file_name);
+        TURBO_RAW_LOG(ERROR, "Unable to open %s", plugin_file_name.c_str());
     }
 
     Module::~Module() noexcept {

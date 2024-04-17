@@ -17,8 +17,9 @@
 #ifndef TURBO_CONCURRENT_THREAD_LOCAL_H_
 #define TURBO_CONCURRENT_THREAD_LOCAL_H_
 
-#include "turbo/meta/type_traits.h"
-#include "turbo/concurrent/internal/thread_local_storage.h"
+#include <turbo/meta/type_traits.h>
+#include <turbo/concurrent/internal/thread_local_storage.h>
+#include <turbo/base/internal/raw_logging.h>
 #include <cstdint>
 
 namespace turbo {
@@ -124,7 +125,7 @@ namespace turbo {
             ptr= concurrent_internal::ThreadLocalStorage<T>::get_or_create_resource(_id);
         }
         if(TURBO_UNLIKELY(!ptr)){
-            TLOG_CRITICAL("ThreadLocal<T>::ThreadLocal(const Args &... args) failed to allocate memory for T");
+            TURBO_RAW_LOG(FATAL,"ThreadLocal<T>::ThreadLocal(const Args &... args) failed to allocate memory for T");
             return nullptr;
         }
         return ptr;

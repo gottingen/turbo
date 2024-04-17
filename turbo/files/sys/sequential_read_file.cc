@@ -15,7 +15,7 @@
 #include "turbo/files/sys/sequential_read_file.h"
 #include "turbo/files/sys/sys_io.h"
 #include "turbo/base/casts.h"
-#include "turbo/log/logging.h"
+#include <turbo/base/internal/raw_logging.h>
 #include <cstdio>
 #include <fcntl.h>
 #include <unistd.h>
@@ -95,29 +95,6 @@ namespace turbo {
         _position += nread;
         content->resize(pre_len + nread);
         return nread;
-    }
-
-    turbo::ResultStatus<size_t> SequentialReadFile::read(turbo::IOBuf *buf, size_t n) {
-        INVALID_FD_RETURN(_fd);
-        size_t len = n;
-        if (len == kInfiniteFileSize) {
-            auto r = turbo::file_size(_fd);
-            if (r == -1) {
-                return make_status();
-            }
-            len = r;
-            if(len == 0) {
-                return 0;
-            }
-        }
-        IOPortal portal;
-        auto r = portal.append_from_file_descriptor(_fd, len);
-        if (!r.ok()) {
-            return r;
-        }
-        _position += r.value();
-        buf->append(IOBuf::Movable(portal));
-        return r.value();
     }
 
     void SequentialReadFile::close() {

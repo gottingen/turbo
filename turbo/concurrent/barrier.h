@@ -18,8 +18,8 @@
 #include <mutex>
 #include <condition_variable>
 
-#include "turbo/platform/port.h"
-#include "turbo/platform/thread_annotations.h"
+#include <turbo/platform/port.h>
+#include <turbo/platform/thread_annotations.h>
 
 namespace turbo {
 

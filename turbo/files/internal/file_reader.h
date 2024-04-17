@@ -42,10 +42,6 @@ namespace turbo {
             return turbo::make_status(kENOSYS);
         }
 
-        [[nodiscard]] virtual turbo::ResultStatus<size_t> read(turbo::IOBuf *result, size_t len = kInfiniteFileSize) {
-            return turbo::make_status(kENOSYS);
-        }
-
         virtual void close() = 0;
 
         virtual size_t position() const = 0;
@@ -64,10 +60,6 @@ namespace turbo {
             [[nodiscard]] virtual turbo::ResultStatus<size_t> read(off_t offset, void *buff, size_t len) = 0;
 
             [[nodiscard]] virtual turbo::ResultStatus<size_t> read(off_t offset, std::string *result, size_t len = kInfiniteFileSize) {
-                return turbo::make_status(kENOSYS);
-            }
-
-            [[nodiscard]] virtual turbo::ResultStatus<size_t> read(off_t offset, turbo::IOBuf *result, size_t len = kInfiniteFileSize) {
                 return turbo::make_status(kENOSYS);
             }
 

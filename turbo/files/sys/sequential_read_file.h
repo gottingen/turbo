@@ -81,16 +81,6 @@ namespace turbo {
 
         /**
          * @brief read file content sequentially from the current position to the specified length.
-         * @param buf [output] file content, can not be nullptr.
-         * @param n [input] read length, default is npos, which means read all. If the length is greater than the file
-         *          size, the file content will be read from the current position to the end of the file.
-         * @return the length of the file content read and the status of the operation.
-         */
-        [[nodiscard]] turbo::ResultStatus<size_t> read(turbo::IOBuf *buf, size_t n = kInfiniteFileSize) override;
-
-
-        /**
-         * @brief read file content sequentially from the current position to the specified length.
          * @param buff [output] file content, can not be nullptr.
          * @param len [input] read length, The length must be less than or equal to the size of the buff.
          *        If the length is greater than the file size, the file content will be read from the current position to the end of the file.

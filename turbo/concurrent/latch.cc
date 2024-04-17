@@ -11,7 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "turbo/concurrent/latch.h"
+
+#include <turbo/concurrent/latch.h>
+#include <turbo/base/internal/raw_logging.h>
 
 namespace turbo {
 
@@ -20,7 +22,7 @@ namespace turbo {
     }
 
     void Latch::CountDown(uint32_t update) {
-        TLOG_CHECK(_data->count > 0, "turbo::Latch::CountDown() called too many times");
+        TURBO_RAW_CHECK(_data->count > 0, "turbo::Latch::CountDown() called too many times");
         _data->count -= update;
         if (_data->count == 0) {
             std::unique_lock lk(_data->mutex);
@@ -34,13 +36,13 @@ namespace turbo {
 
     bool Latch::TryWait() const noexcept {
         std::unique_lock lk(_data->mutex);
-        TLOG_CHECK_GE(_data->count, 0u);
+        TURBO_RAW_CHECK(_data->count >=0u, "");
         return !_data->count;
     }
 
     void Latch::Wait() const {
         std::unique_lock lk(_data->mutex);
-        TLOG_CHECK_GE(_data->count, 0u);
+        TURBO_RAW_CHECK(_data->count >= 0u, "");
         return _data->cond.wait(lk, [this] { return _data->count == 0; });
     }
 
