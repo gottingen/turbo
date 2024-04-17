@@ -177,7 +177,6 @@ if (BUILD_STATIC_LIBRARY)
             COPTS
             ${CARBIN_CXX_OPTIONS}
             DEPS
-            ${CARBIN_DEPS_LINK} collie::collie
             PUBLIC
     )
 endif (BUILD_STATIC_LIBRARY)

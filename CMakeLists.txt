@@ -48,8 +48,6 @@ include(carbin_module)
 #################################################################
 include(user_deps)
 include(user_cxx_config)
-#find_package(collie REQUIRED)
-find_package(collie REQUIRED)
 add_subdirectory(turbo)
 ####################################################################
 # belows are auto, edit it be cation
