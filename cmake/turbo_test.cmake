@@ -1,11 +1,11 @@
 #
-# Copyright 2023 The titan-search Authors.
+# Copyright 2024 The Carbin Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#      https://www.apache.org/licenses/LICENSE-2.0
+#    https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,16 +14,8 @@
 # limitations under the License.
 #
 
+set(${PROJECT_NAME}_SKIP_TEST "")
+set(${PROJECT_NAME}_SKIP_BENCHMARK "")
 
-carbin_cc_benchmark(
-        NAME
-        flag_benchmark
-        SOURCES
-        "flag_benchmark.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
-        benchmark::benchmark
-        benchmark::benchmark_main
-)
+list(APPEND ${PROJECT_NAME}_SKIP_TEST "norun")
+list(APPEND ${PROJECT_NAME}_SKIP_BENCHMARK "norun")

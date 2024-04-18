@@ -18,11 +18,12 @@
 carbin_cc_test(
         NAME
         random_bit_gen_ref_test
+        MODULE random
         SOURCES
         "bit_gen_ref_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GMOCK_LIB}
         ${GTEST_LIB}
@@ -33,11 +34,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_mock_distributions_test
+        MODULE random
         SOURCES
         "mock_distributions_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GMOCK_LIB}
         ${GTEST_LIB}
@@ -47,11 +49,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_mocking_bit_gen_test
+        MODULE random
         SOURCES
         "mocking_bit_gen_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GMOCK_LIB}
         ${GTEST_LIB}
@@ -62,22 +65,24 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_bernoulli_distribution_test
+        MODULE random
         SOURCES
         "bernoulli_distribution_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
 carbin_cc_test(
         NAME
         random_beta_distribution_test
+        MODULE random
         SOURCES
         "beta_distribution_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         turbo::random_internal_distribution_test_util
         ${GMOCK_LIB}
@@ -88,11 +93,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_distributions_test
+        MODULE random
         SOURCES
         "distributions_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         turbo::random_internal_distribution_test_util
         ${GMOCK_LIB}
@@ -103,11 +109,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_generators_test
+        MODULE random
         SOURCES
         "generators_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GMOCK_LIB}
         ${GTEST_LIB}
@@ -117,11 +124,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_log_uniform_int_distribution_test
+        MODULE random
         SOURCES
         "log_uniform_int_distribution_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         turbo::random_internal_distribution_test_util
         ${GMOCK_LIB}
@@ -132,11 +140,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_discrete_distribution_test
+        MODULE random
         SOURCES
         "discrete_distribution_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         turbo::random_internal_distribution_test_util
         pthread
@@ -149,11 +158,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_poisson_distribution_test
+        MODULE random
         SOURCES
         "poisson_distribution_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         turbo::random_internal_distribution_test_util
         ${GMOCK_LIB}
@@ -164,11 +174,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_exponential_distribution_test
+        MODULE random
         SOURCES
         "exponential_distribution_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         turbo::random_internal_distribution_test_util
         ${GMOCK_LIB}
@@ -179,11 +190,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_gaussian_distribution_test
+        MODULE random
         SOURCES
         "gaussian_distribution_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         turbo::random_internal_distribution_test_util
         -lpthread
@@ -196,11 +208,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_uniform_int_distribution_test
+        MODULE random
         SOURCES
         "uniform_int_distribution_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         turbo::random_internal_distribution_test_util
 )
@@ -208,11 +221,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_uniform_real_distribution_test
+        MODULE random
         SOURCES
         "uniform_real_distribution_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         turbo::random_internal_distribution_test_util
         ${GMOCK_LIB}
@@ -223,11 +237,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_zipf_distribution_test
+        MODULE random
         SOURCES
         "zipf_distribution_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         turbo::random_internal_distribution_test_util
         ${GMOCK_LIB}
@@ -238,11 +253,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_examples_test
+        MODULE random
         SOURCES
         "examples_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -251,11 +267,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_seed_sequences_test
+        MODULE random
         SOURCES
         "seed_sequences_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GMOCK_LIB}
         ${GTEST_LIB}
@@ -267,11 +284,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_internal_traits_test
+        MODULE random
         SOURCES
         "traits_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -281,11 +299,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_internal_generate_real_test
+        MODULE random
         SOURCES
         "generate_real_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -303,11 +322,11 @@ carbin_cc_library(
         HEADERS
         "chi_square.h"
         "distribution_test_util.h"
-        COPTS
+        CXXOPTS
         ${TURBO_DEFAULT_COPTS}
         ${CARBIN_RANDOM_RANDEN_COPTS}
         ${CARBIN_SIMD_FLAGS}
-        DEPS
+        LINKS
         ${GTEST_LIB}
         turbo::turbo
 )
@@ -315,11 +334,12 @@ carbin_cc_library(
 carbin_cc_test(
         NAME
         random_internal_distribution_test_util_test
+        MODULE random
         SOURCES
         "distribution_test_util_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         turbo::random_internal_distribution_test_util
         ${GTEST_LIB}
@@ -330,11 +350,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_internal_fastmath_test
+        MODULE random
         SOURCES
         "fastmath_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -344,11 +365,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_internal_explicit_seed_seq_test
+        MODULE random
         SOURCES
         "explicit_seed_seq_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GMOCK_LIB}
         ${GTEST_LIB}
@@ -359,11 +381,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_internal_salted_seed_seq_test
+        MODULE random
         SOURCES
         "salted_seed_seq_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GMOCK_LIB}
         ${GTEST_LIB}
@@ -374,11 +397,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_internal_chi_square_test
+        MODULE random
         SOURCES
         "chi_square_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         turbo::random_internal_distribution_test_util
         ${GTEST_LIB}
@@ -389,11 +413,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_internal_fast_uniform_bits_test
+        MODULE random
         SOURCES
         "fast_uniform_bits_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -403,11 +428,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_internal_nonsecure_base_test
+        MODULE random
         SOURCES
         "nonsecure_base_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -417,11 +443,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_internal_seed_material_test
+        MODULE random
         SOURCES
         "seed_material_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GMOCK_LIB}
         ${GTEST_LIB}
@@ -432,11 +459,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_internal_pool_urbg_test
+        MODULE random
         SOURCES
         "pool_urbg_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -446,11 +474,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_internal_pcg_engine_test
+        MODULE random
         SOURCES
         "pcg_engine_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GMOCK_LIB}
         ${GTEST_LIB}
@@ -461,11 +490,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_internal_randen_engine_test
+        MODULE random
         SOURCES
         "randen_engine_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GMOCK_LIB}
         ${GTEST_LIB}
@@ -476,11 +506,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_internal_randen_test
+        MODULE random
         SOURCES
         "randen_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -490,11 +521,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_internal_randen_slow_test
+        MODULE random
         SOURCES
         "randen_slow_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -504,11 +536,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_internal_randen_hwaes_test
+        MODULE random
         SOURCES
         "randen_hwaes_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
@@ -520,11 +553,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_internal_uniform_helper_test
+        MODULE random
         SOURCES
         "uniform_helper_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -534,11 +568,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_internal_iostream_state_saver_test
+        MODULE random
         SOURCES
         "iostream_state_saver_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -548,11 +583,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         random_internal_wide_multiply_test
+        MODULE random
         SOURCES
         wide_multiply_test.cc
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GMOCK_LIB}
         ${GTEST_LIB}
@@ -561,11 +597,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         exponential_biased_test
+        MODULE random
         SOURCES
         "exponential_biased_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}

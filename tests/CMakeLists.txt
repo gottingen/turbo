@@ -14,6 +14,12 @@
 # limitations under the License.
 #
 
+find_package(GTest REQUIRED)
+
+SET(GTEST_LIB GTest::gtest)
+SET(GTEST_MAIN_LIB GTest::gtest_main)
+SET(GMOCK_LIB GTest::gmock)
+SET(GMOCK_MAIN_LIB GTest::gmock_main)
 add_subdirectory(platform)
 add_subdirectory(base)
 add_subdirectory(cleanup)
@@ -27,8 +33,8 @@ add_subdirectory(format)
 add_subdirectory(memory)
 add_subdirectory(meta)
 add_subdirectory(random)
-add_subdirectory(strings)
 add_subdirectory(times)
+add_subdirectory(strings)
 add_subdirectory(module)
 add_subdirectory(system)
 add_subdirectory(status)

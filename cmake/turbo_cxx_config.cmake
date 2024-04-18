@@ -21,7 +21,6 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO  "-g -O2")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif ()
@@ -39,10 +38,6 @@ endif ()
 # set it to haswell arch
 ##############################################################################
 set(CARBIN_CXX_OPTIONS ${CARBIN_DEFAULT_COPTS} ${CARBIN_ARCH_OPTION} ${CARBIN_RANDOM_RANDEN_COPTS})
-list(APPEND CARBIN_CXX_OPTIONS "-fPIC")
-list(APPEND CARBIN_CXX_OPTIONS "-Wno-ignored-attributes")
-list(APPEND CARBIN_CXX_OPTIONS "-D__const__=__unused__")
-
 ###############################
 #
 # define you options here

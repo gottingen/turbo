@@ -14,9 +14,9 @@
 # limitations under the License.
 #
 
-option(BUILD_STATIC_LIBRARY "carbin set build static library or not" OFF)
+option(BUILD_STATIC_LIBRARY "carbin set build static library or not" ON)
 
-option(BUILD_SHARED_LIBRARY "carbin set build shared library or not" ON)
+option(BUILD_SHARED_LIBRARY "carbin set build shared library or not" OFF)
 
 option(VERBOSE_CARBIN_BUILD "print carbin detail information" OFF)
 

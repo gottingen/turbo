@@ -78,6 +78,18 @@ namespace turbo {
         return hash;
     }
 
+    size_t hasher_engine<xx_hash_tag>::hash32_with_seed(const char *s, size_t len, uint32_t seed) {
+        auto* ctx = XXH3_createState();
+        if(!ctx) {
+            return 0;
+        }
+        XXH3_64bits_reset_withSeed(ctx, seed);
+        XXH3_64bits_update(ctx, s, len);
+        uint32_t hash = XXH3_64bits_digest(ctx);
+        XXH3_freeState(ctx);
+        return hash;
+    }
+
     size_t hasher_engine<xx_hash_tag>::hash64(const char *s, size_t len) {
         auto* ctx = XXH64_createState();
         if(!ctx) {

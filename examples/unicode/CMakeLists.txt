@@ -17,6 +17,6 @@
 carbin_cc_binary(
         NAME utf_demo
         SOURCES utf_demo.cc
-        COPTS ${CARBIN_CXX_OPTIONS}
-        DEPS turbo::turbo
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+        LINKS turbo::turbo
 )

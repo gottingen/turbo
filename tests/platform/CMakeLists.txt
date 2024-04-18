@@ -24,9 +24,9 @@ carbin_cc_library(
         atomic_hook_test_helper
         SOURCES
         "atomic_hook_test_helper.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
 )
@@ -34,11 +34,12 @@ carbin_cc_library(
 carbin_cc_test(
         NAME
         atomic_hook_test
+        MODULE platform
         SOURCES
         "atomic_hook_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::atomic_hook_test_helper
         turbo::turbo
@@ -48,11 +49,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         errno_saver_test
+        MODULE platform
         SOURCES
         "errno_saver_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
 )
@@ -60,11 +62,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         config_test
+        MODULE platform
         SOURCES
         "config_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
 )
@@ -73,11 +76,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         low_level_alloc_test
+        MODULE platform
         SOURCES
         "low_level_alloc_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
         Threads::Threads
@@ -86,11 +90,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         prefetch_test
+        MODULE platform
         SOURCES
         "prefetch_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
 )
@@ -98,11 +103,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         optimization_test
+        MODULE platform
         SOURCES
         "optimization_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
 )
@@ -110,11 +116,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         unique_small_name_test
+        MODULE platform
         SOURCES
         "unique_small_name_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
 )

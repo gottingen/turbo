@@ -15,79 +15,60 @@
 #
 
 
-carbin_cc_benchmark(
+carbin_cc_bm(
         NAME
         raw_hash_set_benchmark
+        MODULE bmc
         SOURCES
         "raw_hash_set_benchmark.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         benchmark::benchmark
         benchmark::benchmark_main
 )
 
-carbin_cc_benchmark(
+carbin_cc_bm(
         NAME
         raw_hash_set_probe_benchmark
+        MODULE bmc
         SOURCES
         "raw_hash_set_probe_benchmark.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         benchmark::benchmark
         benchmark::benchmark_main
 )
 
-carbin_cc_benchmark(
+carbin_cc_bm(
         NAME
         layout_benchmark
+        MODULE bmc
         SOURCES
         "layout_benchmark.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         benchmark::benchmark
         benchmark::benchmark_main
 )
 
-carbin_cc_benchmark(
-        NAME
-        inlined_vector_benchmark
-        SOURCES
-        "inlined_vector_benchmark.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
-        benchmark::benchmark
-        benchmark::benchmark_main
-)
 
-carbin_cc_benchmark(
+carbin_cc_bm(
         NAME
         fixed_array_benchmark
+        MODULE bmc
         SOURCES
         "fixed_array_benchmark.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         benchmark::benchmark
         benchmark::benchmark_main
 )
 
-carbin_cc_benchmark(
-        NAME
-        insert_benchmark
-        SOURCES
-        "Insert.cc"
-        "main.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
-)

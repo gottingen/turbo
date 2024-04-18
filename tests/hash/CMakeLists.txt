@@ -14,66 +14,32 @@
 # limitations under the License.
 #
 
-carbin_cc_library(
-        NAMESPACE
-        turbo
-        NAME
-        hash_testing
-        HEADERS
-        "hash_testing.h"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
-        ${GMOCK_LIB}
-        ${CARBIN_DEPS_LINK}
-)
 
 carbin_cc_test(
         NAME
         hash_test
+        MODULE hash
         SOURCES
         "hash_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
-        turbo::hash_testing
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
-)
-
-# Internal-only target, do not depend on directly.
-#
-# Note: Even though external code should not depend on this target
-# directly, it must be marked PUBLIC since it is a dependency of
-# hash_testing.
-carbin_cc_library(
-        NAMESPACE
-        turbo
-        NAME
-        spy_hash_state
-        HEADERS
-        "spy_hash_state.h"
-        COPTS
-        ${TURBO_DEFAULT_COPTS}
-        DEPS
-        turbo::hash
-        turbo::strings
-        turbo::str_format
-        ${CARBIN_DEPS_LINK}
 )
 
 
 carbin_cc_test(
         NAME
         city_test
+        MODULE hash
         SOURCES
         "city_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${CARBIN_DEPS_LINK}
 )
@@ -82,11 +48,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         bytes_hash_test
+        MODULE hash
         SOURCES
         "bytes_hash_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${CARBIN_DEPS_LINK}
 )
@@ -95,11 +62,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         engine_test
+        MODULE hash
         SOURCES
         "engine_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${CARBIN_DEPS_LINK}
 )

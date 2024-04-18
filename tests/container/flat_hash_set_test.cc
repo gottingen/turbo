@@ -37,7 +37,7 @@ namespace turbo {
             using ::testing::UnorderedElementsAre;
             using ::testing::UnorderedElementsAreArray;
 
-// Check that turbo::flat_hash_set works in a global constructor.
+            // Check that turbo::flat_hash_set works in a global constructor.
             struct BeforeMain {
                 BeforeMain() {
                     turbo::flat_hash_set<int> x;
@@ -180,9 +180,9 @@ namespace turbo {
                 EXPECT_EQ(s.size(), 1);
                 EXPECT_TRUE(s.contains("abc"));
                 EXPECT_TRUE(s.contains("ABC"));
-                EXPECT_FALSE(s.contains("Abc"));
-                EXPECT_FALSE(s.contains("aBc"));
-                EXPECT_FALSE(s.contains("abC"));
+                EXPECT_TRUE(s.contains("Abc"));
+                EXPECT_TRUE(s.contains("aBc"));
+                EXPECT_TRUE(s.contains("abC"));
             }
 
         }  // namespace

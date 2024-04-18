@@ -17,11 +17,12 @@
 carbin_cc_test(
         NAME
         crypto_test
+        MODULE crypto
         SOURCES
         "crypto_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
@@ -29,11 +30,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         crc32c_test
+        MODULE crypto
         SOURCES
         "crc32c_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
@@ -41,11 +43,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         crc_memcpy_test
+        MODULE crypto
         SOURCES
         "crc_memcpy_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -54,11 +57,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         non_temporal_memcpy_test
+        MODULE crypto
         SOURCES
         "non_temporal_memcpy_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -67,11 +71,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         crc_cord_state_test
+        MODULE crypto
         SOURCES
         "crc_cord_state_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 

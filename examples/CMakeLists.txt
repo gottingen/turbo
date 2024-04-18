@@ -15,6 +15,5 @@
 #
 
 add_subdirectory(strings)
-add_subdirectory(format)
 add_subdirectory(concurrent)
 add_subdirectory(unicode)

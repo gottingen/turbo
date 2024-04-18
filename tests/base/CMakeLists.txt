@@ -17,11 +17,12 @@
 carbin_cc_test(
         NAME
         throw_delegate_test
+        MODULE base
         SOURCES
         "throw_delegate_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
 )
@@ -30,11 +31,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         bits_test
+        MODULE base
         SOURCES
         "bits_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${CARBIN_DEPS_LINK}
 )
@@ -42,11 +44,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         endian_test
+        MODULE base
         SOURCES
         "endian_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${CARBIN_DEPS_LINK}
 )
@@ -54,34 +57,35 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         int128_test
+        MODULE base
         SOURCES
         "int128_stream_test.cc"
         "int128_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
 
 # Internal-only target, do not depend on directly.
-carbin_cc_library(
+carbin_cc_interface(
         NAMESPACE
         turbo
         NAME
         exception_testing
         HEADERS
         "exception_testing.h"
-        COPTS
-        ${TURBO_DEFAULT_COPTS}
-        DEPS
+        CXXOPTS
+        ${TURBO_DEFAULT_CXXOPTS}
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
 )
 
 
 # Internal-only target, do not depend on directly.
-carbin_cc_library(
+carbin_cc_test_library(
         NAMESPACE
         turbo
         NAME
@@ -90,9 +94,9 @@ carbin_cc_library(
         "exception_safety_testing.h"
         SOURCES
         "exception_safety_testing.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${GTEST_LIB}
         turbo::turbo
 )
@@ -100,28 +104,30 @@ carbin_cc_library(
 
 carbin_cc_test(
         NAME
-        turbo_exception_safety_testing_test
+        exception_safety_testing_test
+        MODULE base
         SOURCES
         "exception_safety_testing_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
-        ${CARBIN_DEPS_LINK}
-        turbo::exception_safety_testing
+        turbo::exception_safety_testing_static
         ${GTEST_MAIN_LIB}
+        ${CARBIN_DEPS_LINK}
 )
 
 carbin_cc_test(
         NAME
         bit_cast_test
+        MODULE base
         SOURCES
         "bit_cast_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${CARBIN_DEPS_LINK}
 )
@@ -129,14 +135,15 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         inline_variable_test
+        MODULE base
         SOURCES
         "inline_variable_testing.h"
         "inline_variable_test.cc"
         "inline_variable_test_a.cc"
         "inline_variable_test_b.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
 )
@@ -146,11 +153,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         raw_logging_test
+        MODULE base
         SOURCES
         "raw_logging_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -160,11 +168,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         fast_type_id_test
+        MODULE base
         SOURCES
         "fast_type_id_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -174,11 +183,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         strerror_test
+        MODULE base
         SOURCES
         "strerror_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
@@ -186,11 +196,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         math_test
+        MODULE base
         SOURCES
         "math_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
 )

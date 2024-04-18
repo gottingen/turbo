@@ -166,34 +166,16 @@ set(TURBO_ALL_SRC
         "var/internal/periodic_sampler.cc"
         )
 
-if (BUILD_STATIC_LIBRARY)
-    carbin_cc_library(
-            NAMESPACE
-            turbo
-            NAME
-            turbo
-            SOURCES
-            ${TURBO_ALL_SRC}
-            COPTS
-            ${CARBIN_CXX_OPTIONS}
-            DEPS
-            PUBLIC
-    )
-endif (BUILD_STATIC_LIBRARY)
-
-if (BUILD_SHARED_LIBRARY)
-    carbin_cc_library(
-            NAMESPACE
-            turbo
-            NAME
-            turbo
-            SOURCES
-            ${TURBO_ALL_SRC}
-            COPTS
-            ${CARBIN_CXX_OPTIONS}
-            DEPS
-            ${CARBIN_DEPS_LINK}
-            SHARED
-            PUBLIC
-    )
-endif (BUILD_SHARED_LIBRARY)
+carbin_cc_library(
+        NAMESPACE
+        turbo
+        NAME
+        turbo
+        SOURCES
+        ${TURBO_ALL_SRC}
+        CXXOPTS
+        ${CARBIN_CXX_OPTIONS}
+        PLINKS
+        ${CARBIN_DEPS_LINK}
+        PUBLIC
+)

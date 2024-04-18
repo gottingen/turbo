@@ -17,10 +17,11 @@
 carbin_cc_test(
         NAME
         version_test
+        MODULE module
         SOURCES
         "version_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
