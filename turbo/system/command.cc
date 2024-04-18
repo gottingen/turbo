@@ -16,7 +16,6 @@
 #include "turbo/system/command.h"
 #include "turbo/base/internal/raw_logging.h"
 #include <stdio.h>
-#include "turbo/flags/flag.h"
 #include "turbo/platform/port.h"
 #include "turbo/system/io.h"
 #include "turbo/status/error.h"  // errno
@@ -27,10 +26,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include "turbo/fiber/fiber.h"
 #endif
-
-TURBO_FLAG(bool, run_command_through_clone, false, "Run command with clone syscall to avoid the costly page table duplication");
 
 namespace turbo {
 
@@ -107,11 +103,7 @@ int read_command_output_through_clone(std::ostream& os, const char* cmd) {
             break;
         }
         if (wpid == 0) {
-            if (Fiber::is_running_on_fiber()) {
-                turbo::Fiber::usleep(1000);
-            } else {
                 usleep(1000);
-            }
             continue;
         }
         rc = -1;
@@ -186,11 +178,11 @@ END:
         return -1;
     }
 
-    int read_command_output(std::ostream& os, const char* cmd) {
+    int read_command_output(std::ostream& os, const char* cmd, bool run_command_through_clone) {
 #if !defined(TURBO_PLATFORM_LINUX)
         return read_command_output_through_popen(os, cmd);
 #else
-        return get_flag(FLAGS_run_command_through_clone)
+        return run_command_through_clone
         ? read_command_output_through_clone(os, cmd)
         : read_command_output_through_popen(os, cmd);
 #endif

@@ -14,11 +14,6 @@
 # limitations under the License.
 #
 
-add_subdirectory(meta)
 add_subdirectory(strings)
-add_subdirectory(tlog)
-add_subdirectory(flags)
-add_subdirectory(format)
 add_subdirectory(concurrent)
-add_subdirectory(files)
-add_subdirectory(flow)
+add_subdirectory(unicode)

@@ -108,8 +108,6 @@ namespace turbo {
             return write(str.data(), str.size());
         }
 
-        [[nodiscard]] turbo::Status write(const turbo::IOBuf &buff) override;
-
         /**
          * @brief write file content to the end of the file.
          * @param buffer [input] file content, can not be empty.

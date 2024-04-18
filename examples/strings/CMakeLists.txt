@@ -19,6 +19,6 @@ carbin_cc_binary(
         string_cat_example
         SOURCES
         "string_cat_example.cc"
-        DEPS
+        LINKS
         turbo::turbo
 )

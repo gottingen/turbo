@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/system/sysinfo.h"
-#include "turbo/meta/type_traits.h"
+#include <turbo/system/sysinfo.h>
+#include <turbo/meta/type_traits.h>
 #include <algorithm>
 #include <chrono>
 #include <cstdio>
@@ -31,15 +31,11 @@
 
 #    include <io.h>      // _get_osfhandle and _isatty support
 #    include <process.h> //  _get_pid support
-#    include <turbo/log/details/windows_include.h>
 
 #    ifdef __MINGW32__
 #        include <share.h>
 #    endif
-
-#    if defined(TLOG_WCHAR_TO_UTF8_SUPPORT) || defined(TLOG_WCHAR_FILENAMES)
 #        include <limits>
-#    endif
 
 #    include <direct.h> // for _mkdir/_wmkdir
 

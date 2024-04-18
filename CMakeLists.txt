@@ -17,23 +17,44 @@
 # generate by carbin package manager tools for titan-search
 # https://github.com/gottingen/carbin
 ####################################################################################
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.24)
 
 project(turbo CXX)
 
+option(${PROJECT_NAME}_IS_TOP_PROJECT "turbo project is the top level project or not" ON)
+
+get_property(not_top DIRECTORY PROPERTY PARENT_DIRECTORY)
+if (not_top)
+    set(${PROJECT_NAME}_IS_TOP_PROJECT OFF)
+endif ()
+message(STATUS ${PROJECT_NAME}_IS_TOP_PROJECT)
+
 set(PROJECT_DESCRIPTION "Hercules is an ahead of time compiler for a subset of the Python language framework.")
 set(PROJECT_VERSION_MAJOR 0)
-set(PROJECT_VERSION_MINOR 1)
-set(PROJECT_VERSION_PATCH 5)
+set(PROJECT_VERSION_MINOR 9)
+set(PROJECT_VERSION_PATCH 88)
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
-set(CARBIN_VERSION 0.2.0)
+set(${PROJECT_NAME}_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(${PROJECT_NAME}_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(${PROJECT_NAME}_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+set(${PROJECT_NAME}_VERSION ${PROJECT_VERSION})
+configure_file(${PROJECT_SOURCE_DIR}/turbo/version.h.in ${PROJECT_SOURCE_DIR}/turbo/version.h)
+
+
+set(CARBIN_VERSION 0.5.0)
+set(CARBIN_CMAKE_VERSION 0.5.0)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/carbin_cmake)
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+##################################################################
+# add this for ${PROJECT_NAME} 's cmake include
+##################################################################
+list(APPEND CMAKE_MODULE_PATH ${${PROJECT_NAME}_SOURCE_DIR}/cmake)
 #################################################################
 #
 # modify the CARBIN_DEPS_PREFIX to you prefix if needed.
 # for example when you install you deps to "/opt/handsome/guy
 # modify as set(CARBIN_DEPS_PREFIX /opt/handsome/guy)
+# this should be PROJECT_SOURCE_DIR, only install libraries
+# deps to top level project
 #################################################################
 set(CARBIN_DEPS_PREFIX ${PROJECT_SOURCE_DIR}/carbin)
 #######################################################################
@@ -46,8 +67,9 @@ include(carbin_module)
 #
 # your cmake directory ${PROJECT_SOURCE_DIR}/cmake, do things here
 #################################################################
-include(user_deps)
-include(user_cxx_config)
+include(turbo_deps)
+include(turbo_cxx_config)
+include(turbo_test)
 
 add_subdirectory(turbo)
 ####################################################################

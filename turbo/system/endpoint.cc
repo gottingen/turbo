@@ -27,22 +27,22 @@ namespace turbo {
 
     using turbo::system_internal::ExtendedEndPoint;
 
-    void EndPoint::set(IPAddr ip, int port) {
-        _ip = ip;
-        _port = port;
+    void EndPoint::set(IPAddr ip_args, int port_args) {
+        ip = ip_args;
+        port = port_args;
         if (ExtendedEndPoint::is_extended(*this)) {
             ExtendedEndPoint *eep = ExtendedEndPoint::address(*this);
             if (eep) {
                 eep->inc_ref();
             } else {
-                _ip = IPAddr::any();
-                _port = 0;
+                ip = IPAddr::any();
+                port = 0;
             }
         }
     }
 
-    void EndPoint::set(int port) {
-        _port = port;
+    void EndPoint::set(int port_args) {
+        port = port_args;
     }
 
     void EndPoint::reset(void) {
@@ -52,21 +52,21 @@ namespace turbo {
                 eep->dec_ref();
             }
         }
-        _ip = IPAddr::any();
-        _port = 0;
+        ip = IPAddr::any();
+        port = 0;
     }
 
-    EndPoint::EndPoint(IPAddr ip2, int port2) : _ip(ip2), _port(port2) {
+    EndPoint::EndPoint(IPAddr ip2, int port2) : ip(ip2), port(port2) {
         // Should never construct an extended endpoint by this way
         if (ExtendedEndPoint::is_extended(*this)) {
-            TLOG_CHECK(0, "EndPoint construct with value that points to an extended EndPoint");
-            _ip = IPAddr::any();
-            _port = 0;
+            TURBO_RAW_CHECK(0, "EndPoint construct with value that points to an extended EndPoint");
+            ip = IPAddr::any();
+            port = 0;
         }
     }
 
     EndPoint::EndPoint(const EndPoint &rhs) {
-        set(rhs._ip, rhs._port);
+        set(rhs.ip, rhs.port);
     }
 
     EndPoint::~EndPoint() {
@@ -75,13 +75,13 @@ namespace turbo {
 
     void EndPoint::operator=(const EndPoint &rhs) {
         reset();
-        set(rhs._ip, rhs._port);
+        set(rhs.ip, rhs.port);
     }
 
     bool IPAddr::parse(const char *ip_str) {
         if (ip_str != nullptr) {
             for (; isspace(*ip_str); ++ip_str);
-            int rc = inet_pton(AF_INET, ip_str, &_ip);
+            int rc = inet_pton(AF_INET, ip_str, &ip);
             if (rc > 0) {
                 return true;
             }
@@ -91,7 +91,7 @@ namespace turbo {
 
     IPStr IPAddr::to_str() const {
         IPStr str;
-        if (inet_ntop(AF_INET, &_ip, str._buf, INET_ADDRSTRLEN) == nullptr) {
+        if (inet_ntop(AF_INET, &ip, str._buf, INET_ADDRSTRLEN) == nullptr) {
             return any().to_str();
         }
         return str;
@@ -106,7 +106,7 @@ namespace turbo {
         bzero((char *) &sa, sizeof(sa));
         sa.sin_family = AF_INET;
         sa.sin_port = 0;    // useless since we don't need server_name
-        sa.sin_addr = _ip;
+        sa.sin_addr = ip;
         if (getnameinfo((const sockaddr *) &sa, sizeof(sa),
                         host, host_len, nullptr, 0, NI_NAMEREQD) != 0) {
             return -1;
@@ -134,12 +134,12 @@ namespace turbo {
             }
             return str;
         }
-        if (inet_ntop(AF_INET, &_ip._ip, str._buf, INET_ADDRSTRLEN) == nullptr) {
+        if (inet_ntop(AF_INET, &ip.ip, str._buf, INET_ADDRSTRLEN) == nullptr) {
             return EndPoint(IPAddr::none(), 0).to_str();
         }
         char *buf = str._buf + strlen(str._buf);
         *buf++ = ':';
-        snprintf(buf, 16, "%d", _port);
+        snprintf(buf, 16, "%d", port);
         return str;
     }
 
@@ -190,7 +190,7 @@ namespace turbo {
         }
 #endif // defined(TURBO_PLATFORM_OSX)
         // Only fetch the first address here
-        bcopy((char *) result->h_addr, (char *) &_ip, result->h_length);
+        bcopy((char *) result->h_addr, (char *) &ip, result->h_length);
         return true;
     }
 
@@ -244,12 +244,12 @@ namespace turbo {
             return false;
         }
         buf[i] = '\0';
-        if (TURBO_UNLIKELY(!_ip.parse(buf))) {
+        if (TURBO_UNLIKELY(!ip.parse(buf))) {
             return false;
         }
         ++i;
         char *end = nullptr;
-        _port = strtol(str + i, &end, 10);
+        port = strtol(str + i, &end, 10);
         if (end == str + i) {
             return false;
         } else if (*end) {
@@ -258,24 +258,24 @@ namespace turbo {
                 return false;
             }
         }
-        if (_port < 0 || _port > 65535) {
+        if (port < 0 || port > 65535) {
             return false;
         }
         return true;
     }
 
-    bool EndPoint::parse(const char *ip_str, int port) {
-        if (ExtendedEndPoint::create(ip_str, port, this)) {
+    bool EndPoint::parse(const char *ip_str, int port_args) {
+        if (ExtendedEndPoint::create(ip_str, port_args, this)) {
             return true;
         }
 
-        if (TURBO_UNLIKELY(!_ip.parse(ip_str))) {
+        if (TURBO_UNLIKELY(!ip.parse(ip_str))) {
             return false;
         }
-        if (port < 0 || port > 65535) {
+        if (port_args < 0 || port_args > 65535) {
             return false;
         }
-        _port = port;
+        port = port_args;
         return true;
     }
 
@@ -296,14 +296,14 @@ namespace turbo {
         }
 
         buf[i] = '\0';
-        if (TURBO_UNLIKELY(!_ip.parse_hostname(buf))) {
+        if (TURBO_UNLIKELY(!ip.parse_hostname(buf))) {
             return false;
         }
         if (str[i] == ':') {
             ++i;
         }
         char *end = nullptr;
-        _port = strtol(str + i, &end, 10);
+        port = strtol(str + i, &end, 10);
         if (end == str + i) {
             return false;
         } else if (*end) {
@@ -312,20 +312,20 @@ namespace turbo {
                 return false;
             }
         }
-        if (TURBO_UNLIKELY(_port < 0 || _port > 65535)) {
+        if (TURBO_UNLIKELY(port < 0 || port > 65535)) {
             return false;
         }
         return true;
     }
 
-    bool EndPoint::parse_hostname(const char *name_str, int port) {
-        if (TURBO_UNLIKELY(!_ip.parse_hostname(name_str))) {
+    bool EndPoint::parse_hostname(const char *name_str, int port_args) {
+        if (TURBO_UNLIKELY(!ip.parse_hostname(name_str))) {
             return false;
         }
-        if (TURBO_UNLIKELY(port < 0 || port > 65535)) {
+        if (TURBO_UNLIKELY(port_args < 0 || port_args > 65535)) {
             return false;
         }
-        _port = port;
+        port = port_args;
         return true;
     }
 
@@ -341,7 +341,7 @@ namespace turbo {
     }
 
     bool EndPoint::parse_ip(const char *ip_str) {
-        return _ip.parse(ip_str);
+        return ip.parse(ip_str);
     }
 
     bool EndPoint::to_hostname(char *host, size_t host_len) const {
@@ -353,10 +353,10 @@ namespace turbo {
             return false;
         }
 
-        if (TURBO_LIKELY(_ip.to_hostname(host, host_len))) {
+        if (TURBO_LIKELY(ip.to_hostname(host, host_len))) {
             size_t len = strlen(host);
             if (len + 1 < host_len) {
-                ::snprintf(host + len, host_len - len, ":%d", _port);
+                ::snprintf(host + len, host_len - len, ":%d", port);
             }
             return true;
         }
@@ -390,8 +390,8 @@ namespace turbo {
         }
         struct sockaddr_in *in4 = (struct sockaddr_in *) ss;
         in4->sin_family = AF_INET;
-        in4->sin_addr = _ip._ip;
-        in4->sin_port = htons(_port);
+        in4->sin_addr = ip.ip;
+        in4->sin_port = htons(port);
         if (size) {
             *size = sizeof(*in4);
         }
@@ -436,9 +436,9 @@ namespace turbo {
         if (self_port != nullptr) {
             EndPoint pt;
             if (TURBO_LIKELY(pt.local_side(sockfd))) {
-                *self_port = pt._port;
+                *self_port = pt.port;
             } else {
-                TLOG_CHECK(false, "Fail to get the local port of sockfd={}", (int) sockfd);
+                TURBO_RAW_CHECK(false, "Fail to get the local port of sockfd");
             }
         }
         return sockfd.release();
@@ -473,7 +473,7 @@ namespace turbo {
             const int on = 1;
             if (::setsockopt(sockfd, SOL_SOCKET, SO_REUSEPORT,
                            &on, sizeof(on)) != 0) {
-                TLOG_WARN("Fail to setsockopt SO_REUSEPORT of sockfd={}", (int) sockfd);
+                TURBO_RAW_LOG(WARNING,"Fail to setsockopt SO_REUSEPORT of sockfd=%d", (int) sockfd);
             }
 #else
             TLOG_ERROR("Missing def of SO_REUSEPORT while -reuse_port is on");

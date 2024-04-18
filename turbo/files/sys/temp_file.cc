@@ -14,7 +14,7 @@
 #include <errno.h>                                  // errno
 #include <new>                                      // placement new
 #include "turbo/files/sys/temp_file.h"                              // TempFile
-#include "turbo//log/logging.h"
+#include <turbo/base/internal/raw_logging.h>
 #include "turbo/random/random.h"
 #include "turbo/concurrent/spinlock.h"
 

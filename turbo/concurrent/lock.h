@@ -19,8 +19,8 @@
 #ifndef TURBO_CONCURRENT_LOCK_H_
 #define TURBO_CONCURRENT_LOCK_H_
 
-#include "turbo/concurrent/spinlock.h"
-#include "turbo/log/logging.h"
+#include <turbo/concurrent/spinlock.h>
+#include <turbo/base/internal/raw_logging.h>
 
 namespace std {
 
@@ -55,19 +55,19 @@ namespace std {
         }
 
         void lock() {
-            TDLOG_CHECK(!owns_lock());
+            TURBO_RAW_CHECK(!owns_lock(), "");
             _lock->lock();
             _owns_lock = true;
         }
 
         bool try_lock() {
-            TDLOG_CHECK(!owns_lock());
+            TURBO_RAW_CHECK(!owns_lock(), "");
             _owns_lock = _lock->try_lock();
             return _owns_lock;
         }
 
         void unlock() {
-            TDLOG_CHECK(owns_lock());
+            TURBO_RAW_CHECK(owns_lock(), "");
             _lock->unlock();
             _owns_lock = false;
         }
@@ -85,7 +85,7 @@ namespace turbo {
         TDLOG_CHECK(!lck2.owns_lock());
         volatile void *const ptr1 = lck1.mutex();
         volatile void *const ptr2 = lck2.mutex();
-        TDLOG_CHECK_NE(ptr1, ptr2);
+        TURBO_RAW_CHECK(ptr1 != ptr2, "");
         if (ptr1 < ptr2) {
             lck1.lock();
             lck2.lock();

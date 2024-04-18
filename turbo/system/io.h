@@ -19,23 +19,8 @@
 #ifndef TURBO_FILES_IO_H_
 #define TURBO_FILES_IO_H_
 
-#include "turbo/system/io/iobuf.h"
 #include "turbo/system/io/fd_guard.h"
 #include "turbo/system/io/fd_utility.h"
-#include "turbo/system/io/iobuf_printer.h"
 #include "turbo/system/io/sys_io.h"
-
-namespace turbo {
-
-    using turbo::files_internal::IOBuf;
-    using turbo::files_internal::IOBufBuilder;
-    using turbo::files_internal::IOBufAppender;
-    using turbo::files_internal::IOBufCutter;
-    using turbo::files_internal::IOBufAsZeroCopyInputStream;
-    using turbo::files_internal::IOBufAsZeroCopyOutputStream;
-    using turbo::files_internal::IOPortal;
-    using turbo::files_internal::IOBufBytesIterator;
-
-}  // namespace turbo
 
 #endif  // TURBO_FILES_IO_H_

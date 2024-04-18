@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-#include "turbo/system/io/sys_io.h"
-#include "turbo/system/io/fd_guard.h"
-#include "turbo/log/logging.h"
-#include "turbo/status/error.h"  // errno
+#include <turbo/system/io/sys_io.h>
+#include <turbo/system/io/fd_guard.h>
+#include <turbo/base/internal/raw_logging.h>
+#include <turbo/status/error.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -86,14 +86,14 @@ namespace turbo::system_internal {
 #endif
         turbo::FDGuard fd(::open("/dev/zero", O_RDONLY));
         if (fd < 0) {
-            TLOG_WARN("Fail to open /dev/zero");
+            TURBO_RAW_LOG(WARNING,"Fail to open /dev/zero");
             return user_preadv;
         }
         char dummy[1];
         iovec vec = { dummy, sizeof(dummy) };
         const int rc = syscall(SYS_preadv, (int)fd, &vec, 1, 0);
         if (rc < 0) {
-            TLOG_WARN("The kernel doesn't support SYS_preadv, "
+            TURBO_RAW_LOG(WARNING,"The kernel doesn't support SYS_preadv, "
                       " use user_preadv instead");
             return user_preadv;
         }
@@ -103,7 +103,7 @@ namespace turbo::system_internal {
     inline iov_function get_pwritev_func() {
         turbo::FDGuard fd(::open("/dev/null", O_WRONLY));
         if (fd < 0) {
-            TLOG_ERROR("Fail to open /dev/null");
+            TURBO_RAW_LOG(WARNING,"Fail to open /dev/null");
             return user_pwritev;
         }
 #if defined(TURBO_PLATFORM_OSX)
@@ -113,7 +113,7 @@ namespace turbo::system_internal {
         iovec vec = { dummy, sizeof(dummy) };
         const int rc = syscall(SYS_pwritev, (int)fd, &vec, 1, 0);
         if (rc < 0) {
-            TLOG_WARN("The kernel doesn't support SYS_pwritev, "
+            TURBO_RAW_LOG(WARNING,"The kernel doesn't support SYS_pwritev, "
                       " use user_pwritev instead");
             return user_pwritev;
         }

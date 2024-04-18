@@ -20,7 +20,6 @@
 #include "turbo/testing/test.h"
 #include "turbo/system/endpoint.h"
 #include "turbo/system/internal/endpoint_internal.h"
-#include "turbo/log/logging.h"
 #include "turbo/container/flat_hash_map.h"
 
 namespace {
@@ -32,16 +31,16 @@ namespace {
         turbo::EndPoint p2 = p1;
         REQUIRE((p1 == p2 && !(p1 != p2)));
         REQUIRE((p1 <= p2 && p1 >= p2 && !(p1 < p2 || p1 > p2)));
-        p2.set(p1.ip(), p1.port()+1);
+        p2.set(p1.ip, p1.port+1);
         REQUIRE((p1 != p2 && !(p1 == p2)));
         REQUIRE((p1 < p2 && p2 > p1 && !(p2 <= p1 || p1 >= p2)));
-        p2.set(p2.ip().num()-1, p1.port());
+        p2.set(p2.ip.num()-1, p1.port);
         REQUIRE((p1 != p2 && !(p1 == p2)));
         REQUIRE((p1 > p2 && p2 < p1 && !(p1 <= p2 || p2 >= p1)));
     }
 
     TEST_CASE("EndPointTest, ip_t") {
-        TLOG_INFO("INET6_ADDRSTRLEN = {}", INET6_ADDRSTRLEN);
+        std::cout<<"INET6_ADDRSTRLEN = "<< INET6_ADDRSTRLEN<<std::endl;
 
         turbo::IPAddr ip0;
         REQUIRE_EQ(true, ip0.parse("1.1.1.1"));
@@ -66,18 +65,18 @@ namespace {
     }
 
     TEST_CASE("EndPointTest, show_local_info") {
-        //TLOG_INFO("my_ip is {} my_ip_cstr is {} my_hostname is {}", turbo::int2ip(turbo::my_ip()), turbo::my_ip_cstr(),
+        //TLOG_INFO("my_ip is {} my_ip_cstr is {} my_hostname is {}", turbo::int2ip(turbo::my_ip), turbo::my_ip_cstr(),
          //         turbo::my_hostname());
     }
 
     TEST_CASE("EndPointTest, endpoint") {
         turbo::EndPoint p1;
-        REQUIRE_EQ(turbo::IPAddr::any(), p1.ip());
-        REQUIRE_EQ(0, p1.port());
+        REQUIRE_EQ(turbo::IPAddr::any(), p1.ip);
+        REQUIRE_EQ(0, p1.port);
 
         turbo::EndPoint p2(turbo::IPAddr::none(), -1);
-        REQUIRE_EQ(turbo::IPAddr::none(), p2.ip());
-        REQUIRE_EQ(-1, p2.port());
+        REQUIRE_EQ(turbo::IPAddr::none(), p2.ip);
+        REQUIRE_EQ(-1, p2.port);
 
         turbo::EndPoint p3;
         REQUIRE_EQ(false, p3.parse(" 127.0.0.1:-1"));
@@ -87,8 +86,8 @@ namespace {
 
         turbo::EndPoint p4;
         REQUIRE_EQ(true, p4.parse(" 127.0.0.1: 289 "));
-        REQUIRE_EQ("127.0.0.1", p4.ip().to_string());
-        REQUIRE_EQ(289, p4.port());
+        REQUIRE_EQ("127.0.0.1", p4.ip.to_string());
+        REQUIRE_EQ(289, p4.port);
 
         turbo::EndPoint p5;
         REQUIRE_EQ(false, p5.parse_hostname("localhost:-1"));
@@ -251,15 +250,15 @@ namespace {
         {
             turbo::EndPoint ep2(ep);
             REQUIRE_FALSE(ExtendedEndPoint::is_extended(ep));
-            REQUIRE_EQ(ep.ip(), ep2.ip());
-            REQUIRE_EQ(ep.port(), ep2.port());
+            REQUIRE_EQ(ep.ip, ep2.ip);
+            REQUIRE_EQ(ep.port, ep2.port);
         }
 
         // assign
         turbo::EndPoint ep2;
         ep2 = ep;
-        REQUIRE_EQ(ep.ip(), ep2.ip());
-        REQUIRE_EQ(ep.port(), ep2.port());
+        REQUIRE_EQ(ep.ip, ep2.ip);
+        REQUIRE_EQ(ep.port, ep2.port);
     }
 
     TEST_CASE("EndPointTest, extended_endpoint") {

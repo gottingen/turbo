@@ -18,11 +18,12 @@
 carbin_cc_test(
         NAME
         cleanup_test
+        MODULE cleanup
         SOURCES
         "cleanup_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}

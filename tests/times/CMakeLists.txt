@@ -16,7 +16,7 @@
 
 
 # Internal-only target, do not depend on directly.
-carbin_cc_library(
+carbin_cc_test_library(
         NAMESPACE
         turbo
         NAME
@@ -32,6 +32,7 @@ carbin_cc_library(
 carbin_cc_test(
         NAME
         time_test
+        MODULE times
         SOURCES
         "civil_time_test.cc"
         "clock_test.cc"
@@ -42,9 +43,10 @@ carbin_cc_test(
         "time_zone_format_test.cc"
         "time_zone_lookup_test.cc"
         "cctz_civil_time_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::time_internal_test_util
+        LINKS
+        turbo::time_internal_test_util_static
         turbo::turbo
+        Threads::Threads
 )

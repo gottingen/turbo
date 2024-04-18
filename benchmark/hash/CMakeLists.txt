@@ -15,14 +15,15 @@
 #
 
 
-carbin_cc_benchmark(
+carbin_cc_bm(
         NAME
         hash_benchmark
+        MODULE bmhash
         SOURCES
         "hash_benchmark.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         benchmark::benchmark
         benchmark::benchmark_main

@@ -17,43 +17,37 @@
 carbin_cc_test(
         NAME
         memory_test
+        MODULE memory
         SOURCES
         "memory_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
 carbin_cc_test(
         NAME
         object_pool_test
+        MODULE memory
         SOURCES
         "object_pool_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
+        Threads::Threads
 )
 
 carbin_cc_test(
         NAME
         resource_pool_test
+        MODULE memory
         SOURCES
         "resource_pool_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
-)
-
-carbin_cc_test(
-        NAME
-        aligned_allocator_test
-        SOURCES
-        "aligned_allocator_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
+        Threads::Threads
 )

@@ -63,25 +63,6 @@ set(TURBO_ALL_SRC
         "files/sys/temp_file.cc"
         "files/sys/sys_io_posix.cc"
         "files/sys/sys_io_windows.cc"
-        "flags/internal/commandlineflag.cc"
-        "flags/internal/flag.cc"
-        "flags/internal/private_handle_accessor.cc"
-        "flags/internal/program_name.cc"
-        "flags/internal/usage.cc"
-        "flags/commandlineflag.cc"
-        "flags/flag.cc"
-        "flags/marshalling.cc"
-        "flags/parse.cc"
-        "flags/usage.cc"
-        "flags/reflection.cc"
-        "flags/usage_config.cc"
-        "flags/app.cc"
-        "flags/config.cc"
-        "flags/formatter.cc"
-        "flags/option.cc"
-        "flags/split.cc"
-        "flags/string_tools.cc"
-        "flags/validators.cc"
         "format/fmt/format.cc"
         "format/fmt/os.cc"
         "hash/bytes/city.cc"
@@ -93,14 +74,6 @@ set(TURBO_ALL_SRC
         "hash/xx/xxh_x86dispatch.cc"
         "hash/xx/xx.cc"
         "hash/hash_engine.cc"
-        "log/async.cc"
-        "log/cfg.cc"
-        "log/condition.cc"
-        "log/color_sinks.cc"
-        "log/file_sinks.cc"
-        "log/logging.cc"
-        "log/tlog.cc"
-        "log/stdout_sinks.cc"
         "memory/jemalloc_helper.cc"
         "memory/memory.cc"
         "memory/memory_info.cc"
@@ -126,7 +99,6 @@ set(TURBO_ALL_SRC
         "random/internal/seed_material.cc"
         "random/seed_gen_exception.cc"
         "random/seed_sequences.cc"
-        "status/internal/errno.cc"
         "status/status_code.cc"
         "status/status.cc"
         "status/error.cc"
@@ -162,10 +134,7 @@ set(TURBO_ALL_SRC
         "strings/internal/ostringstream.cc"
         "strings/internal/damerau_levenshtein_distance.cc"
         "system/atexit.cc"
-        "system/io/iobuf.cc"
-        "system/io/iobuf_printer.cc"
         "system/io/fd_utility.cc"
-        "system/io/zero_copy_stream.cc"
         "system/io/sys_io.cc"
         "system/endpoint.cc"
         "system/env.cc"
@@ -174,6 +143,9 @@ set(TURBO_ALL_SRC
         "system/sysinfo.cc"
         "system/command.cc"
         "system/internal/sysinfo.cc"
+        "system/process.cc"
+        "system/process_unix.cc"
+        "system/process_win.cc"
         "times/civil_time.cc"
         "times/clock.cc"
         "times/duration.cc"
@@ -190,56 +162,20 @@ set(TURBO_ALL_SRC
         "times/cctz/time_zone_lookup.cc"
         "times/cctz/time_zone_posix.cc"
         "times/cctz/zone_info_source.cc"
-        "unicode/encoding_types.cc"
-        "unicode/codec/encode_utf16.cc"
-        "unicode/codec/validate_utf8.cc"
-        "unicode/codec/validate_utf16.cc"
-        "unicode/codec/validate_utf32.cc"
+        "unicode/simd_utf.cc"
         "var/internal/periodic_sampler.cc"
         )
 
-if (BUILD_STATIC_LIBRARY)
-    carbin_cc_library(
-            NAMESPACE
-            turbo
-            NAME
-            turbo
-            SOURCES
-            ${TURBO_ALL_SRC}
-            COPTS
-            ${CARBIN_CXX_OPTIONS}
-            DEPS
-            ${CARBIN_DEPS_LINK}
-            PUBLIC
-    )
-endif (BUILD_STATIC_LIBRARY)
-
-if (BUILD_SHARED_LIBRARY)
-    carbin_cc_library(
-            NAMESPACE
-            turbo
-            NAME
-            turbo
-            SOURCES
-            ${TURBO_ALL_SRC}
-            COPTS
-            ${CARBIN_CXX_OPTIONS}
-            DEPS
-            ${CARBIN_DEPS_LINK}
-            SHARED
-            PUBLIC
-    )
-endif (BUILD_SHARED_LIBRARY)
-
-file(GLOB_RECURSE TCLI_SRC "tools/*.cc")
-carbin_cc_binary(
+carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         turbo
         SOURCES
-        ${TCLI_SRC}
-        COPTS
+        ${TURBO_ALL_SRC}
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
+        PLINKS
+        ${CARBIN_DEPS_LINK}
         PUBLIC
 )

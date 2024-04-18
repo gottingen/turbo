@@ -18,8 +18,8 @@
 #include <mutex>
 #include <atomic>
 #include <memory>
-#include "turbo/times/time.h"
-#include "turbo/log/logging.h"
+#include <turbo/times/time.h>
+#include <turbo/platform/port.h>
 
 namespace turbo {
 
@@ -41,14 +41,14 @@ namespace turbo {
         bool WaitFor(const turbo::Duration &d) {
             std::chrono::microseconds timeout = d.to_chrono_microseconds();
             std::unique_lock lk(_data->mutex);
-            TLOG_CHECK_GE(_data->count, 0ul);
+            TURBO_ASSERT(_data->count >= 0ul);
             return _data->cond.wait_for(lk, timeout, [this] { return _data->count == 0; });
         }
 
         bool WaitUntil(const turbo::Time &deadline) {
             auto d = deadline.to_chrono_time();
             std::unique_lock lk(_data->mutex);
-            TLOG_CHECK_GE(_data->count, 0ul);
+            TURBO_ASSERT(_data->count >= 0ul);
             return _data->cond.wait_until(lk, d, [this] { return _data->count == 0; });
         }
 

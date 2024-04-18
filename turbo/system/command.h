@@ -21,7 +21,7 @@
 
 namespace turbo {
 
-    int read_command_output(std::ostream& os, const char* cmd);
+    int read_command_output(std::ostream& os, const char* cmd, bool run_command_through_clone = false);
 
     bool self_command_line(std::string &cmd, bool with_args, size_t max_len = 1024);
 }  // namespace turbo

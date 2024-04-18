@@ -15,115 +15,7 @@
 #
 
 # Internal-only target, do not depend on directly.
-carbin_cc_library(
-        NAMESPACE
-        turbo
-        NAME        btree_test_common
-        HEADERS
-        "btree_test.h"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
-)
-
-carbin_cc_test(
-        NAME
-        btree_test
-        SOURCES
-        "btree_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        ${CARBIN_DEPS_LINK}
-        turbo::turbo
-        turbo::btree_test_common
-        turbo::hash_testing
-        turbo::test_instance_tracker
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-
-carbin_cc_test(
-        NAME
-        compressed_tuple_test
-        SOURCES
-        "compressed_tuple_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
-        turbo::test_instance_tracker
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        fixed_array_test
-        SOURCES
-        "fixed_array_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::exception_testing
-        turbo::hash_testing
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        fixed_array_exception_safety_test
-        SOURCES
-        "fixed_array_exception_safety_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::exception_safety_testing
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-
-carbin_cc_test(
-        NAME
-        inlined_vector_test
-        SOURCES
-        "inlined_vector_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::test_instance_tracker
-        turbo::exception_testing
-        turbo::hash_testing
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        inlined_vector_exception_safety_test
-        SOURCES
-        "inlined_vector_exception_safety_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
-        turbo::exception_safety_testing
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-# Internal-only target, do not depend on directly.
-carbin_cc_library(
+carbin_cc_test_library(
         NAMESPACE
         turbo
         NAME
@@ -132,9 +24,9 @@ carbin_cc_library(
         "test_instance_tracker.h"
         SOURCES
         "test_instance_tracker.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GMOCK_LIB}
         ${GTEST_LIB}
@@ -142,13 +34,110 @@ carbin_cc_library(
 
 carbin_cc_test(
         NAME
+        btree_test
+        MODULE container
+        SOURCES
+        "btree_test.cc"
+        CXXOPTS
+        ${CARBIN_CXX_OPTIONS}
+        LINKS
+        ${CARBIN_DEPS_LINK}
+        turbo::turbo
+        turbo::test_instance_tracker_static
+        ${GTEST_LIB}
+        ${GTEST_MAIN_LIB}
+)
+
+
+carbin_cc_test(
+        NAME  compressed_tuple_test
+        MODULE container
+        SOURCES
+        "compressed_tuple_test.cc"
+        CXXOPTS
+        ${CARBIN_CXX_OPTIONS}
+        LINKS
+        turbo::turbo
+        turbo::test_instance_tracker_static
+        ${GTEST_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
+)
+
+carbin_cc_test(
+        NAME  fixed_array_test
+        MODULE container
+        SOURCES
+        "fixed_array_test.cc"
+        CXXOPTS
+        ${CARBIN_CXX_OPTIONS}
+        LINKS
+        turbo::turbo
+        ${GTEST_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
+)
+
+carbin_cc_test(
+        NAME  inlined_vector_test
+        MODULE container
+        SOURCES
+        "inlined_vector_test.cc"
+        CXXOPTS
+        ${CARBIN_CXX_OPTIONS}
+        LINKS
+        turbo::turbo
+        turbo::test_instance_tracker_static
+        ${GTEST_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
+)
+
+
+carbin_cc_test(
+        NAME
+        fixed_array_exception_safety_test
+        MODULE container
+        LINKS
+        turbo::exception_safety_testing_static
+        turbo::turbo
+        ${GTEST_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
+        CXXOPTS
+        ${CARBIN_CXX_OPTIONS}
+        SOURCES
+        "fixed_array_exception_safety_test.cc"
+)
+
+
+carbin_cc_test(
+        NAME
+        inlined_vector_exception_safety_test
+        MODULE container
+        SOURCES
+        "inlined_vector_exception_safety_test.cc"
+        CXXOPTS
+        ${CARBIN_CXX_OPTIONS}
+        LINKS
+        turbo::turbo
+        turbo::exception_safety_testing_static
+        ${GTEST_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
+)
+
+
+carbin_cc_test(
+        NAME
         test_instance_tracker_test
+        MODULE container
         SOURCES
         "test_instance_tracker_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::test_instance_tracker
+        LINKS
+        turbo::test_instance_tracker_static
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
@@ -158,93 +147,84 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         flat_hash_map_test
+        MODULE container
         SOURCES
         "flat_hash_map_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::hash_generator_testing
-        turbo::unordered_map_constructor_test
-        turbo::unordered_map_lookup_test
-        turbo::unordered_map_members_test
-        turbo::unordered_map_modifiers_test
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
         ${GTEST_MAIN_LIB}
 )
 #TODO disabled now(jeff)
-#[[
+
 carbin_cc_test(
         NAME
         flat_hash_set_test
+        MODULE container
         SOURCES
         "flat_hash_set_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
         "-DUNORDERED_SET_CXX17"
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
         turbo::hash_generator_testing
-        turbo::unordered_set_constructor_test
-        turbo::unordered_set_lookup_test
-        turbo::unordered_set_members_test
-        turbo::unordered_set_modifiers_test
         ${GTEST_LIB}
         ${GMOCK_LIB}
         ${GTEST_MAIN_LIB}
 )
-]]
+
 carbin_cc_test(
         NAME
         node_hash_map_test
+        MODULE container
         SOURCES
         "node_hash_map_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::hash_generator_testing
         turbo::turbo
-        turbo::unordered_map_constructor_test
-        turbo::unordered_map_lookup_test
-        turbo::unordered_map_members_test
-        turbo::unordered_map_modifiers_test
         ${GTEST_LIB}
+        ${GMOCK_LIB}
         ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
         NAME
         node_hash_set_test
+        MODULE container
         SOURCES
         "node_hash_set_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
         "-DUNORDERED_SET_CXX17"
-        DEPS
+        LINKS
         turbo::hash_generator_testing
         turbo::turbo
-        turbo::unordered_set_constructor_test
-        turbo::unordered_set_lookup_test
-        turbo::unordered_set_members_test
-        turbo::unordered_set_modifiers_test
         ${GTEST_LIB}
+        ${GMOCK_LIB}
         ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
         NAME
         container_memory_test
+        MODULE container
         SOURCES
         "container_memory_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
-        turbo::test_instance_tracker
+        turbo::test_instance_tracker_static
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
 )
@@ -252,11 +232,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         hash_function_defaults_test
+        MODULE container
         SOURCES
         "hash_function_defaults_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
@@ -273,37 +254,23 @@ carbin_cc_library(
         "hash_generator_testing.h"
         SOURCES
         "hash_generator_testing.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${GTEST_LIB}
-        turbo::hash_policy_testing
         turbo::turbo
 )
 
-# Internal-only target, do not depend on directly.
-carbin_cc_library(
-        NAMESPACE
-        turbo
-        NAME
-        hash_policy_testing
-        HEADERS
-        "hash_policy_testing.h"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        ${GTEST_LIB}
-        turbo::turbo
-)
 
 carbin_cc_test(
         NAME
         hash_policy_testing_test
+        MODULE container
         SOURCES
         "hash_policy_testing_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${GTEST_LIB}
         turbo::turbo
         ${GMOCK_LIB}
@@ -314,11 +281,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         hash_policy_traits_test
+        MODULE container
         SOURCES
         "hash_policy_traits_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${GTEST_LIB}
         ${GMOCK_LIB}
         turbo::turbo
@@ -329,11 +297,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         common_policy_traits_test
+        MODULE container
         SOURCES
         "common_policy_traits_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${GTEST_LIB}
         ${GMOCK_LIB}
         turbo::turbo
@@ -344,11 +313,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         hashtablez_sampler_test
+        MODULE container
         SOURCES
         "hashtablez_sampler_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${GTEST_LIB}
         ${GMOCK_LIB}
         turbo::turbo
@@ -359,11 +329,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         node_slot_policy_test
+        MODULE container
         SOURCES
         "node_slot_policy_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
@@ -373,14 +344,14 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         raw_hash_set_test
+        MODULE container
         SOURCES
         "raw_hash_set_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${GTEST_LIB}
         ${GMOCK_LIB}
-        turbo::hash_policy_testing
         turbo::turbo
         ${GTEST_MAIN_LIB}
 )
@@ -388,11 +359,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         raw_hash_set_allocator_test
+        MODULE container
         SOURCES
         "raw_hash_set_allocator_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${GTEST_LIB}
         turbo::turbo
         ${GMOCK_LIB}
@@ -403,209 +375,55 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         layout_test
+        MODULE container
         SOURCES
         "layout_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
-# Internal-only target, do not depend on directly.
-carbin_cc_library(
-        NAMESPACE
-        turbo
-        NAME
-        tracked
-        HEADERS
-        "tracked.h"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        ${GTEST_LIB}
-        turbo::turbo
-
-)
-
-# Internal-only target, do not depend on directly.
-carbin_cc_library(
-        NAMESPACE
-        turbo
-        NAME
-        unordered_map_constructor_test
-        HEADERS
-        "unordered_map_constructor_test.h"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::hash_generator_testing
-        turbo::hash_policy_testing
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-
-)
-
-# Internal-only target, do not depend on directly.
-carbin_cc_library(
-        NAMESPACE
-        turbo
-        NAME
-        unordered_map_lookup_test
-        HEADERS
-        "unordered_map_lookup_test.h"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::hash_generator_testing
-        turbo::hash_policy_testing
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-
-)
-
-# Internal-only target, do not depend on directly.
-carbin_cc_library(
-        NAMESPACE
-        turbo
-        NAME
-        unordered_map_members_test
-        HEADERS
-        "unordered_map_members_test.h"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-
-)
-
-# Internal-only target, do not depend on directly.
-carbin_cc_library(
-        NAMESPACE
-        turbo
-        NAME
-        unordered_map_modifiers_test
-        HEADERS
-        "unordered_map_modifiers_test.h"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::hash_generator_testing
-        turbo::hash_policy_testing
-        ${GMOCK_LIB}
-        ${GTEST_LIB}
-
-)
-
-# Internal-only target, do not depend on directly.
-carbin_cc_library(
-        NAMESPACE
-        turbo
-        NAME
-        unordered_set_constructor_test
-        HEADERS
-        "unordered_set_constructor_test.h"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::hash_generator_testing
-        turbo::hash_policy_testing
-        ${GMOCK_LIB}
-        ${GTEST_LIB}
-
-)
-
-# Internal-only target, do not depend on directly.
-carbin_cc_library(
-        NAMESPACE
-        turbo
-        NAME
-        unordered_set_lookup_test
-        HEADERS
-        "unordered_set_lookup_test.h"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::hash_generator_testing
-        turbo::hash_policy_testing
-        ${GMOCK_LIB}
-        ${GTEST_LIB}
-)
-
-# Internal-only target, do not depend on directly.
-carbin_cc_library(
-        NAMESPACE
-        turbo
-        NAME
-        unordered_set_members_test
-        HEADERS
-        "unordered_set_members_test.h"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
-        ${GMOCK_LIB}
-        ${GTEST_LIB}
-
-)
-
-# Internal-only target, do not depend on directly.
-carbin_cc_library(
-        NAMESPACE
-        turbo
-        NAME
-        unordered_set_modifiers_test
-        HEADERS
-        "unordered_set_modifiers_test.h"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::hash_generator_testing
-        turbo::hash_policy_testing
-        ${GMOCK_LIB}
-)
 
 carbin_cc_test(
         NAME
         unordered_set_test
+        MODULE container
         SOURCES
         "unordered_set_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::unordered_set_constructor_test
-        turbo::unordered_set_lookup_test
-        turbo::unordered_set_members_test
-        turbo::unordered_set_modifiers_test
+        LINKS
+        turbo::hash_generator_testing_static
         ${GTEST_LIB}
+        ${GMOCK_LIB}
         ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
         NAME
         unordered_map_test
+        MODULE container
         SOURCES
         "unordered_map_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::unordered_map_constructor_test
-        turbo::unordered_map_lookup_test
-        turbo::unordered_map_members_test
-        turbo::unordered_map_modifiers_test
+        LINKS
+        turbo::hash_generator_testing_static
         ${GTEST_LIB}
+        ${GMOCK_LIB}
         ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
         NAME
         sample_element_size_test
+        MODULE container
         SOURCES
         "sample_element_size_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
@@ -615,11 +433,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         ring_buffer_test
+        MODULE container
         SOURCES
         "ring_buffer_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
@@ -630,51 +449,34 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         intrusive_list_test
+        MODULE container
         SOURCES
         "intrusive_list_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
 carbin_cc_test(
         NAME
         bounded_queue_test
+        MODULE container
         SOURCES
         "bounded_queue_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
-carbin_cc_test(
-        NAME
-        small_vector_test
-        SOURCES
-        "small_vector_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
-)
-
-carbin_cc_test(
-        NAME tf_serializer_test
-        SOURCES
-        serializer_test.cc
-        COPTS ${CARBIN_CXX_OPTIONS}
-        DEPS
-        ${CARBIN_DEPS_LINK}
-        turbo::turbo
-)
 carbin_cc_test(
         NAME container_batch_test
+        MODULE container
         SOURCES
         batch_test.cc
-        COPTS ${CARBIN_CXX_OPTIONS}
-        DEPS
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
 )

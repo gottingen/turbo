@@ -14,26 +14,16 @@
 # limitations under the License.
 #
 
-carbin_cc_test(
-        NAME
-        iobuf_test
-        SOURCES
-        "iobuf_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        "-fno-access-control"
-        DEPS
-        turbo::turbo
-)
 
 carbin_cc_test(
         NAME
         env_test
+        MODULE system
         SOURCES
         "env_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
 )
@@ -41,12 +31,13 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         endpoint_test
+        MODULE system
         SOURCES
         "endpoint_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
         "-fno-access-control"
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
 )
@@ -54,11 +45,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         processor_test
+        MODULE system
         SOURCES
         "processor_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
 )
@@ -66,11 +58,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         sysinfo_test
+        MODULE system
         SOURCES
         "sysinfo_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
 )
@@ -78,11 +71,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         atexit_test
+        MODULE system
         SOURCES
         "atexit_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
         ${GTEST_LIB}

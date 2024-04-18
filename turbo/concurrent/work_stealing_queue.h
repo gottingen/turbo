@@ -16,8 +16,8 @@
 #ifndef TURBO_CONCURRENT_WORK_STEALING_QUEUE_H_
 #define TURBO_CONCURRENT_WORK_STEALING_QUEUE_H_
 
-#include "turbo/platform/port.h"
-#include "turbo/log/logging.h"
+#include <turbo/platform/port.h>
+#include <turbo/base/internal/raw_logging.h>
 #include <atomic>
 
 namespace turbo {
@@ -36,15 +36,15 @@ namespace turbo {
 
         int init(size_t capacity) {
             if (_capacity != 0) {
-                TLOG_ERROR("Already initialized");
+                TURBO_RAW_LOG(ERROR, "Already initialized");
                 return -1;
             }
             if (capacity == 0) {
-                TLOG_ERROR("Invalid capacity={}", capacity);
+                TURBO_RAW_LOG(ERROR, "Invalid capacity=%ld", capacity);
                 return -1;
             }
             if (capacity & (capacity - 1)) {
-                TLOG_ERROR("Invalid capacity={} which must be power of 2", capacity);
+                TURBO_RAW_LOG(ERROR, "Invalid capacity=%ld which must be power of 2", capacity);
                 return -1;
             }
             _buffer = new(std::nothrow) T[capacity];

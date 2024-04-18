@@ -65,8 +65,6 @@ namespace turbo {
 
         [[nodiscard]] turbo::Status write(std::string_view buff) override;
 
-        [[nodiscard]] turbo::Status write(const turbo::IOBuf &buff) override;
-
         [[nodiscard]] turbo::Status flush() override { return _file.flush(); }
 
         [[nodiscard]] turbo::Status truncate(size_t size) override { return _file.truncate(size); }
@@ -92,9 +90,6 @@ namespace turbo {
         return write(buff.data(), buff.size());
     }
 
-     [[nodiscard]] inline turbo::Status TempFile::write(const turbo::IOBuf &buff)  {
-        return _file.write(buff);
-    }
 
 } // namespace turbo
 

@@ -123,9 +123,6 @@ namespace turbo {
         [[nodiscard]] turbo::Status write(off_t offset, std::string_view str, bool truncate = false) override {
             return write(offset, str.data(), str.size(), truncate);
         }
-
-        [[nodiscard]] turbo::Status
-        write(off_t offset, const turbo::IOBuf &buff, bool truncate = false) override;
         /**
          * @brief truncate file to the specified length.
          * @param size [input] file length.

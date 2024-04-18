@@ -17,9 +17,9 @@
 #include "turbo/platform/port.h"
 #if defined(TURBO_PLATFORM_OSX)
 
-#include "turbo/system/threading/thread_name_registry.h"
-#include "turbo/base/assume.h"
-#include "turbo/log/logging.h"
+#include <turbo/system/threading/thread_name_registry.h>
+#include <turbo/base/assume.h>
+#include <turbo/base/internal/raw_logging.h>
 
 #include <errno.h>
 #include <sched.h>
@@ -86,7 +86,7 @@ namespace turbo {
         TDLOG_CHECK_NE(handle.id_, kInvalidThreadId);
         const int kNiceSetting = ThreadNiceValue(priority);
         if (setpriority(PRIO_PROCESS, handle.id_, kNiceSetting)) {
-            TLOG_ERROR("Failed to set nice value of thread ({}) to {}",
+            TURBO_RAW_LOG(ERROR,"Failed to set nice value of thread (%ld) to %ld",
                        handle.id_, kNiceSetting);
         }
 #endif  //  !defined(TURBO_PLATFORM_NACL)

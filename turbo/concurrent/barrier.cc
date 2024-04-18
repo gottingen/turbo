@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/concurrent/barrier.h"
-#include "turbo/base/internal/raw_logging.h"
+#include <turbo/concurrent/barrier.h>
+#include <turbo/base/internal/raw_logging.h>
 
 namespace turbo {
 

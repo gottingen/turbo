@@ -20,15 +20,16 @@ find_library(EXECINFO_LIBRARY execinfo)
 carbin_cc_library(
         NAMESPACE
         turbo
+        MODULE debugging
         NAME
         stack_consumption
         HEADERS
         "stack_consumption.h"
         SOURCES
         "stack_consumption.cc"
-        COPTS
-        ${TURBO_DEFAULT_COPTS}
-        DEPS
+        CXXOPTS
+        ${TURBO_DEFAULT_CXXOPTS}
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
 )
@@ -36,11 +37,12 @@ carbin_cc_library(
 carbin_cc_test(
         NAME
         stacktrace_test
+        MODULE debugging
         SOURCES
         "stacktrace_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -49,11 +51,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         symbolize_test
+        MODULE debugging
         SOURCES
         "symbolize_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         turbo::stack_consumption
         ${GTEST_LIB}
@@ -64,11 +67,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         failure_signal_handler_test
+        MODULE debugging
         SOURCES
         "failure_signal_handler_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         Threads::Threads
         ${GTEST_LIB}
@@ -79,11 +83,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         demangle_test
+        MODULE debugging
         SOURCES
         "demangle_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         turbo::stack_consumption
         ${GTEST_LIB}
@@ -94,11 +99,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         leak_check_test
+        MODULE debugging
         SOURCES
         "leak_check_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -107,11 +113,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         stack_consumption_test
+        MODULE debugging
         SOURCES
         "stack_consumption_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::stack_consumption
         turbo::turbo
         ${GTEST_LIB}

@@ -29,15 +29,10 @@ outputs:
         - {{ pin_compatible('turbo', exact=True) }}
     requirements:
       build:
-        - {{ compiler('cxx') }}
-        - sysroot_linux-64 >=2.17  # [linux64]
       host:
-        - sysroot_linux-64 >=2.17  # [linux64]
       run:
-        - sysroot_linux-64 >=2.17  # [linux64]
     test:
       commands:
-        - test -f $PREFIX/lib/libturbo.so              # [linux]
-        - test -f $PREFIX/lib/libturbo.dylib           # [osx]
+        - test -f $PREFIX/lib/libturbo.a              # [linux]
       #  - conda inspect linkages -p $PREFIX $PKG_NAME  # [not win]
       #  - conda inspect objects -p $PREFIX $PKG_NAME   # [osx]

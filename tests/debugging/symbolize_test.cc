@@ -15,8 +15,10 @@
 #include "turbo/debugging/symbolize.h"
 
 #ifndef _WIN32
+
 #include <fcntl.h>
 #include <sys/mman.h>
+
 #endif
 
 #include <cstring>
@@ -26,7 +28,6 @@
 #include "turbo/base/casts.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "stack_consumption.h"
-#include "turbo/log/logging.h"
 #include "turbo/memory/memory.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/per_thread_tls.h"
@@ -45,55 +46,55 @@ using testing::Contains;
 // Functions to symbolize. Use C linkage to avoid mangled names.
 extern "C" {
 TURBO_SYMBOLIZE_TEST_NOINLINE void nonstatic_func() {
-  // The next line makes this a unique function to prevent the compiler from
-  // folding identical functions together.
-  volatile int x = __LINE__;
-  static_cast<void>(x);
-  TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
+    // The next line makes this a unique function to prevent the compiler from
+    // folding identical functions together.
+    volatile int x = __LINE__;
+    static_cast<void>(x);
+    TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
 }
 
 TURBO_SYMBOLIZE_TEST_NOINLINE static void static_func() {
-  // The next line makes this a unique function to prevent the compiler from
-  // folding identical functions together.
-  volatile int x = __LINE__;
-  static_cast<void>(x);
-  TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
+    // The next line makes this a unique function to prevent the compiler from
+    // folding identical functions together.
+    volatile int x = __LINE__;
+    static_cast<void>(x);
+    TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
 }
 }  // extern "C"
 
 struct Foo {
-  static void func(int x);
+    static void func(int x);
 };
 
 // A C++ method that should have a mangled name.
 TURBO_SYMBOLIZE_TEST_NOINLINE void Foo::func(int) {
-  // The next line makes this a unique function to prevent the compiler from
-  // folding identical functions together.
-  volatile int x = __LINE__;
-  static_cast<void>(x);
-  TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
+    // The next line makes this a unique function to prevent the compiler from
+    // folding identical functions together.
+    volatile int x = __LINE__;
+    static_cast<void>(x);
+    TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
 }
 
 // Create functions that will remain in different text sections in the
 // final binary when linker option "-z,keep-text-section-prefix" is used.
 int TURBO_ATTRIBUTE_SECTION_VARIABLE(.text.unlikely) unlikely_func() {
-  return 0;
+    return 0;
 }
 
 int TURBO_ATTRIBUTE_SECTION_VARIABLE(.text.hot) hot_func() {
-  return 0;
+    return 0;
 }
 
 int TURBO_ATTRIBUTE_SECTION_VARIABLE(.text.startup) startup_func() {
-  return 0;
+    return 0;
 }
 
 int TURBO_ATTRIBUTE_SECTION_VARIABLE(.text.exit) exit_func() {
-  return 0;
+    return 0;
 }
 
 int /*TURBO_ATTRIBUTE_SECTION_VARIABLE(.text)*/ regular_func() {
-  return 0;
+    return 0;
 }
 
 // Thread-local data may confuse the symbolizer, ensure that it does not.
@@ -101,7 +102,7 @@ int /*TURBO_ATTRIBUTE_SECTION_VARIABLE(.text)*/ regular_func() {
 #if TURBO_PER_THREAD_TLS
 static TURBO_PER_THREAD_TLS_KEYWORD char symbolize_test_thread_small[1];
 static TURBO_PER_THREAD_TLS_KEYWORD char
-    symbolize_test_thread_big[2 * 1024 * 1024];
+        symbolize_test_thread_big[2 * 1024 * 1024];
 #endif
 
 #if !defined(__EMSCRIPTEN__)
@@ -113,7 +114,7 @@ static volatile bool volatile_bool = false;
 // Force the binary to be large enough that a THP .text remap will succeed.
 static constexpr size_t kHpageSize = 1 << 21;
 const char kHpageTextPadding[kHpageSize * 4] TURBO_ATTRIBUTE_SECTION_VARIABLE(
-    .text) = "";
+        .text) = "";
 #endif  // !defined(__EMSCRIPTEN__)
 
 static char try_symbolize_buffer[4096];
@@ -123,89 +124,89 @@ static char try_symbolize_buffer[4096];
 // turbo::Symbolize() returns false, otherwise returns try_symbolize_buffer with
 // the result of turbo::Symbolize().
 static const char *TrySymbolizeWithLimit(void *pc, int limit) {
-  TURBO_RAW_CHECK(limit <= sizeof(try_symbolize_buffer),
-                 "try_symbolize_buffer is too small");
+    TURBO_RAW_CHECK(limit <= sizeof(try_symbolize_buffer),
+                    "try_symbolize_buffer is too small");
 
-  // Use the heap to facilitate heap and buffer sanitizer tools.
-  TLOG_INFO("limit size:{}", limit);
-  auto heap_buffer = std::make_unique<char[]>(sizeof(try_symbolize_buffer));
-  bool found = turbo::Symbolize(pc, heap_buffer.get(), limit);
-  if (found) {
-    TURBO_RAW_CHECK(strnlen(heap_buffer.get(), limit) < limit,
-                   "turbo::Symbolize() did not properly terminate the string");
-    strncpy(try_symbolize_buffer, heap_buffer.get(),
-            sizeof(try_symbolize_buffer) - 1);
-    try_symbolize_buffer[sizeof(try_symbolize_buffer) - 1] = '\0';
-  }
-  TLOG_INFO("found: {}",(found ? "true" : "false"));
-  return found ? try_symbolize_buffer : nullptr;
+    // Use the heap to facilitate heap and buffer sanitizer tools.
+    std::cout << "limit size: " << limit << std::endl;
+    auto heap_buffer = std::make_unique<char[]>(sizeof(try_symbolize_buffer));
+    bool found = turbo::Symbolize(pc, heap_buffer.get(), limit);
+    if (found) {
+        TURBO_RAW_CHECK(strnlen(heap_buffer.get(), limit) < limit,
+                        "turbo::Symbolize() did not properly terminate the string");
+        strncpy(try_symbolize_buffer, heap_buffer.get(),
+                sizeof(try_symbolize_buffer) - 1);
+        try_symbolize_buffer[sizeof(try_symbolize_buffer) - 1] = '\0';
+    }
+    std::cout << "found: " << (found ? "true" : "false") << std::endl;
+    return found ? try_symbolize_buffer : nullptr;
 }
 
 // A wrapper for TrySymbolizeWithLimit(), with a large limit.
 static const char *TrySymbolize(void *pc) {
-  return TrySymbolizeWithLimit(pc, sizeof(try_symbolize_buffer));
+    return TrySymbolizeWithLimit(pc, sizeof(try_symbolize_buffer));
 }
 
-#if defined(TURBO_INTERNAL_HAVE_ELF_SYMBOLIZE) ||    \
+#if defined(TURBO_INTERNAL_HAVE_ELF_SYMBOLIZE) || \
     defined(TURBO_INTERNAL_HAVE_DARWIN_SYMBOLIZE) || \
     defined(TURBO_INTERNAL_HAVE_EMSCRIPTEN_SYMBOLIZE)
 
 // Test with a return address.
 void TURBO_NO_INLINE TestWithReturnAddress() {
 #if defined(TURBO_NO_INLINE_SUPPORTED)
-  void *return_address = __builtin_return_address(0);
-  const char *symbol = TrySymbolize(return_address);
-  TURBO_RAW_CHECK(symbol != nullptr, "TestWithReturnAddress failed");
-  TURBO_RAW_CHECK(strcmp(symbol, "main") == 0, "TestWithReturnAddress failed");
-  std::cout << "TestWithReturnAddress passed" << std::endl;
+    void *return_address = __builtin_return_address(0);
+    const char *symbol = TrySymbolize(return_address);
+    TURBO_RAW_CHECK(symbol != nullptr, "TestWithReturnAddress failed");
+    TURBO_RAW_CHECK(strcmp(symbol, "main") == 0, "TestWithReturnAddress failed");
+    std::cout << "TestWithReturnAddress passed" << std::endl;
 #endif
 }
 
 #ifndef TURBO_INTERNAL_HAVE_EMSCRIPTEN_SYMBOLIZE
 
 TEST(Symbolize, Cached) {
-  // Compilers should give us pointers to them.
-  EXPECT_STREQ("nonstatic_func", TrySymbolize((void *)(&nonstatic_func)));
+    // Compilers should give us pointers to them.
+    EXPECT_STREQ("nonstatic_func", TrySymbolize((void *) (&nonstatic_func)));
 
-  // The name of an internal linkage symbol is not specified; allow either a
-  // mangled or an unmangled name here.
-  const char *static_func_symbol = TrySymbolize((void *)(&static_func));
-  EXPECT_TRUE(strcmp("static_func", static_func_symbol) == 0 ||
-              strcmp("static_func()", static_func_symbol) == 0);
+    // The name of an internal linkage symbol is not specified; allow either a
+    // mangled or an unmangled name here.
+    const char *static_func_symbol = TrySymbolize((void *) (&static_func));
+    EXPECT_TRUE(strcmp("static_func", static_func_symbol) == 0 ||
+                strcmp("static_func()", static_func_symbol) == 0);
 
-  EXPECT_TRUE(nullptr == TrySymbolize(nullptr));
+    EXPECT_TRUE(nullptr == TrySymbolize(nullptr));
 }
 
 TEST(Symbolize, Truncation) {
-  constexpr char kNonStaticFunc[] = "nonstatic_func";
-  EXPECT_STREQ("nonstatic_func",
-               TrySymbolizeWithLimit((void *)(&nonstatic_func),
-                                     strlen(kNonStaticFunc) + 1));
-  EXPECT_STREQ("nonstatic_...",
-               TrySymbolizeWithLimit((void *)(&nonstatic_func),
-                                     strlen(kNonStaticFunc) + 0));
-  EXPECT_STREQ("nonstatic...",
-               TrySymbolizeWithLimit((void *)(&nonstatic_func),
-                                     strlen(kNonStaticFunc) - 1));
-  EXPECT_STREQ("n...", TrySymbolizeWithLimit((void *)(&nonstatic_func), 5));
-  EXPECT_STREQ("...", TrySymbolizeWithLimit((void *)(&nonstatic_func), 4));
-  EXPECT_STREQ("..", TrySymbolizeWithLimit((void *)(&nonstatic_func), 3));
-  EXPECT_STREQ(".", TrySymbolizeWithLimit((void *)(&nonstatic_func), 2));
-  EXPECT_STREQ("", TrySymbolizeWithLimit((void *)(&nonstatic_func), 1));
-  EXPECT_EQ(nullptr, TrySymbolizeWithLimit((void *)(&nonstatic_func), 0));
+    constexpr char kNonStaticFunc[] = "nonstatic_func";
+    EXPECT_STREQ("nonstatic_func",
+                 TrySymbolizeWithLimit((void *) (&nonstatic_func),
+                                       strlen(kNonStaticFunc) + 1));
+    EXPECT_STREQ("nonstatic_...",
+                 TrySymbolizeWithLimit((void *) (&nonstatic_func),
+                                       strlen(kNonStaticFunc) + 0));
+    EXPECT_STREQ("nonstatic...",
+                 TrySymbolizeWithLimit((void *) (&nonstatic_func),
+                                       strlen(kNonStaticFunc) - 1));
+    EXPECT_STREQ("n...", TrySymbolizeWithLimit((void *) (&nonstatic_func), 5));
+    EXPECT_STREQ("...", TrySymbolizeWithLimit((void *) (&nonstatic_func), 4));
+    EXPECT_STREQ("..", TrySymbolizeWithLimit((void *) (&nonstatic_func), 3));
+    EXPECT_STREQ(".", TrySymbolizeWithLimit((void *) (&nonstatic_func), 2));
+    EXPECT_STREQ("", TrySymbolizeWithLimit((void *) (&nonstatic_func), 1));
+    EXPECT_EQ(nullptr, TrySymbolizeWithLimit((void *) (&nonstatic_func), 0));
 }
 
 TEST(Symbolize, SymbolizeWithDemangling) {
-  Foo::func(100);
-  EXPECT_STREQ("Foo::func()", TrySymbolize((void *)(&Foo::func)));
+    Foo::func(100);
+    EXPECT_STREQ("Foo::func()", TrySymbolize((void *) (&Foo::func)));
 }
 
 TEST(Symbolize, SymbolizeSplitTextSections) {
-  EXPECT_STREQ("unlikely_func()", TrySymbolize((void *)(&unlikely_func)));
-  EXPECT_STREQ("hot_func()", TrySymbolize((void *)(&hot_func)));
-  EXPECT_STREQ("startup_func()", TrySymbolize((void *)(&startup_func)));
-  EXPECT_STREQ("exit_func()", TrySymbolize((void *)(&exit_func)));
-  EXPECT_STREQ("regular_func()", TrySymbolize((void *)(&regular_func)));
+    EXPECT_STREQ("unlikely_func()", TrySymbolize((void *) (&unlikely_func)));
+    EXPECT_STREQ("hot_func()", TrySymbolize((void *) (&hot_func)));
+    EXPECT_STREQ("startup_func()", TrySymbolize((void *) (&startup_func)));
+    EXPECT_STREQ("exit_func()", TrySymbolize((void *) (&exit_func)));
+    EXPECT_STREQ("regular_func()", TrySymbolize((void *) (&regular_func)));
 }
 
 // Tests that verify that Symbolize stack footprint is within some limit.
@@ -216,61 +217,61 @@ static char g_symbolize_buffer[4096];
 static char *g_symbolize_result;
 
 static void SymbolizeSignalHandler(int signo) {
-  if (turbo::Symbolize(g_pc_to_symbolize, g_symbolize_buffer,
-                      sizeof(g_symbolize_buffer))) {
-    g_symbolize_result = g_symbolize_buffer;
-  } else {
-    g_symbolize_result = nullptr;
-  }
+    if (turbo::Symbolize(g_pc_to_symbolize, g_symbolize_buffer,
+                         sizeof(g_symbolize_buffer))) {
+        g_symbolize_result = g_symbolize_buffer;
+    } else {
+        g_symbolize_result = nullptr;
+    }
 }
 
 // Call Symbolize and figure out the stack footprint of this call.
 static const char *SymbolizeStackConsumption(void *pc, int *stack_consumed) {
-  g_pc_to_symbolize = pc;
-  *stack_consumed = turbo::debugging_internal::GetSignalHandlerStackConsumption(
-      SymbolizeSignalHandler);
-  return g_symbolize_result;
+    g_pc_to_symbolize = pc;
+    *stack_consumed = turbo::debugging_internal::GetSignalHandlerStackConsumption(
+            SymbolizeSignalHandler);
+    return g_symbolize_result;
 }
 
 static int GetStackConsumptionUpperLimit() {
-  // Symbolize stack consumption should be within 2kB.
-  int stack_consumption_upper_limit = 2048;
+    // Symbolize stack consumption should be within 2kB.
+    int stack_consumption_upper_limit = 2048;
 #if defined(TURBO_HAVE_ADDRESS_SANITIZER) || \
     defined(TURBO_HAVE_MEMORY_SANITIZER) || defined(TURBO_HAVE_THREAD_SANITIZER)
-  // Account for sanitizer instrumentation requiring additional stack space.
-  stack_consumption_upper_limit *= 5;
+    // Account for sanitizer instrumentation requiring additional stack space.
+    stack_consumption_upper_limit *= 5;
 #endif
-  return stack_consumption_upper_limit;
+    return stack_consumption_upper_limit;
 }
 
 TEST(Symbolize, SymbolizeStackConsumption) {
-  int stack_consumed = 0;
+    int stack_consumed = 0;
 
-  const char *symbol =
-      SymbolizeStackConsumption((void *)(&nonstatic_func), &stack_consumed);
-  EXPECT_STREQ("nonstatic_func", symbol);
-  EXPECT_GT(stack_consumed, 0);
-  EXPECT_LT(stack_consumed, GetStackConsumptionUpperLimit());
+    const char *symbol =
+            SymbolizeStackConsumption((void *) (&nonstatic_func), &stack_consumed);
+    EXPECT_STREQ("nonstatic_func", symbol);
+    EXPECT_GT(stack_consumed, 0);
+    EXPECT_LT(stack_consumed, GetStackConsumptionUpperLimit());
 
-  // The name of an internal linkage symbol is not specified; allow either a
-  // mangled or an unmangled name here.
-  symbol = SymbolizeStackConsumption((void *)(&static_func), &stack_consumed);
-  EXPECT_TRUE(strcmp("static_func", symbol) == 0 ||
-              strcmp("static_func()", symbol) == 0);
-  EXPECT_GT(stack_consumed, 0);
-  EXPECT_LT(stack_consumed, GetStackConsumptionUpperLimit());
+    // The name of an internal linkage symbol is not specified; allow either a
+    // mangled or an unmangled name here.
+    symbol = SymbolizeStackConsumption((void *) (&static_func), &stack_consumed);
+    EXPECT_TRUE(strcmp("static_func", symbol) == 0 ||
+                strcmp("static_func()", symbol) == 0);
+    EXPECT_GT(stack_consumed, 0);
+    EXPECT_LT(stack_consumed, GetStackConsumptionUpperLimit());
 }
 
 TEST(Symbolize, SymbolizeWithDemanglingStackConsumption) {
-  Foo::func(100);
-  int stack_consumed = 0;
+    Foo::func(100);
+    int stack_consumed = 0;
 
-  const char *symbol =
-      SymbolizeStackConsumption((void *)(&Foo::func), &stack_consumed);
+    const char *symbol =
+            SymbolizeStackConsumption((void *) (&Foo::func), &stack_consumed);
 
-  EXPECT_STREQ("Foo::func()", symbol);
-  EXPECT_GT(stack_consumed, 0);
-  EXPECT_LT(stack_consumed, GetStackConsumptionUpperLimit());
+    EXPECT_STREQ("Foo::func()", symbol);
+    EXPECT_GT(stack_consumed, 0);
+    EXPECT_LT(stack_consumed, GetStackConsumptionUpperLimit());
 }
 
 #endif  // TURBO_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION
@@ -281,130 +282,130 @@ const size_t kPageSize = 64 << 10;
 // We place a read-only symbols into the .text section and verify that we can
 // symbolize them and other symbols after remapping them.
 const char kPadding0[kPageSize * 4] TURBO_ATTRIBUTE_SECTION_VARIABLE(.text) =
-    "";
+        "";
 const char kPadding1[kPageSize * 4] TURBO_ATTRIBUTE_SECTION_VARIABLE(.text) =
-    "";
+        "";
 
 static int FilterElfHeader(struct dl_phdr_info *info, size_t size, void *data) {
-  for (int i = 0; i < info->dlpi_phnum; i++) {
-    if (info->dlpi_phdr[i].p_type == PT_LOAD &&
-        info->dlpi_phdr[i].p_flags == (PF_R | PF_X)) {
-      const void *const vaddr =
-          turbo::bit_cast<void *>(info->dlpi_addr + info->dlpi_phdr[i].p_vaddr);
-      const auto segsize = info->dlpi_phdr[i].p_memsz;
+    for (int i = 0; i < info->dlpi_phnum; i++) {
+        if (info->dlpi_phdr[i].p_type == PT_LOAD &&
+            info->dlpi_phdr[i].p_flags == (PF_R | PF_X)) {
+            const void *const vaddr =
+                    turbo::bit_cast<void *>(info->dlpi_addr + info->dlpi_phdr[i].p_vaddr);
+            const auto segsize = info->dlpi_phdr[i].p_memsz;
 
-      const char *self_exe;
-      if (info->dlpi_name != nullptr && info->dlpi_name[0] != '\0') {
-        self_exe = info->dlpi_name;
-      } else {
-        self_exe = "/proc/self/exe";
-      }
+            const char *self_exe;
+            if (info->dlpi_name != nullptr && info->dlpi_name[0] != '\0') {
+                self_exe = info->dlpi_name;
+            } else {
+                self_exe = "/proc/self/exe";
+            }
 
-      turbo::debugging_internal::RegisterFileMappingHint(
-          vaddr, reinterpret_cast<const char *>(vaddr) + segsize,
-          info->dlpi_phdr[i].p_offset, self_exe);
+            turbo::debugging_internal::RegisterFileMappingHint(
+                    vaddr, reinterpret_cast<const char *>(vaddr) + segsize,
+                    info->dlpi_phdr[i].p_offset, self_exe);
 
-      return 1;
+            return 1;
+        }
     }
-  }
 
-  return 1;
+    return 1;
 }
 
 TEST(Symbolize, SymbolizeWithMultipleMaps) {
-  // Force kPadding0 and kPadding1 to be linked in.
-  if (volatile_bool) {
-    TURBO_RAW_LOG(INFO, "%s", kPadding0);
-    TURBO_RAW_LOG(INFO, "%s", kPadding1);
-  }
-
-  // Verify we can symbolize everything.
-  char buf[512];
-  memset(buf, 0, sizeof(buf));
-  turbo::Symbolize(kPadding0, buf, sizeof(buf));
-  EXPECT_STREQ("kPadding0", buf);
-
-  memset(buf, 0, sizeof(buf));
-  turbo::Symbolize(kPadding1, buf, sizeof(buf));
-  EXPECT_STREQ("kPadding1", buf);
-
-  // Specify a hint for the executable segment.
-  dl_iterate_phdr(FilterElfHeader, nullptr);
-
-  // Reload at least one page out of kPadding0, kPadding1
-  const char *ptrs[] = {kPadding0, kPadding1};
-
-  for (const char *ptr : ptrs) {
-    const int kMapFlags = MAP_ANONYMOUS | MAP_PRIVATE;
-    void *addr = mmap(nullptr, kPageSize, PROT_READ, kMapFlags, 0, 0);
-    ASSERT_NE(addr, MAP_FAILED);
-
-    // kPadding[0-1] is full of zeroes, so we can remap anywhere within it, but
-    // we ensure there is at least a full page of padding.
-    void *remapped = reinterpret_cast<void *>(
-        reinterpret_cast<uintptr_t>(ptr + kPageSize) & ~(kPageSize - 1ULL));
-
-    const int kMremapFlags = (MREMAP_MAYMOVE | MREMAP_FIXED);
-    void *ret = mremap(addr, kPageSize, kPageSize, kMremapFlags, remapped);
-    ASSERT_NE(ret, MAP_FAILED);
-  }
-
-  // Invalidate the symbolization cache so we are forced to rely on the hint.
-  turbo::Symbolize(nullptr, buf, sizeof(buf));
-
-  // Verify we can still symbolize.
-  const char *expected[] = {"kPadding0", "kPadding1"};
-  const size_t offsets[] = {0, kPageSize, 2 * kPageSize, 3 * kPageSize};
-
-  for (int i = 0; i < 2; i++) {
-    for (size_t offset : offsets) {
-      memset(buf, 0, sizeof(buf));
-      turbo::Symbolize(ptrs[i] + offset, buf, sizeof(buf));
-      EXPECT_STREQ(expected[i], buf);
+    // Force kPadding0 and kPadding1 to be linked in.
+    if (volatile_bool) {
+        TURBO_RAW_LOG(INFO, "%s", kPadding0);
+        TURBO_RAW_LOG(INFO, "%s", kPadding1);
     }
-  }
+
+    // Verify we can symbolize everything.
+    char buf[512];
+    memset(buf, 0, sizeof(buf));
+    turbo::Symbolize(kPadding0, buf, sizeof(buf));
+    EXPECT_STREQ("kPadding0", buf);
+
+    memset(buf, 0, sizeof(buf));
+    turbo::Symbolize(kPadding1, buf, sizeof(buf));
+    EXPECT_STREQ("kPadding1", buf);
+
+    // Specify a hint for the executable segment.
+    dl_iterate_phdr(FilterElfHeader, nullptr);
+
+    // Reload at least one page out of kPadding0, kPadding1
+    const char *ptrs[] = {kPadding0, kPadding1};
+
+    for (const char *ptr: ptrs) {
+        const int kMapFlags = MAP_ANONYMOUS | MAP_PRIVATE;
+        void *addr = mmap(nullptr, kPageSize, PROT_READ, kMapFlags, 0, 0);
+        ASSERT_NE(addr, MAP_FAILED);
+
+        // kPadding[0-1] is full of zeroes, so we can remap anywhere within it, but
+        // we ensure there is at least a full page of padding.
+        void *remapped = reinterpret_cast<void *>(
+                reinterpret_cast<uintptr_t>(ptr + kPageSize) & ~(kPageSize - 1ULL));
+
+        const int kMremapFlags = (MREMAP_MAYMOVE | MREMAP_FIXED);
+        void *ret = mremap(addr, kPageSize, kPageSize, kMremapFlags, remapped);
+        ASSERT_NE(ret, MAP_FAILED);
+    }
+
+    // Invalidate the symbolization cache so we are forced to rely on the hint.
+    turbo::Symbolize(nullptr, buf, sizeof(buf));
+
+    // Verify we can still symbolize.
+    const char *expected[] = {"kPadding0", "kPadding1"};
+    const size_t offsets[] = {0, kPageSize, 2 * kPageSize, 3 * kPageSize};
+
+    for (int i = 0; i < 2; i++) {
+        for (size_t offset: offsets) {
+            memset(buf, 0, sizeof(buf));
+            turbo::Symbolize(ptrs[i] + offset, buf, sizeof(buf));
+            EXPECT_STREQ(expected[i], buf);
+        }
+    }
 }
 
 // Appends string(*args->arg) to args->symbol_buf.
 static void DummySymbolDecorator(
-    const turbo::debugging_internal::SymbolDecoratorArgs *args) {
-  std::string *message = static_cast<std::string *>(args->arg);
-  strncat(args->symbol_buf, message->c_str(),
-          args->symbol_buf_size - strlen(args->symbol_buf) - 1);
+        const turbo::debugging_internal::SymbolDecoratorArgs *args) {
+    std::string *message = static_cast<std::string *>(args->arg);
+    strncat(args->symbol_buf, message->c_str(),
+            args->symbol_buf_size - strlen(args->symbol_buf) - 1);
 }
 
 TEST(Symbolize, InstallAndRemoveSymbolDecorators) {
-  int ticket_a;
-  std::string a_message("a");
-  EXPECT_GE(ticket_a = turbo::debugging_internal::InstallSymbolDecorator(
-                DummySymbolDecorator, &a_message),
-            0);
+    int ticket_a;
+    std::string a_message("a");
+    EXPECT_GE(ticket_a = turbo::debugging_internal::InstallSymbolDecorator(
+            DummySymbolDecorator, &a_message),
+              0);
 
-  int ticket_b;
-  std::string b_message("b");
-  EXPECT_GE(ticket_b = turbo::debugging_internal::InstallSymbolDecorator(
-                DummySymbolDecorator, &b_message),
-            0);
+    int ticket_b;
+    std::string b_message("b");
+    EXPECT_GE(ticket_b = turbo::debugging_internal::InstallSymbolDecorator(
+            DummySymbolDecorator, &b_message),
+              0);
 
-  int ticket_c;
-  std::string c_message("c");
-  EXPECT_GE(ticket_c = turbo::debugging_internal::InstallSymbolDecorator(
-                DummySymbolDecorator, &c_message),
-            0);
+    int ticket_c;
+    std::string c_message("c");
+    EXPECT_GE(ticket_c = turbo::debugging_internal::InstallSymbolDecorator(
+            DummySymbolDecorator, &c_message),
+              0);
 
-  // Use addresses 4 and 8 here to ensure that we always use valid addresses
-  // even on systems that require instructions to be 32-bit aligned.
-  char *address = reinterpret_cast<char *>(4);
-  EXPECT_STREQ("abc", TrySymbolize(address));
+    // Use addresses 4 and 8 here to ensure that we always use valid addresses
+    // even on systems that require instructions to be 32-bit aligned.
+    char *address = reinterpret_cast<char *>(4);
+    EXPECT_STREQ("abc", TrySymbolize(address));
 
-  EXPECT_TRUE(turbo::debugging_internal::RemoveSymbolDecorator(ticket_b));
+    EXPECT_TRUE(turbo::debugging_internal::RemoveSymbolDecorator(ticket_b));
 
-  EXPECT_STREQ("ac", TrySymbolize(address + 4));
+    EXPECT_STREQ("ac", TrySymbolize(address + 4));
 
-  // Cleanup: remove all remaining decorators so other stack traces don't
-  // get mystery "ac" decoration.
-  EXPECT_TRUE(turbo::debugging_internal::RemoveSymbolDecorator(ticket_a));
-  EXPECT_TRUE(turbo::debugging_internal::RemoveSymbolDecorator(ticket_c));
+    // Cleanup: remove all remaining decorators so other stack traces don't
+    // get mystery "ac" decoration.
+    EXPECT_TRUE(turbo::debugging_internal::RemoveSymbolDecorator(ticket_a));
+    EXPECT_TRUE(turbo::debugging_internal::RemoveSymbolDecorator(ticket_c));
 }
 
 // Some versions of Clang with optimizations enabled seem to be able
@@ -414,72 +415,73 @@ TEST(Symbolize, InstallAndRemoveSymbolDecorators) {
 static int in_data_section = 1;
 
 TEST(Symbolize, ForEachSection) {
-  int fd = TEMP_FAILURE_RETRY(open("/proc/self/exe", O_RDONLY));
-  ASSERT_NE(fd, -1);
+    int fd = TEMP_FAILURE_RETRY(open("/proc/self/exe", O_RDONLY));
+    ASSERT_NE(fd, -1);
 
-  std::vector<std::string> sections;
-  ASSERT_TRUE(turbo::debugging_internal::ForEachSection(
-      fd, [&sections](const std::string_view name, const ElfW(Shdr) &) {
+    std::vector<std::string> sections;
+    ASSERT_TRUE(turbo::debugging_internal::ForEachSection(
+            fd, [&sections](const std::string_view name, const ElfW(Shdr) & ) {
         sections.emplace_back(name);
         return true;
-      }));
+    }));
 
-  // Check for the presence of common section names.
-  EXPECT_THAT(sections, Contains(".text"));
-  EXPECT_THAT(sections, Contains(".rodata"));
-  EXPECT_THAT(sections, Contains(".bss"));
-  ++in_data_section;
-  EXPECT_THAT(sections, Contains(".data"));
+    // Check for the presence of common section names.
+    EXPECT_THAT(sections, Contains(".text"));
+    EXPECT_THAT(sections, Contains(".rodata"));
+    EXPECT_THAT(sections, Contains(".bss"));
+    ++in_data_section;
+    EXPECT_THAT(sections, Contains(".data"));
 
-  close(fd);
+    close(fd);
 }
+
 #endif  // !TURBO_INTERNAL_HAVE_DARWIN_SYMBOLIZE
 #endif  // !TURBO_INTERNAL_HAVE_EMSCRIPTEN_SYMBOLIZE
 
 // x86 specific tests.  Uses some inline assembler.
 extern "C" {
-TURBO_FORCE_INLINE void * inline_func() {
-  void *pc = nullptr;
+TURBO_FORCE_INLINE void *inline_func() {
+    void *pc = nullptr;
 #if defined(__i386__)
-  __asm__ __volatile__("call 1f;\n 1: pop %[PC]" : [ PC ] "=r"(pc));
+    __asm__ __volatile__("call 1f;\n 1: pop %[PC]" : [ PC ] "=r"(pc));
 #elif defined(__x86_64__)
-  __asm__ __volatile__("leaq 0(%%rip),%[PC];\n" : [ PC ] "=r"(pc));
+    __asm__ __volatile__("leaq 0(%%rip),%[PC];\n" : [ PC ] "=r"(pc));
 #endif
-  return pc;
+    return pc;
 }
 
 void *TURBO_NO_INLINE non_inline_func() {
-  void *pc = nullptr;
+    void *pc = nullptr;
 #if defined(__i386__)
-  __asm__ __volatile__("call 1f;\n 1: pop %[PC]" : [ PC ] "=r"(pc));
+    __asm__ __volatile__("call 1f;\n 1: pop %[PC]" : [ PC ] "=r"(pc));
 #elif defined(__x86_64__)
-  __asm__ __volatile__("leaq 0(%%rip),%[PC];\n" : [ PC ] "=r"(pc));
+    __asm__ __volatile__("leaq 0(%%rip),%[PC];\n" : [ PC ] "=r"(pc));
 #endif
-  return pc;
+    return pc;
 }
 
 void TURBO_NO_INLINE TestWithPCInsideNonInlineFunction() {
 #if defined(TURBO_NO_INLINE_SUPPORTED) && \
     (defined(__i386__) || defined(__x86_64__))
-  void *pc = non_inline_func();
-  const char *symbol = TrySymbolize(pc);
-  TURBO_RAW_CHECK(symbol != nullptr, "TestWithPCInsideNonInlineFunction failed");
-  TURBO_RAW_CHECK(strcmp(symbol, "non_inline_func") == 0,
-                 "TestWithPCInsideNonInlineFunction failed");
-  std::cout << "TestWithPCInsideNonInlineFunction passed" << std::endl;
+    void *pc = non_inline_func();
+    const char *symbol = TrySymbolize(pc);
+    TURBO_RAW_CHECK(symbol != nullptr, "TestWithPCInsideNonInlineFunction failed");
+    TURBO_RAW_CHECK(strcmp(symbol, "non_inline_func") == 0,
+                    "TestWithPCInsideNonInlineFunction failed");
+    std::cout << "TestWithPCInsideNonInlineFunction passed" << std::endl;
 #endif
 }
 
 void TURBO_NO_INLINE TestWithPCInsideInlineFunction() {
 #if defined(TURBO_FORCE_INLINE_SUPPORTED) && \
     (defined(__i386__) || defined(__x86_64__))
-  void *pc = inline_func();  // Must be inlined.
-  const char *symbol = TrySymbolize(pc);
-    std::cout <<"symbol: "<<symbol<< std::endl;
-  TURBO_RAW_CHECK(symbol != nullptr, "TestWithPCInsideInlineFunction failed");
-  TURBO_RAW_CHECK(strcmp(symbol, __FUNCTION__) == 0,
-                 "TestWithPCInsideInlineFunction failed");
-  std::cout << "TestWithPCInsideInlineFunction passed" << std::endl;
+    void *pc = inline_func();  // Must be inlined.
+    const char *symbol = TrySymbolize(pc);
+    std::cout << "symbol: " << symbol << std::endl;
+    TURBO_RAW_CHECK(symbol != nullptr, "TestWithPCInsideInlineFunction failed");
+    TURBO_RAW_CHECK(strcmp(symbol, __FUNCTION__) == 0,
+                    "TestWithPCInsideInlineFunction failed");
+    std::cout << "TestWithPCInsideInlineFunction passed" << std::endl;
 #endif
 }
 }
@@ -528,7 +530,7 @@ void TURBO_NO_INLINE TestArmThumbOverlap() {
 }
 
 #endif  // defined(__arm__) && TURBO_HAVE_ATTRIBUTE(target) && ((__ARM_ARCH >= 7)
-        // || !defined(__ARM_PCS_VFP))
+// || !defined(__ARM_PCS_VFP))
 
 #elif defined(_WIN32)
 #if !defined(TURBO_CONSUME_DLL)
@@ -583,31 +585,31 @@ TEST(Symbolize, Unimplemented) {
 
 int main(int argc, char **argv) {
 #if !defined(__EMSCRIPTEN__)
-  // Make sure kHpageTextPadding is linked into the binary.
-  if (volatile_bool) {
-    TURBO_RAW_LOG(INFO, "%s", kHpageTextPadding);
-  }
+    // Make sure kHpageTextPadding is linked into the binary.
+    if (volatile_bool) {
+        TURBO_RAW_LOG(INFO, "%s", kHpageTextPadding);
+    }
 #endif  // !defined(__EMSCRIPTEN__)
 
 #if TURBO_PER_THREAD_TLS
-  // Touch the per-thread variables.
-  symbolize_test_thread_small[0] = 0;
-  symbolize_test_thread_big[0] = 0;
+    // Touch the per-thread variables.
+    symbolize_test_thread_small[0] = 0;
+    symbolize_test_thread_big[0] = 0;
 #endif
 
-  turbo::InitializeSymbolizer(argv[0]);
-  testing::InitGoogleTest(&argc, argv);
+    turbo::InitializeSymbolizer(argv[0]);
+    testing::InitGoogleTest(&argc, argv);
 
 #if defined(TURBO_INTERNAL_HAVE_ELF_SYMBOLIZE) || \
     defined(TURBO_INTERNAL_HAVE_DARWIN_SYMBOLIZE)
-  TestWithPCInsideInlineFunction();
-  TestWithPCInsideNonInlineFunction();
-  TestWithReturnAddress();
+    TestWithPCInsideInlineFunction();
+    TestWithPCInsideNonInlineFunction();
+    TestWithReturnAddress();
 #if defined(__arm__) && TURBO_HAVE_ATTRIBUTE(target) && \
     ((__ARM_ARCH >= 7) || !defined(__ARM_PCS_VFP))
-  TestArmThumbOverlap();
+    TestArmThumbOverlap();
 #endif
 #endif
 
-  return RUN_ALL_TESTS();
+    return RUN_ALL_TESTS();
 }

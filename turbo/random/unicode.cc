@@ -16,8 +16,7 @@
 
 #include "turbo/random/unicode.h"
 #include "turbo/base/endian.h"
-#include "turbo/unicode/codec.h"
-#include "turbo/unicode/converter.h"
+#include <turbo/unicode/utf.h>
 
 namespace turbo {
 
@@ -105,26 +104,24 @@ namespace turbo {
         std::vector<char16_t> result;
         result.reserve(size);
 
-        char16_t W1;
-        char16_t W2;
         size_t count{0};
-        while (result.size() < size) {
+        char16_t output_buf[2];
             count++;
             const uint32_t value = generate();
-            switch (turbo::unicode::utf16::encode(value, W1, W2)) {
+            auto r = turbo::convert_utf32_to_utf16(reinterpret_cast<const char32_t *>(&value), 1, output_buf);
+            switch (r) {
                 case 0:
                     throw std::runtime_error("Random UTF-16 generator is broken");
                 case 1:
-                    result.push_back(W1);
+                    result.push_back(output_buf[0]);
                     break;
                 case 2:
-                    result.push_back(W1);
-                    result.push_back(W2);
+                    result.push_back(output_buf[0]);
+                    result.push_back(output_buf[1]);
                     break;
             }
-        }
         if constexpr (!kIsLittleEndian) {
-            change_endianness_utf16(result.data(),result.size(), result.data());
+            turbo::change_endianness_utf16(result.data(),result.size(), result.data());
         }
         return make_pair(result,count);
     }

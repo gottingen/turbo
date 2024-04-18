@@ -86,16 +86,6 @@ namespace turbo {
         /**
          * @brief read file content from offset to the specified length.
          * @param offset [input] file offset
-         * @param buf [output] file content, can not be nullptr.
-         * @param n [input] read length, default is npos, which means read all. If the length is greater than the file
-         *          size, the file content will be read from offset to the end of the file.
-         * @return the length of the file content read and the status of the operation.
-         */
-        [[nodiscard]] turbo::ResultStatus<size_t> read(off_t offset, turbo::IOBuf *buf, size_t n = kInfiniteFileSize) override;
-
-        /**
-         * @brief read file content from offset to the specified length.
-         * @param offset [input] file offset
          * @param buff [output] file content, can not be nullptr.
          * @param len [input] read length, and buff size must be greater than len. if from offset to the end of the file
          *            is less than len, the file content will be read from offset to the end of the file. the size of read

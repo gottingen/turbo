@@ -42,7 +42,6 @@
 #include "turbo/container/internal/hash_function_defaults.h"
 #include "hash_policy_testing.h"
 #include "turbo/container/internal/hashtable_debug.h"
-#include "turbo/log/logging.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/cycleclock.h"
 #include "turbo/memory/prefetch.h"

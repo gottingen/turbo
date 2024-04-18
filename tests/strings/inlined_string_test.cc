@@ -25,7 +25,6 @@
 #include <list>
 #include <random>
 #include <sstream>
-#include <turbo/log/logging.h>
 #include "turbo/times/clock.h"
 #include <turbo/strings/str_split.h>
 #include "turbo/container/for_each.h"
@@ -652,7 +651,7 @@ void clause11_21_4_7_1(String &test) {
     // exercise get_allocator()
     String s;
     randomString(&s, maxString);
-    TLOG_CHECK(test.get_allocator() == s.get_allocator());
+    assert(test.get_allocator() == s.get_allocator());
 }
 
 template<class String>

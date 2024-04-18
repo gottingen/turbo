@@ -17,10 +17,10 @@
 #ifndef TURBO_CONCURRENT_THREAD_LOCAL_STORAGE_H_
 #define TURBO_CONCURRENT_THREAD_LOCAL_STORAGE_H_
 
-#include "turbo/meta/type_traits.h"
-#include "turbo/base/reusable_id.h"
-#include "turbo/log/logging.h"
-#include "turbo/system/atexit.h"
+#include <turbo/meta/type_traits.h>
+#include <turbo/base/reusable_id.h>
+#include <turbo/base/internal/raw_logging.h>
+#include <turbo/system/atexit.h>
 #include <mutex>
 #include <algorithm>
 
@@ -74,7 +74,7 @@ namespace turbo::concurrent_internal {
 
         static T* get_or_create_resource(resource_id_type id) {
             if (TURBO_UNLIKELY(id >= INVALID_RESOURCE_ID)) {
-               TLOG_CRITICAL("invalid resource id: {}", id);
+                TURBO_RAW_LOG(FATAL,"invalid resource id: %d", id);
             }
             if(!_tls_blocks) {
                 _tls_blocks = new std::vector<Block *>();
@@ -89,7 +89,7 @@ namespace turbo::concurrent_internal {
             if (block == nullptr) {
                 block = new Block();
                 if(TURBO_UNLIKELY(block == nullptr)) {
-                    TLOG_CRITICAL("Fail to create block, {}", strerror(errno));
+                    TURBO_RAW_LOG(FATAL,"Fail to create block, %s",  strerror(errno));
                     return nullptr;
                 }
                 (*_tls_blocks)[block_id] = block;

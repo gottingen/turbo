@@ -15,28 +15,30 @@
 #
 
 
-carbin_cc_benchmark(
+carbin_cc_bm(
         NAME
         randen_benchmarks.cc
+        MODULE bmrand
         SOURCES
         "nanobenchmark.cc"
         "randen_benchmarks.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         benchmark::benchmark
         benchmark::benchmark_main
 )
 
-carbin_cc_benchmark(
+carbin_cc_bm(
         NAME
         random_benchmarks.cc
+        MODULE bmrand
         SOURCES
         "benchmarks.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         benchmark::benchmark
         benchmark::benchmark_main

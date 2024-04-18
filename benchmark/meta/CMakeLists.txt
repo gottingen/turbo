@@ -15,27 +15,29 @@
 #
 
 
-carbin_cc_benchmark(
+carbin_cc_bm(
         NAME
         equal_benchmark
+        MODULE bmmeta
         SOURCES
         "equal_benchmark.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         benchmark::benchmark
         benchmark::benchmark_main
 )
 
-carbin_cc_benchmark(
+carbin_cc_bm(
         NAME
         function_type_benchmark
+        MODULE bmmeta
         SOURCES
         "function_type_benchmark.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         benchmark::benchmark
         benchmark::benchmark_main

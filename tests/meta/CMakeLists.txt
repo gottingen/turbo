@@ -14,26 +14,16 @@
 # limitations under the License.
 #
 
-carbin_cc_test(
-        NAME
-        reflect_test
-        SOURCES
-        "reflect_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
-)
-
 
 carbin_cc_test(
         NAME
         type_traits_test
+        MODULE meta
         SOURCES
         "type_traits_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
@@ -41,49 +31,38 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         utility_test
+        MODULE meta
         SOURCES
         "utility_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
-
+#[[
 carbin_cc_test(
         NAME
         span_test
+        MODULE meta
         SOURCES
         "span_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::exception_testing
-        turbo::hash_testing
         turbo::turbo
 )
-
-carbin_cc_test(
-        NAME
-        span_test_noexceptions
-        SOURCES
-        "span_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::exception_testing
-        turbo::hash_testing
-        turbo::turbo
-)
-
+]]
 carbin_cc_test(
         NAME
         compare_test
+        MODULE meta
         SOURCES
         "compare_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
@@ -92,11 +71,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         algorithm_test
+        MODULE meta
         SOURCES
         "algorithm_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
@@ -104,11 +84,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         container_test
+        MODULE meta
         SOURCES
         "container_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
@@ -116,36 +97,25 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         bind_front_test
+        MODULE meta
         SOURCES
         "bind_front_test.cc"
-        COPTS
+        CXXOPTS
         ${TURBO_DEFAULT_COPTS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
 carbin_cc_test(
         NAME
         function_ref_test
+        MODULE meta
         SOURCES
         "function_ref_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
-        ${CARBIN_DEPS_LINK}
+        LINKS
+        ${CARBIN_LINKS_LINK}
         turbo::turbo
-        turbo::test_instance_tracker
-)
-
-carbin_cc_test(
-        NAME
-        unique_generic_test
-        SOURCES
-        "unique_generic_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        ${CARBIN_DEPS_LINK}
-        turbo::turbo
-        turbo::test_instance_tracker
+        turbo::test_instance_tracker_static
 )

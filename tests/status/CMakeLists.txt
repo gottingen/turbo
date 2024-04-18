@@ -18,11 +18,12 @@
 carbin_cc_test(
         NAME
         status_test
+        MODULE status
         SOURCES
         "status_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
         ${GTEST_LIB}
@@ -32,11 +33,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         result_status_test
+        MODULE status
         SOURCES
         "result_status_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
         ${GTEST_LIB}

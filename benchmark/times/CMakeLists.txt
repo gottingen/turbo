@@ -15,66 +15,71 @@
 #
 
 
-carbin_cc_benchmark(
+carbin_cc_bm(
         NAME
         clock_benchmark.cc
+        MODULE bmtimes
         SOURCES
         "clock_benchmark.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         benchmark::benchmark
         benchmark::benchmark_main
 )
 
-carbin_cc_benchmark(
+carbin_cc_bm(
         NAME
         civil_time_benchmark.cc
+        MODULE bmtimes
         SOURCES
         "civil_time_benchmark.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         benchmark::benchmark
         benchmark::benchmark_main
 )
 
-carbin_cc_benchmark(
+carbin_cc_bm(
         NAME
         duration_benchmark.cc
+        MODULE bmtimes
         SOURCES
         "duration_benchmark.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         benchmark::benchmark
         benchmark::benchmark_main
 )
 
-carbin_cc_benchmark(
+carbin_cc_bm(
         NAME
         time_benchmark.cc
+        MODULE bmtimes
         SOURCES
         "time_benchmark.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         benchmark::benchmark
         benchmark::benchmark_main
 )
 
-carbin_cc_benchmark(
+carbin_cc_bm(
         NAME
         format_benchmark
+        MODULE bmtimes
         SOURCES
         "format_benchmark.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         benchmark::benchmark
         benchmark::benchmark_main

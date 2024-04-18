@@ -57,9 +57,9 @@ namespace turbo {
 
         constexpr IPAddr() = default;
 
-        constexpr IPAddr(ip_t ip) : _ip(ip) {}
+        constexpr IPAddr(ip_t ip_args) : ip(ip_args) {}
 
-        constexpr IPAddr(uint32_t ip) : _ip(ip_t{ip}) {}
+        constexpr IPAddr(uint32_t ip_args) : ip(ip_t{ip_args}) {}
 
         // Convert string `ip_str' to ip_t *ip.
         // `ip_str' is in IPv4 dotted-quad format: `127.0.0.1', `10.23.249.73' ...
@@ -72,13 +72,11 @@ namespace turbo {
         // Returns false on success, true otherwise.
         bool parse_hostname(const char *hostname);
 
-        constexpr uint32_t num() const { return _ip.s_addr; }
+        constexpr uint32_t num() const { return ip.s_addr; }
 
-        constexpr ip_t ip_struct() const { return _ip; }
+        constexpr bool is_any() const { return ip.s_addr == IP_ANY.s_addr; }
 
-        constexpr bool is_any() const { return _ip.s_addr == IP_ANY.s_addr; }
-
-        constexpr bool is_none() const { return _ip.s_addr == IP_NONE.s_addr; }
+        constexpr bool is_none() const { return ip.s_addr == IP_NONE.s_addr; }
 
         bool to_hostname(char *hostname, size_t hostname_len) const;
 
@@ -101,8 +99,7 @@ namespace turbo {
 
         friend class EndPoint;
 
-    private:
-        ip_t _ip{IP_ANY};
+        ip_t ip{IP_ANY};
     };
 
     inline std::string IPAddr::to_string() const {
@@ -128,7 +125,7 @@ namespace turbo {
         explicit EndPoint(int port) : EndPoint(IPAddr::any(), port) {}
 
         explicit EndPoint(const sockaddr_in &in)
-                : _ip(in.sin_addr), _port(ntohs(in.sin_port)) {}
+                : ip(in.sin_addr), port(ntohs(in.sin_port)) {}
 
         EndPoint(const EndPoint &);
 
@@ -146,13 +143,9 @@ namespace turbo {
 
         std::string to_string() const;
 
-        constexpr IPAddr ip() const { return _ip; }
+        IPStr ip_str() const { return ip.to_str(); }
 
-        IPStr ip_str() const { return _ip.to_str(); }
-
-        std::string ip_string() const { return _ip.to_string(); }
-
-        constexpr int port() const { return _port; }
+        std::string ip_string() const { return ip.to_string(); }
 
         bool to_hostname(char *hostname, size_t hostname_len) const;
 
@@ -203,8 +196,8 @@ namespace turbo {
 
         // Get the other end of a socket connection
         static bool test_remote_side(int fd);
-        IPAddr _ip;
-        int _port{0};
+        IPAddr ip;
+        int port{0};
     };
     static_assert(sizeof(EndPoint) == sizeof(IPAddr)+ sizeof(int),
                   "EndPoint size mismatch with the one in POD-style, may cause ABI problem");
@@ -219,7 +212,7 @@ namespace turbo {
 
     template<typename H>
     inline H hash_value(H h, const EndPoint &point) {
-        return H::combine(std::move(h), point.ip(), point.port());
+        return H::combine(std::move(h), point.ip, point.port);
     }
 
 
@@ -256,7 +249,7 @@ namespace turbo {
     }
 
     inline bool operator<(EndPoint p1, EndPoint p2) {
-        return (p1.ip() != p2.ip()) ? (p1.ip() < p2.ip()) : (p1.port() < p2.port());
+        return (p1.ip != p2.ip) ? (p1.ip < p2.ip) : (p1.port < p2.port);
     }
 
     inline bool operator>(EndPoint p1, EndPoint p2) {
@@ -272,7 +265,7 @@ namespace turbo {
     }
 
     inline bool operator==(EndPoint p1, EndPoint p2) {
-        return p1.ip() == p2.ip() && p1.port() == p2.port();
+        return p1.ip == p2.ip && p1.port == p2.port;
     }
 
     inline bool operator!=(EndPoint p1, EndPoint p2) {

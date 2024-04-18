@@ -45,10 +45,6 @@ namespace turbo {
             return turbo::make_status(kENOSYS);
         }
 
-        [[nodiscard]] virtual  turbo::Status write(const turbo::IOBuf &buff) {
-            return turbo::make_status(kENOSYS);
-        }
-
         [[nodiscard]] virtual turbo::Status truncate(size_t size) = 0;
 
         template<typename ...Args>
@@ -77,11 +73,6 @@ namespace turbo {
 
         [[nodiscard]] virtual turbo::Status
         write(off_t offset, std::string_view buff, bool truncate = false) {
-            return turbo::make_status(kENOSYS);
-        }
-
-        [[nodiscard]] virtual turbo::Status
-        write(off_t offset, const turbo::IOBuf &buff, bool truncate = false) {
             return turbo::make_status(kENOSYS);
         }
 
@@ -115,10 +106,6 @@ namespace turbo {
         [[nodiscard]] virtual turbo::Status truncate(size_t size) = 0;
 
         [[nodiscard]] virtual turbo::Status write(std::string_view buff) {
-            return turbo::make_status(kENOSYS);
-        }
-
-        [[nodiscard]] virtual turbo::Status write(const turbo::IOBuf &buff) {
             return turbo::make_status(kENOSYS);
         }
 

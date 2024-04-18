@@ -14,13 +14,14 @@
 # limitations under the License.
 #
 
+find_package(Threads REQUIRED)
 carbin_cc_binary(
         NAME
         hash_lock
         SOURCES
         "hash_lock.cc"
-        DEPS
-        turbo::turbo
+        LINKS
+        turbo::turbo Threads::Threads
 )
 
 carbin_cc_binary(
@@ -28,6 +29,6 @@ carbin_cc_binary(
         write_local
         SOURCES
         "write_local.cc"
-        DEPS
-        turbo::turbo
+        LINKS
+        turbo::turbo Threads::Threads
 )

@@ -20,11 +20,12 @@ carbin_cc_test(
         turbo
         NAME
         match_test
+        MODULE strings
         SOURCES
         "match_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
@@ -33,11 +34,12 @@ carbin_cc_test(
         turbo
         NAME
         inlined_string_test
+        MODULE strings
         SOURCES
         "inlined_string_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -48,11 +50,12 @@ carbin_cc_test(
         turbo
         NAME
         escaping_test
+        MODULE strings
         SOURCES
         "escaping_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -63,11 +66,12 @@ carbin_cc_test(
         turbo
         NAME
         ascii_test
+        MODULE strings
         SOURCES
         "ascii_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -77,11 +81,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         memutil_test
+        MODULE strings
         SOURCES
         "memutil_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
@@ -90,11 +95,12 @@ carbin_cc_test(
         turbo
         NAME
         string_constant_test
+        MODULE strings
         SOURCES
         "string_constant_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -105,22 +111,24 @@ carbin_cc_test(
         turbo
         NAME
         str_replace_test
+        MODULE strings
         SOURCES
         "str_replace_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 #[[
 carbin_cc_test(
         NAME
         str_split_test
+        MODULE strings
         SOURCES
         "str_split_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
@@ -132,11 +140,12 @@ carbin_cc_test(
         turbo
         NAME
         cord_buffer_test
+        MODULE strings
         SOURCES
         "cord_buffer_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -145,11 +154,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         ostringstream_test
+        MODULE strings
         SOURCES
         "ostringstream_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -158,11 +168,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         resize_uninitialized_test
+        MODULE strings
         SOURCES
         "resize_uninitialized_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -171,12 +182,13 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         numbers_test
+        MODULE strings
         SOURCES
         "numbers_test_common.h"
         "numbers_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::pow10_helper
         turbo::turbo
         ${GTEST_LIB}
@@ -186,33 +198,36 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         strip_test
+        MODULE strings
         SOURCES
         "strip_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
 carbin_cc_test(
         NAME
         char_map_test
+        MODULE strings
         SOURCES
         "char_map_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
 carbin_cc_test(
         NAME
         charconv_test
+        MODULE strings
         SOURCES
         "charconv_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         turbo::pow10_helper
 )
@@ -220,22 +235,24 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         charconv_parse_test
+        MODULE strings
         SOURCES
         "charconv_parse_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
 carbin_cc_test(
         NAME
         charconv_bigint_test
+        MODULE strings
         SOURCES
         "charconv_bigint_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
@@ -248,9 +265,9 @@ carbin_cc_library(
         pow10_helper
         SOURCES
         "pow10_helper.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
 )
@@ -258,11 +275,12 @@ carbin_cc_library(
 carbin_cc_test(
         NAME
         pow10_helper_test
+        MODULE strings
         SOURCES
         "pow10_helper_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::pow10_helper
         turbo::turbo
         ${GTEST_LIB}
@@ -273,11 +291,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         cordz_update_tracker_test
+        MODULE strings
         SOURCES
         "cordz_update_tracker_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -287,9 +306,10 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         cordz_functions_test
+        MODULE strings
         SOURCES
         "cordz_functions_test.cc"
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -299,9 +319,10 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         cordz_handle_test
+        MODULE strings
         SOURCES
         "cordz_handle_test.cc"
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -310,11 +331,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         cordz_info_test
+        MODULE strings
         SOURCES
         "cordz_info_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -323,11 +345,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         cordz_info_statistics_test
+        MODULE strings
         SOURCES
         "cordz_info_statistics_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
@@ -337,11 +360,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         cordz_sample_token_test
+        MODULE strings
         SOURCES
         "cordz_sample_token_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -351,38 +375,41 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         cordz_update_scope_test
+        MODULE strings
         SOURCES
         "cordz_update_scope_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
 )
-#[[
+
 carbin_cc_test(
         NAME
         cord_test
+        MODULE strings
         SOURCES
         "cord_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
         ${GTEST_MAIN_LIB}
 )
-]]
+
 carbin_cc_test(
         NAME
         cord_data_edge_test
+        MODULE strings
         SOURCES
         "cord_data_edge_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -391,11 +418,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         cord_rep_btree_test
+        MODULE strings
         SOURCES
         "cord_rep_btree_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
@@ -405,11 +433,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         cord_rep_btree_navigator_test
+        MODULE strings
         SOURCES
         "cord_rep_btree_navigator_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -418,11 +447,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         cord_rep_btree_reader_test
+        MODULE strings
         SOURCES
         "cord_rep_btree_reader_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -431,40 +461,43 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         cord_rep_crc_test
+        MODULE strings
         SOURCES
         "cord_rep_crc_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
 )
 #TODO(jeff) disable now
-#[[
+
 carbin_cc_test(
         NAME
         cord_ring_test
+        MODULE strings
         SOURCES
         "cord_ring_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${CARBIN_DEPS_LINK}
         ${GTEST_LIB}
         ${GMOCK_LIB}
         ${GMOCK_MAIN_LIB}
 )
-]]
+
 carbin_cc_test(
         NAME
         cord_ring_reader_test
+        MODULE strings
         SOURCES
         "cord_ring_reader_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -473,11 +506,12 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         cordz_test
+        MODULE strings
         SOURCES
         "cordz_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
@@ -487,43 +521,47 @@ carbin_cc_test(
 carbin_cc_test(
         NAME
         str_case_conv_test
+        MODULE strings
         SOURCES
         "str_case_conv_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
 carbin_cc_test(
         NAME
         str_trim_test
+        MODULE strings
         SOURCES
         "str_trim_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
 carbin_cc_test(
         NAME
         unicode_view
+        MODULE strings
         SOURCES
         "unicode_view_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
 
 carbin_cc_test(
         NAME
         fixed_string_test
+        MODULE strings
         SOURCES
         "fixed_string_test.cc"
-        COPTS
+        CXXOPTS
         ${CARBIN_CXX_OPTIONS}
-        DEPS
+        LINKS
         turbo::turbo
 )
