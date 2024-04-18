@@ -6,7 +6,7 @@ changelog
 2. remove log, EA using collie-log
 3. remove flags, EA using collie-cli
 4. fix gtest find case
-
+5. export both static and shared library
 
 # v0.7.0
 1. simd unicode
