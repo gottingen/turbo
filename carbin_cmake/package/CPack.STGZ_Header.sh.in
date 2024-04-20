@@ -1,0 +1,327 @@
+#!/bin/bash
+#
+# NAME:  @CPACK_PACKAGE_NAME@
+# VER:   @CPACK_PACKAGE_VERSION@
+# PLAT:  linux-64
+# LINES: 328
+
+# check shell avoid running in the parent process
+if ! echo "$0" | grep '\.sh$' > /dev/null; then
+    printf 'Please run using "bash" or "sh", but not "." or "source"\\n' >&2
+    return 1
+fi
+
+# Determine RUNNING_SHELL; if SHELL is non-zero use that.
+if [ -n "$SHELL" ]; then
+    RUNNING_SHELL="$SHELL"
+else
+    if [ "$(uname)" = "Darwin" ]; then
+        RUNNING_SHELL=/bin/bash
+    else
+        if [ -d /proc ] && [ -r /proc ] && [ -d /proc/$$ ] && [ -r /proc/$$ ] && [ -L /proc/$$/exe ] && [ -r /proc/$$/exe ]; then
+            RUNNING_SHELL=$(readlink /proc/$$/exe)
+        fi
+        if [ -z "$RUNNING_SHELL" ] || [ ! -f "$RUNNING_SHELL" ]; then
+            RUNNING_SHELL=$(ps -p $$ -o args= | sed 's|^-||')
+            case "$RUNNING_SHELL" in
+                */*)
+                    ;;
+                default)
+                    RUNNING_SHELL=$(which "$RUNNING_SHELL")
+                    ;;
+            esac
+        fi
+    fi
+fi
+
+# Some final fallback locations
+if [ -z "$RUNNING_SHELL" ] || [ ! -f "$RUNNING_SHELL" ]; then
+    if [ -f /bin/bash ]; then
+        RUNNING_SHELL=/bin/bash
+    else
+        if [ -f /bin/sh ]; then
+            RUNNING_SHELL=/bin/sh
+        fi
+    fi
+fi
+
+if [ -z "$RUNNING_SHELL" ] || [ ! -f "$RUNNING_SHELL" ]; then
+    printf 'Unable to determine your shell. Please set the SHELL env. var and re-run\\n' >&2
+    exit 1
+fi
+
+THIS_DIR=$(DIRNAME=$(dirname "$0"); cd "$DIRNAME"; pwd)
+THIS_FILE=$(basename "$0")
+THIS_PATH="$THIS_DIR/$THIS_FILE"
+PREFIX=$HOME/software/@CPACK_PACKAGE_NAME@
+UPREFIX=0
+SETENV=0
+DSETENV=0
+FORCE=0
+USAGE="
+usage: $0 [options]
+Installs @CPACK_PACKAGE_NAME@ @CPACK_PACKAGE_VERSION@
+-h|--help              print this help message and exit
+-p|--prefix=<path>     install prefix, defaults to $PREFIX, must not contain spaces
+-e|--env               automatic setup of environment variables
+-d|--disable-env       not automatic setup of environment variables
+-f|--force             clear folder if install prefix folder already exists
+"
+
+OPTS=$(getopt -o hp:edf -l help,prefix:,env,disable-env,force -- "$@" 2>/dev/null)
+if [ ! $? ]; then
+    printf "%s\\n" "$USAGE"
+    exit 2
+fi
+eval set -- "$OPTS"
+
+while true; do
+    case "$1" in
+        -h|--help)
+            printf "%s\\n" "$USAGE"
+            exit 2
+            ;;
+        -f|--force)
+            FORCE=1
+            shift
+            ;;
+        -p|--prefix)
+            PREFIX="$2"
+            UPREFIX=1
+            shift
+            shift
+            ;;
+        -e|--env)
+            SETENV=1
+            shift
+            ;;
+        -d|--disable-env)
+            DSETENV=1
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            printf "ERROR: did not recognize option '%s', please try -h\\n" "$1"
+            exit 1
+            ;;
+    esac
+done
+
+# check tar
+if ! tar --help >/dev/null 2>&1; then
+    printf "WARNING: tar does not appear to be installed this may cause problems below\\n" >&2
+fi
+
+# check system architecture type
+if [ "$(uname -m)" != "x86_64" ]; then
+    printf "WARNING:\\n"
+    printf "    Your operating system appears not to be 64-bit, but you are trying to\\n"
+    printf "    install a 64-bit version of @CPACK_PACKAGE_NAME@.\\n"
+    printf "    Are sure you want to continue the installation? [yes|no]\\n"
+    printf "[no] >>> "
+    read -r ans
+    if [ "$ans" != "yes" ] && [ "$ans" != "Yes" ] && [ "$ans" != "YES" ] && \
+        [ "$ans" != "y" ]   && [ "$ans" != "Y" ]
+    then
+        printf "Aborting installation\\n"
+        exit 2
+    fi
+fi
+
+#check operating system type
+if [ "$(uname)" != "Linux" ]; then
+    printf "WARNING:\\n"
+    printf "    Your operating system does not appear to be Linux, \\n"
+    printf "    but you are trying to install a Linux version of @CPACK_PACKAGE_NAME@.\\n"
+    printf "    Are sure you want to continue the installation? [yes|no]\\n"
+    printf "[no] >>> "
+    read -r ans
+    if [ "$ans" != "yes" ] && [ "$ans" != "Yes" ] && [ "$ans" != "YES" ] && \
+        [ "$ans" != "y" ]   && [ "$ans" != "Y" ]
+    then
+        printf "Aborting installation\\n"
+        exit 2
+    fi
+fi
+
+printf "\\n"
+printf "Welcome to @CPACK_PACKAGE_NAME@ @CPACK_PACKAGE_VERSION@\\n"
+printf "\\n"
+printf "@CPACK_PACKAGE_NAME@ will now be installed into this location:\\n"
+printf "%s\\n" "$PREFIX"
+printf "\\n"
+
+if [ "$UPREFIX" = "0" ]; then
+    printf "  - Press ENTER to confirm the location\\n"
+    printf "  - Press CTRL-C to abort the installation\\n"
+    printf "  - Or specify a different location below\\n"
+    printf "\\n"
+    printf "[%s] >>> " "$PREFIX"
+    read -r user_prefix
+    if [ "$user_prefix" != "" ]; then
+        case "$user_prefix" in
+            *\ * )
+                printf "ERROR: Cannot install into directories with spaces\\n" >&2
+                exit 1
+                ;;
+            *)
+                eval PREFIX="$user_prefix"
+                ;;
+        esac
+    fi
+fi
+
+case "$PREFIX" in
+    *\ * )
+        printf "ERROR: Cannot install into directories with spaces\\n" >&2
+        exit 1
+        ;;
+esac
+
+# confirm whether to overwrite
+if [ "$FORCE" = "0" ] && [ -e "$PREFIX" ]; then
+    if [ "$(ls -A $PREFIX)" ]; then
+        printf "ERROR: File or directory is not empty: '%s'\\n" "$PREFIX" >&2
+        printf "Or use -f/--force to force the installation which will clear the original directory.\n" >&2
+        exit 1
+    fi
+fi
+
+if [ "$FORCE" = "1" ] && [ -e "$PREFIX" ]; then
+    if [ "$(ls -A $PREFIX)" ]; then
+        force_ans=no
+        printf "! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !\\n"
+        printf "Do you wish to clear the installation directory: '%s' ? [yes|no]\\n" "$PREFIX"
+        printf "\\n"
+        printf "[default is %s] >>> " "$force_ans"
+        read -r uans
+        if [ "$uans" != "" ]; then
+            force_ans=$uans
+        fi
+
+        if [ "$force_ans" = "yes" ] || [ "$force_ans" = "Yes" ] || [ "$force_ans" = "YES" ] || \
+            [ "$force_ans" = "y" ] || [ "$force_ans" = "Y" ]; then
+            rm -fr $PREFIX/*
+            printf "\\n"
+            printf "Finished to clear the installation directory: '%s'!\\n" "$PREFIX"
+            printf "\\n"
+        fi
+    fi
+fi
+
+# creat install directory
+if ! mkdir -p "$PREFIX"; then
+    printf "ERROR: Could not create directory: '%s'\\n" "$PREFIX" >&2
+    exit 1
+fi
+
+PREFIX=$(cd "$PREFIX"; pwd)
+export PREFIX
+printf "install prefix = %s\\n" "$PREFIX"
+
+# extract the tarball appended to this header, this creates the *.tar.gz files
+# for all the packages which get installed below
+cd "$PREFIX"
+printf "Extracting, please wait...\\n"
+
+if ! tail -n +328 "$THIS_PATH" | tar xzvf -; then
+    printf "ERROR: could not extract tar starting at line 328\\n" >&2
+    exit 1
+fi
+
+printf "installation finished.\\n"
+
+BASH_RC="$HOME"/.bashrc
+eans=no
+ask=yes
+
+if [ "$SETENV" = "1" ]; then
+    if [ "$DSETENV" = "1" ]; then
+        eans=no
+        ask=yes
+    else
+        eans=yes
+        ask=no
+    fi
+else
+    if [ "$DSETENV" = "1" ]; then
+        eans=no
+        ask=no
+    else
+        eans=no
+        ask=yes
+    fi
+fi
+
+if [ "$ask" = "yes" ]; then
+    printf "Do you wish the installer to initialize @CPACK_PACKAGE_NAME@\\n"
+    printf "in your %s ? [yes|no]\\n" "$BASH_RC"
+    printf "[default is %s] >>> " "$eans"
+
+    read -r ans
+    if [ "$ans" != "" ]; then
+        eans=$ans
+    fi
+fi
+
+typeset -u PROJECT_UNAME
+PROJECT_UNAME=@CPACK_PACKAGE_NAME@
+
+if [ "$eans" != "yes" ] && [ "$eans" != "Yes" ] && [ "$eans" != "YES" ] && \
+    [ "$eans" != "y" ]   && [ "$eans" != "Y" ]; then
+    printf "\\n"
+    printf "You may need to set "$PROJECT_UNAME"_DIR manually in your $BASH_RC or /etc/profile\\n"
+    printf "\\n"
+    printf "export "$PROJECT_UNAME"_DIR=\"$PREFIX/lib/cmake/@CPACK_PACKAGE_NAME@\"\\n"
+    printf "\\n"
+    printf "If it is a dynamic library, you also need to set LD_LIBRARY_PATH in your $BASH_RC or /etc/profile\\n"
+    printf "\\n"
+    printf "export LD_LIBRARY_PATH=\"$PREFIX/lib:\$LD_LIBRARY_PATH\"\\n"
+    printf "\\n"
+    printf "Please source your $BASH_RC before include @CPACK_PACKAGE_NAME@ \\n"
+    printf "\\n"
+else
+    printf "\\n"
+    printf "Initializing @CPACK_PACKAGE_NAME@ in %s\\n" "$BASH_RC"
+    printf "\\n"
+
+    tips=no
+
+    addDir="export "$PROJECT_UNAME"_DIR=\"$PREFIX/lib/cmake/@CPACK_PACKAGE_NAME@\""
+    if ! grep "$addDir" $BASH_RC > /dev/null 2>&1; then
+        echo "# @CPACK_PACKAGE_NAME@_DIR" >> $BASH_RC
+        echo ${addDir} >> $BASH_RC
+        printf "DIR of @CPACK_PACKAGE_NAME@ has been added in $BASH_RC\\n"
+        tips=yes
+    else
+        printf "DIR of @CPACK_PACKAGE_NAME@ already exists in $BASH_RC\\n"
+    fi
+
+    if [ ! "$(find $PREFIX/lib -name "*.a")" ]; then
+        addLDPath="export LD_LIBRARY_PATH=\"$PREFIX/lib:\$LD_LIBRARY_PATH\""
+        if ! grep "$addLDPath" $BASH_RC > /dev/null 2>&1; then
+            echo "# @CPACK_PACKAGE_NAME@ LD_LIBRARY_PATH" >> $BASH_RC
+            echo ${addLDPath} >> $BASH_RC
+            printf "LD_LIBRARY_PATH of @CPACK_PACKAGE_NAME@ has been added in $BASH_RC\\n"
+            tips=yes
+        else
+            printf "LD_LIBRARY_PATH of @CPACK_PACKAGE_NAME@ already exists in $BASH_RC\\n"
+        fi
+    fi
+
+    printf "\\n"
+    if [ "$tips" = "yes" ]; then
+        printf "Please source your $BASH_RC before include @CPACK_PACKAGE_NAME@ \\n"
+        printf "\\n"
+    fi
+fi
+
+printf "Thank you for installing @CPACK_PACKAGE_NAME@!\\n"
+exit 0
+
+### Start of TAR.GZ file ###;
+#
+#

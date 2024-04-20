@@ -159,3 +159,4 @@ install(
         DESTINATION
         "${config_install_dir}"
 )
+include(carbin_cpack)
