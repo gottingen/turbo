@@ -70,6 +70,7 @@ include(carbin_module)
 include(turbo_deps)
 include(turbo_cxx_config)
 include(turbo_test)
+include(turbo_package_config)
 
 add_subdirectory(turbo)
 ####################################################################

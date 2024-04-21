@@ -47,9 +47,6 @@ function(carbin_cc_bm)
             ${ARGN}
     )
 
-    if(NOT CARBIN_CC_BM_MODULE)
-        carbin_error("no module name to the bm")
-    endif ()
 
     carbin_raw("-----------------------------------")
     carbin_print_label("Building Benchmark" "${CARBIN_CC_BM_NAME}")
@@ -74,10 +71,15 @@ function(carbin_cc_bm)
     if (CARBIN_CC_BM_EXT)
         set(CARBIN_RUN_THIS_TEST OFF)
     endif ()
-    set(testcase ${CARBIN_CC_BM_MODULE}_${CARBIN_CC_BM_NAME})
-    if(${CARBIN_CC_BM_MODULE} IN_LIST ${PROJECT_NAME}_SKIP_BENCHMARK)
-        set(CARBIN_RUN_THIS_TEST OFF)
-    endif ()
+
+    if(CARBIN_CC_BM_MODULE)
+        set(testcase ${CARBIN_CC_BM_MODULE}_${CARBIN_CC_BM_NAME})
+        if(${CARBIN_CC_BM_MODULE} IN_LIST ${PROJECT_NAME}_SKIP_BENCHMARK)
+            set(CARBIN_RUN_THIS_TEST OFF)
+        endif ()
+    else ()
+        set(testcase ${CARBIN_CC_BM_NAME})
+    endif()
 
     add_executable(${testcase} ${CARBIN_CC_BM_SOURCES})
 
