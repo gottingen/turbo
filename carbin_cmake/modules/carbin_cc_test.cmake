@@ -47,9 +47,8 @@ function(carbin_cc_test)
             "${list_args}"
             ${ARGN}
     )
-    if(NOT CARBIN_CC_TEST_MODULE)
-        carbin_error("no module name")
-    endif ()
+
+
     carbin_raw("-----------------------------------")
     carbin_print_label("Building Test" "${CARBIN_CC_TEST_NAME}")
     carbin_raw("-----------------------------------")
@@ -75,10 +74,14 @@ function(carbin_cc_test)
         set(CARBIN_RUN_THIS_TEST OFF)
     endif ()
 
-    set(testcase ${CARBIN_CC_TEST_MODULE}_${CARBIN_CC_TEST_NAME})
-    if(${CARBIN_CC_TEST_MODULE} IN_LIST ${PROJECT_NAME}_SKIP_TEST)
-        set(CARBIN_RUN_THIS_TEST OFF)
-    endif ()
+    if(CARBIN_CC_TEST_MODULE)
+        set(testcase ${CARBIN_CC_TEST_MODULE}_${CARBIN_CC_TEST_NAME})
+        if(${CARBIN_CC_TEST_MODULE} IN_LIST ${PROJECT_NAME}_SKIP_TEST)
+            set(CARBIN_RUN_THIS_TEST OFF)
+        endif ()
+    else ()
+        set(testcase ${CARBIN_CC_TEST_NAME})
+    endif()
 
     add_executable(${testcase} ${CARBIN_CC_TEST_SOURCES})
 

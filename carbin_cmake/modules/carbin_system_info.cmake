@@ -14,12 +14,20 @@
 # limitations under the License.
 #
 
-include(carbin_system_info)
+cmake_host_system_information(RESULT PRETTY_NAME QUERY DISTRIB_PRETTY_NAME)
+message(STATUS "${PRETTY_NAME}")
+cmake_host_system_information(RESULT DISTRO QUERY DISTRIB_INFO)
+foreach(VAR IN LISTS DISTRO)
+    message(STATUS "${VAR}=`${${VAR}}`")
+endforeach()
+
+set(CARBIN_PACKAGE_SYSTEM_NAME "unknown")
 if (${PRETTY_NAME} MATCHES "Ubuntu")
-    MESSAGE(STATUS "Linux dist: ubuntu, build deb package")
-    include(carbin_deb)
+    set(CARBIN_PACKAGE_SYSTEM_NAME "ubuntu-${DISTRO_VERSION_ID}")
 elseif (${PRETTY_NAME} MATCHES "darwin")
-    MESSAGE(STATUS "Linux dist: macos build dmg package")
+    MESSAGE(STATUS "Linux dist: macos")
+    set(HOST_SYSTEM_NAME "dmg")
 elseif (${PRETTY_NAME} MATCHES "centos")
-    include(carbin_rpm)
+    MESSAGE(STATUS "Linux dist: ubuntu")
+    set(HOST_SYSTEM_NAME "rh")
 endif ()
