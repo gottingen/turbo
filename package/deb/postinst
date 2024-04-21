@@ -10,10 +10,10 @@ if [ ! -f /etc/ld.so.conf.d/99_EA_library.conf ]; then
 fi
 
 if [ ! -f /etc/profile.d/99_EA_library.sh ]; then
-    echo "export PATH=$PATH:/opt/EA/bin" >> /etc/profile.d/99_EA_library.sh
-    echo "export PATH=$PATH:/opt/EA/inf/bin" >> /etc/profile.d/99_EA_library.sh
-    echo "export PATH=$PATH:/usr/local/EA/bin" >> /etc/profile.d/99_EA_library.sh
-    echo "export PATH=$PATH:/usr/local/EA/inf/bin" >> /etc/profile.d/99_EA_library.sh
+    echo "export PATH=\$PATH:/opt/EA/bin" >> /etc/profile.d/99_EA_library.sh
+    echo "export PATH=\$PATH:/opt/EA/inf/bin" >> /etc/profile.d/99_EA_library.sh
+    echo "export PATH=\$PATH:/usr/local/EA/bin" >> /etc/profile.d/99_EA_library.sh
+    echo "export PATH=\$PATH:/usr/local/EA/inf/bin" >> /etc/profile.d/99_EA_library.sh
 fi
 
 ldconfig
