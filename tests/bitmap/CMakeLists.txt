@@ -1,5 +1,5 @@
 #
-# Copyright 2023 The Turbo Authors.
+# Copyright 2023 The titan-search Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,16 @@
 # limitations under the License.
 #
 
-add_subdirectory(strings)
-add_subdirectory(concurrent)
-add_subdirectory(unicode)
-add_subdirectory(bitmap)
+
+carbin_cc_test(
+        NAME
+        save_test
+        MODULE system
+        SOURCES
+        "save_test.cc"
+        CXXOPTS
+        ${CARBIN_CXX_OPTIONS}
+        LINKS
+        ${CARBIN_DEPS_LINK}
+        turbo::turbo
+)

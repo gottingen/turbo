@@ -20,6 +20,7 @@ set(TURBO_ALL_SRC
         "base/internal/strerror.cc"
         "base/log_severity.cc"
         "base/int128.cc"
+        "bitmap/roaring.c"
         "container/internal/hashtablez_sampler.cc"
         "container/internal/hashtablez_sampler_force_weak_definition.cc"
         "container/internal/raw_hash_set.cc"

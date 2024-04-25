@@ -19,7 +19,7 @@
 ####################################################################################
 cmake_minimum_required(VERSION 3.24)
 
-project(turbo CXX)
+project(turbo CXX C)
 
 option(${PROJECT_NAME}_IS_TOP_PROJECT "turbo project is the top level project or not" ON)
 
