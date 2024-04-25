@@ -19,7 +19,7 @@
 ####################################################################################
 cmake_minimum_required(VERSION 3.24)
 
-project(turbo CXX)
+project(turbo CXX C)
 
 option(${PROJECT_NAME}_IS_TOP_PROJECT "turbo project is the top level project or not" ON)
 
@@ -32,7 +32,7 @@ message(STATUS ${PROJECT_NAME}_IS_TOP_PROJECT)
 set(PROJECT_DESCRIPTION "Hercules is an ahead of time compiler for a subset of the Python language framework.")
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 9)
-set(PROJECT_VERSION_PATCH 88)
+set(PROJECT_VERSION_PATCH 91)
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 set(${PROJECT_NAME}_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
 set(${PROJECT_NAME}_VERSION_MINOR ${PROJECT_VERSION_MINOR})

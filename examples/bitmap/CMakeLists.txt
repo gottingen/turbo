@@ -14,7 +14,20 @@
 # limitations under the License.
 #
 
-add_subdirectory(strings)
-add_subdirectory(concurrent)
-add_subdirectory(unicode)
-add_subdirectory(bitmap)
+carbin_cc_binary(
+        NAME
+        bitmap_c
+        SOURCES
+        "bitmap_c.c"
+        LINKS
+        turbo::turbo
+)
+
+carbin_cc_binary(
+        NAME
+        bitmap
+        SOURCES
+        "bitmap.cc"
+        LINKS
+        turbo::turbo
+)
