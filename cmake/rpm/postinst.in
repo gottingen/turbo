@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+if [ ! -f /etc/ld.so.conf.d/99_EA_library.conf ]; then
+    echo "/opt/EA/@CMAKE_INSTALL_LIBDIR@" >> /etc/ld.so.conf.d/99_EA_library.conf
+    echo "/opt/EA/inf/@CMAKE_INSTALL_LIBDIR@/" >> /etc/ld.so.conf.d/99_EA_library.conf
+    echo "/usr/local/EA/@CMAKE_INSTALL_LIBDIR@" >> /etc/ld.so.conf.d/99_EA_library.conf
+    echo "/usr/local/EA/inf/@CMAKE_INSTALL_LIBDIR@/" >> /etc/ld.so.conf.d/99_EA_library.conf
+fi
+
+if [ ! -f /etc/profile.d/99_EA_library.sh ]; then
+    echo "export PATH=\$PATH:/opt/EA/bin" >> /etc/profile.d/99_EA_library.sh
+    echo "export PATH=\$PATH:/opt/EA/inf/bin" >> /etc/profile.d/99_EA_library.sh
+    echo "export PATH=\$PATH:/usr/local/EA/bin" >> /etc/profile.d/99_EA_library.sh
+    echo "export PATH=\$PATH:/usr/local/EA/inf/bin" >> /etc/profile.d/99_EA_library.sh
+fi
+
+ldconfig

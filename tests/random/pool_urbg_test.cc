@@ -1,18 +1,21 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/random/internal/pool_urbg.h"
+#include <turbo/random/internal/pool_urbg.h>
 
 #include <algorithm>
 #include <bitset>
@@ -20,9 +23,9 @@
 #include <cstdint>
 #include <iterator>
 
-#include "gtest/gtest.h"
-#include "turbo/meta/type_traits.h"
-#include "turbo/meta/span.h"
+#include <gtest/gtest.h>
+#include <turbo/meta/type_traits.h>
+#include <turbo/types/span.h>
 
 using turbo::random_internal::PoolURBG;
 using turbo::random_internal::RandenPool;
@@ -31,7 +34,7 @@ namespace {
 
 // is_randen_pool trait is true when parameterized by an RandenPool
 template <typename T>
-using is_randen_pool = typename std::disjunction<  //
+using is_randen_pool = typename turbo::disjunction<  //
     std::is_same<T, RandenPool<uint8_t>>,           //
     std::is_same<T, RandenPool<uint16_t>>,          //
     std::is_same<T, RandenPool<uint32_t>>,          //
@@ -39,13 +42,13 @@ using is_randen_pool = typename std::disjunction<  //
 
 // MyFill either calls RandenPool::Fill() or std::generate(..., rng)
 template <typename T, typename V>
-typename std::enable_if_t<std::negation<is_randen_pool<T>>::value, void>  //
+typename turbo::enable_if_t<turbo::negation<is_randen_pool<T>>::value, void>  //
 MyFill(T& rng, turbo::Span<V> data) {  // NOLINT(runtime/references)
   std::generate(std::begin(data), std::end(data), rng);
 }
 
 template <typename T, typename V>
-typename std::enable_if_t<is_randen_pool<T>::value, void>  //
+typename turbo::enable_if_t<is_randen_pool<T>::value, void>  //
 MyFill(T& rng, turbo::Span<V> data) {  // NOLINT(runtime/references)
   rng.Fill(data);
 }
@@ -78,7 +81,7 @@ TYPED_TEST(PoolURBGTypedTest, URBGInterface) {
   static_assert(std::is_copy_constructible<E>::value,
                 "engine must be copy constructible");
 
-  static_assert(std::is_copy_assignable<E>::value,
+  static_assert(turbo::is_copy_assignable<E>::value,
                 "engine must be copy assignable");
 
   E e;

@@ -1,46 +1,52 @@
-// Copyright 2021 The Turbo Authors
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//     https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #ifndef TURBO_STRINGS_CORDZ_TEST_HELPERS_H_
 #define TURBO_STRINGS_CORDZ_TEST_HELPERS_H_
 
 #include <utility>
 
-#include "turbo/platform/port.h"
-#include "turbo/strings/cord.h"
-#include "turbo/strings/internal/cord_internal.h"
-#include "turbo/strings/internal/cordz_info.h"
-#include "turbo/strings/internal/cordz_sample_token.h"
-#include "turbo/strings/internal/cordz_statistics.h"
-#include "turbo/strings/internal/cordz_update_tracker.h"
-#include "turbo/format/format.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include <turbo/base/config.h>
+#include <turbo/base/macros.h>
+#include <turbo/base/nullability.h>
+#include <turbo/strings/cord.h>
+#include <turbo/strings/internal/cord_internal.h>
+#include <turbo/strings/internal/cordz_info.h>
+#include <turbo/strings/internal/cordz_sample_token.h>
+#include <turbo/strings/internal/cordz_statistics.h>
+#include <turbo/strings/internal/cordz_update_tracker.h>
+#include <turbo/strings/str_cat.h>
 
 namespace turbo {
-
+TURBO_NAMESPACE_BEGIN
 
 // Returns the CordzInfo for the cord, or nullptr if the cord is not sampled.
-inline const cord_internal::CordzInfo* GetCordzInfoForTesting(
+inline turbo::Nullable<const cord_internal::CordzInfo*> GetCordzInfoForTesting(
     const Cord& cord) {
   if (!cord.contents_.is_tree()) return nullptr;
   return cord.contents_.cordz_info();
 }
 
 // Returns true if the provided cordz_info is in the list of sampled cords.
-inline bool CordzInfoIsListed(const cord_internal::CordzInfo* cordz_info,
-                              cord_internal::CordzSampleToken token = {}) {
+inline bool CordzInfoIsListed(
+    turbo::Nonnull<const cord_internal::CordzInfo*> cordz_info,
+    cord_internal::CordzSampleToken token = {}) {
   for (const cord_internal::CordzInfo& info : token) {
     if (cordz_info == &info) return true;
   }
@@ -79,7 +85,7 @@ MATCHER_P(HasValidCordzInfoOf, method, "CordzInfo matches cord") {
 // Matcher on Cord that verifies that the cord is sampled and that the CordzInfo
 // update tracker has 'method' with a call count of 'n'
 MATCHER_P2(CordzMethodCountEq, method, n,
-           turbo::format("CordzInfo method count equals {}", n)) {
+           turbo::StrCat("CordzInfo method count equals ", n)) {
   const cord_internal::CordzInfo* cord_info = GetCordzInfoForTesting(arg);
   if (cord_info == nullptr) {
     *result_listener << "cord is not sampled";
@@ -118,7 +124,7 @@ class CordzSamplingIntervalHelper {
 
 // Wrapper struct managing a small CordRep `rep`
 struct TestCordRep {
-  cord_internal::CordRepFlat* rep;
+  turbo::Nonnull<cord_internal::CordRepFlat*> rep;
 
   TestCordRep() {
     rep = cord_internal::CordRepFlat::New(100);
@@ -144,7 +150,7 @@ Cord UnsampledCord(Args... args) {
   return cord;
 }
 
-
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_CORDZ_TEST_HELPERS_H_

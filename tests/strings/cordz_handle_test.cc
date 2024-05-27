@@ -1,30 +1,33 @@
-// Copyright 2019 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-#include "turbo/strings/internal/cordz_handle.h"
+#include <turbo/strings/internal/cordz_handle.h>
 
 #include <random>
 
-#include "turbo/concurrent/notification.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/memory/memory.h"
-#include "turbo/concurrent/internal/thread_pool.h"
-#include "turbo/times/clock.h"
-#include "turbo/times/time.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include <turbo/memory/memory.h>
+#include <turbo/synchronization/internal/thread_pool.h>
+#include <turbo/synchronization/notification.h>
+#include <turbo/time/clock.h>
+#include <turbo/time/time.h>
 
 namespace turbo {
-
+TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 namespace {
 
@@ -176,7 +179,6 @@ TEST(CordzHandleTest, DiagnosticsGetSafeToInspectDeletedHandles) {
 
 // Create and delete CordzHandle and CordzSnapshot objects in multiple threads
 // so that tsan has some time to chew on it and look for memory problems.
-/*
 TEST(CordzHandleTest, MultiThreaded) {
   Notification stop;
   static constexpr int kNumThreads = 4;
@@ -200,7 +202,7 @@ TEST(CordzHandleTest, MultiThreaded) {
   std::atomic<bool> found_safe_to_inspect(false);
 
   {
-    turbo::concurrent_internal::ThreadPool pool(kNumThreads);
+    turbo::synchronization_internal::ThreadPool pool(kNumThreads);
     for (int i = 0; i < kNumThreads; ++i) {
       pool.Schedule([&stop, &handles, &found_safe_to_inspect]() {
         std::minstd_rand gen;
@@ -249,7 +251,7 @@ TEST(CordzHandleTest, MultiThreaded) {
 
     // The threads will hammer away.  Give it a little bit of time for tsan to
     // spot errors.
-    turbo::sleep_for(turbo::Duration::seconds(3));
+    turbo::SleepFor(turbo::Seconds(3));
     stop.Notify();
   }
 
@@ -259,8 +261,8 @@ TEST(CordzHandleTest, MultiThreaded) {
   // See also comments on `found_safe_to_inspect`
   EXPECT_TRUE(found_safe_to_inspect.load());
 }
-*/
+
 }  // namespace
 }  // namespace cord_internal
-
+TURBO_NAMESPACE_END
 }  // namespace turbo

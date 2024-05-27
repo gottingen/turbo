@@ -1,33 +1,38 @@
-// Copyright 2021 The Turbo Authors
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//     https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #ifndef TURBO_STRINGS_INTERNAL_CORD_REP_BTREE_READER_H_
 #define TURBO_STRINGS_INTERNAL_CORD_REP_BTREE_READER_H_
 
 #include <cassert>
 
-#include "turbo/platform/port.h"
-#include "turbo/strings/internal/cord_data_edge.h"
-#include "turbo/strings/internal/cord_internal.h"
-#include "turbo/strings/internal/cord_rep_btree.h"
-#include "turbo/strings/internal/cord_rep_btree_navigator.h"
-#include "turbo/strings/internal/cord_rep_flat.h"
+#include <turbo/base/config.h>
+#include <turbo/strings/internal/cord_data_edge.h>
+#include <turbo/strings/internal/cord_internal.h>
+#include <turbo/strings/internal/cord_rep_btree.h>
+#include <turbo/strings/internal/cord_rep_btree_navigator.h>
+#include <turbo/strings/internal/cord_rep_flat.h>
 
-namespace turbo::cord_internal {
+namespace turbo {
+TURBO_NAMESPACE_BEGIN
+namespace cord_internal {
 
 // CordRepBtreeReader implements logic to iterate over cord btrees.
-// References to the underlying data are returned as std::string_view values.
+// References to the underlying data are returned as turbo::string_view values.
 // The most typical use case is a forward only iteration over tree data.
 // The class also provides `Skip()`, `Seek()` and `Read()` methods similar to
 // CordRepBtreeNavigator that allow more advanced navigation.
@@ -35,7 +40,7 @@ namespace turbo::cord_internal {
 // Example: iterate over all data inside a cord btree:
 //
 //   CordRepBtreeReader reader;
-//   for (std::string_view sv = reader.Init(tree); !sv.Empty(); sv = sv.Next()) {
+//   for (string_view sv = reader.Init(tree); !sv.Empty(); sv = sv.Next()) {
 //     DoSomethingWithDataIn(sv);
 //   }
 //
@@ -47,7 +52,7 @@ namespace turbo::cord_internal {
 // Example: iterate over all data inside a btree skipping the first 100 bytes:
 //
 //   CordRepBtreeReader reader;
-//   std::string_view sv = reader.Init(tree);
+//   turbo::string_view sv = reader.Init(tree);
 //   if (sv.length() > 100) {
 //     sv.RemovePrefix(100);
 //   } else {
@@ -55,7 +60,7 @@ namespace turbo::cord_internal {
 //   }
 //   while (!sv.empty()) {
 //     DoSomethingWithDataIn(sv);
-//     std::string_view sv = reader.Next();
+//     turbo::string_view sv = reader.Next();
 //   }
 //
 // It is important to notice that `remaining` is based on the end position of
@@ -65,7 +70,7 @@ namespace turbo::cord_internal {
 // For example, consider a cord btree with five data edges: "abc", "def", "ghi",
 // "jkl" and "mno":
 //
-//   std::string_view sv;
+//   turbo::string_view sv;
 //   CordRepBtreeReader reader;
 //
 //   sv = reader.Init(tree); // sv = "abc", remaining = 12
@@ -74,135 +79,137 @@ namespace turbo::cord_internal {
 //   sv = reader.Next();     // sv = "mno", remaining = 0
 //   sv = reader.Seek(1);    // sv = "bc", remaining = 12
 //
-    class CordRepBtreeReader {
-    public:
-        using ReadResult = CordRepBtreeNavigator::ReadResult;
-        using Position = CordRepBtreeNavigator::Position;
+class CordRepBtreeReader {
+ public:
+  using ReadResult = CordRepBtreeNavigator::ReadResult;
+  using Position = CordRepBtreeNavigator::Position;
 
-        // Returns true if this instance is not empty.
-        explicit operator bool() const { return navigator_.btree() != nullptr; }
+  // Returns true if this instance is not empty.
+  explicit operator bool() const { return navigator_.btree() != nullptr; }
 
-        // Returns the tree referenced by this instance or nullptr if empty.
-        CordRepBtree *btree() const { return navigator_.btree(); }
+  // Returns the tree referenced by this instance or nullptr if empty.
+  CordRepBtree* btree() const { return navigator_.btree(); }
 
-        // Returns the current data edge inside the referenced btree.
-        // Requires that the current instance is not empty.
-        CordRep *node() const { return navigator_.Current(); }
+  // Returns the current data edge inside the referenced btree.
+  // Requires that the current instance is not empty.
+  CordRep* node() const { return navigator_.Current(); }
 
-        // Returns the length of the referenced tree.
-        // Requires that the current instance is not empty.
-        size_t length() const;
+  // Returns the length of the referenced tree.
+  // Requires that the current instance is not empty.
+  size_t length() const;
 
-        // Returns the number of remaining bytes available for iteration, which is the
-        // number of bytes directly following the end of the last chunk returned.
-        // This value will be zero if we iterated over the last edge in the bound
-        // tree, in which case any call to Next() or Skip() will return an empty
-        // std::string_view reflecting the EOF state.
-        // Note that a call to `Seek()` resets `remaining` to a value based on the
-        // end position of the chunk returned by that call.
-        size_t remaining() const { return remaining_; }
+  // Returns the number of remaining bytes available for iteration, which is the
+  // number of bytes directly following the end of the last chunk returned.
+  // This value will be zero if we iterated over the last edge in the bound
+  // tree, in which case any call to Next() or Skip() will return an empty
+  // string_view reflecting the EOF state.
+  // Note that a call to `Seek()` resets `remaining` to a value based on the
+  // end position of the chunk returned by that call.
+  size_t remaining() const { return remaining_; }
 
-        // Resets this instance to an empty value.
-        void Reset() { navigator_.Reset(); }
+  // Resets this instance to an empty value.
+  void Reset() { navigator_.Reset(); }
 
-        // Initializes this instance with `tree`. `tree` must not be null.
-        // Returns a reference to the first data edge of the provided tree.
-        std::string_view Init(CordRepBtree *tree);
+  // Initializes this instance with `tree`. `tree` must not be null.
+  // Returns a reference to the first data edge of the provided tree.
+  turbo::string_view Init(CordRepBtree* tree);
 
-        // Navigates to and returns the next data edge of the referenced tree.
-        // Returns an empty std::string_view if an attempt is made to read beyond the end
-        // of the tree, i.e.: if `remaining()` is zero indicating an EOF condition.
-        // Requires that the current instance is not empty.
-        std::string_view Next();
+  // Navigates to and returns the next data edge of the referenced tree.
+  // Returns an empty string_view if an attempt is made to read beyond the end
+  // of the tree, i.e.: if `remaining()` is zero indicating an EOF condition.
+  // Requires that the current instance is not empty.
+  turbo::string_view Next();
 
-        // Skips the provided amount of bytes and returns a reference to the data
-        // directly following the skipped bytes.
-        std::string_view Skip(size_t skip);
+  // Skips the provided amount of bytes and returns a reference to the data
+  // directly following the skipped bytes.
+  turbo::string_view Skip(size_t skip);
 
-        // Reads `n` bytes into `tree`.
-        // If `chunk_size` is zero, starts reading at the next data edge. If
-        // `chunk_size` is non zero, the read starts at the last `chunk_size` bytes of
-        // the last returned data edge. Effectively, this means that the read starts
-        // at offset `consumed() - chunk_size`.
-        // Requires that `chunk_size` is less than or equal to the length of the
-        // last returned data edge. The purpose of `chunk_size` is to simplify code
-        // partially consuming a returned chunk and wanting to include the remaining
-        // bytes in the Read call. For example, the below code will read 1000 bytes of
-        // data into a cord tree if the first chunk starts with "big:":
-        //
-        //   CordRepBtreeReader reader;
-        //   std::string_view sv = reader.Init(tree);
-        //   if (turbo::starts_with(sv, "big:")) {
-        //     CordRepBtree tree;
-        //     sv = reader.Read(1000, sv.size() - 4 /* "big:" */, &tree);
-        //   }
-        //
-        // This method will return an empty string view if all remaining data was
-        // read. If `n` exceeded the amount of remaining data this function will
-        // return an empty string view and `tree` will be set to nullptr.
-        // In both cases, `consumed` will be set to `length`.
-        std::string_view Read(size_t n, size_t chunk_size, CordRep *&tree);
+  // Reads `n` bytes into `tree`.
+  // If `chunk_size` is zero, starts reading at the next data edge. If
+  // `chunk_size` is non zero, the read starts at the last `chunk_size` bytes of
+  // the last returned data edge. Effectively, this means that the read starts
+  // at offset `consumed() - chunk_size`.
+  // Requires that `chunk_size` is less than or equal to the length of the
+  // last returned data edge. The purpose of `chunk_size` is to simplify code
+  // partially consuming a returned chunk and wanting to include the remaining
+  // bytes in the Read call. For example, the below code will read 1000 bytes of
+  // data into a cord tree if the first chunk starts with "big:":
+  //
+  //   CordRepBtreeReader reader;
+  //   turbo::string_view sv = reader.Init(tree);
+  //   if (turbo::StartsWith(sv, "big:")) {
+  //     CordRepBtree tree;
+  //     sv = reader.Read(1000, sv.size() - 4 /* "big:" */, &tree);
+  //   }
+  //
+  // This method will return an empty string view if all remaining data was
+  // read. If `n` exceeded the amount of remaining data this function will
+  // return an empty string view and `tree` will be set to nullptr.
+  // In both cases, `consumed` will be set to `length`.
+  turbo::string_view Read(size_t n, size_t chunk_size, CordRep*& tree);
 
-        // Navigates to the chunk at offset `offset`.
-        // Returns a reference into the navigated to chunk, adjusted for the relative
-        // position of `offset` into that chunk. For example, calling `Seek(13)` on a
-        // cord tree containing 2 chunks of 10 and 20 bytes respectively will return
-        // a string view into the second chunk starting at offset 3 with a size of 17.
-        // Returns an empty string view if `offset` is equal to or greater than the
-        // length of the referenced tree.
-        std::string_view Seek(size_t offset);
+  // Navigates to the chunk at offset `offset`.
+  // Returns a reference into the navigated to chunk, adjusted for the relative
+  // position of `offset` into that chunk. For example, calling `Seek(13)` on a
+  // cord tree containing 2 chunks of 10 and 20 bytes respectively will return
+  // a string view into the second chunk starting at offset 3 with a size of 17.
+  // Returns an empty string view if `offset` is equal to or greater than the
+  // length of the referenced tree.
+  turbo::string_view Seek(size_t offset);
 
-    private:
-        size_t remaining_ = 0;
-        CordRepBtreeNavigator navigator_;
-    };
+ private:
+  size_t remaining_ = 0;
+  CordRepBtreeNavigator navigator_;
+};
 
-    inline size_t CordRepBtreeReader::length() const {
-        assert(btree() != nullptr);
-        return btree()->length;
-    }
+inline size_t CordRepBtreeReader::length() const {
+  assert(btree() != nullptr);
+  return btree()->length;
+}
 
-    inline std::string_view CordRepBtreeReader::Init(CordRepBtree *tree) {
-        assert(tree != nullptr);
-        const CordRep *edge = navigator_.InitFirst(tree);
-        remaining_ = tree->length - edge->length;
-        return EdgeData(edge);
-    }
+inline turbo::string_view CordRepBtreeReader::Init(CordRepBtree* tree) {
+  assert(tree != nullptr);
+  const CordRep* edge = navigator_.InitFirst(tree);
+  remaining_ = tree->length - edge->length;
+  return EdgeData(edge);
+}
 
-    inline std::string_view CordRepBtreeReader::Next() {
-        if (remaining_ == 0) return {};
-        const CordRep *edge = navigator_.Next();
-        assert(edge != nullptr);
-        remaining_ -= edge->length;
-        return EdgeData(edge);
-    }
+inline turbo::string_view CordRepBtreeReader::Next() {
+  if (remaining_ == 0) return {};
+  const CordRep* edge = navigator_.Next();
+  assert(edge != nullptr);
+  remaining_ -= edge->length;
+  return EdgeData(edge);
+}
 
-    inline std::string_view CordRepBtreeReader::Skip(size_t skip) {
-        // As we are always positioned on the last 'consumed' edge, we
-        // need to skip the current edge as well as `skip`.
-        const size_t edge_length = navigator_.Current()->length;
-        CordRepBtreeNavigator::Position pos = navigator_.Skip(skip + edge_length);
-        if (TURBO_UNLIKELY(pos.edge == nullptr)) {
-            remaining_ = 0;
-            return {};
-        }
-        // The combined length of all edges skipped before `pos.edge` is `skip -
-        // pos.offset`, all of which are 'consumed', as well as the current edge.
-        remaining_ -= skip - pos.offset + pos.edge->length;
-        return EdgeData(pos.edge).substr(pos.offset);
-    }
+inline turbo::string_view CordRepBtreeReader::Skip(size_t skip) {
+  // As we are always positioned on the last 'consumed' edge, we
+  // need to skip the current edge as well as `skip`.
+  const size_t edge_length = navigator_.Current()->length;
+  CordRepBtreeNavigator::Position pos = navigator_.Skip(skip + edge_length);
+  if (TURBO_PREDICT_FALSE(pos.edge == nullptr)) {
+    remaining_ = 0;
+    return {};
+  }
+  // The combined length of all edges skipped before `pos.edge` is `skip -
+  // pos.offset`, all of which are 'consumed', as well as the current edge.
+  remaining_ -= skip - pos.offset + pos.edge->length;
+  return EdgeData(pos.edge).substr(pos.offset);
+}
 
-    inline std::string_view CordRepBtreeReader::Seek(size_t offset) {
-        const CordRepBtreeNavigator::Position pos = navigator_.Seek(offset);
-        if (TURBO_UNLIKELY(pos.edge == nullptr)) {
-            remaining_ = 0;
-            return {};
-        }
-        std::string_view chunk = EdgeData(pos.edge).substr(pos.offset);
-        remaining_ = length() - offset - chunk.length();
-        return chunk;
-    }
+inline turbo::string_view CordRepBtreeReader::Seek(size_t offset) {
+  const CordRepBtreeNavigator::Position pos = navigator_.Seek(offset);
+  if (TURBO_PREDICT_FALSE(pos.edge == nullptr)) {
+    remaining_ = 0;
+    return {};
+  }
+  turbo::string_view chunk = EdgeData(pos.edge).substr(pos.offset);
+  remaining_ = length() - offset - chunk.length();
+  return chunk;
+}
 
-}  // namespace turbo::cord_internal
+}  // namespace cord_internal
+TURBO_NAMESPACE_END
+}  // namespace turbo
 
 #endif  // TURBO_STRINGS_INTERNAL_CORD_REP_BTREE_READER_H_

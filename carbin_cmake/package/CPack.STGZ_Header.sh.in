@@ -275,11 +275,11 @@ if [ "$eans" != "yes" ] && [ "$eans" != "Yes" ] && [ "$eans" != "YES" ] && \
     printf "\\n"
     printf "You may need to set "$PROJECT_UNAME"_DIR manually in your $BASH_RC or /etc/profile\\n"
     printf "\\n"
-    printf "export "$PROJECT_UNAME"_DIR=\"$PREFIX/lib/cmake/@CPACK_PACKAGE_NAME@\"\\n"
+    printf "export "$PROJECT_UNAME"_DIR=\"$PREFIX/@CMAKE_INSTALL_LIBDIR@/cmake/@CPACK_PACKAGE_NAME@\"\\n"
     printf "\\n"
     printf "If it is a dynamic library, you also need to set LD_LIBRARY_PATH in your $BASH_RC or /etc/profile\\n"
     printf "\\n"
-    printf "export LD_LIBRARY_PATH=\"$PREFIX/lib:\$LD_LIBRARY_PATH\"\\n"
+    printf "export LD_LIBRARY_PATH=\"$PREFIX/@CMAKE_INSTALL_LIBDIR@:\$LD_LIBRARY_PATH\"\\n"
     printf "\\n"
     printf "Please source your $BASH_RC before include @CPACK_PACKAGE_NAME@ \\n"
     printf "\\n"
@@ -290,7 +290,7 @@ else
 
     tips=no
 
-    addDir="export "$PROJECT_UNAME"_DIR=\"$PREFIX/lib/cmake/@CPACK_PACKAGE_NAME@\""
+    addDir="export "$PROJECT_UNAME"_DIR=\"$PREFIX/@CMAKE_INSTALL_LIBDIR@/cmake/@CPACK_PACKAGE_NAME@\""
     if ! grep "$addDir" $BASH_RC > /dev/null 2>&1; then
         echo "# @CPACK_PACKAGE_NAME@_DIR" >> $BASH_RC
         echo ${addDir} >> $BASH_RC
@@ -300,8 +300,8 @@ else
         printf "DIR of @CPACK_PACKAGE_NAME@ already exists in $BASH_RC\\n"
     fi
 
-    if [ ! "$(find $PREFIX/lib -name "*.a")" ]; then
-        addLDPath="export LD_LIBRARY_PATH=\"$PREFIX/lib:\$LD_LIBRARY_PATH\""
+    if [ ! "$(find $PREFIX/@CMAKE_INSTALL_LIBDIR@ -name "*.a")" ]; then
+        addLDPath="export LD_LIBRARY_PATH=\"$PREFIX/@CMAKE_INSTALL_LIBDIR@:\$LD_LIBRARY_PATH\""
         if ! grep "$addLDPath" $BASH_RC > /dev/null 2>&1; then
             echo "# @CPACK_PACKAGE_NAME@ LD_LIBRARY_PATH" >> $BASH_RC
             echo ${addLDPath} >> $BASH_RC

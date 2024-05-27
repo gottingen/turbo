@@ -1,24 +1,37 @@
-// Copyright 2018 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-// An async-signal-safe and thread-safe demangler for Itanium C++ ABI
-// (aka G++ V3 ABI).
+#ifndef TURBO_DEBUGGING_INTERNAL_DEMANGLE_H_
+#define TURBO_DEBUGGING_INTERNAL_DEMANGLE_H_
+
+#include <string>
+#include <turbo/base/config.h>
+
+namespace turbo {
+TURBO_NAMESPACE_BEGIN
+namespace debugging_internal {
+
+// Demangle `mangled`.  On success, return true and write the
+// demangled symbol name to `out`.  Otherwise, return false.
+// `out` is modified even if demangling is unsuccessful.
 //
-// The demangler is implemented to be used in async signal handlers to
-// symbolize stack traces.  We cannot use libstdc++'s
-// abi::__cxa_demangle() in such signal handlers since it's not async
-// signal safe (it uses malloc() internally).
+// This function provides an alternative to libstdc++'s abi::__cxa_demangle,
+// which is not async signal safe (it uses malloc internally).  It's intended to
+// be used in async signal handlers to symbolize stack traces.
 //
 // Note that this demangler doesn't support full demangling.  More
 // specifically, it doesn't print types of function parameters and
@@ -30,38 +43,36 @@
 //
 // Example:
 //
-// | Mangled Name  | The Demangler | abi::__cxa_demangle()
-// |---------------|---------------|-----------------------
-// | _Z1fv         | f()           | f()
-// | _Z1fi         | f()           | f(int)
-// | _Z3foo3bar    | foo()         | foo(bar)
-// | _Z1fIiEvi     | f<>()         | void f<int>(int)
-// | _ZN1N1fE      | N::f          | N::f
-// | _ZN3Foo3BarEv | Foo::Bar()    | Foo::Bar()
-// | _Zrm1XS_"     | operator%()   | operator%(X, X)
-// | _ZN3FooC1Ev   | Foo::Foo()    | Foo::Foo()
-// | _Z1fSs        | f()           | f(std::basic_string<char,
-// |               |               |   std::char_traits<char>,
-// |               |               |   std::allocator<char> >)
+// | Mangled Name  | Demangle    | DemangleString
+// |---------------|-------------|-----------------------
+// | _Z1fv         | f()         | f()
+// | _Z1fi         | f()         | f(int)
+// | _Z3foo3bar    | foo()       | foo(bar)
+// | _Z1fIiEvi     | f<>()       | void f<int>(int)
+// | _ZN1N1fE      | N::f        | N::f
+// | _ZN3Foo3BarEv | Foo::Bar()  | Foo::Bar()
+// | _Zrm1XS_"     | operator%() | operator%(X, X)
+// | _ZN3FooC1Ev   | Foo::Foo()  | Foo::Foo()
+// | _Z1fSs        | f()         | f(std::basic_string<char,
+// |               |             |   std::char_traits<char>,
+// |               |             |   std::allocator<char> >)
 //
 // See the unit test for more examples.
 //
+// Support for Rust mangled names is in development; see demangle_rust.h.
+//
 // Note: we might want to write demanglers for ABIs other than Itanium
 // C++ ABI in the future.
+bool Demangle(const char* mangled, char* out, size_t out_size);
+
+// A wrapper around `abi::__cxa_demangle()`.  On success, returns the demangled
+// name.  On failure, returns the input mangled name.
 //
+// This function is not async-signal-safe.
+std::string DemangleString(const char* mangled);
 
-#ifndef TURBO_DEBUGGING_INTERNAL_DEMANGLE_H_
-#define TURBO_DEBUGGING_INTERNAL_DEMANGLE_H_
-
-#include "turbo/platform/port.h"
-
-namespace turbo::debugging_internal {
-
-    // Demangle `mangled`.  On success, return true and write the
-    // demangled symbol name to `out`.  Otherwise, return false.
-    // `out` is modified even if demangling is unsuccessful.
-    bool Demangle(const char *mangled, char *out, size_t out_size);
-
-}  // namespace turbo::debugging_internal
+}  // namespace debugging_internal
+TURBO_NAMESPACE_END
+}  // namespace turbo
 
 #endif  // TURBO_DEBUGGING_INTERNAL_DEMANGLE_H_

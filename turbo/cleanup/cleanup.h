@@ -1,16 +1,19 @@
-// Copyright 2021 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 //
 // -----------------------------------------------------------------------------
 // File: cleanup.h
@@ -25,7 +28,7 @@
 //   turbo::Status CopyGoodData(const char* source_path, const char* sink_path) {
 //     FILE* source_file = fopen(source_path, "r");
 //     if (source_file == nullptr) {
-//       return turbo::not_found_error("No source file");  // No cleanups execute
+//       return turbo::NotFoundError("No source file");  // No cleanups execute
 //     }
 //
 //     // C++17 style cleanup using class template argument deduction
@@ -33,7 +36,7 @@
 //
 //     FILE* sink_file = fopen(sink_path, "w");
 //     if (sink_file == nullptr) {
-//       return turbo::not_found_error("No sink file");  // First cleanup executes
+//       return turbo::NotFoundError("No sink file");  // First cleanup executes
 //     }
 //
 //     // C++11 style cleanup using the factory function
@@ -42,13 +45,13 @@
 //     Data data;
 //     while (ReadData(source_file, &data)) {
 //       if (!data.IsGood()) {
-//         turbo::Status result = turbo::failed_precondition_error("Read bad data");
+//         turbo::Status result = turbo::FailedPreconditionError("Read bad data");
 //         return result;  // Both cleanups execute
 //       }
 //       SaveData(sink_file, &data);
 //     }
 //
-//     return turbo::ok_status();  // Both cleanups execute
+//     return turbo::OkStatus();  // Both cleanups execute
 //   }
 // ```
 //
@@ -70,68 +73,71 @@
 
 #include <utility>
 
-#include "turbo/cleanup/internal/cleanup.h"
-#include "turbo/platform/port.h"
+#include <turbo/base/config.h>
+#include <turbo/base/macros.h>
+#include <turbo/cleanup/internal/cleanup.h>
 
 namespace turbo {
+TURBO_NAMESPACE_BEGIN
 
-    template<typename Arg, typename Callback = void()>
-    class TURBO_MUST_USE_RESULT Cleanup final {
-        static_assert(cleanup_internal::WasDeduced<Arg>(),
-                      "Explicit template parameters are not supported.");
+template <typename Arg, typename Callback = void()>
+class TURBO_MUST_USE_RESULT Cleanup final {
+  static_assert(cleanup_internal::WasDeduced<Arg>(),
+                "Explicit template parameters are not supported.");
 
-        static_assert(cleanup_internal::ReturnsVoid<Callback>(),
-                      "Callbacks that return values are not supported.");
+  static_assert(cleanup_internal::ReturnsVoid<Callback>(),
+                "Callbacks that return values are not supported.");
 
-    public:
-        Cleanup(Callback callback) : storage_(std::move(callback)) {}  // NOLINT
+ public:
+  Cleanup(Callback callback) : storage_(std::move(callback)) {}  // NOLINT
 
-        Cleanup(Cleanup &&other) = default;
+  Cleanup(Cleanup&& other) = default;
 
-        void Cancel() &&{
-            TURBO_HARDENING_ASSERT(storage_.IsCallbackEngaged());
-            storage_.DestroyCallback();
-        }
+  void Cancel() && {
+    TURBO_HARDENING_ASSERT(storage_.IsCallbackEngaged());
+    storage_.DestroyCallback();
+  }
 
-        void Invoke() &&{
-            TURBO_HARDENING_ASSERT(storage_.IsCallbackEngaged());
-            storage_.InvokeCallback();
-            storage_.DestroyCallback();
-        }
+  void Invoke() && {
+    TURBO_HARDENING_ASSERT(storage_.IsCallbackEngaged());
+    storage_.InvokeCallback();
+    storage_.DestroyCallback();
+  }
 
-        ~Cleanup() {
-            if (storage_.IsCallbackEngaged()) {
-                storage_.InvokeCallback();
-                storage_.DestroyCallback();
-            }
-        }
+  ~Cleanup() {
+    if (storage_.IsCallbackEngaged()) {
+      storage_.InvokeCallback();
+      storage_.DestroyCallback();
+    }
+  }
 
-    private:
-        cleanup_internal::Storage<Callback> storage_;
-    };
+ private:
+  cleanup_internal::Storage<Callback> storage_;
+};
 
 // `turbo::Cleanup c = /* callback */;`
 //
 // C++17 type deduction API for creating an instance of `turbo::Cleanup`
 #if defined(TURBO_HAVE_CLASS_TEMPLATE_ARGUMENT_DEDUCTION)
-    template<typename Callback>
-    Cleanup(Callback callback) -> Cleanup<cleanup_internal::Tag, Callback>;
+template <typename Callback>
+Cleanup(Callback callback) -> Cleanup<cleanup_internal::Tag, Callback>;
 #endif  // defined(TURBO_HAVE_CLASS_TEMPLATE_ARGUMENT_DEDUCTION)
 
-    // `auto c = turbo::MakeCleanup(/* callback */);`
-    //
-    // C++11 type deduction API for creating an instance of `turbo::Cleanup`
-    template<typename... Args, typename Callback>
-    turbo::Cleanup<cleanup_internal::Tag, Callback> MakeCleanup(Callback callback) {
-        static_assert(cleanup_internal::WasDeduced<cleanup_internal::Tag, Args...>(),
-                      "Explicit template parameters are not supported.");
+// `auto c = turbo::MakeCleanup(/* callback */);`
+//
+// C++11 type deduction API for creating an instance of `turbo::Cleanup`
+template <typename... Args, typename Callback>
+turbo::Cleanup<cleanup_internal::Tag, Callback> MakeCleanup(Callback callback) {
+  static_assert(cleanup_internal::WasDeduced<cleanup_internal::Tag, Args...>(),
+                "Explicit template parameters are not supported.");
 
-        static_assert(cleanup_internal::ReturnsVoid<Callback>(),
-                      "Callbacks that return values are not supported.");
+  static_assert(cleanup_internal::ReturnsVoid<Callback>(),
+                "Callbacks that return values are not supported.");
 
-        return {std::move(callback)};
-    }
+  return {std::move(callback)};
+}
 
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_CLEANUP_CLEANUP_H_

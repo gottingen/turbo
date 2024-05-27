@@ -1,27 +1,32 @@
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Copyright 2020 The Turbo Authors.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 //
 
-#ifndef TURBO_PLATFORM_INTERNAL_THROW_DELEGATE_H_
-#define TURBO_PLATFORM_INTERNAL_THROW_DELEGATE_H_
+#ifndef TURBO_BASE_INTERNAL_THROW_DELEGATE_H_
+#define TURBO_BASE_INTERNAL_THROW_DELEGATE_H_
 
 #include <string>
 
-#include "turbo/platform/port.h"
+#include <turbo/base/config.h>
 
-namespace turbo::base_internal {
+namespace turbo {
+TURBO_NAMESPACE_BEGIN
+namespace base_internal {
+
 // Helper functions that allow throwing exceptions consistently from anywhere.
 // The main use case is for header-based libraries (eg templates), as they will
 // be built by many different targets with their own compiler options.
@@ -36,53 +41,37 @@ namespace turbo::base_internal {
 // both with and without exceptions and you need to conform to an interface
 // that uses exceptions.
 
-    [[noreturn]] void ThrowStdLogicError(const std::string &what_arg);
+[[noreturn]] void ThrowStdLogicError(const std::string& what_arg);
+[[noreturn]] void ThrowStdLogicError(const char* what_arg);
+[[noreturn]] void ThrowStdInvalidArgument(const std::string& what_arg);
+[[noreturn]] void ThrowStdInvalidArgument(const char* what_arg);
+[[noreturn]] void ThrowStdDomainError(const std::string& what_arg);
+[[noreturn]] void ThrowStdDomainError(const char* what_arg);
+[[noreturn]] void ThrowStdLengthError(const std::string& what_arg);
+[[noreturn]] void ThrowStdLengthError(const char* what_arg);
+[[noreturn]] void ThrowStdOutOfRange(const std::string& what_arg);
+[[noreturn]] void ThrowStdOutOfRange(const char* what_arg);
+[[noreturn]] void ThrowStdRuntimeError(const std::string& what_arg);
+[[noreturn]] void ThrowStdRuntimeError(const char* what_arg);
+[[noreturn]] void ThrowStdRangeError(const std::string& what_arg);
+[[noreturn]] void ThrowStdRangeError(const char* what_arg);
+[[noreturn]] void ThrowStdOverflowError(const std::string& what_arg);
+[[noreturn]] void ThrowStdOverflowError(const char* what_arg);
+[[noreturn]] void ThrowStdUnderflowError(const std::string& what_arg);
+[[noreturn]] void ThrowStdUnderflowError(const char* what_arg);
 
-    [[noreturn]] void ThrowStdLogicError(const char *what_arg);
+[[noreturn]] void ThrowStdBadFunctionCall();
+[[noreturn]] void ThrowStdBadAlloc();
 
-    [[noreturn]] void ThrowStdInvalidArgument(const std::string &what_arg);
+// ThrowStdBadArrayNewLength() cannot be consistently supported because
+// std::bad_array_new_length is missing in libstdc++ until 4.9.0.
+// https://gcc.gnu.org/onlinedocs/gcc-4.8.3/libstdc++/api/a01379_source.html
+// https://gcc.gnu.org/onlinedocs/gcc-4.9.0/libstdc++/api/a01327_source.html
+// libcxx (as of 3.2) and msvc (as of 2015) both have it.
+// [[noreturn]] void ThrowStdBadArrayNewLength();
 
-    [[noreturn]] void ThrowStdInvalidArgument(const char *what_arg);
+}  // namespace base_internal
+TURBO_NAMESPACE_END
+}  // namespace turbo
 
-    [[noreturn]] void ThrowStdDomainError(const std::string &what_arg);
-
-    [[noreturn]] void ThrowStdDomainError(const char *what_arg);
-
-    [[noreturn]] void ThrowStdLengthError(const std::string &what_arg);
-
-    [[noreturn]] void ThrowStdLengthError(const char *what_arg);
-
-    [[noreturn]] void ThrowStdOutOfRange(const std::string &what_arg);
-
-    [[noreturn]] void ThrowStdOutOfRange(const char *what_arg);
-
-    [[noreturn]] void ThrowStdRuntimeError(const std::string &what_arg);
-
-    [[noreturn]] void ThrowStdRuntimeError(const char *what_arg);
-
-    [[noreturn]] void ThrowStdRangeError(const std::string &what_arg);
-
-    [[noreturn]] void ThrowStdRangeError(const char *what_arg);
-
-    [[noreturn]] void ThrowStdOverflowError(const std::string &what_arg);
-
-    [[noreturn]] void ThrowStdOverflowError(const char *what_arg);
-
-    [[noreturn]] void ThrowStdUnderflowError(const std::string &what_arg);
-
-    [[noreturn]] void ThrowStdUnderflowError(const char *what_arg);
-
-    [[noreturn]] void ThrowStdBadFunctionCall();
-
-    [[noreturn]] void ThrowStdBadAlloc();
-
-    // ThrowStdBadArrayNewLength() cannot be consistently supported because
-    // std::bad_array_new_length is missing in libstdc++ until 4.9.0.
-    // https://gcc.gnu.org/onlinedocs/gcc-4.8.3/libstdc++/api/a01379_source.html
-    // https://gcc.gnu.org/onlinedocs/gcc-4.9.0/libstdc++/api/a01327_source.html
-    // libcxx (as of 3.2) and msvc (as of 2015) both have it.
-    // [[noreturn]] void ThrowStdBadArrayNewLength();
-
-}  // namespace turbo::base_internal
-
-#endif  // TURBO_PLATFORM_INTERNAL_THROW_DELEGATE_H_
+#endif  // TURBO_BASE_INTERNAL_THROW_DELEGATE_H_

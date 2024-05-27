@@ -1,58 +1,67 @@
-// Copyright 2021 The Turbo Authors
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//     https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/strings/internal/cord_rep_consume.h"
+#include <turbo/strings/internal/cord_rep_consume.h>
 
 #include <array>
 #include <utility>
 
-#include "turbo/container/inlined_vector.h"
-#include "turbo/meta/function_ref.h"
-#include "turbo/strings/internal/cord_internal.h"
+#include <turbo/container/inlined_vector.h>
+#include <turbo/functional/function_ref.h>
+#include <turbo/strings/internal/cord_internal.h>
 
-namespace turbo::cord_internal {
+namespace turbo {
+TURBO_NAMESPACE_BEGIN
+namespace cord_internal {
 
-    namespace {
+namespace {
 
-        // Unrefs the provided `substring`, and returns `substring->child`
-        // Adds or assumes a reference on `substring->child`
-        CordRep *ClipSubstring(CordRepSubstring *substring) {
-            CordRep *child = substring->child;
-            if (substring->refcount.IsOne()) {
-                delete substring;
-            } else {
-                CordRep::Ref(child);
-                CordRep::Unref(substring);
-            }
-            return child;
-        }
+// Unrefs the provided `substring`, and returns `substring->child`
+// Adds or assumes a reference on `substring->child`
+CordRep* ClipSubstring(CordRepSubstring* substring) {
+  CordRep* child = substring->child;
+  if (substring->refcount.IsOne()) {
+    delete substring;
+  } else {
+    CordRep::Ref(child);
+    CordRep::Unref(substring);
+  }
+  return child;
+}
 
-    }  // namespace
+}  // namespace
 
-    void Consume(CordRep *rep, ConsumeFn consume_fn) {
-        size_t offset = 0;
-        size_t length = rep->length;
+void Consume(CordRep* rep,
+             FunctionRef<void(CordRep*, size_t, size_t)> consume_fn) {
+  size_t offset = 0;
+  size_t length = rep->length;
 
-        if (rep->tag == SUBSTRING) {
-            offset += rep->substring()->start;
-            rep = ClipSubstring(rep->substring());
-        }
-        consume_fn(rep, offset, length);
-    }
+  if (rep->tag == SUBSTRING) {
+    offset += rep->substring()->start;
+    rep = ClipSubstring(rep->substring());
+  }
+  consume_fn(rep, offset, length);
+}
 
-    void ReverseConsume(CordRep *rep, ConsumeFn consume_fn) {
-        return Consume(rep, std::move(consume_fn));
-    }
+void ReverseConsume(CordRep* rep,
+                    FunctionRef<void(CordRep*, size_t, size_t)> consume_fn) {
+  return Consume(rep, consume_fn);
+}
 
-}  // namespace turbo::cord_internal
+}  // namespace cord_internal
+TURBO_NAMESPACE_END
+}  // namespace turbo

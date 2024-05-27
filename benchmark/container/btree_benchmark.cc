@@ -1,16 +1,19 @@
-// Copyright 2018 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #include <stdint.h>
 
@@ -26,25 +29,25 @@
 #include <unordered_set>
 #include <vector>
 
-#include "benchmark/benchmark.h"
-#include "turbo/meta/container.h"
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/container/btree_map.h"
-#include "turbo/container/btree_set.h"
-#include "turbo/container/btree_test.h"
-#include "turbo/container/flat_hash_map.h"
-#include "turbo/container/flat_hash_set.h"
-#include "turbo/container/internal/hashtable_debug.h"
-#include "turbo/hash/hash.h"
-#include "turbo/log/log.h"
-#include "turbo/memory/memory.h"
-#include "turbo/random/random.h"
-#include "turbo/strings/cord.h"
-#include "turbo/strings/str_format.h"
-#include "turbo/times/time.h"
+#include <benchmark/benchmark.h>
+#include <turbo/algorithm/container.h>
+#include <turbo/base/internal/raw_logging.h>
+#include <turbo/container/btree_map.h>
+#include <turbo/container/btree_set.h>
+#include <tests/container/btree_test.h>
+#include <turbo/container/flat_hash_map.h>
+#include <turbo/container/flat_hash_set.h>
+#include <turbo/container/internal/hashtable_debug.h>
+#include <turbo/hash/hash.h>
+#include <turbo/log/log.h>
+#include <turbo/memory/memory.h>
+#include <turbo/random/random.h>
+#include <turbo/strings/cord.h>
+#include <turbo/strings/str_format.h>
+#include <turbo/time/time.h>
 
 namespace turbo {
-
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
 
@@ -601,7 +604,7 @@ struct BigType {
 
   // Support turbo::Hash.
   template <typename State>
-  friend State hash_value(State h, const BigType& b) {
+  friend State turbo_hash_value(State h, const BigType& b) {
     for (int i = 0; i < Size && i < Copies; ++i)
       h = State::combine(std::move(h), b.values[i]);
     return h;
@@ -673,14 +676,14 @@ template <int Size>
 struct BigTypePtr {
   BigTypePtr() : BigTypePtr(0) {}
   explicit BigTypePtr(int x) {
-    ptr = std::make_unique<BigType<Size, Size>>(x);
+    ptr = turbo::make_unique<BigType<Size, Size>>(x);
   }
   BigTypePtr(const BigTypePtr& other) {
-    ptr = std::make_unique<BigType<Size, Size>>(*other.ptr);
+    ptr = turbo::make_unique<BigType<Size, Size>>(*other.ptr);
   }
   BigTypePtr(BigTypePtr&& other) noexcept = default;
   BigTypePtr& operator=(const BigTypePtr& other) {
-    ptr = std::make_unique<BigType<Size, Size>>(*other.ptr);
+    ptr = turbo::make_unique<BigType<Size, Size>>(*other.ptr);
   }
   BigTypePtr& operator=(BigTypePtr&& other) noexcept = default;
 
@@ -746,13 +749,13 @@ void BM_BtreeSet_IteratorSubtraction(benchmark::State& state) {
   turbo::btree_set<int> set;
   for (int i : vec) set.insert(i);
 
-  size_t distance = turbo::uniform(bitgen, 0u, set.size());
+  size_t distance = turbo::Uniform(bitgen, 0u, set.size());
   while (state.KeepRunningBatch(distance)) {
-    size_t end = turbo::uniform(bitgen, distance, set.size());
+    size_t end = turbo::Uniform(bitgen, distance, set.size());
     size_t begin = end - distance;
     benchmark::DoNotOptimize(set.find(static_cast<int>(end)) -
                              set.find(static_cast<int>(begin)));
-    distance = turbo::uniform(bitgen, 0u, set.size());
+    distance = turbo::Uniform(bitgen, 0u, set.size());
   }
 }
 
@@ -760,5 +763,5 @@ BENCHMARK(BM_BtreeSet_IteratorSubtraction)->Range(1 << 10, 1 << 20);
 
 }  // namespace
 }  // namespace container_internal
-
+TURBO_NAMESPACE_END
 }  // namespace turbo

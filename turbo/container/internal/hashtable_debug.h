@@ -1,16 +1,19 @@
-// Copyright 2018 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 //
 // This library provides APIs to debug the probing behavior of hash tables.
 //
@@ -35,72 +38,68 @@
 #include <type_traits>
 #include <vector>
 
-#include "turbo/container/internal/hashtable_debug_hooks.h"
+#include <turbo/container/internal/hashtable_debug_hooks.h>
 
-namespace turbo::container_internal {
+namespace turbo {
+TURBO_NAMESPACE_BEGIN
+namespace container_internal {
 
-    // Returns the number of probes required to lookup `key`.  Returns 0 for a
-    // search with no collisions.  Higher values mean more hash collisions occurred;
-    // however, the exact meaning of this number varies according to the container
-    // type.
-    template<typename C>
-    size_t GetHashtableDebugNumProbes(
-            const C &c, const typename C::key_type &key) {
-        return turbo::container_internal::hashtable_debug_internal::
-        HashtableDebugAccess<C>::GetNumProbes(c, key);
-    }
+// Returns the number of probes required to lookup `key`.  Returns 0 for a
+// search with no collisions.  Higher values mean more hash collisions occurred;
+// however, the exact meaning of this number varies according to the container
+// type.
+template <typename C>
+size_t GetHashtableDebugNumProbes(
+    const C& c, const typename C::key_type& key) {
+  return turbo::container_internal::hashtable_debug_internal::
+      HashtableDebugAccess<C>::GetNumProbes(c, key);
+}
 
-    // Gets a histogram of the number of probes for each elements in the container.
-    // The sum of all the values in the vector is equal to container.size().
-    template<typename C>
-    std::vector<size_t> GetHashtableDebugNumProbesHistogram(const C &container) {
-        std::vector<size_t> v;
-        for (auto it = container.begin(); it != container.end(); ++it) {
-            size_t num_probes = GetHashtableDebugNumProbes(
-                    container,
-                    turbo::container_internal::hashtable_debug_internal::GetKey<C>(*it, 0));
-            v.resize((std::max)(v.size(), num_probes + 1));
-            v[num_probes]++;
-        }
-        return v;
-    }
+// Gets a histogram of the number of probes for each elements in the container.
+// The sum of all the values in the vector is equal to container.size().
+template <typename C>
+std::vector<size_t> GetHashtableDebugNumProbesHistogram(const C& container) {
+  std::vector<size_t> v;
+  for (auto it = container.begin(); it != container.end(); ++it) {
+    size_t num_probes = GetHashtableDebugNumProbes(
+        container,
+        turbo::container_internal::hashtable_debug_internal::GetKey<C>(*it, 0));
+    v.resize((std::max)(v.size(), num_probes + 1));
+    v[num_probes]++;
+  }
+  return v;
+}
 
-    struct HashtableDebugProbeSummary {
-        size_t total_elements;
-        size_t total_num_probes;
-        double mean;
-    };
+struct HashtableDebugProbeSummary {
+  size_t total_elements;
+  size_t total_num_probes;
+  double mean;
+};
 
-    // Gets a summary of the probe count distribution for the elements in the
-    // container.
-    template<typename C>
-    HashtableDebugProbeSummary GetHashtableDebugProbeSummary(const C &container) {
-        auto probes = GetHashtableDebugNumProbesHistogram(container);
-        HashtableDebugProbeSummary summary = {};
-        for (size_t i = 0; i < probes.size(); ++i) {
-            summary.total_elements += probes[i];
-            summary.total_num_probes += probes[i] * i;
-        }
-        summary.mean = 1.0 * summary.total_num_probes / summary.total_elements;
-        return summary;
-    }
+// Gets a summary of the probe count distribution for the elements in the
+// container.
+template <typename C>
+HashtableDebugProbeSummary GetHashtableDebugProbeSummary(const C& container) {
+  auto probes = GetHashtableDebugNumProbesHistogram(container);
+  HashtableDebugProbeSummary summary = {};
+  for (size_t i = 0; i < probes.size(); ++i) {
+    summary.total_elements += probes[i];
+    summary.total_num_probes += probes[i] * i;
+  }
+  summary.mean = 1.0 * summary.total_num_probes / summary.total_elements;
+  return summary;
+}
 
-    // Returns the number of bytes requested from the allocator by the container
-    // and not freed.
-    template<typename C>
-    size_t AllocatedByteSize(const C &c) {
-        return turbo::container_internal::hashtable_debug_internal::
-        HashtableDebugAccess<C>::AllocatedByteSize(c);
-    }
+// Returns the number of bytes requested from the allocator by the container
+// and not freed.
+template <typename C>
+size_t AllocatedByteSize(const C& c) {
+  return turbo::container_internal::hashtable_debug_internal::
+      HashtableDebugAccess<C>::AllocatedByteSize(c);
+}
 
-    // Returns a tight lower bound for AllocatedByteSize(c) where `c` is of type `C`
-    // and `c.size()` is equal to `num_elements`.
-    template<typename C>
-    size_t LowerBoundAllocatedByteSize(size_t num_elements) {
-        return turbo::container_internal::hashtable_debug_internal::
-        HashtableDebugAccess<C>::LowerBoundAllocatedByteSize(num_elements);
-    }
-
-}  // namespace turbo::container_internal
+}  // namespace container_internal
+TURBO_NAMESPACE_END
+}  // namespace turbo
 
 #endif  // TURBO_CONTAINER_INTERNAL_HASHTABLE_DEBUG_H_

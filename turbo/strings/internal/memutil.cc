@@ -1,132 +1,51 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/strings/internal/memutil.h"
+#include <turbo/strings/internal/memutil.h>
 
 #include <cstdlib>
 
-namespace turbo::strings_internal {
+#include <turbo/strings/ascii.h>
 
-    int memcasecmp(const char *s1, const char *s2, size_t len) {
-        const unsigned char *us1 = reinterpret_cast<const unsigned char *>(s1);
-        const unsigned char *us2 = reinterpret_cast<const unsigned char *>(s2);
+namespace turbo {
+TURBO_NAMESPACE_BEGIN
+namespace strings_internal {
 
-        for (size_t i = 0; i < len; i++) {
-            const int diff =
-                    int{static_cast<unsigned char>(turbo::ascii_to_lower(us1[i]))} -
-                    int{static_cast<unsigned char>(turbo::ascii_to_lower(us2[i]))};
-            if (diff != 0) return diff;
-        }
-        return 0;
+int memcasecmp(const char* s1, const char* s2, size_t len) {
+  const unsigned char* us1 = reinterpret_cast<const unsigned char*>(s1);
+  const unsigned char* us2 = reinterpret_cast<const unsigned char*>(s2);
+
+  for (size_t i = 0; i < len; i++) {
+    unsigned char c1 = us1[i];
+    unsigned char c2 = us2[i];
+    // If bytes are the same, they will be the same when converted to lower.
+    // So we only need to convert if bytes are not equal.
+    // NOTE(b/308193381): We do not use `turbo::ascii_tolower` here in order
+    // to avoid its lookup table and improve performance.
+    if (c1 != c2) {
+      c1 = c1 >= 'A' && c1 <= 'Z' ? c1 - 'A' + 'a' : c1;
+      c2 = c2 >= 'A' && c2 <= 'Z' ? c2 - 'A' + 'a' : c2;
+      const int diff = int{c1} - int{c2};
+      if (diff != 0) return diff;
     }
+  }
+  return 0;
+}
 
-    char *memdup(const char *s, size_t slen) {
-        void *copy;
-        if ((copy = malloc(slen)) == nullptr) return nullptr;
-        memcpy(copy, s, slen);
-        return reinterpret_cast<char *>(copy);
-    }
-
-    char *memrchr(const char *s, int c, size_t slen) {
-        for (const char *e = s + slen - 1; e >= s; e--) {
-            if (*e == c) return const_cast<char *>(e);
-        }
-        return nullptr;
-    }
-
-    size_t memspn(const char *s, size_t slen, const char *accept) {
-        const char *p = s;
-        const char *spanp;
-        char c, sc;
-
-        cont:
-        c = *p++;
-        if (slen-- == 0)
-            return static_cast<size_t>(p - 1 - s);
-        for (spanp = accept; (sc = *spanp++) != '\0';)
-            if (sc == c) goto cont;
-        return static_cast<size_t>(p - 1 - s);
-    }
-
-    size_t memcspn(const char *s, size_t slen, const char *reject) {
-        const char *p = s;
-        const char *spanp;
-        char c, sc;
-
-        while (slen-- != 0) {
-            c = *p++;
-            for (spanp = reject; (sc = *spanp++) != '\0';)
-                if (sc == c)
-                    return static_cast<size_t>(p - 1 - s);
-        }
-        return static_cast<size_t>(p - s);
-    }
-
-    char *mempbrk(const char *s, size_t slen, const char *accept) {
-        const char *scanp;
-        int sc;
-
-        for (; slen; ++s, --slen) {
-            for (scanp = accept; (sc = *scanp++) != '\0';)
-                if (sc == *s) return const_cast<char *>(s);
-        }
-        return nullptr;
-    }
-
-    // This is significantly faster for case-sensitive matches with very
-    // few possible matches.  See unit test for benchmarks.
-    const char *memmatch(const char *phaystack, size_t haylen, const char *pneedle,
-                         size_t neelen) {
-        if (0 == neelen) {
-            return phaystack;  // even if haylen is 0
-        }
-        if (haylen < neelen) return nullptr;
-
-        const char *match;
-        const char *hayend = phaystack + haylen - neelen + 1;
-        // A static cast is used here to work around the fact that memchr returns
-        // a void* on Posix-compliant systems and const void* on Windows.
-        while (
-                (match = static_cast<const char *>(memchr(
-                        phaystack, pneedle[0], static_cast<size_t>(hayend - phaystack))))) {
-            if (memcmp(match, pneedle, neelen) == 0)
-                return match;
-            else
-                phaystack = match + 1;
-        }
-        return nullptr;
-    }
-
-    const char32_t *memmatch(const char32_t *phaystack,
-                             size_t haylen,
-                             const char32_t *pneedle,
-                             size_t neelen) {
-        if (0 == neelen) {
-            return phaystack;  // even if haylen is 0
-        }
-        if (haylen < neelen)
-            return nullptr;
-        const char32_t *match;
-        const char32_t *hayend = phaystack + haylen - neelen + 1;
-        while ((match = std::char_traits<char32_t>::find(
-                phaystack, hayend - phaystack, pneedle[0]))) {
-            if (std::char_traits<char32_t>::compare(match, pneedle, neelen) == 0)
-                return match;
-            else
-                phaystack = match + 1;
-        }
-        return nullptr;
-    }
-
-}  // namespace turbo::strings_internal
+}  // namespace strings_internal
+TURBO_NAMESPACE_END
+}  // namespace turbo

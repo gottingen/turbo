@@ -1,25 +1,28 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/random/internal/fast_uniform_bits.h"
+#include <turbo/random/internal/fast_uniform_bits.h>
 
 #include <random>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 namespace turbo {
-
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 namespace {
 
@@ -167,7 +170,7 @@ TEST(FastUniformBitsTest, RangeSize) {
              FakeUrbg<uint64_t, 0, (std::numeric_limits<uint64_t>::max)()>>()));
 }
 
-// The constants need to be choosen so that an infinite rejection loop doesn't
+// The constants need to be chosen so that an infinite rejection loop doesn't
 // happen...
 using Urng1_5bit = FakeUrbg<uint8_t, 0, 2, 0>;  // ~1.5 bits (range 3)
 using Urng4bits = FakeUrbg<uint8_t, 1, 0x10, 2>;
@@ -332,5 +335,5 @@ TEST(FastUniformBitsTest, URBG32bitRegression) {
 
 }  // namespace
 }  // namespace random_internal
-
+TURBO_NAMESPACE_END
 }  // namespace turbo

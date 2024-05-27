@@ -1,4 +1,4 @@
-// Copyright 2020 Google Inc. All Rights Reserved.
+// Copyright 2017 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "benchmark/random/nanobenchmark.h"
+#include <turbo/random/internal/nanobenchmark.h>
 
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/strings/numbers.h"
+#include <turbo/log/check.h>
+#include <turbo/log/log.h>
+#include <turbo/strings/numbers.h>
+#include <turbo/strings/str_format.h>
 
 namespace turbo {
-
+TURBO_NAMESPACE_BEGIN
 namespace random_internal_nanobenchmark {
 namespace {
 
@@ -36,16 +38,16 @@ void MeasureDiv(const FuncInput (&inputs)[N]) {
   params.max_evals = 6;  // avoid test timeout
   const size_t num_results = Measure(&Div, nullptr, inputs, N, results, params);
   if (num_results == 0) {
-    TURBO_RAW_LOG(
-        WARNING,
-        "WARNING: Measurement failed, should not happen when using "
-        "PinThreadToCPU unless the region to measure takes > 1 second.\n");
+    LOG(WARNING)
+        << "WARNING: Measurement failed, should not happen when using "
+           "PinThreadToCPU unless the region to measure takes > 1 second.";
     return;
   }
   for (size_t i = 0; i < num_results; ++i) {
-    TURBO_RAW_LOG(INFO, "%5zu: %6.2f ticks; MAD=%4.2f%%\n", results[i].input,
-                 results[i].ticks, results[i].variability * 100.0);
-    TURBO_RAW_CHECK(results[i].ticks != 0.0f, "Zero duration");
+    LOG(INFO) << turbo::StreamFormat("%5u: %6.2f ticks; MAD=%4.2f%%\n",
+                                    results[i].input, results[i].ticks,
+                                    results[i].variability * 100.0);
+    CHECK_NE(results[i].ticks, 0.0f) << "Zero duration";
   }
 }
 
@@ -53,8 +55,8 @@ void RunAll(const int argc, char* argv[]) {
   // Avoid migrating between cores - important on multi-socket systems.
   int cpu = -1;
   if (argc == 2) {
-    if (!turbo::simple_atoi(argv[1], &cpu)) {
-      TURBO_RAW_LOG(FATAL, "The optional argument must be a CPU number >= 0.\n");
+    if (!turbo::SimpleAtoi(argv[1], &cpu)) {
+      LOG(FATAL) << "The optional argument must be a CPU number >= 0.";
     }
   }
   PinThreadToCPU(cpu);
@@ -68,7 +70,7 @@ void RunAll(const int argc, char* argv[]) {
 
 }  // namespace
 }  // namespace random_internal_nanobenchmark
-
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 int main(int argc, char* argv[]) {

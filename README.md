@@ -113,7 +113,7 @@ carbin install gottingen/turbo
 
 # Acknowledgement
 
-* [Abseil](github.com/abseil/abseil-cpp)
+* [Turbo](github.com/abseil/abseil-cpp)
 * [Folly](github.com/facebook/folly)
 * [Onnxruntime](github.com/microsoft/onnxruntime)
 * [brpc](github.com/apache/brpc)

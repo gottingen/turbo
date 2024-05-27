@@ -1,27 +1,30 @@
-// Copyright 2019 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/strings/internal/cordz_functions.h"
+#include <turbo/strings/internal/cordz_functions.h>
 
 #include <thread>  // NOLINT we need real clean new threads
 
-#include "turbo/platform/port.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include <turbo/base/config.h>
 
 namespace turbo {
-
+TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 namespace {
 
@@ -38,7 +41,7 @@ TEST(CordzFunctionsTest, SampleRate) {
 }
 
 // Cordz is disabled when we don't have thread_local. All calls to
-// should_profile will return false when cordz is diabled, so we might want to
+// should_profile will return false when cordz is disabled, so we might want to
 // avoid those tests.
 #ifdef TURBO_INTERNAL_CORDZ_ENABLED
 
@@ -47,9 +50,9 @@ TEST(CordzFunctionsTest, ShouldProfileDisable) {
 
   set_cordz_mean_interval(0);
   cordz_set_next_sample_for_testing(0);
-  EXPECT_FALSE(cordz_should_profile());
+  EXPECT_EQ(cordz_should_profile(), 0);
   // 1 << 16 is from kIntervalIfDisabled in cordz_functions.cc.
-  EXPECT_THAT(cordz_next_sample, Eq(1 << 16));
+  EXPECT_THAT(cordz_next_sample.next_sample, Eq(1 << 16));
 
   set_cordz_mean_interval(orig_sample_rate);
 }
@@ -59,8 +62,8 @@ TEST(CordzFunctionsTest, ShouldProfileAlways) {
 
   set_cordz_mean_interval(1);
   cordz_set_next_sample_for_testing(1);
-  EXPECT_TRUE(cordz_should_profile());
-  EXPECT_THAT(cordz_next_sample, Le(1));
+  EXPECT_GT(cordz_should_profile(), 0);
+  EXPECT_THAT(cordz_next_sample.next_sample, Le(1));
 
   set_cordz_mean_interval(orig_sample_rate);
 }
@@ -74,9 +77,7 @@ TEST(CordzFunctionsTest, DoesNotAlwaysSampleFirstCord) {
   do {
     ++tries;
     ASSERT_THAT(tries, Le(1000));
-    std::thread thread([&sampled] {
-      sampled = cordz_should_profile();
-    });
+    std::thread thread([&sampled] { sampled = cordz_should_profile() > 0; });
     thread.join();
   } while (sampled);
 }
@@ -94,7 +95,7 @@ TEST(CordzFunctionsTest, ShouldProfileRate) {
     // new value for next_sample each iteration.
     cordz_set_next_sample_for_testing(0);
     cordz_should_profile();
-    sum_of_intervals += cordz_next_sample;
+    sum_of_intervals += cordz_next_sample.next_sample;
   }
 
   // The sum of independent exponential variables is an Erlang distribution,
@@ -145,5 +146,5 @@ TEST(CordzFunctionsTest, ShouldProfileDisabled) {
 
 }  // namespace
 }  // namespace cord_internal
-
+TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -1,16 +1,19 @@
-// Copyright 2018 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 //
 // Utilities to help tests verify that hash tables properly handle stateful
 // allocators and hash functions.
@@ -26,10 +29,11 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/hash/hash.h"
-#include "turbo/strings/string_view.h"
+#include <turbo/hash/hash.h>
+#include <turbo/strings/string_view.h>
 
 namespace turbo {
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 namespace hash_testing_internal {
 
@@ -86,7 +90,7 @@ struct NonStandardLayout {
   }
 
   template <typename H>
-  friend H hash_value(H h, const NonStandardLayout& v) {
+  friend H turbo_hash_value(H h, const NonStandardLayout& v) {
     return H::combine(std::move(h), v.value);
   }
 
@@ -162,6 +166,7 @@ auto keys(const Set& s)
 }
 
 }  // namespace container_internal
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 // TURBO_UNORDERED_SUPPORTS_ALLOC_CTORS is false for glibcxx versions
@@ -172,8 +177,7 @@ auto keys(const Set& s)
 // From GCC-4.9 Changelog: (src: https://gcc.gnu.org/gcc-4.9/changes.html)
 // "the unordered associative containers in <unordered_map> and <unordered_set>
 // meet the allocator-aware container requirements;"
-#if (defined(__GLIBCXX__) && __GLIBCXX__ <= 20140425 ) || \
-( __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 9 ))
+#if defined(__GLIBCXX__) && __GLIBCXX__ <= 20140425
 #define TURBO_UNORDERED_SUPPORTS_ALLOC_CTORS 0
 #else
 #define TURBO_UNORDERED_SUPPORTS_ALLOC_CTORS 1

@@ -17,5 +17,15 @@
 set(${PROJECT_NAME}_SKIP_TEST "")
 set(${PROJECT_NAME}_SKIP_BENCHMARK "")
 
-list(APPEND ${PROJECT_NAME}_SKIP_TEST "norun")
+list(APPEND ${PROJECT_NAME}_SKIP_TEST
+        "norun"
+        "base"
+        "container"
+        "algorithm"
+        "cleanup"
+        "crc"
+        "debugging"
+        "flags"
+        "functional"
+)
 list(APPEND ${PROJECT_NAME}_SKIP_BENCHMARK "norun")

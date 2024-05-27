@@ -1,16 +1,19 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 //
 // Thread-safe logging routines that do not allocate any memory or
 // acquire any locks, and can therefore be used by low-level memory
@@ -21,10 +24,13 @@
 
 #include <string>
 
-#include "turbo/base/log_severity.h"
-#include "turbo/platform/port.h"
-#include "turbo/platform/internal/atomic_hook.h"
-#include "turbo/platform/port.h"
+#include <turbo/base/attributes.h>
+#include <turbo/base/config.h>
+#include <turbo/base/internal/atomic_hook.h>
+#include <turbo/base/log_severity.h>
+#include <turbo/base/macros.h>
+#include <turbo/base/optimization.h>
+#include <turbo/base/port.h>
 
 // This is similar to LOG(severity) << format..., but
 // * it is to be used ONLY by low-level modules that can't use normal LOG()
@@ -45,6 +51,7 @@
     ::turbo::raw_log_internal::RawLog(TURBO_RAW_LOG_INTERNAL_##severity,         \
                                      turbo_raw_log_internal_basename, __LINE__, \
                                      __VA_ARGS__);                             \
+    TURBO_RAW_LOG_INTERNAL_MAYBE_UNREACHABLE_##severity;                        \
   } while (0)
 
 // Similar to CHECK(condition) << message, but for low-level modules:
@@ -54,7 +61,7 @@
 // so that the args are not computed when not needed.
 #define TURBO_RAW_CHECK(condition, message)                             \
   do {                                                                 \
-    if (TURBO_UNLIKELY(!(condition))) {                            \
+    if (TURBO_PREDICT_FALSE(!(condition))) {                            \
       TURBO_RAW_LOG(FATAL, "Check %s failed: %s", #condition, message); \
     }                                                                  \
   } while (0)
@@ -66,123 +73,148 @@
 // nor for its non-allocating nature, but rather because raw logging has very
 // few other dependencies.
 //
-// The API is a subset of the above: each macro only takes two arguments.
+// The API is a subset of the above: each macro only takes two arguments.  Use
+// StrCat if you need to build a richer message.
 #define TURBO_INTERNAL_LOG(severity, message)                              \
   do {                                                                    \
     constexpr const char* turbo_raw_log_internal_filename = __FILE__;      \
     ::turbo::raw_log_internal::internal_log_function(                      \
         TURBO_RAW_LOG_INTERNAL_##severity, turbo_raw_log_internal_filename, \
         __LINE__, message);                                               \
-    if (TURBO_RAW_LOG_INTERNAL_##severity == ::turbo::LogSeverity::kFatal)  \
-      TURBO_UNREACHABLE();                                                 \
+    TURBO_RAW_LOG_INTERNAL_MAYBE_UNREACHABLE_##severity;                   \
   } while (0)
 
 #define TURBO_INTERNAL_CHECK(condition, message)                    \
   do {                                                             \
-    if (TURBO_UNLIKELY(!(condition))) {                        \
+    if (TURBO_PREDICT_FALSE(!(condition))) {                        \
       std::string death_message = "Check " #condition " failed: "; \
       death_message += std::string(message);                       \
       TURBO_INTERNAL_LOG(FATAL, death_message);                     \
     }                                                              \
   } while (0)
 
+#ifndef NDEBUG
+
+#define TURBO_RAW_DLOG(severity, ...) TURBO_RAW_LOG(severity, __VA_ARGS__)
+#define TURBO_RAW_DCHECK(condition, message) TURBO_RAW_CHECK(condition, message)
+
+#else  // NDEBUG
+
+#define TURBO_RAW_DLOG(severity, ...)                   \
+  while (false) TURBO_RAW_LOG(severity, __VA_ARGS__)
+#define TURBO_RAW_DCHECK(condition, message) \
+  while (false) TURBO_RAW_CHECK(condition, message)
+
+#endif  // NDEBUG
+
 #define TURBO_RAW_LOG_INTERNAL_INFO ::turbo::LogSeverity::kInfo
 #define TURBO_RAW_LOG_INTERNAL_WARNING ::turbo::LogSeverity::kWarning
 #define TURBO_RAW_LOG_INTERNAL_ERROR ::turbo::LogSeverity::kError
 #define TURBO_RAW_LOG_INTERNAL_FATAL ::turbo::LogSeverity::kFatal
+#define TURBO_RAW_LOG_INTERNAL_DFATAL ::turbo::kLogDebugFatal
 #define TURBO_RAW_LOG_INTERNAL_LEVEL(severity) \
   ::turbo::NormalizeLogSeverity(severity)
 
-namespace turbo::raw_log_internal {
+#define TURBO_RAW_LOG_INTERNAL_MAYBE_UNREACHABLE_INFO
+#define TURBO_RAW_LOG_INTERNAL_MAYBE_UNREACHABLE_WARNING
+#define TURBO_RAW_LOG_INTERNAL_MAYBE_UNREACHABLE_ERROR
+#define TURBO_RAW_LOG_INTERNAL_MAYBE_UNREACHABLE_FATAL TURBO_UNREACHABLE()
+#define TURBO_RAW_LOG_INTERNAL_MAYBE_UNREACHABLE_DFATAL
+#define TURBO_RAW_LOG_INTERNAL_MAYBE_UNREACHABLE_LEVEL(severity)
 
-    // Helper function to implement TURBO_RAW_LOG
-    // Logs format... at "severity" level, reporting it
-    // as called from file:line.
-    // This does not allocate memory or acquire locks.
-    void RawLog(turbo::LogSeverity severity, const char *file, int line,
-                const char *format, ...) TURBO_PRINTF_ATTRIBUTE(4, 5);
+namespace turbo {
+TURBO_NAMESPACE_BEGIN
+namespace raw_log_internal {
 
-    // Writes the provided buffer directly to stderr, in a signal-safe, low-level
-    // manner.
-    void AsyncSignalSafeWriteToStderr(const char *s, size_t len);
+// Helper function to implement TURBO_RAW_LOG
+// Logs format... at "severity" level, reporting it
+// as called from file:line.
+// This does not allocate memory or acquire locks.
+void RawLog(turbo::LogSeverity severity, const char* file, int line,
+            const char* format, ...) TURBO_PRINTF_ATTRIBUTE(4, 5);
 
-    // compile-time function to get the "base" filename, that is, the part of
-    // a filename after the last "/" or "\" path separator.  The search starts at
-    // the end of the string; the second parameter is the length of the string.
-    constexpr const char *Basename(const char *fname, int offset) {
-        return offset == 0 || fname[offset - 1] == '/' || fname[offset - 1] == '\\'
-               ? fname + offset
-               : Basename(fname, offset - 1);
-    }
+// Writes the provided buffer directly to stderr, in a signal-safe, low-level
+// manner.  Preserves errno.
+void AsyncSignalSafeWriteError(const char* s, size_t len);
 
-    // For testing only.
-    // Returns true if raw logging is fully supported. When it is not
-    // fully supported, no messages will be emitted, but a log at FATAL
-    // severity will cause an abort.
-    //
-    // TODO(gfalcon): Come up with a better name for this method.
-    bool RawLoggingFullySupported();
+// compile-time function to get the "base" filename, that is, the part of
+// a filename after the last "/" or "\" path separator.  The search starts at
+// the end of the string; the second parameter is the length of the string.
+constexpr const char* Basename(const char* fname, int offset) {
+  return offset == 0 || fname[offset - 1] == '/' || fname[offset - 1] == '\\'
+             ? fname + offset
+             : Basename(fname, offset - 1);
+}
 
-    // Function type for a raw_log customization hook for suppressing messages
-    // by severity, and for writing custom prefixes on non-suppressed messages.
-    //
-    // The installed hook is called for every raw log invocation.  The message will
-    // be logged to stderr only if the hook returns true.  FATAL errors will cause
-    // the process to abort, even if writing to stderr is suppressed.  The hook is
-    // also provided with an output buffer, where it can write a custom log message
-    // prefix.
-    //
-    // The raw_log system does not allocate memory or grab locks.  User-provided
-    // hooks must avoid these operations, and must not throw exceptions.
-    //
-    // 'severity' is the severity level of the message being written.
-    // 'file' and 'line' are the file and line number where the TURBO_RAW_LOG macro
-    // was located.
-    // 'buf' and 'buf_size' are pointers to the buffer and buffer size.  If the
-    // hook writes a prefix, it must increment *buf and decrement *buf_size
-    // accordingly.
-    using LogFilterAndPrefixHook = bool (*)(turbo::LogSeverity severity,
-                                            const char *file, int line, char **buf,
-                                            int *buf_size);
+// For testing only.
+// Returns true if raw logging is fully supported. When it is not
+// fully supported, no messages will be emitted, but a log at FATAL
+// severity will cause an abort.
+//
+// TODO(gfalcon): Come up with a better name for this method.
+bool RawLoggingFullySupported();
 
-    // Function type for a raw_log customization hook called to abort a process
-    // when a FATAL message is logged.  If the provided AbortHook() returns, the
-    // logging system will call abort().
-    //
-    // 'file' and 'line' are the file and line number where the TURBO_RAW_LOG macro
-    // was located.
-    // The NUL-terminated logged message lives in the buffer between 'buf_start'
-    // and 'buf_end'.  'prefix_end' points to the first non-prefix character of the
-    // buffer (as written by the LogFilterAndPrefixHook.)
-    //
-    // The lifetime of the filename and message buffers will not end while the
-    // process remains alive.
-    using AbortHook = void (*)(const char *file, int line, const char *buf_start,
-                               const char *prefix_end, const char *buf_end);
+// Function type for a raw_log customization hook for suppressing messages
+// by severity, and for writing custom prefixes on non-suppressed messages.
+//
+// The installed hook is called for every raw log invocation.  The message will
+// be logged to stderr only if the hook returns true.  FATAL errors will cause
+// the process to abort, even if writing to stderr is suppressed.  The hook is
+// also provided with an output buffer, where it can write a custom log message
+// prefix.
+//
+// The raw_log system does not allocate memory or grab locks.  User-provided
+// hooks must avoid these operations, and must not throw exceptions.
+//
+// 'severity' is the severity level of the message being written.
+// 'file' and 'line' are the file and line number where the TURBO_RAW_LOG macro
+// was located.
+// 'buf' and 'buf_size' are pointers to the buffer and buffer size.  If the
+// hook writes a prefix, it must increment *buf and decrement *buf_size
+// accordingly.
+using LogFilterAndPrefixHook = bool (*)(turbo::LogSeverity severity,
+                                        const char* file, int line, char** buf,
+                                        int* buf_size);
 
-    // Internal logging function for TURBO_INTERNAL_LOG to dispatch to.
-    //
-    // TODO(gfalcon): When std::string_view no longer depends on base, change this
-    // interface to take its message as a std::string_view instead.
-    using InternalLogFunction = void (*)(turbo::LogSeverity severity,
-                                         const char *file, int line,
-                                         const std::string &message);
+// Function type for a raw_log customization hook called to abort a process
+// when a FATAL message is logged.  If the provided AbortHook() returns, the
+// logging system will call abort().
+//
+// 'file' and 'line' are the file and line number where the TURBO_RAW_LOG macro
+// was located.
+// The NUL-terminated logged message lives in the buffer between 'buf_start'
+// and 'buf_end'.  'prefix_end' points to the first non-prefix character of the
+// buffer (as written by the LogFilterAndPrefixHook.)
+//
+// The lifetime of the filename and message buffers will not end while the
+// process remains alive.
+using AbortHook = void (*)(const char* file, int line, const char* buf_start,
+                           const char* prefix_end, const char* buf_end);
 
-    TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES TURBO_DLL extern base_internal::AtomicHook<InternalLogFunction>
-            internal_log_function;
+// Internal logging function for TURBO_INTERNAL_LOG to dispatch to.
+//
+// TODO(gfalcon): When string_view no longer depends on base, change this
+// interface to take its message as a string_view instead.
+using InternalLogFunction = void (*)(turbo::LogSeverity severity,
+                                     const char* file, int line,
+                                     const std::string& message);
 
-    // Registers hooks of the above types.  Only a single hook of each type may be
-    // registered.  It is an error to call these functions multiple times with
-    // different input arguments.
-    //
-    // These functions are safe to call at any point during initialization; they do
-    // not block or malloc, and are async-signal safe.
-    void RegisterLogFilterAndPrefixHook(LogFilterAndPrefixHook func);
+TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES TURBO_DLL extern base_internal::AtomicHook<
+    InternalLogFunction>
+    internal_log_function;
 
-    void RegisterAbortHook(AbortHook func);
+// Registers hooks of the above types.  Only a single hook of each type may be
+// registered.  It is an error to call these functions multiple times with
+// different input arguments.
+//
+// These functions are safe to call at any point during initialization; they do
+// not block or malloc, and are async-signal safe.
+void RegisterLogFilterAndPrefixHook(LogFilterAndPrefixHook func);
+void RegisterAbortHook(AbortHook func);
+void RegisterInternalLogFunction(InternalLogFunction func);
 
-    void RegisterInternalLogFunction(InternalLogFunction func);
-
-}  // namespace turbo::raw_log_internal
+}  // namespace raw_log_internal
+TURBO_NAMESPACE_END
+}  // namespace turbo
 
 #endif  // TURBO_BASE_INTERNAL_RAW_LOGGING_H_

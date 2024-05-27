@@ -1,26 +1,29 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/random/internal/randen_hwaes.h"
+#include <turbo/random/internal/randen_hwaes.h>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/random/internal/platform.h"
-#include "turbo/random/internal/randen_detect.h"
-#include "turbo/random/internal/randen_traits.h"
-#include "turbo/format/format.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include <turbo/log/log.h>
+#include <turbo/random/internal/platform.h>
+#include <turbo/random/internal/randen_detect.h>
+#include <turbo/random/internal/randen_traits.h>
+#include <turbo/strings/str_format.h>
 
 namespace {
 
@@ -67,32 +70,32 @@ TEST(RandenHwAesTest, Default) {
 int main(int argc, char* argv[]) {
   testing::InitGoogleTest(&argc, argv);
 
-  TURBO_RAW_LOG(INFO, "TURBO_HAVE_ACCELERATED_AES=%d", TURBO_HAVE_ACCELERATED_AES);
-  TURBO_RAW_LOG(INFO, "TURBO_RANDOM_INTERNAL_AES_DISPATCH=%d",
-               TURBO_RANDOM_INTERNAL_AES_DISPATCH);
+  LOG(INFO) << "TURBO_HAVE_ACCELERATED_AES=" << TURBO_HAVE_ACCELERATED_AES;
+  LOG(INFO) << "TURBO_RANDOM_INTERNAL_AES_DISPATCH="
+            << TURBO_RANDOM_INTERNAL_AES_DISPATCH;
 
 #if defined(TURBO_ARCH_X86_64)
-  TURBO_RAW_LOG(INFO, "TURBO_ARCH_X86_64");
+  LOG(INFO) << "TURBO_ARCH_X86_64";
 #elif defined(TURBO_ARCH_X86_32)
-  TURBO_RAW_LOG(INFO, "TURBO_ARCH_X86_32");
+  LOG(INFO) << "TURBO_ARCH_X86_32";
 #elif defined(TURBO_ARCH_AARCH64)
-  TURBO_RAW_LOG(INFO, "TURBO_ARCH_AARCH64");
+  LOG(INFO) << "TURBO_ARCH_AARCH64";
 #elif defined(TURBO_ARCH_ARM)
-  TURBO_RAW_LOG(INFO, "TURBO_ARCH_ARM");
+  LOG(INFO) << "TURBO_ARCH_ARM";
 #elif defined(TURBO_ARCH_PPC)
-  TURBO_RAW_LOG(INFO, "TURBO_ARCH_PPC");
+  LOG(INFO) << "TURBO_ARCH_PPC";
 #else
-  TURBO_RAW_LOG(INFO, "ARCH Unknown");
+  LOG(INFO) << "ARCH Unknown";
 #endif
 
   int x = turbo::random_internal::HasRandenHwAesImplementation();
-  TURBO_RAW_LOG(INFO, "HasRandenHwAesImplementation = %d", x);
+  LOG(INFO) << "HasRandenHwAesImplementation = " << x;
 
   int y = turbo::random_internal::CPUSupportsRandenHwAes();
-  TURBO_RAW_LOG(INFO, "CPUSupportsRandenHwAes = %d", x);
+  LOG(INFO) << "CPUSupportsRandenHwAes = " << x;
 
   if (!x || !y) {
-    TURBO_RAW_LOG(INFO, "Skipping Randen HWAES tests.");
+    LOG(INFO) << "Skipping Randen HWAES tests.";
     return 0;
   }
   return RUN_ALL_TESTS();

@@ -1,16 +1,19 @@
-// Copyright 2018 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 //
 // Generates probe length statistics for many combinations of key types and key
 // distributions, all using the default hash function for swisstable.
@@ -19,17 +22,18 @@
 #include <regex>  // NOLINT
 #include <vector>
 
-#include "turbo/container/flat_hash_map.h"
-#include "turbo/container/internal/hash_function_defaults.h"
-#include "turbo/container/internal/hashtable_debug.h"
-#include "turbo/container/internal/raw_hash_set.h"
-#include "turbo/random/fwd.h"
-#include "turbo/random/random.h"
-#include "turbo/format/format.h"
-#include "turbo/strings/string_view.h"
-#include "turbo/strings/str_strip.h"
-#include "turbo/format/format.h"
-#include "turbo/format/print.h"
+#include <turbo/base/no_destructor.h>
+#include <turbo/container/flat_hash_map.h>
+#include <turbo/container/internal/hash_function_defaults.h>
+#include <turbo/container/internal/hashtable_debug.h>
+#include <turbo/container/internal/raw_hash_set.h>
+#include <turbo/random/distributions.h>
+#include <turbo/random/random.h>
+#include <turbo/strings/str_cat.h>
+#include <turbo/strings/str_format.h>
+#include <turbo/strings/string_view.h>
+#include <turbo/strings/strip.h>
+#include <turbo/types/optional.h>
 
 namespace {
 
@@ -39,7 +43,7 @@ enum class OutputStyle { kRegular, kBenchmark };
 // This is populated from main().
 // When run in "benchmark" mode, we have different output. This allows
 // A/B comparisons with tools like `benchy`.
-std::string_view benchmarks;
+turbo::string_view benchmarks;
 
 OutputStyle output() {
   return !benchmarks.empty() ? OutputStyle::kBenchmark : OutputStyle::kRegular;
@@ -69,10 +73,15 @@ struct Policy {
       -> decltype(std::forward<F>(f)(arg, arg)) {
     return std::forward<F>(f)(arg, arg);
   }
+
+  template <class Hash>
+  static constexpr auto get_hash_slot_fn() {
+    return nullptr;
+  }
 };
 
 turbo::BitGen& GlobalBitGen() {
-  static auto* value = new turbo::BitGen;
+  static turbo::NoDestructor<turbo::BitGen> value;
   return *value;
 }
 
@@ -96,7 +105,7 @@ class RandomizedAllocator {
     }
 
     // Choose a random one.
-    size_t i = turbo::uniform<size_t>(GlobalBitGen(), 0, pointers.size());
+    size_t i = turbo::Uniform<size_t>(GlobalBitGen(), 0, pointers.size());
     T* result = pointers[i];
     pointers[i] = pointers.back();
     pointers.pop_back();
@@ -113,7 +122,7 @@ class RandomizedAllocator {
   static constexpr size_t kRandomPool = 20;
 
   static std::vector<T*>& GetPointers(size_t n) {
-    static auto* m = new turbo::flat_hash_map<size_t, std::vector<T*>>();
+    static turbo::NoDestructor<turbo::flat_hash_map<size_t, std::vector<T*>>> m;
     return (*m)[n];
   }
 };
@@ -239,13 +248,13 @@ struct PtrIdentity {
   }
 };
 
-constexpr char kStringFormat[] = "/path/to/file/name-{:07d}-of-9999999.txt";
+constexpr char kStringFormat[] = "/path/to/file/name-%07d-of-9999999.txt";
 
 template <bool small>
 struct String {
   std::string value;
   static std::string Make(uint32_t v) {
-    return {small ? turbo::format(v) : turbo::format(kStringFormat, v)};
+    return {small ? turbo::StrCat(v) : turbo::StrFormat(kStringFormat, v)};
   }
 };
 
@@ -326,7 +335,7 @@ struct AlmostSequential {
   mutable Sequential<T> current;
 
   auto operator()() const -> decltype(current()) {
-    while (turbo::uniform(GlobalBitGen(), 0.0, 1.0) <= percent_skip / 100.)
+    while (turbo::Uniform(GlobalBitGen(), 0.0, 1.0) <= percent_skip / 100.)
       current();
     return current();
   }
@@ -335,7 +344,7 @@ struct AlmostSequential {
 struct Uniform {
   template <typename T>
   T operator()(T) const {
-    return turbo::uniform<T>(turbo::IntervalClosed, GlobalBitGen(), T{0}, ~T{0});
+    return turbo::Uniform<T>(turbo::IntervalClosed, GlobalBitGen(), T{0}, ~T{0});
   }
 };
 
@@ -344,7 +353,7 @@ struct Gaussian {
   T operator()(T) const {
     double d;
     do {
-      d = turbo::gaussian<double>(GlobalBitGen(), 1e6, 1e4);
+      d = turbo::Gaussian<double>(GlobalBitGen(), 1e6, 1e4);
     } while (d <= 0 || d > std::numeric_limits<T>::max() / 2);
     return static_cast<T>(d);
   }
@@ -353,7 +362,7 @@ struct Gaussian {
 struct Zipf {
   template <typename T>
   T operator()(T) const {
-    return turbo::zipf<T>(GlobalBitGen(), std::numeric_limits<T>::max(), 1.6);
+    return turbo::Zipf<T>(GlobalBitGen(), std::numeric_limits<T>::max(), 1.6);
   }
 };
 
@@ -407,12 +416,12 @@ std::string Name(IntIdentity*) { return "IntIdentity"; }
 
 template <int Align>
 std::string Name(Ptr<Align>**) {
-  return turbo::format("Ptr{}", Align);
+  return turbo::StrCat("Ptr", Align);
 }
 
 template <int Align>
 std::string Name(PtrIdentity<Align>*) {
-  return turbo::format("PtrIdentity{}", Align);
+  return turbo::StrCat("PtrIdentity", Align);
 }
 
 template <bool small>
@@ -423,8 +432,8 @@ std::string Name(String<small>*) {
 template <class T, class U>
 std::string Name(std::pair<T, U>*) {
   if (output() == OutputStyle::kBenchmark)
-    return turbo::format("P_{}_{}", Name<T>(), Name<U>());
-  return turbo::format("P<{},{}>", Name<T>(), Name<U>());
+    return turbo::StrCat("P_", Name<T>(), "_", Name<U>());
+  return turbo::StrCat("P<", Name<T>(), ",", Name<U>(), ">");
 }
 
 template <class T>
@@ -434,7 +443,7 @@ std::string Name(Sequential<T>*) {
 
 template <class T, int P>
 std::string Name(AlmostSequential<T, P>*) {
-  return turbo::format("AlmostSeq_{}", P);
+  return turbo::StrCat("AlmostSeq_", P);
 }
 
 template <class T>
@@ -460,13 +469,13 @@ std::string Name() {
 constexpr int kNameWidth = 15;
 constexpr int kDistWidth = 16;
 
-bool CanRunBenchmark(std::string_view name) {
-  static std::regex* const filter = []() -> std::regex* {
+bool CanRunBenchmark(turbo::string_view name) {
+  static const turbo::NoDestructor<turbo::optional<std::regex>> filter([] {
     return benchmarks.empty() || benchmarks == "all"
-               ? nullptr
-               : new std::regex(std::string(benchmarks));
-  }();
-  return filter == nullptr || std::regex_search(std::string(name), *filter);
+               ? turbo::nullopt
+               : turbo::make_optional(std::regex(std::string(benchmarks)));
+  }());
+  return !filter->has_value() || std::regex_search(std::string(name), **filter);
 }
 
 struct Result {
@@ -477,12 +486,12 @@ struct Result {
 
 template <typename T, typename Dist>
 void RunForTypeAndDistribution(std::vector<Result>& results) {
-  std::string name = turbo::format("{}/{}", Name<T>(), Name<Dist>());
+  std::string name = turbo::StrCat(Name<T>(), "/", Name<Dist>());
   // We have to check against all three names (min/avg/max) before we run it.
   // If any of them is enabled, we run it.
-  if (!CanRunBenchmark(turbo::format("{}/min", name)) &&
-      !CanRunBenchmark(turbo::format("{}/avg", name)) &&
-      !CanRunBenchmark(turbo::format("{}/max", name))) {
+  if (!CanRunBenchmark(turbo::StrCat(name, "/min")) &&
+      !CanRunBenchmark(turbo::StrCat(name, "/avg")) &&
+      !CanRunBenchmark(turbo::StrCat(name, "/max"))) {
     return;
   }
   results.push_back({Name<T>(), Name<Dist>(), CollectMeanProbeLengths<Dist>()});
@@ -506,21 +515,21 @@ void RunForType(std::vector<Result>& results) {
 int main(int argc, char** argv) {
   // Parse the benchmark flags. Ignore all of them except the regex pattern.
   for (int i = 1; i < argc; ++i) {
-    std::string_view arg = argv[i];
+    turbo::string_view arg = argv[i];
     const auto next = [&] { return argv[std::min(i + 1, argc - 1)]; };
 
-    if (turbo::consume_prefix(&arg, "--benchmark_filter")) {
+    if (turbo::ConsumePrefix(&arg, "--benchmark_filter")) {
       if (arg == "") {
         // --benchmark_filter X
         benchmarks = next();
-      } else if (turbo::consume_prefix(&arg, "=")) {
+      } else if (turbo::ConsumePrefix(&arg, "=")) {
         // --benchmark_filter=X
         benchmarks = arg;
       }
     }
 
     // Any --benchmark flag turns on the mode.
-    if (turbo::consume_prefix(&arg, "--benchmark")) {
+    if (turbo::ConsumePrefix(&arg, "--benchmark")) {
       if (benchmarks.empty()) benchmarks="all";
     }
   }
@@ -546,43 +555,43 @@ int main(int argc, char** argv) {
 
   switch (output()) {
     case OutputStyle::kRegular:
-      turbo::printf("%-*s%-*s       Min       Avg       Max\n%s\n", kNameWidth,
+      turbo::PrintF("%-*s%-*s       Min       Avg       Max\n%s\n", kNameWidth,
                    "Type", kDistWidth, "Distribution",
                    std::string(kNameWidth + kDistWidth + 10 * 3, '-'));
       for (const auto& result : results) {
-        turbo::printf("%-*s%-*s  %8.4f  %8.4f  %8.4f\n", kNameWidth, result.name,
+        turbo::PrintF("%-*s%-*s  %8.4f  %8.4f  %8.4f\n", kNameWidth, result.name,
                      kDistWidth, result.dist_name, result.ratios.min_load,
                      result.ratios.avg_load, result.ratios.max_load);
       }
       break;
     case OutputStyle::kBenchmark: {
-      turbo::printf("{\n");
-      turbo::printf("  \"benchmarks\": [\n");
-      std::string_view comma;
+      turbo::PrintF("{\n");
+      turbo::PrintF("  \"benchmarks\": [\n");
+      turbo::string_view comma;
       for (const auto& result : results) {
-        auto print = [&](std::string_view stat, double Ratios::*val) {
+        auto print = [&](turbo::string_view stat, double Ratios::*val) {
           std::string name =
-              turbo::format("{}/{}/", result.name, result.dist_name, stat);
+              turbo::StrCat(result.name, "/", result.dist_name, "/", stat);
           // Check the regex again. We might had have enabled only one of the
           // stats for the benchmark.
           if (!CanRunBenchmark(name)) return;
-          turbo::printf("    %s{\n", comma);
-          turbo::printf("      \"cpu_time\": %f,\n", 1e9 * result.ratios.*val);
-          turbo::printf("      \"real_time\": %f,\n", 1e9 * result.ratios.*val);
-          turbo::printf("      \"iterations\": 1,\n");
-          turbo::printf("      \"name\": \"%s\",\n", name);
-          turbo::printf("      \"time_unit\": \"ns\"\n");
-          turbo::printf("    }\n");
+          turbo::PrintF("    %s{\n", comma);
+          turbo::PrintF("      \"cpu_time\": %f,\n", 1e9 * result.ratios.*val);
+          turbo::PrintF("      \"real_time\": %f,\n", 1e9 * result.ratios.*val);
+          turbo::PrintF("      \"iterations\": 1,\n");
+          turbo::PrintF("      \"name\": \"%s\",\n", name);
+          turbo::PrintF("      \"time_unit\": \"ns\"\n");
+          turbo::PrintF("    }\n");
           comma = ",";
         };
         print("min", &Ratios::min_load);
         print("avg", &Ratios::avg_load);
         print("max", &Ratios::max_load);
       }
-      turbo::printf("  ],\n");
-      turbo::printf("  \"context\": {\n");
-      turbo::printf("  }\n");
-      turbo::printf("}\n");
+      turbo::PrintF("  ],\n");
+      turbo::PrintF("  \"context\": {\n");
+      turbo::PrintF("  }\n");
+      turbo::PrintF("}\n");
       break;
     }
   }

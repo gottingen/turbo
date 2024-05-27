@@ -1,126 +1,43 @@
 #
-# Copyright 2023 The titan-search Authors.
+# Copyright (C) 2024 EA group inc.
+# Author: Jeff.li lijippy@163.com
+# All rights reserved.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
 #
-#      https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-find_library(EXECINFO_LIBRARY execinfo)
-
-# Internal-only target, do not depend on directly.
-carbin_cc_library(
-        NAMESPACE
-        turbo
-        MODULE debugging
-        NAME
-        stack_consumption
-        HEADERS
-        "stack_consumption.h"
-        SOURCES
-        "stack_consumption.cc"
-        CXXOPTS
-        ${TURBO_DEFAULT_CXXOPTS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        stacktrace_test
-        MODULE debugging
-        SOURCES
-        "stacktrace_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        symbolize_test
-        MODULE debugging
-        SOURCES
-        "symbolize_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        turbo::stack_consumption
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-)
-
-
-carbin_cc_test(
-        NAME
+set(DEBUGGING_TEST_SRC
+       demangle_test
+        demangle_rust_test
         failure_signal_handler_test
-        MODULE debugging
-        SOURCES
-        "failure_signal_handler_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        Threads::Threads
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-)
-
-
-carbin_cc_test(
-        NAME
-        demangle_test
-        MODULE debugging
-        SOURCES
-        "demangle_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        turbo::stack_consumption
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-
-carbin_cc_test(
-        NAME
+        leak_check_fail_test
         leak_check_test
-        MODULE debugging
-        SOURCES
-        "leak_check_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
         stack_consumption_test
-        MODULE debugging
-        SOURCES
-        "stack_consumption_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::stack_consumption
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
+        stacktrace_test
+        symbolize_test
 )
+foreach (test ${DEBUGGING_TEST_SRC})
+
+    carbin_cc_test(
+            NAME ${test}
+            MODULE debugging
+            SOURCES ${test}.cc
+            LINKS
+            turbo::turbo
+            GTest::gtest
+            GTest::gmock
+            GTest::gmock_main
+            ${CARBIN_DEPS_LINK}
+            CXXOPTS ${CARBIN_CXX_OPTIONS}
+    )
+endforeach ()

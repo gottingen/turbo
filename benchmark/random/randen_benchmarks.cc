@@ -1,30 +1,33 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 //
-#include "turbo/random/internal/randen.h"
+#include <turbo/random/internal/randen.h>
 
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
 
-#include "turbo/base/internal/raw_logging.h"
-#include "benchmark/random/nanobenchmark.h"
-#include "turbo/random/internal/platform.h"
-#include "turbo/random/internal/randen_engine.h"
-#include "turbo/random/internal/randen_hwaes.h"
-#include "turbo/random/internal/randen_slow.h"
-#include "turbo/strings/numbers.h"
+#include <turbo/base/internal/raw_logging.h>
+#include <turbo/random/internal/nanobenchmark.h>
+#include <turbo/random/internal/platform.h>
+#include <turbo/random/internal/randen_engine.h>
+#include <turbo/random/internal/randen_hwaes.h>
+#include <turbo/random/internal/randen_slow.h>
+#include <turbo/strings/numbers.h>
 
 namespace {
 
@@ -47,8 +50,10 @@ static constexpr size_t kSeedSizeT = Randen::kSeedBytes / sizeof(uint32_t);
 // Randen implementation benchmarks.
 template <typename T>
 struct AbsorbFn : public T {
-  mutable uint64_t state[kStateSizeT] = {};
-  mutable uint32_t seed[kSeedSizeT] = {};
+  // These are both cast to uint128* in the RandenHwAes implementation, so
+  // ensure they are 16 byte aligned.
+  alignas(16) mutable uint64_t state[kStateSizeT] = {};
+  alignas(16) mutable uint32_t seed[kSeedSizeT] = {};
 
   static constexpr size_t bytes() { return sizeof(seed); }
 
@@ -139,7 +144,7 @@ void Measure(const char* name, const FuncInput (&inputs)[N]) {
 void RunAll(const int argc, char* argv[]) {
   if (argc == 2) {
     int cpu = -1;
-    if (!turbo::simple_atoi(argv[1], &cpu)) {
+    if (!turbo::SimpleAtoi(argv[1], &cpu)) {
       TURBO_RAW_LOG(FATAL, "The optional argument must be a CPU number >= 0.\n");
     }
     PinThreadToCPU(cpu);

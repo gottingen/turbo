@@ -1,41 +1,43 @@
-// Copyright 2021 The Turbo Authors
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #include <iostream>
 #include <random>
 #include <vector>
 
-#include "turbo/crypto/internal/crc_cord_state.h"
-#include "turbo/platform/port.h"
-#include "turbo/strings/cord.h"
-#include "turbo/concurrent/latch.h"
-#include "turbo/strings/internal/cord_internal.h"
-#include "turbo/strings/internal/cord_rep_btree.h"
-#include "turbo/strings/internal/cord_rep_crc.h"
-#include "turbo/strings/internal/cord_rep_flat.h"
-#include "turbo/strings/internal/cord_rep_ring.h"
-#include "turbo/strings/internal/cordz_info.h"
-#include "turbo/strings/internal/cordz_sample_token.h"
-#include "turbo/strings/internal/cordz_statistics.h"
-#include "turbo/strings/internal/cordz_update_scope.h"
-#include "turbo/strings/internal/cordz_update_tracker.h"
-#include "turbo/concurrent/internal/thread_pool.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include <turbo/base/config.h>
+#include <turbo/crc/internal/crc_cord_state.h>
+#include <turbo/strings/cord.h>
+#include <turbo/strings/internal/cord_internal.h>
+#include <turbo/strings/internal/cord_rep_btree.h>
+#include <turbo/strings/internal/cord_rep_crc.h>
+#include <turbo/strings/internal/cord_rep_flat.h>
+#include <turbo/strings/internal/cordz_info.h>
+#include <turbo/strings/internal/cordz_sample_token.h>
+#include <turbo/strings/internal/cordz_statistics.h>
+#include <turbo/strings/internal/cordz_update_scope.h>
+#include <turbo/strings/internal/cordz_update_tracker.h>
+#include <turbo/synchronization/internal/thread_pool.h>
+#include <turbo/synchronization/notification.h>
 
 namespace turbo {
-
+TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 
 // Do not print statistics contents, the matcher prints them as needed.
@@ -65,7 +67,7 @@ CordRepFlat* Flat(size_t size) {
 // Creates an external of the specified length
 CordRepExternal* External(size_t length = 512) {
   return static_cast<CordRepExternal*>(
-      NewExternalRep(std::string_view("", length), [](std::string_view) {}));
+      NewExternalRep(turbo::string_view("", length), [](turbo::string_view) {}));
 }
 
 // Creates a substring on the provided rep of length - 1
@@ -123,11 +125,6 @@ size_t SizeOf(const CordRepExternal* rep) {
   return sizeof(CordRepExternalImpl<intptr_t>) + rep->length;
 }
 
-template <>
-size_t SizeOf(const CordRepRing* rep) {
-  return CordRepRing::AllocSize(rep->capacity());
-}
-
 // Computes fair share memory used in a naive 'we dare to recurse' way.
 double FairShareImpl(CordRep* rep, size_t ref) {
   double self = 0.0, children = 0.0;
@@ -144,11 +141,6 @@ double FairShareImpl(CordRep* rep, size_t ref) {
     for (CordRep*edge : rep->btree()->Edges()) {
       children += FairShareImpl(edge, ref);
     }
-  } else if (rep->tag == RING) {
-    self = SizeOf(rep->ring());
-    rep->ring()->ForEach([&](CordRepRing::index_type i) {
-      self += FairShareImpl(rep->ring()->entry_child(i), 1);
-    });
   } else {
     assert(false);
   }
@@ -163,7 +155,7 @@ size_t FairShare(CordRep* rep, size_t ref = 1) {
 // Samples the cord and returns CordzInfo::GetStatistics()
 CordzStatistics SampleCord(CordRep* rep) {
   InlineData cord(rep);
-  CordzInfo::TrackCord(cord, CordzUpdateTracker::kUnknown);
+  CordzInfo::TrackCord(cord, CordzUpdateTracker::kUnknown, 1);
   CordzStatistics stats = cord.cordz_info()->GetCordzStatistics();
   cord.cordz_info()->Untrack();
   return stats;
@@ -294,64 +286,6 @@ TEST(CordzInfoStatisticsTest, SharedSubstring) {
   EXPECT_THAT(SampleCord(substring), EqStatistics(expected));
 }
 
-
-TEST(CordzInfoStatisticsTest, Ring) {
-  RefHelper ref;
-  auto* flat1 = Flat(240);
-  auto* flat2 = Flat(2000);
-  auto* flat3 = Flat(70);
-  auto* external = External(3000);
-  CordRepRing* ring = CordRepRing::Create(flat1);
-  ring = CordRepRing::Append(ring, flat2);
-  ring = CordRepRing::Append(ring, flat3);
-  ring = ref.NeedsUnref(CordRepRing::Append(ring, external));
-
-  CordzStatistics expected;
-  expected.size = ring->length;
-  expected.estimated_memory_usage = SizeOf(ring) + SizeOf(flat1) +
-                                    SizeOf(flat2) + SizeOf(flat3) +
-                                    SizeOf(external);
-  expected.estimated_fair_share_memory_usage = expected.estimated_memory_usage;
-  expected.node_count = 5;
-  expected.node_counts.flat = 3;
-  expected.node_counts.flat_128 = 1;
-  expected.node_counts.flat_256 = 1;
-  expected.node_counts.external = 1;
-  expected.node_counts.ring = 1;
-
-  EXPECT_THAT(SampleCord(ring), EqStatistics(expected));
-}
-
-TEST(CordzInfoStatisticsTest, SharedSubstringRing) {
-  RefHelper ref;
-  auto* flat1 = ref.Ref(Flat(240));
-  auto* flat2 = Flat(200);
-  auto* flat3 = Flat(70);
-  auto* external = ref.Ref(External(3000), 5);
-  CordRepRing* ring = CordRepRing::Create(flat1);
-  ring = CordRepRing::Append(ring, flat2);
-  ring = CordRepRing::Append(ring, flat3);
-  ring = ref.Ref(CordRepRing::Append(ring, external), 4);
-  auto* substring = ref.Ref(ref.NeedsUnref(Substring(ring)));
-
-
-  CordzStatistics expected;
-  expected.size = substring->length;
-  expected.estimated_memory_usage = SizeOf(ring) + SizeOf(flat1) +
-                                    SizeOf(flat2) + SizeOf(flat3) +
-                                    SizeOf(external) + SizeOf(substring);
-  expected.estimated_fair_share_memory_usage = FairShare(substring);
-  expected.node_count = 6;
-  expected.node_counts.flat = 3;
-  expected.node_counts.flat_128 = 1;
-  expected.node_counts.flat_256 = 2;
-  expected.node_counts.external = 1;
-  expected.node_counts.ring = 1;
-  expected.node_counts.substring = 1;
-
-  EXPECT_THAT(SampleCord(substring), EqStatistics(expected));
-}
-
 TEST(CordzInfoStatisticsTest, BtreeLeaf) {
   ASSERT_THAT(CordRepBtree::kMaxCapacity, Ge(3u));
   RefHelper ref;
@@ -452,8 +386,7 @@ TEST(CordzInfoStatisticsTest, BtreeNodeShared) {
 TEST(CordzInfoStatisticsTest, Crc) {
   RefHelper ref;
   auto* left = Flat(1000);
-  auto* crc =
-      ref.NeedsUnref(CordRepCrc::New(left, crc_internal::CrcCordState()));
+  auto* crc = ref.NeedsUnref(CordRepCrc::New(left, {}));
 
   CordzStatistics expected;
   expected.size = left->length;
@@ -466,20 +399,34 @@ TEST(CordzInfoStatisticsTest, Crc) {
 
   EXPECT_THAT(SampleCord(crc), EqStatistics(expected));
 }
-/*
+
+TEST(CordzInfoStatisticsTest, EmptyCrc) {
+  RefHelper ref;
+  auto* crc = ref.NeedsUnref(CordRepCrc::New(nullptr, {}));
+
+  CordzStatistics expected;
+  expected.size = 0;
+  expected.estimated_memory_usage = SizeOf(crc);
+  expected.estimated_fair_share_memory_usage = expected.estimated_memory_usage;
+  expected.node_count = 1;
+  expected.node_counts.crc = 1;
+
+  EXPECT_THAT(SampleCord(crc), EqStatistics(expected));
+}
+
 TEST(CordzInfoStatisticsTest, ThreadSafety) {
-  bool stop;
+  Notification stop;
   static constexpr int kNumThreads = 8;
   int64_t sampled_node_count = 0;
 
   {
-    turbo::concurrent_internal::ThreadPool pool(kNumThreads);
-      turbo::concurrent_internal::ThreadPool pool2(kNumThreads);
+    turbo::synchronization_internal::ThreadPool pool(kNumThreads);
+
     // Run analyzer thread emulating a CordzHandler collection.
     pool.Schedule([&]() {
-      while (!stop) {
+      while (!stop.HasBeenNotified()) {
         // Run every 10us (about 100K total collections).
-        turbo::sleep_for(turbo::Duration::microseconds(10));
+        turbo::SleepFor(turbo::Microseconds(10));
         CordzSampleToken token;
         for (const CordzInfo& cord_info : token) {
           CordzStatistics stats = cord_info.GetCordzStatistics();
@@ -490,15 +437,16 @@ TEST(CordzInfoStatisticsTest, ThreadSafety) {
 
     // Run 'application threads'
     for (int i = 0; i < kNumThreads; ++i) {
-      pool2.Schedule([&]() {
+      pool.Schedule([&]() {
         // Track 0 - 2 cordz infos at a time, providing permutations of 0, 1
         // and 2 CordzHandle and CordzInfo queues being active, with plenty of
         // 'empty to non empty' transitions.
         InlineData cords[2];
         std::minstd_rand gen;
         std::uniform_int_distribution<int> coin_toss(0, 1);
+        std::uniform_int_distribution<int> dice_roll(1, 6);
 
-        while (!stop) {
+        while (!stop.HasBeenNotified()) {
           for (InlineData& cord : cords) {
             // 50/50 flip the state of the cord
             if (coin_toss(gen) != 0) {
@@ -514,20 +462,28 @@ TEST(CordzInfoStatisticsTest, ThreadSafety) {
                 CordRep::Unref(cord.as_tree());
                 cord.set_inline_size(0);
               } else {
-                // Coin toss to 25% ring, 25% btree, and 50% flat.
+                // Coin toss to 50% btree, and 50% flat.
                 CordRep* rep = Flat(256);
                 if (coin_toss(gen) != 0) {
-                  if (coin_toss(gen) != 0) {
-                    rep = CordRepRing::Create(rep);
+                  rep = CordRepBtree::Create(rep);
+                }
+
+                // Maybe CRC this cord
+                if (dice_roll(gen) == 6) {
+                  if (dice_roll(gen) == 6) {
+                    // Empty CRC rep
+                    CordRep::Unref(rep);
+                    rep = CordRepCrc::New(nullptr, {});
                   } else {
-                    rep = CordRepBtree::Create(rep);
+                    // Regular CRC rep
+                    rep = CordRepCrc::New(rep, {});
                   }
                 }
                 cord.make_tree(rep);
 
                 // 50/50 sample
                 if (coin_toss(gen) != 0) {
-                  CordzInfo::TrackCord(cord, CordzUpdateTracker::kUnknown);
+                  CordzInfo::TrackCord(cord, CordzUpdateTracker::kUnknown, 1);
                 }
               }
             }
@@ -544,14 +500,14 @@ TEST(CordzInfoStatisticsTest, ThreadSafety) {
 
     // Run for 1 second to give memory and thread safety analyzers plenty of
     // time to detect any mishaps or undefined behaviors.
-    turbo::sleep_for(turbo::Duration::seconds(1));
-    stop = true;
+    turbo::SleepFor(turbo::Seconds(1));
+    stop.Notify();
   }
 
   std::cout << "Sampled " << sampled_node_count << " nodes\n";
 }
-*/
+
 }  // namespace
 }  // namespace cord_internal
-
+TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -1,16 +1,19 @@
-// Copyright 2022 The Turbo Authors
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//     https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #ifndef TURBO_STRINGS_INTERNAL_CORD_DATA_EDGE_H_
 #define TURBO_STRINGS_INTERNAL_CORD_DATA_EDGE_H_
@@ -18,42 +21,46 @@
 #include <cassert>
 #include <cstddef>
 
-#include "turbo/platform/port.h"
-#include "turbo/strings/internal/cord_internal.h"
-#include "turbo/strings/internal/cord_rep_flat.h"
-#include "turbo/strings/string_view.h"
+#include <turbo/base/config.h>
+#include <turbo/strings/internal/cord_internal.h>
+#include <turbo/strings/internal/cord_rep_flat.h>
+#include <turbo/strings/string_view.h>
 
-namespace turbo::cord_internal {
+namespace turbo {
+TURBO_NAMESPACE_BEGIN
+namespace cord_internal {
 
-    // Returns true if the provided rep is a FLAT, EXTERNAL or a SUBSTRING node
-    // holding a FLAT or EXTERNAL child rep. Requires `rep != nullptr`.
-    inline bool IsDataEdge(const CordRep *edge) {
-        assert(edge != nullptr);
+// Returns true if the provided rep is a FLAT, EXTERNAL or a SUBSTRING node
+// holding a FLAT or EXTERNAL child rep. Requires `rep != nullptr`.
+inline bool IsDataEdge(const CordRep* edge) {
+  assert(edge != nullptr);
 
-        // The fast path is that `edge` is an EXTERNAL or FLAT node, making the below
-        // if a single, well predicted branch. We then repeat the FLAT or EXTERNAL
-        // check in the slow path of the SUBSTRING check to optimize for the hot path.
-        if (edge->tag == EXTERNAL || edge->tag >= FLAT) return true;
-        if (edge->tag == SUBSTRING) edge = edge->substring()->child;
-        return edge->tag == EXTERNAL || edge->tag >= FLAT;
-    }
+  // The fast path is that `edge` is an EXTERNAL or FLAT node, making the below
+  // if a single, well predicted branch. We then repeat the FLAT or EXTERNAL
+  // check in the slow path of the SUBSTRING check to optimize for the hot path.
+  if (edge->tag == EXTERNAL || edge->tag >= FLAT) return true;
+  if (edge->tag == SUBSTRING) edge = edge->substring()->child;
+  return edge->tag == EXTERNAL || edge->tag >= FLAT;
+}
 
-    // Returns the `std::string_view` data reference for the provided data edge.
-    // Requires 'IsDataEdge(edge) == true`.
-    inline std::string_view EdgeData(const CordRep *edge) {
-        assert(IsDataEdge(edge));
+// Returns the `turbo::string_view` data reference for the provided data edge.
+// Requires 'IsDataEdge(edge) == true`.
+inline turbo::string_view EdgeData(const CordRep* edge) {
+  assert(IsDataEdge(edge));
 
-        size_t offset = 0;
-        const size_t length = edge->length;
-        if (edge->IsSubstring()) {
-            offset = edge->substring()->start;
-            edge = edge->substring()->child;
-        }
-        return edge->tag >= FLAT
-               ? std::string_view{edge->flat()->Data() + offset, length}
-               : std::string_view{edge->external()->base + offset, length};
-    }
+  size_t offset = 0;
+  const size_t length = edge->length;
+  if (edge->IsSubstring()) {
+    offset = edge->substring()->start;
+    edge = edge->substring()->child;
+  }
+  return edge->tag >= FLAT
+             ? turbo::string_view{edge->flat()->Data() + offset, length}
+             : turbo::string_view{edge->external()->base + offset, length};
+}
 
-}  // namespace turbo::cord_internal
+}  // namespace cord_internal
+TURBO_NAMESPACE_END
+}  // namespace turbo
 
 #endif  // TURBO_STRINGS_INTERNAL_CORD_DATA_EDGE_H_

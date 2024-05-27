@@ -13,8 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+############################################################
+# system pthread and rt, dl
+############################################################
+set(CARBIN_SYSTEM_DYLINK)
+if (APPLE)
+    find_library(CoreFoundation CoreFoundation)
+    list(APPEND CARBIN_SYSTEM_DYLINK ${CoreFoundation} pthread)
+elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+    list(APPEND CARBIN_SYSTEM_DYLINK rt dl pthread)
+endif ()
 
-if (CARBIN_BUILD_TEST)
+if (CARBIN_BUILD_TEST OR CARBIN_BUILD_BENCHMARK)
     enable_testing()
     #include(require_gtest)
     #include(require_gmock)
@@ -26,7 +36,6 @@ if (CARBIN_BUILD_BENCHMARK)
 endif ()
 
 find_package(Threads REQUIRED)
-#include(require_turbo)
 
 ############################################################
 #
@@ -35,7 +44,6 @@ find_package(Threads REQUIRED)
 # CARBIN_SYSTEM_DYLINK, using it for fun.
 ##########################################################
 set(CARBIN_DEPS_LINK
-        #${TURBO_LIB}
         ${CARBIN_SYSTEM_DYLINK}
         )
 list(REMOVE_DUPLICATES CARBIN_DEPS_LINK)

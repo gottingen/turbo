@@ -1,36 +1,39 @@
-// Copyright 2021 The Turbo Authors
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//     https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/strings/internal/cord_rep_btree_reader.h"
+#include <turbo/strings/internal/cord_rep_btree_reader.h>
 
 #include <iostream>
 #include <random>
 #include <string>
 #include <vector>
 
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/port.h"
-#include "turbo/strings/cord.h"
-#include "turbo/strings/internal/cord_internal.h"
-#include "turbo/strings/internal/cord_rep_btree.h"
-#include "turbo/strings/internal/cord_rep_test_util.h"
-#include "turbo/strings/string_view.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include <turbo/base/config.h>
+#include <turbo/base/internal/raw_logging.h>
+#include <turbo/strings/cord.h>
+#include <turbo/strings/internal/cord_internal.h>
+#include <turbo/strings/internal/cord_rep_btree.h>
+#include <turbo/strings/internal/cord_rep_test_util.h>
+#include <turbo/strings/string_view.h>
 
 namespace turbo {
-
+TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 namespace {
 
@@ -59,7 +62,7 @@ TEST(CordRepBtreeReaderTest, Next) {
 
     CordRepBtreeReader reader;
     size_t remaining = data.length();
-    std::string_view chunk = reader.Init(node);
+    turbo::string_view chunk = reader.Init(node);
     EXPECT_THAT(chunk, Eq(data.substr(0, chunk.length())));
 
     remaining -= chunk.length();
@@ -76,7 +79,7 @@ TEST(CordRepBtreeReaderTest, Next) {
 
     EXPECT_THAT(reader.remaining(), Eq(0u));
 
-    // Verify trying to read beyond EOF returns empty std::string_view
+    // Verify trying to read beyond EOF returns empty string_view
     EXPECT_THAT(reader.Next(), testing::IsEmpty());
 
     CordRep::Unref(node);
@@ -97,7 +100,7 @@ TEST(CordRepBtreeReaderTest, Skip) {
       for (size_t skip2 = 0; skip2 < data.length() - kChars; ++skip2) {
         CordRepBtreeReader reader;
         size_t remaining = data.length();
-        std::string_view chunk = reader.Init(node);
+        turbo::string_view chunk = reader.Init(node);
         remaining -= chunk.length();
 
         chunk = reader.Skip(skip1);
@@ -142,7 +145,7 @@ TEST(CordRepBtreeReaderTest, Seek) {
     for (size_t seek = 0; seek < data.length() - 1; ++seek) {
       CordRepBtreeReader reader;
       reader.Init(node);
-      std::string_view chunk = reader.Seek(seek);
+      turbo::string_view chunk = reader.Seek(seek);
       ASSERT_THAT(chunk, Not(IsEmpty()));
       ASSERT_THAT(chunk, Eq(data.substr(seek, chunk.length())));
       ASSERT_THAT(reader.remaining(),
@@ -172,7 +175,7 @@ TEST(CordRepBtreeReaderTest, Read) {
 
   CordRep* tree;
   CordRepBtreeReader reader;
-  std::string_view chunk;
+  turbo::string_view chunk;
 
   // Read zero bytes
   chunk = reader.Init(node);
@@ -254,7 +257,7 @@ TEST(CordRepBtreeReaderTest, ReadExhaustive) {
 
     for (size_t read_size : {kChars - 1, kChars, kChars + 7, cap * cap}) {
       CordRepBtreeReader reader;
-      std::string_view chunk = reader.Init(node);
+      turbo::string_view chunk = reader.Init(node);
 
       // `consumed` tracks the end of last consumed chunk which is the start of
       // the next chunk: we always read with `chunk_size = chunk.length()`.
@@ -289,5 +292,5 @@ TEST(CordRepBtreeReaderTest, ReadExhaustive) {
 
 }  // namespace
 }  // namespace cord_internal
-
+TURBO_NAMESPACE_END
 }  // namespace turbo
