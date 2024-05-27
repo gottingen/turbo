@@ -1,567 +1,86 @@
 #
-# Copyright 2023 The titan-search Authors.
+# Copyright (C) 2024 EA group inc.
+# Author: Jeff.li lijippy@163.com
+# All rights reserved.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
 #
-#      https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
 
-carbin_cc_test(
-        NAMESPACE
-        turbo
-        NAME
-        match_test
-        MODULE strings
-        SOURCES
-        "match_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-)
-
-carbin_cc_test(
-        NAMESPACE
-        turbo
-        NAME
-        inlined_string_test
-        MODULE strings
-        SOURCES
-        "inlined_string_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAMESPACE
-        turbo
-        NAME
-        escaping_test
-        MODULE strings
-        SOURCES
-        "escaping_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAMESPACE
-        turbo
-        NAME
+set(STRINGS_TEST_SRC
+        arg_test
         ascii_test
-        MODULE strings
-        SOURCES
-        "ascii_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-
-carbin_cc_test(
-        NAME
-        memutil_test
-        MODULE strings
-        SOURCES
-        "memutil_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-)
-
-carbin_cc_test(
-        NAMESPACE
-        turbo
-        NAME
-        string_constant_test
-        MODULE strings
-        SOURCES
-        "string_constant_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAMESPACE
-        turbo
-        NAME
-        str_replace_test
-        MODULE strings
-        SOURCES
-        "str_replace_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-)
-#[[
-carbin_cc_test(
-        NAME
-        str_split_test
-        MODULE strings
-        SOURCES
-        "str_split_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-        ${GMOCK_MAIN_LIB}
-)
-]]
-carbin_cc_test(
-        NAMESPACE
-        turbo
-        NAME
-        cord_buffer_test
-        MODULE strings
-        SOURCES
-        "cord_buffer_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        ostringstream_test
-        MODULE strings
-        SOURCES
-        "ostringstream_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        resize_uninitialized_test
-        MODULE strings
-        SOURCES
-        "resize_uninitialized_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        numbers_test
-        MODULE strings
-        SOURCES
-        "numbers_test_common.h"
-        "numbers_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::pow10_helper
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        strip_test
-        MODULE strings
-        SOURCES
-        "strip_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-)
-
-carbin_cc_test(
-        NAME
-        char_map_test
-        MODULE strings
-        SOURCES
-        "char_map_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-)
-
-carbin_cc_test(
-        NAME
-        charconv_test
-        MODULE strings
-        SOURCES
-        "charconv_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        turbo::pow10_helper
-)
-
-carbin_cc_test(
-        NAME
-        charconv_parse_test
-        MODULE strings
-        SOURCES
-        "charconv_parse_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-)
-
-carbin_cc_test(
-        NAME
+        #atod_manual_test
+        bind_test
+        char_formatting_test
         charconv_bigint_test
-        MODULE strings
-        SOURCES
-        "charconv_bigint_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-)
-
-
-# Internal-only target, do not depend on directly.
-carbin_cc_library(
-        NAMESPACE
-        turbo
-        NAME
-        pow10_helper
-        SOURCES
-        "pow10_helper.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        pow10_helper_test
-        MODULE strings
-        SOURCES
-        "pow10_helper_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::pow10_helper
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-
-carbin_cc_test(
-        NAME
-        cordz_update_tracker_test
-        MODULE strings
-        SOURCES
-        "cordz_update_tracker_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-
-carbin_cc_test(
-        NAME
-        cordz_functions_test
-        MODULE strings
-        SOURCES
-        "cordz_functions_test.cc"
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-
-carbin_cc_test(
-        NAME
-        cordz_handle_test
-        MODULE strings
-        SOURCES
-        "cordz_handle_test.cc"
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        cordz_info_test
-        MODULE strings
-        SOURCES
-        "cordz_info_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        cordz_info_statistics_test
-        MODULE strings
-        SOURCES
-        "cordz_info_statistics_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        cordz_sample_token_test
-        MODULE strings
-        SOURCES
-        "cordz_sample_token_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-
-carbin_cc_test(
-        NAME
-        cordz_update_scope_test
-        MODULE strings
-        SOURCES
-        "cordz_update_scope_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        cord_test
-        MODULE strings
-        SOURCES
-        "cord_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
+        charconv_parse_test
+        charconv_test
+        charset_test
+        checker_test
+        convert_test
+        cord_buffer_test
         cord_data_edge_test
-        MODULE strings
-        SOURCES
-        "cord_data_edge_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        cord_rep_btree_test
-        MODULE strings
-        SOURCES
-        "cord_rep_btree_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
         cord_rep_btree_navigator_test
-        MODULE strings
-        SOURCES
-        "cord_rep_btree_navigator_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
         cord_rep_btree_reader_test
-        MODULE strings
-        SOURCES
-        "cord_rep_btree_reader_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
+        cord_rep_btree_test
         cord_rep_crc_test
-        MODULE strings
-        SOURCES
-        "cord_rep_crc_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-#TODO(jeff) disable now
-
-carbin_cc_test(
-        NAME
-        cord_ring_test
-        MODULE strings
-        SOURCES
-        "cord_ring_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${CARBIN_DEPS_LINK}
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-        ${GMOCK_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        cord_ring_reader_test
-        MODULE strings
-        SOURCES
-        "cord_ring_reader_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
+        cord_test
+        cordz_functions_test
+        cordz_handle_test
+        cordz_info_statistics_test
+        cordz_info_test
+        cordz_sample_token_test
         cordz_test
-        MODULE strings
-        SOURCES
-        "cordz_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-        ${GTEST_MAIN_LIB}
+        cordz_update_scope_test
+        cordz_update_tracker_test
+        damerau_levenshtein_distance_test
+        escaping_test
+        extension_test
+        has_stringify_test
+        has_ostream_operator_test
+        match_test
+        memutil_test
+        numbers_test
+        ostringstream_test
+        output_test
+        parser_test
+        pow10_helper_test
+        resize_uninitialized_test
+        str_cat_test
+        str_format_test
+        str_join_test
+        str_replace_test
+        str_split_test
+        string_constant_test
+        string_view_test
+        strip_test
+        substitute_test
+        utf8_test
 )
+foreach (test ${STRINGS_TEST_SRC})
 
-carbin_cc_test(
-        NAME
-        str_case_conv_test
-        MODULE strings
-        SOURCES
-        "str_case_conv_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-)
-
-carbin_cc_test(
-        NAME
-        str_trim_test
-        MODULE strings
-        SOURCES
-        "str_trim_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-)
-
-carbin_cc_test(
-        NAME
-        unicode_view
-        MODULE strings
-        SOURCES
-        "unicode_view_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-)
-
-carbin_cc_test(
-        NAME
-        fixed_string_test
-        MODULE strings
-        SOURCES
-        "fixed_string_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-)
+    carbin_cc_test(
+            NAME ${test}
+            MODULE strings
+            SOURCES ${test}.cc
+            LINKS
+            turbo::turbo
+            time_test_util_static
+            GTest::gtest
+            GTest::gmock
+            GTest::gmock_main
+            ${CARBIN_DEPS_LINK}
+            CXXOPTS ${CARBIN_CXX_OPTIONS}
+    )
+endforeach ()

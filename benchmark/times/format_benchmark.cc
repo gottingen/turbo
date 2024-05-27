@@ -1,80 +1,68 @@
-// Copyright 2018 The Turbo Authors.
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
 
 #include <cstddef>
 #include <string>
 
-#include "turbo/times/time.h"
-#include "benchmark/benchmark.h"
-#include "turbo/base/internal/raw_logging.h"
-
-namespace turbo {
-
-    namespace time_internal {
-
-        TimeZone load_time_zone(const std::string &name) {
-            TimeZone tz;
-            TURBO_RAW_CHECK(load_time_zone(name, &tz), name.c_str());
-            return tz;
-        }
-
-    }  // namespace time_internal
-
-}  // namespace turbo
+#include <tests/times/test_util.h>
+#include <turbo/time/time.h>
+#include <benchmark/benchmark.h>
 
 namespace {
 
-    namespace {
-        const char *const kFormats[] = {
-                turbo::RFC1123_full,     // 0
-                turbo::RFC1123_no_wday,  // 1
-                turbo::RFC3339_full,     // 2
-                turbo::RFC3339_sec,      // 3
-                "%Y-%m-%d%ET%H:%M:%S",  // 4
-                "%Y-%m-%d",             // 5
-        };
-        const int kNumFormats = sizeof(kFormats) / sizeof(kFormats[0]);
-    }  // namespace
+namespace {
+const char* const kFormats[] = {
+    turbo::RFC1123_full,     // 0
+    turbo::RFC1123_no_wday,  // 1
+    turbo::RFC3339_full,     // 2
+    turbo::RFC3339_sec,      // 3
+    "%Y-%m-%d%ET%H:%M:%S",  // 4
+    "%Y-%m-%d",             // 5
+};
+const int kNumFormats = sizeof(kFormats) / sizeof(kFormats[0]);
+}  // namespace
 
-    void BM_Format_FormatTime(benchmark::State &state) {
-        const std::string fmt = kFormats[state.range(0)];
-        state.SetLabel(fmt);
-        const turbo::TimeZone lax =
-                turbo::time_internal::load_time_zone("America/Los_Angeles");
-        const turbo::Time t =
-                turbo::Time::from_civil(turbo::CivilSecond(1977, 6, 28, 9, 8, 7), lax) +
-                turbo::Duration::nanoseconds(1);
-        while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(t.to_string(fmt, lax).length());
-        }
-    }
+void BM_Format_FormatTime(benchmark::State& state) {
+  const std::string fmt = kFormats[state.range(0)];
+  state.SetLabel(fmt);
+  const turbo::TimeZone lax =
+      turbo::time_internal::LoadTimeZone("America/Los_Angeles");
+  const turbo::Time t =
+      turbo::FromCivil(turbo::CivilSecond(1977, 6, 28, 9, 8, 7), lax) +
+      turbo::Nanoseconds(1);
+  while (state.KeepRunning()) {
+    benchmark::DoNotOptimize(turbo::FormatTime(fmt, t, lax).length());
+  }
+}
+BENCHMARK(BM_Format_FormatTime)->DenseRange(0, kNumFormats - 1);
 
-    BENCHMARK(BM_Format_FormatTime)->DenseRange(0, kNumFormats - 1);
-
-    void BM_Format_ParseTime(benchmark::State &state) {
-        const std::string fmt = kFormats[state.range(0)];
-        state.SetLabel(fmt);
-        const turbo::TimeZone lax =
-                turbo::time_internal::load_time_zone("America/Los_Angeles");
-        turbo::Time t = turbo::Time::from_civil(turbo::CivilSecond(1977, 6, 28, 9, 8, 7), lax) +
-                        turbo::Duration::nanoseconds(1);
-        const std::string when = t.to_string(fmt, lax);
-        std::string err;
-        while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(t.parse_time(fmt, when, lax, &err));
-        }
-    }
-
-    BENCHMARK(BM_Format_ParseTime)->DenseRange(0, kNumFormats - 1);
+void BM_Format_ParseTime(benchmark::State& state) {
+  const std::string fmt = kFormats[state.range(0)];
+  state.SetLabel(fmt);
+  const turbo::TimeZone lax =
+      turbo::time_internal::LoadTimeZone("America/Los_Angeles");
+  turbo::Time t = turbo::FromCivil(turbo::CivilSecond(1977, 6, 28, 9, 8, 7), lax) +
+                 turbo::Nanoseconds(1);
+  const std::string when = turbo::FormatTime(fmt, t, lax);
+  std::string err;
+  while (state.KeepRunning()) {
+    benchmark::DoNotOptimize(turbo::ParseTime(fmt, when, lax, &t, &err));
+  }
+}
+BENCHMARK(BM_Format_ParseTime)->DenseRange(0, kNumFormats - 1);
 
 }  // namespace

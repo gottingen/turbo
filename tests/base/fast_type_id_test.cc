@@ -1,28 +1,30 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//     https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/base/internal/fast_type_id.h"
+#include <turbo/base/internal/fast_type_id.h>
 
 #include <cstdint>
 #include <map>
 #include <vector>
 
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "turbo/testing/test.h"
+#include <gtest/gtest.h>
 
 namespace {
-    namespace bi = turbo::base_internal;
+namespace bi = turbo::base_internal;
 
 // NOLINTNEXTLINE
 #define PRIM_TYPES(A)   \
@@ -39,30 +41,30 @@ namespace {
   A(double)             \
   A(long double)
 
-    TEST_CASE("FastTypeIdTest, PrimitiveTypes") {
-        bi::FastTypeIdType type_ids[] = {
+TEST(FastTypeIdTest, PrimitiveTypes) {
+  bi::FastTypeIdType type_ids[] = {
 #define A(T) bi::FastTypeId<T>(),
-                PRIM_TYPES(A)
+    PRIM_TYPES(A)
 #undef A
 #define A(T) bi::FastTypeId<const T>(),
-                PRIM_TYPES(A)
+    PRIM_TYPES(A)
 #undef A
 #define A(T) bi::FastTypeId<volatile T>(),
-                PRIM_TYPES(A)
+    PRIM_TYPES(A)
 #undef A
 #define A(T) bi::FastTypeId<const volatile T>(),
-                PRIM_TYPES(A)
+    PRIM_TYPES(A)
 #undef A
-        };
-        size_t total_type_ids = sizeof(type_ids) / sizeof(bi::FastTypeIdType);
+  };
+  size_t total_type_ids = sizeof(type_ids) / sizeof(bi::FastTypeIdType);
 
-        for (int i = 0; i < total_type_ids; ++i) {
-            CHECK_EQ(type_ids[i], type_ids[i]);
-            for (int j = 0; j < i; ++j) {
-                CHECK_NE(type_ids[i], type_ids[j]);
-            }
-        }
+  for (int i = 0; i < total_type_ids; ++i) {
+    EXPECT_EQ(type_ids[i], type_ids[i]);
+    for (int j = 0; j < i; ++j) {
+      EXPECT_NE(type_ids[i], type_ids[j]);
     }
+  }
+}
 
 #define FIXED_WIDTH_TYPES(A) \
   A(int8_t)                  \
@@ -74,54 +76,51 @@ namespace {
   A(int64_t)                 \
   A(uint64_t)
 
-    TEST_CASE("FastTypeIdTest, FixedWidthTypes") {
-        bi::FastTypeIdType type_ids[] = {
+TEST(FastTypeIdTest, FixedWidthTypes) {
+  bi::FastTypeIdType type_ids[] = {
 #define A(T) bi::FastTypeId<T>(),
-                FIXED_WIDTH_TYPES(A)
+    FIXED_WIDTH_TYPES(A)
 #undef A
 #define A(T) bi::FastTypeId<const T>(),
-                FIXED_WIDTH_TYPES(A)
+    FIXED_WIDTH_TYPES(A)
 #undef A
 #define A(T) bi::FastTypeId<volatile T>(),
-                FIXED_WIDTH_TYPES(A)
+    FIXED_WIDTH_TYPES(A)
 #undef A
 #define A(T) bi::FastTypeId<const volatile T>(),
-                FIXED_WIDTH_TYPES(A)
+    FIXED_WIDTH_TYPES(A)
 #undef A
-        };
-        size_t total_type_ids = sizeof(type_ids) / sizeof(bi::FastTypeIdType);
+  };
+  size_t total_type_ids = sizeof(type_ids) / sizeof(bi::FastTypeIdType);
 
-        for (int i = 0; i < total_type_ids; ++i) {
-            CHECK_EQ(type_ids[i], type_ids[i]);
-            for (int j = 0; j < i; ++j) {
-                CHECK_NE(type_ids[i], type_ids[j]);
-            }
-        }
+  for (int i = 0; i < total_type_ids; ++i) {
+    EXPECT_EQ(type_ids[i], type_ids[i]);
+    for (int j = 0; j < i; ++j) {
+      EXPECT_NE(type_ids[i], type_ids[j]);
     }
+  }
+}
 
-    TEST_CASE("FastTypeIdTest, AliasTypes") {
-        using int_alias = int;
-        CHECK_EQ(bi::FastTypeId<int_alias>(), bi::FastTypeId<int>());
-    }
+TEST(FastTypeIdTest, AliasTypes) {
+  using int_alias = int;
+  EXPECT_EQ(bi::FastTypeId<int_alias>(), bi::FastTypeId<int>());
+}
 
-    TEST_CASE("FastTypeIdTest, TemplateSpecializations") {
-        CHECK_NE(bi::FastTypeId<std::vector<int>>(),
-                  bi::FastTypeId<std::vector<long>>());
+TEST(FastTypeIdTest, TemplateSpecializations) {
+  EXPECT_NE(bi::FastTypeId<std::vector<int>>(),
+            bi::FastTypeId<std::vector<long>>());
 
-        CHECK_NE((bi::FastTypeId<std::map<int, float>>()),
-                  (bi::FastTypeId<std::map<int, double>>()));
-    }
+  EXPECT_NE((bi::FastTypeId<std::map<int, float>>()),
+            (bi::FastTypeId<std::map<int, double>>()));
+}
 
-    struct Base {
-    };
-    struct Derived : Base {
-    };
-    struct PDerived : private Base {
-    };
+struct Base {};
+struct Derived : Base {};
+struct PDerived : private Base {};
 
-    TEST_CASE("FastTypeIdTest, Inheritance") {
-        CHECK_NE(bi::FastTypeId<Base>(), bi::FastTypeId<Derived>());
-        CHECK_NE(bi::FastTypeId<Base>(), bi::FastTypeId<PDerived>());
-    }
+TEST(FastTypeIdTest, Inheritance) {
+  EXPECT_NE(bi::FastTypeId<Base>(), bi::FastTypeId<Derived>());
+  EXPECT_NE(bi::FastTypeId<Base>(), bi::FastTypeId<PDerived>());
+}
 
 }  // namespace

@@ -1,74 +1,65 @@
 #
-# Copyright 2023 The titan-search Authors.
+# Copyright (C) 2024 EA group inc.
+# Author: Jeff.li lijippy@163.com
+# All rights reserved.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
 #
-#      https://www.apache.org/licenses/LICENSE-2.0
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
 
 carbin_cc_bm(
-        NAME
-        raw_hash_set_benchmark
-        MODULE bmc
-        SOURCES
-        "raw_hash_set_benchmark.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        benchmark::benchmark
-        benchmark::benchmark_main
+        NAME btree_benchmark
+        MODULE container
+        SOURCES btree_benchmark.cc
+        LINKS turbo::turbo benchmark::benchmark benchmark::benchmark_main ${CARBIN_DEPS_LINK}
+        CXXOPTS ${USER_CXX_FLAGS}
 )
 
 carbin_cc_bm(
-        NAME
-        raw_hash_set_probe_benchmark
-        MODULE bmc
-        SOURCES
-        "raw_hash_set_probe_benchmark.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        benchmark::benchmark
-        benchmark::benchmark_main
+        NAME fixed_array_benchmark
+        MODULE container
+        SOURCES fixed_array_benchmark.cc
+        LINKS turbo::turbo benchmark::benchmark benchmark::benchmark_main ${CARBIN_DEPS_LINK}
+        CXXOPTS ${USER_CXX_FLAGS}
 )
 
 carbin_cc_bm(
-        NAME
-        layout_benchmark
-        MODULE bmc
-        SOURCES
-        "layout_benchmark.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        benchmark::benchmark
-        benchmark::benchmark_main
+        NAME inlined_vector_benchmark
+        MODULE container
+        SOURCES inlined_vector_benchmark.cc
+        LINKS turbo::turbo benchmark::benchmark benchmark::benchmark_main ${CARBIN_DEPS_LINK}
+        CXXOPTS ${USER_CXX_FLAGS}
 )
-
 
 carbin_cc_bm(
-        NAME
-        fixed_array_benchmark
-        MODULE bmc
-        SOURCES
-        "fixed_array_benchmark.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        benchmark::benchmark
-        benchmark::benchmark_main
+        NAME layout_benchmark
+        MODULE container
+        SOURCES layout_benchmark.cc
+        LINKS turbo::turbo benchmark::benchmark benchmark::benchmark_main ${CARBIN_DEPS_LINK}
+        CXXOPTS ${USER_CXX_FLAGS}
 )
 
+carbin_cc_bm(
+        NAME raw_hash_set_benchmark
+        MODULE container
+        SOURCES raw_hash_set_benchmark.cc
+        LINKS turbo::turbo benchmark::benchmark benchmark::benchmark_main ${CARBIN_DEPS_LINK}
+        CXXOPTS ${USER_CXX_FLAGS}
+)
+
+carbin_cc_bm(
+        NAME raw_hash_set_probe_benchmark
+        MODULE container
+        SOURCES raw_hash_set_probe_benchmark.cc
+        LINKS turbo::turbo benchmark::benchmark benchmark::benchmark_main ${CARBIN_DEPS_LINK}
+        CXXOPTS ${USER_CXX_FLAGS}
+)

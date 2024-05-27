@@ -1,23 +1,26 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #ifndef TURBO_BASE_INTERNAL_INLINE_VARIABLE_H_
 #define TURBO_BASE_INTERNAL_INLINE_VARIABLE_H_
 
 #include <type_traits>
 
-#include "identity.h"
+#include <turbo/base/internal/identity.h>
 
 // File:
 //   This file define a macro that allows the creation of or emulation of C++17
@@ -63,12 +66,12 @@
 // Bug: https://bugs.llvm.org/show_bug.cgi?id=35862
 //
 // Note:
-//   identity_t is used here so that the const and name are in the
+//   type_identity_t is used here so that the const and name are in the
 //   appropriate place for pointer types, reference types, function pointer
 //   types, etc..
 #if defined(__clang__)
 #define TURBO_INTERNAL_EXTERN_DECL(type, name) \
-  extern const ::turbo::internal::identity_t<type> name;
+  extern const ::turbo::internal::type_identity_t<type> name;
 #else  // Otherwise, just define the macro to do nothing.
 #define TURBO_INTERNAL_EXTERN_DECL(type, name)
 #endif  // defined(__clang__)
@@ -76,30 +79,31 @@
 // See above comment at top of file for details.
 #define TURBO_INTERNAL_INLINE_CONSTEXPR(type, name, init) \
   TURBO_INTERNAL_EXTERN_DECL(type, name)                  \
-  inline constexpr ::turbo::internal::identity_t<type> name = init
+  inline constexpr ::turbo::internal::type_identity_t<type> name = init
 
 #else
 
 // See above comment at top of file for details.
 //
 // Note:
-//   identity_t is used here so that the const and name are in the
+//   type_identity_t is used here so that the const and name are in the
 //   appropriate place for pointer types, reference types, function pointer
 //   types, etc..
-#define TURBO_INTERNAL_INLINE_CONSTEXPR(var_type, name, init)                  \
-  template <class /*TurboInternalDummy*/ = void>                               \
-  struct TurboInternalInlineVariableHolder##name {                             \
-    static constexpr ::turbo::internal::identity_t<var_type> kInstance = init; \
-  };                                                                          \
-                                                                              \
-  template <class TurboInternalDummy>                                          \
-  constexpr ::turbo::internal::identity_t<var_type>                            \
-      TurboInternalInlineVariableHolder##name<TurboInternalDummy>::kInstance;   \
-                                                                              \
-  static constexpr const ::turbo::internal::identity_t<var_type>&              \
-      name = /* NOLINT */                                                     \
-      TurboInternalInlineVariableHolder##name<>::kInstance;                    \
-  static_assert(sizeof(void (*)(decltype(name))) != 0,                        \
+#define TURBO_INTERNAL_INLINE_CONSTEXPR(var_type, name, init)                 \
+  template <class /*TurboInternalDummy*/ = void>                              \
+  struct TurboInternalInlineVariableHolder##name {                            \
+    static constexpr ::turbo::internal::type_identity_t<var_type> kInstance = \
+        init;                                                                \
+  };                                                                         \
+                                                                             \
+  template <class TurboInternalDummy>                                         \
+  constexpr ::turbo::internal::type_identity_t<var_type>                      \
+      TurboInternalInlineVariableHolder##name<TurboInternalDummy>::kInstance;  \
+                                                                             \
+  static constexpr const ::turbo::internal::type_identity_t<var_type>&        \
+      name = /* NOLINT */                                                    \
+      TurboInternalInlineVariableHolder##name<>::kInstance;                   \
+  static_assert(sizeof(void (*)(decltype(name))) != 0,                       \
                 "Silence unused variable warnings.")
 
 #endif  // __cpp_inline_variables

@@ -1,18 +1,21 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/random/gaussian_distribution.h"
+#include <turbo/random/gaussian_distribution.h>
 
 #include <algorithm>
 #include <cmath>
@@ -24,18 +27,19 @@
 #include <type_traits>
 #include <vector>
 
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/base/internal/representation.h"
-#include "turbo/platform/port.h"
-#include "tests/random/chi_square.h"
-#include "tests/random/distribution_test_util.h"
-#include "turbo/random/internal/sequence_urbg.h"
-#include "turbo/random/random.h"
-#include "turbo/format/format.h"
-#include "turbo/strings/str_replace.h"
-#include "turbo/strings/str_strip.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include <turbo/base/macros.h>
+#include <turbo/log/log.h>
+#include <turbo/numeric/internal/representation.h>
+#include <tests/random/chi_square.h>
+#include <tests/random/distribution_test_util.h>
+#include <turbo/random/internal/sequence_urbg.h>
+#include <turbo/random/random.h>
+#include <turbo/strings/str_cat.h>
+#include <turbo/strings/str_format.h>
+#include <turbo/strings/str_replace.h>
+#include <turbo/strings/strip.h>
 
 namespace {
 
@@ -115,9 +119,8 @@ TYPED_TEST(GaussianDistributionInterfaceTest, SerializeTest) {
           EXPECT_LE(sample, before.max()) << before;
         }
         if (!std::is_same<TypeParam, long double>::value) {
-          TURBO_INTERNAL_LOG(
-              INFO, turbo::format("Range{{{}, {}}}: {}, {}", mean, stddev,
-                                    sample_min, sample_max));
+          LOG(INFO) << "Range{" << mean << ", " << stddev << "}: " << sample_min
+                    << ", " << sample_max;
         }
 
         std::stringstream ss;
@@ -239,17 +242,16 @@ bool GaussianDistributionTests::SingleZTest(const double p,
       (std::pow(m.skewness, 2.0) + std::pow(m.kurtosis - 3.0, 2.0) / 4.0);
 
   if (!pass || jb > 9.21) {
-    TURBO_INTERNAL_LOG(
-        INFO, turbo::format("p={} max_err={}\n"
-                              " mean={} vs. {}\n"
-                              " stddev={} vs. {}\n"
-                              " skewness={} vs. {}\n"
-                              " kurtosis={} vs. {}\n"
-                              " z={} vs. 0\n"
-                              " jb={} vs. 9.21",
-                              p, max_err, m.mean, mean(), std::sqrt(m.variance),
-                              stddev(), m.skewness, skew(), m.kurtosis,
-                              kurtosis(), z, jb));
+    // clang-format off
+    LOG(INFO)
+        << "p=" << p << " max_err=" << max_err << "\n"
+           " mean=" << m.mean << " vs. " << mean() << "\n"
+           " stddev=" << std::sqrt(m.variance) << " vs. " << stddev() << "\n"
+           " skewness=" << m.skewness << " vs. " << skew() << "\n"
+           " kurtosis=" << m.kurtosis << " vs. " << kurtosis() << "\n"
+           " z=" << z << " vs. 0\n"
+           " jb=" << jb << " vs. 9.21";
+    // clang-format on
   }
   return pass;
 }
@@ -296,16 +298,16 @@ double GaussianDistributionTests::SingleChiSquaredTest() {
 
   // Log if the chi_square value is above the threshold.
   if (chi_square > threshold) {
-    for (int i = 0; i < cutoffs.size(); i++) {
-      TURBO_INTERNAL_LOG(
-          INFO, turbo::format("{} : ({}) = {}", i, cutoffs[i], counts[i]));
+    for (size_t i = 0; i < cutoffs.size(); i++) {
+      LOG(INFO) << i << " : (" << cutoffs[i] << ") = " << counts[i];
     }
 
-    TURBO_INTERNAL_LOG(
-        INFO, turbo::format("mean={} stddev={}\n expected {}\n{} {} ({})\n {}  @ 0.98 = {}", mean(), stddev(),
-                           expected,             //
-                           kChiSquared, chi_square, p,
-                           kChiSquared, threshold));
+    // clang-format off
+    LOG(INFO) << "mean=" << mean() << " stddev=" << stddev() << "\n"
+                 " expected " << expected << "\n"
+              << kChiSquared << " " << chi_square << " (" << p << ")\n"
+              << kChiSquared << " @ 0.98 = " << threshold;
+    // clang-format on
   }
   return p;
 }
@@ -378,8 +380,9 @@ std::vector<Param> GenParams() {
 
 std::string ParamName(const ::testing::TestParamInfo<Param>& info) {
   const auto& p = info.param;
-  std::string name = turbo::format("mean_{:.6g}__stddev_{:.6g}",p.mean, p.stddev);
-  return turbo::str_replace_all(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
+  std::string name = turbo::StrCat("mean_", turbo::SixDigits(p.mean), "__stddev_",
+                                  turbo::SixDigits(p.stddev));
+  return turbo::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
 }
 
 INSTANTIATE_TEST_SUITE_P(All, GaussianDistributionTests,

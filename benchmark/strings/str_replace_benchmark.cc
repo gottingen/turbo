@@ -1,24 +1,27 @@
-// Copyright 2018 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/strings/str_replace.h"
+#include <turbo/strings/str_replace.h>
 
 #include <cstring>
 #include <string>
 
-#include "benchmark/benchmark.h"
-#include "turbo/base/internal/raw_logging.h"
+#include <benchmark/benchmark.h>
+#include <turbo/base/internal/raw_logging.h>
 
 namespace {
 
@@ -96,7 +99,7 @@ void BM_StrReplaceAllOneReplacement(benchmark::State& state) {
   SetUpStrings();
   std::string src = *big_string;
   for (auto _ : state) {
-    std::string dest = turbo::str_replace_all(src, {{"the", "box"}});
+    std::string dest = turbo::StrReplaceAll(src, {{"the", "box"}});
     TURBO_RAW_CHECK(dest == *after_replacing_the,
                    "not benchmarking intended behavior");
   }
@@ -107,7 +110,7 @@ void BM_StrReplaceAll(benchmark::State& state) {
   SetUpStrings();
   std::string src = *big_string;
   for (auto _ : state) {
-    std::string dest = turbo::str_replace_all(src, {{"the", "box"},
+    std::string dest = turbo::StrReplaceAll(src, {{"the", "box"},
                                                  {"brown", "quick"},
                                                  {"jumped", "liquored"},
                                                  {"dozen", "brown"},

@@ -1,11 +1,12 @@
-name: turbo-dev
+name: changeme-dev
 channels:
   - conda-forge
   - defaults
+  - titan-search
 dependencies:
-  - gcc
-  - gxx
-  - sysroot_linux-64 >=2.17 # [linux]
+  - gcc =8.5 # [linux]
+  - gxx =8.5 # [linux]
+  - sysroot_linux-64=2.17 # [linux]
   - gtest
   - gmock
   - benchmark

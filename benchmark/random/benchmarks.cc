@@ -1,16 +1,19 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 // Benchmarks for turbo random distributions as well as a selection of the
 // C++ standard library random distributions.
@@ -25,21 +28,21 @@
 #include <type_traits>
 #include <vector>
 
-#include "benchmark/benchmark.h"
-#include "turbo/meta/type_traits.h"
-#include "turbo/platform/port.h"
-#include "turbo/random/bernoulli_distribution.h"
-#include "turbo/random/beta_distribution.h"
-#include "turbo/random/exponential_distribution.h"
-#include "turbo/random/gaussian_distribution.h"
-#include "turbo/random/internal/fast_uniform_bits.h"
-#include "turbo/random/internal/randen_engine.h"
-#include "turbo/random/log_uniform_int_distribution.h"
-#include "turbo/random/poisson_distribution.h"
-#include "turbo/random/random.h"
-#include "turbo/random/uniform_int_distribution.h"
-#include "turbo/random/uniform_real_distribution.h"
-#include "turbo/random/zipf_distribution.h"
+#include <turbo/base/macros.h>
+#include <turbo/meta/type_traits.h>
+#include <turbo/random/bernoulli_distribution.h>
+#include <turbo/random/beta_distribution.h>
+#include <turbo/random/exponential_distribution.h>
+#include <turbo/random/gaussian_distribution.h>
+#include <turbo/random/internal/fast_uniform_bits.h>
+#include <turbo/random/internal/randen_engine.h>
+#include <turbo/random/log_uniform_int_distribution.h>
+#include <turbo/random/poisson_distribution.h>
+#include <turbo/random/random.h>
+#include <turbo/random/uniform_int_distribution.h>
+#include <turbo/random/uniform_real_distribution.h>
+#include <turbo/random/zipf_distribution.h>
+#include <benchmark/benchmark.h>
 
 namespace {
 
@@ -62,7 +65,7 @@ class PrecompiledSeedSeq {
  public:
   using result_type = uint32_t;
 
-  PrecompiledSeedSeq() {}
+  PrecompiledSeedSeq() = default;
 
   template <typename Iterator>
   PrecompiledSeedSeq(Iterator begin, Iterator end) {}
@@ -75,13 +78,13 @@ class PrecompiledSeedSeq {
     static size_t idx = 0;
     for (; begin != end; begin++) {
       *begin = kSeedData[idx++];
-      if (idx >= TURBO_ARRAY_SIZE(kSeedData)) {
+      if (idx >= TURBO_ARRAYSIZE(kSeedData)) {
         idx = 0;
       }
     }
   }
 
-  size_t size() const { return TURBO_ARRAY_SIZE(kSeedData); }
+  size_t size() const { return TURBO_ARRAYSIZE(kSeedData); }
 
   template <typename OutIterator>
   void param(OutIterator out) const {
@@ -100,7 +103,7 @@ using use_default_initialization = std::false_type;
 // either via the default constructor, when use_default_initialization<T>
 // is true, or via the indicated seed sequence, SSeq.
 template <typename Engine, typename SSeq = PrecompiledSeedSeq>
-typename std::enable_if_t<!use_default_initialization<Engine>::value, Engine>
+typename turbo::enable_if_t<!use_default_initialization<Engine>::value, Engine>
 make_engine() {
   // Initialize the random engine using the seed sequence SSeq, which
   // is constructed from the precompiled seed data.
@@ -109,7 +112,7 @@ make_engine() {
 }
 
 template <typename Engine, typename SSeq = PrecompiledSeedSeq>
-typename std::enable_if_t<use_default_initialization<Engine>::value, Engine>
+typename turbo::enable_if_t<use_default_initialization<Engine>::value, Engine>
 make_engine() {
   // Initialize the random engine using the default constructor.
   return Engine();
@@ -291,7 +294,7 @@ void BM_Thread(benchmark::State& state) {
   BENCHMARK_TEMPLATE(BM_Shuffle, Engine, 100)->ThreadPerCpu();      \
   BENCHMARK_TEMPLATE(BM_Shuffle, Engine, 1000)->ThreadPerCpu();     \
   BENCHMARK_TEMPLATE(BM_ShuffleReuse, Engine, 100)->ThreadPerCpu(); \
-  BENCHMARK_TEMPLATE(BM_ShuffleReuse, Engine, 1000)->ThreadPerCpu();
+  BENCHMARK_TEMPLATE(BM_ShuffleReuse, Engine, 1000)->ThreadPerCpu()
 
 #define BM_EXTENDED(Engine)                                                    \
   /* -------------- Extended Uniform -----------------------*/                 \
@@ -355,9 +358,8 @@ void BM_Thread(benchmark::State& state) {
   BENCHMARK_TEMPLATE(BM_Beta, Engine, turbo::beta_distribution<float>, 410,     \
                      580);                                                     \
   BENCHMARK_TEMPLATE(BM_Gamma, Engine, std::gamma_distribution<float>, 199);   \
-  BENCHMARK_TEMPLATE(BM_Gamma, Engine, std::gamma_distribution<double>, 199);
+  BENCHMARK_TEMPLATE(BM_Gamma, Engine, std::gamma_distribution<double>, 199)
 
-// TURBO Recommended interfaces.
 BM_BASIC(turbo::InsecureBitGen);  // === pcg64_2018_engine
 BM_BASIC(turbo::BitGen);    // === randen_engine<uint64_t>.
 BM_THREAD(turbo::BitGen);

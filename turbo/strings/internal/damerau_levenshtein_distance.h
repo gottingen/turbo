@@ -1,34 +1,37 @@
-// Copyright 2023 The Elastic-AI Authors.
-// part of Elastic AI Search
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-//
-// Created by jeff on 24-1-21.
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
 #ifndef TURBO_STRINGS_INTERNAL_DAMERAU_LEVENSHTEIN_DISTANCE_H_
 #define TURBO_STRINGS_INTERNAL_DAMERAU_LEVENSHTEIN_DISTANCE_H_
 
 #include <cstdint>
-#include <string_view>
+
+#include <turbo/strings/string_view.h>
 
 namespace turbo {
-    namespace strings_internal {
-        // Calculate DamerauLevenshtein distance between two strings.
-        // When the distance is larger than cutoff, the code just returns cutoff + 1.
-        uint8_t CappedDamerauLevenshteinDistance(std::string_view s1,
-                                                 std::string_view s2, uint8_t cutoff);
+TURBO_NAMESPACE_BEGIN
+namespace strings_internal {
+// Calculate DamerauLevenshtein distance between two strings.
+// When the distance is larger than cutoff, the code just returns cutoff + 1.
+uint8_t CappedDamerauLevenshteinDistance(turbo::string_view s1,
+                                         turbo::string_view s2, uint8_t cutoff);
 
-    }  // namespace strings_internal
-}
+}  // namespace strings_internal
+TURBO_NAMESPACE_END
+}  // namespace turbo
+
 #endif  // TURBO_STRINGS_INTERNAL_DAMERAU_LEVENSHTEIN_DISTANCE_H_

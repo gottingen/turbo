@@ -1,16 +1,19 @@
-// Copyright 2021 The Turbo Authors
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//     https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #ifndef TURBO_STRINGS_CORD_ANALYSIS_H_
 #define TURBO_STRINGS_CORD_ANALYSIS_H_
@@ -18,23 +21,46 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "turbo/platform/port.h"
-#include "turbo/strings/internal/cord_internal.h"
+#include <turbo/base/config.h>
+#include <turbo/base/nullability.h>
+#include <turbo/strings/internal/cord_internal.h>
 
-namespace turbo::cord_internal {
+namespace turbo {
+TURBO_NAMESPACE_BEGIN
+namespace cord_internal {
 
-    // Returns the *approximate* number of bytes held in full or in part by this
-    // Cord (which may not remain the same between invocations). Cords that share
-    // memory could each be "charged" independently for the same shared memory.
-    size_t GetEstimatedMemoryUsage(const CordRep *rep);
+// Returns the *approximate* number of bytes held in full or in part by this
+// Cord (which may not remain the same between invocations). Cords that share
+// memory could each be "charged" independently for the same shared memory.
+size_t GetEstimatedMemoryUsage(turbo::Nonnull<const CordRep*> rep);
 
-    // Returns the *approximate* number of bytes held in full or in part by this
-    // CordRep weighted by the sharing ratio of that data. For example, if some data
-    // edge is shared by 4 different Cords, then each cord is attribute 1/4th of
-    // the total memory usage as a 'fair share' of the total memory usage.
-    size_t GetEstimatedFairShareMemoryUsage(const CordRep *rep);
+// Returns the *approximate* number of bytes held in full or in part by this
+// Cord for the distinct memory held by this cord. This is similar to
+// `GetEstimatedMemoryUsage()`, except that if the cord has multiple references
+// to the same memory, that memory is only counted once.
+//
+// For example:
+//   turbo::Cord cord;
+//   cord.append(some_other_cord);
+//   cord.append(some_other_cord);
+//    // Calls GetEstimatedMemoryUsage() and counts `other_cord` twice:
+//   cord.EstimatedMemoryUsage(kTotal);
+//    // Calls GetMorePreciseMemoryUsage() and counts `other_cord` once:
+//   cord.EstimatedMemoryUsage(kTotalMorePrecise);
+//
+// This is more expensive than `GetEstimatedMemoryUsage()` as it requires
+// deduplicating all memory references.
+size_t GetMorePreciseMemoryUsage(turbo::Nonnull<const CordRep*> rep);
 
-}  // namespace turbo::cord_internal
+// Returns the *approximate* number of bytes held in full or in part by this
+// CordRep weighted by the sharing ratio of that data. For example, if some data
+// edge is shared by 4 different Cords, then each cord is attribute 1/4th of
+// the total memory usage as a 'fair share' of the total memory usage.
+size_t GetEstimatedFairShareMemoryUsage(turbo::Nonnull<const CordRep*> rep);
+
+}  // namespace cord_internal
+TURBO_NAMESPACE_END
+}  // namespace turbo
 
 
 #endif  // TURBO_STRINGS_CORD_ANALYSIS_H_

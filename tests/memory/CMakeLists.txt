@@ -1,53 +1,33 @@
 #
-# Copyright 2023 The titan-search Authors.
+# Copyright (C) 2024 EA group inc.
+# Author: Jeff.li lijippy@163.com
+# All rights reserved.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
 #
-#      https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-carbin_cc_test(
-        NAME
-        memory_test
-        MODULE memory
-        SOURCES
-        "memory_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-)
 
 carbin_cc_test(
-        NAME
-        object_pool_test
+        NAME memory_test
         MODULE memory
-        SOURCES
-        "object_pool_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
+        SOURCES memory_test.cc
+        DEPS
+        test_instance_tracker_static
         LINKS
         turbo::turbo
-        Threads::Threads
-)
-
-carbin_cc_test(
-        NAME
-        resource_pool_test
-        MODULE memory
-        SOURCES
-        "resource_pool_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        Threads::Threads
+        GTest::gtest
+        GTest::gmock
+        GTest::gmock_main
+        ${CARBIN_DEPS_LINK}
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
 )

@@ -1,16 +1,19 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 // Produce stack trace.
 //
@@ -34,110 +37,109 @@
 // correctly when turbo::GetStackTrace() is called with max_depth == 0.
 // Some code may do that.
 
-#include "turbo/debugging/stacktrace.h"
+#include <turbo/debugging/stacktrace.h>
 
 #include <atomic>
 
-#include "turbo/debugging/internal/stacktrace_config.h"
-#include "turbo/platform/port.h"
+#include <turbo/base/attributes.h>
+#include <turbo/base/port.h>
+#include <turbo/debugging/internal/stacktrace_config.h>
 
 #if defined(TURBO_STACKTRACE_INL_HEADER)
-
 #include TURBO_STACKTRACE_INL_HEADER
-
 #else
 # error Cannot calculate stack trace: will need to write for your environment
 
-# include "turbo/debugging/internal/stacktrace_aarch64-inl.h"
-# include "turbo/debugging/internal/stacktrace_arm-inl.h"
-# include "turbo/debugging/internal/stacktrace_emscripten-inl.h"
-# include "turbo/debugging/internal/stacktrace_generic-inl.h"
-# include "turbo/debugging/internal/stacktrace_powerpc-inl.h"
-# include "turbo/debugging/internal/stacktrace_riscv-inl.h"
-# include "turbo/debugging/internal/stacktrace_unimplemented-inl.h"
-# include "turbo/debugging/internal/stacktrace_win32-inl.h"
-# include "turbo/debugging/internal/stacktrace_x86-inl.h"
+# include "turbo/debugging/internal/stacktrace_aarch64-inl.inc"
+# include "turbo/debugging/internal/stacktrace_arm-inl.inc"
+# include "turbo/debugging/internal/stacktrace_emscripten-inl.inc"
+# include "turbo/debugging/internal/stacktrace_generic-inl.inc"
+# include "turbo/debugging/internal/stacktrace_powerpc-inl.inc"
+# include "turbo/debugging/internal/stacktrace_riscv-inl.inc"
+# include "turbo/debugging/internal/stacktrace_unimplemented-inl.inc"
+# include "turbo/debugging/internal/stacktrace_win32-inl.inc"
+# include "turbo/debugging/internal/stacktrace_x86-inl.inc"
 #endif
 
 namespace turbo {
-    namespace {
+TURBO_NAMESPACE_BEGIN
+namespace {
 
-        typedef int (*Unwinder)(void **, int *, int, int, const void *, int *);
+typedef int (*Unwinder)(void**, int*, int, int, const void*, int*);
+std::atomic<Unwinder> custom;
 
-        std::atomic<Unwinder> custom;
+template <bool IS_STACK_FRAMES, bool IS_WITH_CONTEXT>
+TURBO_ATTRIBUTE_ALWAYS_INLINE inline int Unwind(void** result, int* sizes,
+                                               int max_depth, int skip_count,
+                                               const void* uc,
+                                               int* min_dropped_frames) {
+  Unwinder f = &UnwindImpl<IS_STACK_FRAMES, IS_WITH_CONTEXT>;
+  Unwinder g = custom.load(std::memory_order_acquire);
+  if (g != nullptr) f = g;
 
-        template<bool IS_STACK_FRAMES, bool IS_WITH_CONTEXT>
-        TURBO_FORCE_INLINE int Unwind(void **result, int *sizes,
-                                      int max_depth, int skip_count,
-                                      const void *uc,
-                                      int *min_dropped_frames) {
-            Unwinder f = &UnwindImpl<IS_STACK_FRAMES, IS_WITH_CONTEXT>;
-            Unwinder g = custom.load(std::memory_order_acquire);
-            if (g != nullptr) f = g;
+  // Add 1 to skip count for the unwinder function itself
+  int size = (*f)(result, sizes, max_depth, skip_count + 1, uc,
+                  min_dropped_frames);
+  // To disable tail call to (*f)(...)
+  TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
+  return size;
+}
 
-            // Add 1 to skip count for the unwinder function itself
-            int size = (*f)(result, sizes, max_depth, skip_count + 1, uc,
+}  // anonymous namespace
+
+TURBO_ATTRIBUTE_NOINLINE TURBO_ATTRIBUTE_NO_TAIL_CALL int GetStackFrames(
+    void** result, int* sizes, int max_depth, int skip_count) {
+  return Unwind<true, false>(result, sizes, max_depth, skip_count, nullptr,
+                             nullptr);
+}
+
+TURBO_ATTRIBUTE_NOINLINE TURBO_ATTRIBUTE_NO_TAIL_CALL int
+GetStackFramesWithContext(void** result, int* sizes, int max_depth,
+                          int skip_count, const void* uc,
+                          int* min_dropped_frames) {
+  return Unwind<true, true>(result, sizes, max_depth, skip_count, uc,
                             min_dropped_frames);
-            // To disable tail call to (*f)(...)
-            TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
-            return size;
-        }
+}
 
-    }  // anonymous namespace
+TURBO_ATTRIBUTE_NOINLINE TURBO_ATTRIBUTE_NO_TAIL_CALL int GetStackTrace(
+    void** result, int max_depth, int skip_count) {
+  return Unwind<false, false>(result, nullptr, max_depth, skip_count, nullptr,
+                              nullptr);
+}
 
-    TURBO_NO_INLINE TURBO_ATTRIBUTE_NO_TAIL_CALL int GetStackFrames(
-            void **result, int *sizes, int max_depth, int skip_count) {
-        return Unwind<true, false>(result, sizes, max_depth, skip_count, nullptr,
-                                   nullptr);
+TURBO_ATTRIBUTE_NOINLINE TURBO_ATTRIBUTE_NO_TAIL_CALL int
+GetStackTraceWithContext(void** result, int max_depth, int skip_count,
+                         const void* uc, int* min_dropped_frames) {
+  return Unwind<false, true>(result, nullptr, max_depth, skip_count, uc,
+                             min_dropped_frames);
+}
+
+void SetStackUnwinder(Unwinder w) {
+  custom.store(w, std::memory_order_release);
+}
+
+int DefaultStackUnwinder(void** pcs, int* sizes, int depth, int skip,
+                         const void* uc, int* min_dropped_frames) {
+  skip++;  // For this function
+  Unwinder f = nullptr;
+  if (sizes == nullptr) {
+    if (uc == nullptr) {
+      f = &UnwindImpl<false, false>;
+    } else {
+      f = &UnwindImpl<false, true>;
     }
-
-    TURBO_NO_INLINE TURBO_ATTRIBUTE_NO_TAIL_CALL int
-    GetStackFramesWithContext(void **result, int *sizes, int max_depth,
-                              int skip_count, const void *uc,
-                              int *min_dropped_frames) {
-        return Unwind<true, true>(result, sizes, max_depth, skip_count, uc,
-                                  min_dropped_frames);
+  } else {
+    if (uc == nullptr) {
+      f = &UnwindImpl<true, false>;
+    } else {
+      f = &UnwindImpl<true, true>;
     }
+  }
+  volatile int x = 0;
+  int n = (*f)(pcs, sizes, depth, skip, uc, min_dropped_frames);
+  x = 1; (void) x;  // To disable tail call to (*f)(...)
+  return n;
+}
 
-    TURBO_NO_INLINE TURBO_ATTRIBUTE_NO_TAIL_CALL int GetStackTrace(
-            void **result, int max_depth, int skip_count) {
-        return Unwind<false, false>(result, nullptr, max_depth, skip_count, nullptr,
-                                    nullptr);
-    }
-
-    TURBO_NO_INLINE TURBO_ATTRIBUTE_NO_TAIL_CALL int
-    GetStackTraceWithContext(void **result, int max_depth, int skip_count,
-                             const void *uc, int *min_dropped_frames) {
-        return Unwind<false, true>(result, nullptr, max_depth, skip_count, uc,
-                                   min_dropped_frames);
-    }
-
-    void SetStackUnwinder(Unwinder w) {
-        custom.store(w, std::memory_order_release);
-    }
-
-    int DefaultStackUnwinder(void **pcs, int *sizes, int depth, int skip,
-                             const void *uc, int *min_dropped_frames) {
-        skip++;  // For this function
-        Unwinder f = nullptr;
-        if (sizes == nullptr) {
-            if (uc == nullptr) {
-                f = &UnwindImpl<false, false>;
-            } else {
-                f = &UnwindImpl<false, true>;
-            }
-        } else {
-            if (uc == nullptr) {
-                f = &UnwindImpl<true, false>;
-            } else {
-                f = &UnwindImpl<true, true>;
-            }
-        }
-        volatile int x = 0;
-        int n = (*f)(pcs, sizes, depth, skip, uc, min_dropped_frames);
-        x = 1;
-        (void) x;  // To disable tail call to (*f)(...)
-        return n;
-    }
-
+TURBO_NAMESPACE_END
 }  // namespace turbo

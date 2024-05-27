@@ -1,18 +1,21 @@
-// Copyright 2019 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/container/fixed_array.h"
+#include <turbo/container/fixed_array.h>
 
 #include <stdio.h>
 
@@ -25,14 +28,14 @@
 #include <string>
 #include <vector>
 
-#include "../base/exception_testing.h"
-#include "turbo/container/internal/counting_allocator.h"
-#include "tests/hash/hash_testing.h"
-#include "turbo/memory/memory.h"
-#include "turbo/platform/port.h"
-#include "turbo/platform/options.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include <turbo/base/config.h>
+#include <tests/base/exception_testing.h>
+#include <turbo/base/options.h>
+#include <tests/container/test_allocator.h>
+#include <tests/hash/hash_testing.h>
+#include <turbo/memory/memory.h>
 
 using ::testing::ElementsAreArray;
 
@@ -109,7 +112,7 @@ TEST(FixedArrayTest, CopyCtor) {
 TEST(FixedArrayTest, MoveCtor) {
   turbo::FixedArray<std::unique_ptr<int>, 10> on_stack(5);
   for (int i = 0; i < 5; ++i) {
-    on_stack[i] = std::make_unique<int>(i);
+    on_stack[i] = turbo::make_unique<int>(i);
   }
 
   turbo::FixedArray<std::unique_ptr<int>, 10> stack_copy = std::move(on_stack);
@@ -118,7 +121,7 @@ TEST(FixedArrayTest, MoveCtor) {
 
   turbo::FixedArray<std::unique_ptr<int>, 10> allocated(15);
   for (int i = 0; i < 15; ++i) {
-    allocated[i] = std::make_unique<int>(i);
+    allocated[i] = turbo::make_unique<int>(i);
   }
 
   turbo::FixedArray<std::unique_ptr<int>, 10> alloced_copy =
@@ -304,7 +307,7 @@ static void TestArrayOfArrays(int n) {
     using InnerArray = ConstructionTester[elements_per_inner_array];
     // Heap-allocate the FixedArray to avoid blowing the stack frame.
     auto array_ptr =
-        std::make_unique<turbo::FixedArray<InnerArray, inline_elements>>(n);
+        turbo::make_unique<turbo::FixedArray<InnerArray, inline_elements>>(n);
     auto& array = *array_ptr;
 
     ASSERT_EQ(array.size(), n);
@@ -356,20 +359,20 @@ static void TestArrayOfArrays(int n) {
 
 TEST(IteratorConstructorTest, NonInline) {
   int const kInput[] = {2, 3, 5, 7, 11, 13, 17};
-  turbo::FixedArray<int, TURBO_ARRAY_SIZE(kInput) - 1> const fixed(
-      kInput, kInput + TURBO_ARRAY_SIZE(kInput));
-  ASSERT_EQ(TURBO_ARRAY_SIZE(kInput), fixed.size());
-  for (size_t i = 0; i < TURBO_ARRAY_SIZE(kInput); ++i) {
+  turbo::FixedArray<int, TURBO_ARRAYSIZE(kInput) - 1> const fixed(
+      kInput, kInput + TURBO_ARRAYSIZE(kInput));
+  ASSERT_EQ(TURBO_ARRAYSIZE(kInput), fixed.size());
+  for (size_t i = 0; i < TURBO_ARRAYSIZE(kInput); ++i) {
     ASSERT_EQ(kInput[i], fixed[i]);
   }
 }
 
 TEST(IteratorConstructorTest, Inline) {
   int const kInput[] = {2, 3, 5, 7, 11, 13, 17};
-  turbo::FixedArray<int, TURBO_ARRAY_SIZE(kInput)> const fixed(
-      kInput, kInput + TURBO_ARRAY_SIZE(kInput));
-  ASSERT_EQ(TURBO_ARRAY_SIZE(kInput), fixed.size());
-  for (size_t i = 0; i < TURBO_ARRAY_SIZE(kInput); ++i) {
+  turbo::FixedArray<int, TURBO_ARRAYSIZE(kInput)> const fixed(
+      kInput, kInput + TURBO_ARRAYSIZE(kInput));
+  ASSERT_EQ(TURBO_ARRAYSIZE(kInput), fixed.size());
+  for (size_t i = 0; i < TURBO_ARRAYSIZE(kInput); ++i) {
     ASSERT_EQ(kInput[i], fixed[i]);
   }
 }
@@ -378,9 +381,9 @@ TEST(IteratorConstructorTest, NonPod) {
   char const* kInput[] = {"red",  "orange", "yellow", "green",
                           "blue", "indigo", "violet"};
   turbo::FixedArray<std::string> const fixed(kInput,
-                                            kInput + TURBO_ARRAY_SIZE(kInput));
-  ASSERT_EQ(TURBO_ARRAY_SIZE(kInput), fixed.size());
-  for (size_t i = 0; i < TURBO_ARRAY_SIZE(kInput); ++i) {
+                                            kInput + TURBO_ARRAYSIZE(kInput));
+  ASSERT_EQ(TURBO_ARRAYSIZE(kInput), fixed.size());
+  for (size_t i = 0; i < TURBO_ARRAYSIZE(kInput); ++i) {
     ASSERT_EQ(kInput[i], fixed[i]);
   }
 }
@@ -394,7 +397,7 @@ TEST(IteratorConstructorTest, FromEmptyVector) {
 
 TEST(IteratorConstructorTest, FromNonEmptyVector) {
   int const kInput[] = {2, 3, 5, 7, 11, 13, 17};
-  std::vector<int> const items(kInput, kInput + TURBO_ARRAY_SIZE(kInput));
+  std::vector<int> const items(kInput, kInput + TURBO_ARRAYSIZE(kInput));
   turbo::FixedArray<int> const fixed(items.begin(), items.end());
   ASSERT_EQ(items.size(), fixed.size());
   for (size_t i = 0; i < items.size(); ++i) {
@@ -404,7 +407,7 @@ TEST(IteratorConstructorTest, FromNonEmptyVector) {
 
 TEST(IteratorConstructorTest, FromBidirectionalIteratorRange) {
   int const kInput[] = {2, 3, 5, 7, 11, 13, 17};
-  std::list<int> const items(kInput, kInput + TURBO_ARRAY_SIZE(kInput));
+  std::list<int> const items(kInput, kInput + TURBO_ARRAYSIZE(kInput));
   turbo::FixedArray<int> const fixed(items.begin(), items.end());
   EXPECT_THAT(fixed, testing::ElementsAreArray(kInput));
 }
@@ -673,7 +676,7 @@ TEST(AllocatorSupportTest, CountOutoflineAllocations) {
     const int ia[] = {0, 1, 2, 3, 4, 5, 6, 7};
     Alloc alloc(&allocated, &active_instances);
 
-    AllocFxdArr arr(ia, ia + TURBO_ARRAY_SIZE(ia), alloc);
+    AllocFxdArr arr(ia, ia + TURBO_ARRAYSIZE(ia), alloc);
 
     EXPECT_EQ(allocated, arr.size() * sizeof(int));
     static_cast<void>(arr);
@@ -766,6 +769,22 @@ TEST(AllocatorSupportTest, SizeValAllocConstructor) {
     EXPECT_EQ(allocated, len * sizeof(int));
     EXPECT_THAT(arr, AllOf(SizeIs(len), Each(0)));
   }
+}
+
+TEST(AllocatorSupportTest, PropagatesStatefulAllocator) {
+  constexpr size_t inlined_size = 4;
+  using Alloc = turbo::container_internal::CountingAllocator<int>;
+  using AllocFxdArr = turbo::FixedArray<int, inlined_size, Alloc>;
+
+  auto len = inlined_size * 2;
+  auto val = 0;
+  int64_t allocated = 0;
+  AllocFxdArr arr(len, val, Alloc(&allocated));
+
+  EXPECT_EQ(allocated, len * sizeof(int));
+
+  AllocFxdArr copy = arr;
+  EXPECT_EQ(allocated, len * sizeof(int) * 2);
 }
 
 #ifdef TURBO_HAVE_ADDRESS_SANITIZER

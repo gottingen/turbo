@@ -1,30 +1,33 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/random/internal/randen_engine.h"
+#include <turbo/random/internal/randen_engine.h>
 
 #include <algorithm>
 #include <bitset>
 #include <random>
 #include <sstream>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/random/internal/explicit_seed_seq.h"
-#include "turbo/format/format.h"
-#include "turbo/times/clock.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include <turbo/log/log.h>
+#include <turbo/random/internal/explicit_seed_seq.h>
+#include <turbo/strings/str_cat.h>
+#include <turbo/time/clock.h>
 
 #define UPDATE_GOLDEN 0
 
@@ -170,13 +173,13 @@ TYPED_TEST(RandenEngineTypedTest, RandomNumberEngineInterface) {
   static_assert(std::is_copy_constructible<E>::value,
                 "randen_engine must be copy constructible");
 
-  static_assert(std::is_copy_assignable<E>::value,
+  static_assert(turbo::is_copy_assignable<E>::value,
                 "randen_engine must be copy assignable");
 
   static_assert(std::is_move_constructible<E>::value,
                 "randen_engine must be move constructible");
 
-  static_assert(std::is_move_assignable<E>::value,
+  static_assert(turbo::is_move_assignable<E>::value,
                 "randen_engine must be move assignable");
 
   static_assert(std::is_same<decltype(std::declval<E>()()), T>::value,
@@ -639,15 +642,14 @@ TEST(RandenTest, IsFastOrSlow) {
   static constexpr size_t kCount = 100000;
   randen_u64 engine;
   randen_u64::result_type sum = 0;
-  auto start = turbo::get_current_time_nanos();
+  auto start = turbo::GetCurrentTimeNanos();
   for (int i = 0; i < kCount; i++) {
     sum += engine();
   }
-  auto duration = turbo::get_current_time_nanos() - start;
+  auto duration = turbo::GetCurrentTimeNanos() - start;
 
-  TURBO_INTERNAL_LOG(INFO, turbo::format("{}{}", static_cast<double>(duration) /
-                                           static_cast<double>(kCount),
-                                       "ns"));
+  LOG(INFO) << static_cast<double>(duration) / static_cast<double>(kCount)
+            << "ns";
 
   EXPECT_GT(sum, 0);
   EXPECT_GE(duration, kCount);  // Should be slower than 1ns per call.

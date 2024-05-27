@@ -1,16 +1,19 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #ifndef TURBO_RANDOM_INTERNAL_SEQUENCE_URBG_H_
 #define TURBO_RANDOM_INTERNAL_SEQUENCE_URBG_H_
@@ -21,38 +24,40 @@
 #include <type_traits>
 #include <vector>
 
-#include "turbo/platform/port.h"
+#include <turbo/base/config.h>
 
-namespace turbo::random_internal {
+namespace turbo {
+TURBO_NAMESPACE_BEGIN
+namespace random_internal {
 
-    // `sequence_urbg` is a simple random number generator which meets the
-    // requirements of [rand.req.urbg], and is solely for testing turbo
-    // distributions.
-    class sequence_urbg {
-    public:
-        using result_type = uint64_t;
+// `sequence_urbg` is a simple random number generator which meets the
+// requirements of [rand.req.urbg], and is solely for testing turbo
+// distributions.
+class sequence_urbg {
+ public:
+  using result_type = uint64_t;
 
-        static constexpr result_type (min)() {
-            return (std::numeric_limits<result_type>::min)();
-        }
+  static constexpr result_type(min)() {
+    return (std::numeric_limits<result_type>::min)();
+  }
+  static constexpr result_type(max)() {
+    return (std::numeric_limits<result_type>::max)();
+  }
 
-        static constexpr result_type (max)() {
-            return (std::numeric_limits<result_type>::max)();
-        }
+  sequence_urbg(std::initializer_list<result_type> data) : i_(0), data_(data) {}
+  void reset() { i_ = 0; }
 
-        sequence_urbg(std::initializer_list<result_type> data) : i_(0), data_(data) {}
+  result_type operator()() { return data_[i_++ % data_.size()]; }
 
-        void reset() { i_ = 0; }
+  size_t invocations() const { return i_; }
 
-        result_type operator()() { return data_[i_++ % data_.size()]; }
+ private:
+  size_t i_;
+  std::vector<result_type> data_;
+};
 
-        size_t invocations() const { return i_; }
-
-    private:
-        size_t i_;
-        std::vector<result_type> data_;
-    };
-
-}  // namespace turbo::random_internal
+}  // namespace random_internal
+TURBO_NAMESPACE_END
+}  // namespace turbo
 
 #endif  // TURBO_RANDOM_INTERNAL_SEQUENCE_URBG_H_

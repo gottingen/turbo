@@ -1,21 +1,24 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/random/internal/randen.h"
+#include <turbo/random/internal/randen.h>
 
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/random/internal/randen_detect.h"
+#include <turbo/base/internal/raw_logging.h>
+#include <turbo/random/internal/randen_detect.h>
 
 // RANDen = RANDom generator or beetroots in Swiss High German.
 // 'Strong' (well-distributed, unpredictable, backtracking-resistant) random
@@ -40,48 +43,52 @@
 // We combine these three ideas and also change Simpira's subround keys from
 // structured/low-entropy counters to digits of Pi.
 
-namespace turbo::random_internal {
-    namespace {
+namespace turbo {
+TURBO_NAMESPACE_BEGIN
+namespace random_internal {
+namespace {
 
-        struct RandenState {
-            const void *keys;
-            bool has_crypto;
-        };
+struct RandenState {
+  const void* keys;
+  bool has_crypto;
+};
 
-        RandenState GetRandenState() {
-            static const RandenState state = []() {
-                RandenState tmp;
+RandenState GetRandenState() {
+  static const RandenState state = []() {
+    RandenState tmp;
 #if TURBO_RANDOM_INTERNAL_AES_DISPATCH
-                // HW AES Dispatch.
-                if (HasRandenHwAesImplementation() && CPUSupportsRandenHwAes()) {
-                    tmp.has_crypto = true;
-                    tmp.keys = RandenHwAes::GetKeys();
-                } else {
-                    tmp.has_crypto = false;
-                    tmp.keys = RandenSlow::GetKeys();
-                }
-#elif TURBO_HAVE_ACCELERATED_AES
-                // HW AES is enabled.
-                tmp.has_crypto = true;
-                tmp.keys = RandenHwAes::GetKeys();
-#else
-                // HW AES is disabled.
-                tmp.has_crypto = false;
-                tmp.keys = RandenSlow::GetKeys();
-#endif
-                return tmp;
-            }();
-            return state;
-        }
-
-    }  // namespace
-
-    Randen::Randen() {
-        auto tmp = GetRandenState();
-        keys_ = tmp.keys;
-#if TURBO_RANDOM_INTERNAL_AES_DISPATCH
-        has_crypto_ = tmp.has_crypto;
-#endif
+    // HW AES Dispatch.
+    if (HasRandenHwAesImplementation() && CPUSupportsRandenHwAes()) {
+      tmp.has_crypto = true;
+      tmp.keys = RandenHwAes::GetKeys();
+    } else {
+      tmp.has_crypto = false;
+      tmp.keys = RandenSlow::GetKeys();
     }
+#elif TURBO_HAVE_ACCELERATED_AES
+    // HW AES is enabled.
+    tmp.has_crypto = true;
+    tmp.keys = RandenHwAes::GetKeys();
+#else
+    // HW AES is disabled.
+    tmp.has_crypto = false;
+    tmp.keys = RandenSlow::GetKeys();
+#endif
+    return tmp;
+  }();
+  return state;
+}
 
-}  // namespace turbo::random_internal
+}  // namespace
+
+Randen::Randen() {
+  auto tmp = GetRandenState();
+  keys_ = tmp.keys;
+#if TURBO_RANDOM_INTERNAL_AES_DISPATCH
+  has_crypto_ = tmp.has_crypto;
+#endif
+}
+
+}  // namespace random_internal
+TURBO_NAMESPACE_END
+}  // namespace turbo

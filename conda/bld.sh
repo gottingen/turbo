@@ -24,9 +24,8 @@ cmake .. -DCMAKE_INSTALL_PREFIX=$PREFIX \
         -DCARBIN_BUILD_BENCHMARK=OFF \
         -DCARBIN_BUILD_EXAMPLES=OFF \
         -DCARBIN_USE_CXX11_ABI=ON \
-        -DBUILD_SHARED_LIBRARY=OFF \
-        -DCMAKE_INSTALL_LIBDIR=lib \
-        -DBUILD_STATIC_LIBRARY=ON
+        -DBUILD_SHARED_LIBRARY=ON \
+        -DBUILD_STATIC_LIBRARY=OFF
 
 cmake --build .
 cmake --build . --target install

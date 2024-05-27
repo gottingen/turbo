@@ -1,16 +1,19 @@
-// Copyright 2021 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #ifndef TURBO_CLEANUP_INTERNAL_CLEANUP_H_
 #define TURBO_CLEANUP_INTERNAL_CLEANUP_H_
@@ -19,76 +22,82 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/meta/utility.h"
-#include "turbo/platform/port.h"
-#include "turbo/platform/thread_annotations.h"
+#include <turbo/base/internal/invoke.h>
+#include <turbo/base/macros.h>
+#include <turbo/base/thread_annotations.h>
+#include <turbo/utility/utility.h>
 
-namespace turbo::cleanup_internal {
+namespace turbo {
+TURBO_NAMESPACE_BEGIN
 
-    struct Tag {
-    };
+namespace cleanup_internal {
 
-    template<typename Arg, typename... Args>
-    constexpr bool WasDeduced() {
-        return (std::is_same<cleanup_internal::Tag, Arg>::value) &&
-               (sizeof...(Args) == 0);
-    }
+struct Tag {};
 
-    template<typename Callback>
-    constexpr bool ReturnsVoid() {
-        return (std::is_same<std::invoke_result_t<Callback>, void>::value);
-    }
+template <typename Arg, typename... Args>
+constexpr bool WasDeduced() {
+  return (std::is_same<cleanup_internal::Tag, Arg>::value) &&
+         (sizeof...(Args) == 0);
+}
 
-    template<typename Callback>
-    class Storage {
-    public:
-        Storage() = delete;
+template <typename Callback>
+constexpr bool ReturnsVoid() {
+  return (std::is_same<base_internal::invoke_result_t<Callback>, void>::value);
+}
 
-        explicit Storage(Callback callback) {
-            // Placement-new into a character buffer is used for eager destruction when
-            // the cleanup is invoked or cancelled. To ensure this optimizes well, the
-            // behavior is implemented locally instead of using an std::optional.
-            ::new(GetCallbackBuffer()) Callback(std::move(callback));
-            is_callback_engaged_ = true;
-        }
+template <typename Callback>
+class Storage {
+ public:
+  Storage() = delete;
 
-        Storage(Storage &&other) {
-            TURBO_HARDENING_ASSERT(other.IsCallbackEngaged());
+  explicit Storage(Callback callback) {
+    // Placement-new into a character buffer is used for eager destruction when
+    // the cleanup is invoked or cancelled. To ensure this optimizes well, the
+    // behavior is implemented locally instead of using an turbo::optional.
+    ::new (GetCallbackBuffer()) Callback(std::move(callback));
+    is_callback_engaged_ = true;
+  }
 
-            ::new(GetCallbackBuffer()) Callback(std::move(other.GetCallback()));
-            is_callback_engaged_ = true;
+  Storage(Storage&& other) {
+    TURBO_HARDENING_ASSERT(other.IsCallbackEngaged());
 
-            other.DestroyCallback();
-        }
+    ::new (GetCallbackBuffer()) Callback(std::move(other.GetCallback()));
+    is_callback_engaged_ = true;
 
-        Storage(const Storage &other) = delete;
+    other.DestroyCallback();
+  }
 
-        Storage &operator=(Storage &&other) = delete;
+  Storage(const Storage& other) = delete;
 
-        Storage &operator=(const Storage &other) = delete;
+  Storage& operator=(Storage&& other) = delete;
 
-        void *GetCallbackBuffer() { return static_cast<void *>(+callback_buffer_); }
+  Storage& operator=(const Storage& other) = delete;
 
-        Callback &GetCallback() {
-            return *reinterpret_cast<Callback *>(GetCallbackBuffer());
-        }
+  void* GetCallbackBuffer() { return static_cast<void*>(+callback_buffer_); }
 
-        bool IsCallbackEngaged() const { return is_callback_engaged_; }
+  Callback& GetCallback() {
+    return *reinterpret_cast<Callback*>(GetCallbackBuffer());
+  }
 
-        void DestroyCallback() {
-            is_callback_engaged_ = false;
-            GetCallback().~Callback();
-        }
+  bool IsCallbackEngaged() const { return is_callback_engaged_; }
 
-        void InvokeCallback() TURBO_NO_THREAD_SAFETY_ANALYSIS {
-            std::move(GetCallback())();
-        }
+  void DestroyCallback() {
+    is_callback_engaged_ = false;
+    GetCallback().~Callback();
+  }
 
-    private:
-        bool is_callback_engaged_;
-        alignas(Callback) char callback_buffer_[sizeof(Callback)];
-    };
+  void InvokeCallback() TURBO_NO_THREAD_SAFETY_ANALYSIS {
+    std::move(GetCallback())();
+  }
 
-}  // namespace turbo::cleanup_internal
+ private:
+  bool is_callback_engaged_;
+  alignas(Callback) char callback_buffer_[sizeof(Callback)];
+};
+
+}  // namespace cleanup_internal
+
+TURBO_NAMESPACE_END
+}  // namespace turbo
 
 #endif  // TURBO_CLEANUP_INTERNAL_CLEANUP_H_

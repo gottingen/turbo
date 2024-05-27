@@ -1,84 +1,78 @@
-// Copyright 2018 The Turbo Authors.
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
 
-#include "turbo/times/clock.h"
+#include <turbo/time/clock.h>
 
 #if !defined(_WIN32)
-
 #include <sys/time.h>
-
 #else
 #include <winsock2.h>
 #endif  // _WIN32
-
 #include <cstdio>
 
-#include "turbo/platform/internal/cycleclock.h"
-#include "benchmark/benchmark.h"
+#include <turbo/base/internal/cycleclock.h>
+#include <benchmark/benchmark.h>
 
 namespace {
 
-    void BM_Clock_Now_TurboTime(benchmark::State &state) {
-        while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::time_now());
-        }
-    }
+void BM_Clock_Now_TurboTime(benchmark::State& state) {
+  while (state.KeepRunning()) {
+    benchmark::DoNotOptimize(turbo::Now());
+  }
+}
+BENCHMARK(BM_Clock_Now_TurboTime);
 
-    BENCHMARK(BM_Clock_Now_TurboTime);
+void BM_Clock_Now_GetCurrentTimeNanos(benchmark::State& state) {
+  while (state.KeepRunning()) {
+    benchmark::DoNotOptimize(turbo::GetCurrentTimeNanos());
+  }
+}
+BENCHMARK(BM_Clock_Now_GetCurrentTimeNanos);
 
-    void BM_Clock_Now_GetCurrentTimeNanos(benchmark::State &state) {
-        while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::get_current_time_nanos());
-        }
-    }
+void BM_Clock_Now_TurboTime_ToUnixNanos(benchmark::State& state) {
+  while (state.KeepRunning()) {
+    benchmark::DoNotOptimize(turbo::ToUnixNanos(turbo::Now()));
+  }
+}
+BENCHMARK(BM_Clock_Now_TurboTime_ToUnixNanos);
 
-    BENCHMARK(BM_Clock_Now_GetCurrentTimeNanos);
-
-    void BM_Clock_Now_TurboTime_ToUnixNanos(benchmark::State &state) {
-        while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::time_now().to_nanoseconds());
-        }
-    }
-
-    BENCHMARK(BM_Clock_Now_TurboTime_ToUnixNanos);
-
-    void BM_Clock_Now_CycleClock(benchmark::State &state) {
-        while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::base_internal::CycleClock::time_now());
-        }
-    }
-
-    BENCHMARK(BM_Clock_Now_CycleClock);
+void BM_Clock_Now_CycleClock(benchmark::State& state) {
+  while (state.KeepRunning()) {
+    benchmark::DoNotOptimize(turbo::base_internal::CycleClock::Now());
+  }
+}
+BENCHMARK(BM_Clock_Now_CycleClock);
 
 #if !defined(_WIN32)
+static void BM_Clock_Now_gettimeofday(benchmark::State& state) {
+  struct timeval tv;
+  while (state.KeepRunning()) {
+    benchmark::DoNotOptimize(gettimeofday(&tv, nullptr));
+  }
+}
+BENCHMARK(BM_Clock_Now_gettimeofday);
 
-    static void BM_Clock_Now_gettimeofday(benchmark::State &state) {
-        struct timeval tv;
-        while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(gettimeofday(&tv, nullptr));
-        }
-    }
-
-    BENCHMARK(BM_Clock_Now_gettimeofday);
-
-    static void BM_Clock_Now_clock_gettime(benchmark::State &state) {
-        struct timespec ts;
-        while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(clock_gettime(CLOCK_REALTIME, &ts));
-        }
-    }
-
-    BENCHMARK(BM_Clock_Now_clock_gettime);
+static void BM_Clock_Now_clock_gettime(benchmark::State& state) {
+  struct timespec ts;
+  while (state.KeepRunning()) {
+    benchmark::DoNotOptimize(clock_gettime(CLOCK_REALTIME, &ts));
+  }
+}
+BENCHMARK(BM_Clock_Now_clock_gettime);
 #endif  // _WIN32
 
 }  // namespace

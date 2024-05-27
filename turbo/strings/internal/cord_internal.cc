@@ -1,72 +1,73 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-#include "turbo/strings/internal/cord_internal.h"
+#include <turbo/strings/internal/cord_internal.h>
 
 #include <atomic>
 #include <cassert>
 #include <memory>
 
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/container/inlined_vector.h"
-#include "turbo/strings/internal/cord_rep_btree.h"
-#include "turbo/strings/internal/cord_rep_crc.h"
-#include "turbo/strings/internal/cord_rep_flat.h"
-#include "turbo/strings/internal/cord_rep_ring.h"
-#include "turbo/format/format.h"
+#include <turbo/base/internal/raw_logging.h>
+#include <turbo/container/inlined_vector.h>
+#include <turbo/strings/internal/cord_rep_btree.h>
+#include <turbo/strings/internal/cord_rep_crc.h>
+#include <turbo/strings/internal/cord_rep_flat.h>
+#include <turbo/strings/str_cat.h>
 
-namespace turbo::cord_internal {
-    TURBO_CONST_INIT std::atomic<bool> cord_ring_buffer_enabled(
-            kCordEnableRingBufferDefault);
-    TURBO_CONST_INIT std::atomic<bool> shallow_subcords_enabled(
-            kCordShallowSubcordsDefault);
-    TURBO_CONST_INIT std::atomic<bool> cord_btree_exhaustive_validation(false);
+namespace turbo {
+TURBO_NAMESPACE_BEGIN
+namespace cord_internal {
 
-    void LogFatalNodeType(CordRep *rep) {
-        TURBO_INTERNAL_LOG(FATAL, turbo::format("Unexpected node type: {}",
-                                                static_cast<int>(rep->tag)));
+TURBO_CONST_INIT std::atomic<bool> shallow_subcords_enabled(
+    kCordShallowSubcordsDefault);
+
+void LogFatalNodeType(CordRep* rep) {
+  TURBO_INTERNAL_LOG(FATAL, turbo::StrCat("Unexpected node type: ",
+                                        static_cast<int>(rep->tag)));
+}
+
+void CordRep::Destroy(CordRep* rep) {
+  assert(rep != nullptr);
+
+  while (true) {
+    assert(!rep->refcount.IsImmortal());
+    if (rep->tag == BTREE) {
+      CordRepBtree::Destroy(rep->btree());
+      return;
+    } else if (rep->tag == EXTERNAL) {
+      CordRepExternal::Delete(rep);
+      return;
+    } else if (rep->tag == SUBSTRING) {
+      CordRepSubstring* rep_substring = rep->substring();
+      rep = rep_substring->child;
+      delete rep_substring;
+      if (rep->refcount.Decrement()) {
+        return;
+      }
+    } else if (rep->tag == CRC) {
+      CordRepCrc::Destroy(rep->crc());
+      return;
+    } else {
+      assert(rep->IsFlat());
+      CordRepFlat::Delete(rep);
+      return;
     }
+  }
+}
 
-    void CordRep::Destroy(CordRep *rep) {
-        assert(rep != nullptr);
-
-        while (true) {
-            assert(!rep->refcount.IsImmortal());
-            if (rep->tag == BTREE) {
-                CordRepBtree::Destroy(rep->btree());
-                return;
-            } else if (rep->tag == RING) {
-                CordRepRing::Destroy(rep->ring());
-                return;
-            } else if (rep->tag == EXTERNAL) {
-                CordRepExternal::Delete(rep);
-                return;
-            } else if (rep->tag == SUBSTRING) {
-                CordRepSubstring *rep_substring = rep->substring();
-                rep = rep_substring->child;
-                delete rep_substring;
-                if (rep->refcount.Decrement()) {
-                    return;
-                }
-            } else if (rep->tag == CRC) {
-                CordRepCrc::Destroy(rep->crc());
-                return;
-            } else {
-                assert(rep->IsFlat());
-                CordRepFlat::Delete(rep);
-                return;
-            }
-        }
-    }
-
-}  // namespace turbo::cord_internal
+}  // namespace cord_internal
+TURBO_NAMESPACE_END
+}  // namespace turbo

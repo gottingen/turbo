@@ -1,208 +1,169 @@
 #
-# Copyright 2023 The titan-search Authors.
+# Copyright (C) 2024 EA group inc.
+# Author: Jeff.li lijippy@163.com
+# All rights reserved.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
 #
-#      https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
 carbin_cc_test(
-        NAME
-        throw_delegate_test
+        NAME atomic_hook_test
         MODULE base
-        SOURCES
-        "throw_delegate_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        ${CARBIN_DEPS_LINK}
-        turbo::turbo
-)
-
-
-carbin_cc_test(
-        NAME
-        bits_test
-        MODULE base
-        SOURCES
-        "bits_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
+        SOURCES atomic_hook_test.cc atomic_hook_test_helper.h atomic_hook_test_helper.cc
         LINKS
         turbo::turbo
+        GTest::gtest
+        GTest::gmock
+        GTest::gmock_main
         ${CARBIN_DEPS_LINK}
+        CXXOPTS
+        ${CARBIN_CXX_OPTIONS}
 )
 
 carbin_cc_test(
-        NAME
+        NAME bit_cast_test
+        MODULE base
+        SOURCES bit_cast_test.cc
+        LINKS
+        turbo::turbo
+        GTest::gtest
+        GTest::gmock
+        GTest::gmock_main
+        ${CARBIN_DEPS_LINK}
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+
+carbin_cc_test(
+        NAME call_once_test
+        MODULE base
+        SOURCES call_once_test.cc
+        LINKS
+        turbo::turbo
+        GTest::gtest
+        GTest::gmock
+        GTest::gmock_main
+        ${CARBIN_DEPS_LINK}
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+
+carbin_cc_test(
+        NAME cmake_thread_test
+        MODULE base
+        SOURCES cmake_thread_test.cc
+        LINKS
+        turbo::turbo
+        ${CARBIN_DEPS_LINK}
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+set(BASE_SRC_LIST
+        config_test
         endian_test
-        MODULE base
-        SOURCES
-        "endian_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${CARBIN_DEPS_LINK}
-)
-
-carbin_cc_test(
-        NAME
-        int128_test
-        MODULE base
-        SOURCES
-        "int128_stream_test.cc"
-        "int128_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-)
-
-
-# Internal-only target, do not depend on directly.
-carbin_cc_interface(
-        NAMESPACE
-        turbo
-        NAME
-        exception_testing
-        HEADERS
-        "exception_testing.h"
-        CXXOPTS
-        ${TURBO_DEFAULT_CXXOPTS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-)
-
-
-# Internal-only target, do not depend on directly.
-carbin_cc_test_library(
-        NAMESPACE
-        turbo
-        NAME
-        exception_safety_testing
-        HEADERS
-        "exception_safety_testing.h"
-        SOURCES
-        "exception_safety_testing.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        ${GTEST_LIB}
-        turbo::turbo
-)
-
-
-carbin_cc_test(
-        NAME
-        exception_safety_testing_test
-        MODULE base
-        SOURCES
-        "exception_safety_testing_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-        turbo::exception_safety_testing_static
-        ${GTEST_MAIN_LIB}
-        ${CARBIN_DEPS_LINK}
-)
-
-carbin_cc_test(
-        NAME
-        bit_cast_test
-        MODULE base
-        SOURCES
-        "bit_cast_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${CARBIN_DEPS_LINK}
-)
-
-carbin_cc_test(
-        NAME
-        inline_variable_test
-        MODULE base
-        SOURCES
-        "inline_variable_testing.h"
-        "inline_variable_test.cc"
-        "inline_variable_test_a.cc"
-        "inline_variable_test_b.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        ${CARBIN_DEPS_LINK}
-        turbo::turbo
-)
-
-
-
-carbin_cc_test(
-        NAME
-        raw_logging_test
-        MODULE base
-        SOURCES
-        "raw_logging_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-
-carbin_cc_test(
-        NAME
+        errno_saver_test
         fast_type_id_test
-        MODULE base
-        SOURCES
-        "fast_type_id_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-
-carbin_cc_test(
-        NAME
+        invoke_test
+        log_severity_test
+        low_level_alloc_test
+        no_destructor_test
+        nullability_test
+        optimization_test
+        prefetch_test
+        raw_logging_test
+        scoped_set_env_test
+        spinlock_test_common
         strerror_test
-        MODULE base
-        SOURCES
-        "strerror_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
-        LINKS
-        turbo::turbo
+        sysinfo_test
+        thread_identity_test
+        throw_delegate_test
+        unique_small_name_test
 )
 
+foreach (SRC ${BASE_SRC_LIST})
+    carbin_cc_test(
+            NAME ${SRC}
+            MODULE base
+            SOURCES ${SRC}.cc
+            LINKS
+            turbo::turbo
+            GTest::gtest
+            GTest::gmock
+            GTest::gmock_main
+            ${CARBIN_DEPS_LINK}
+            CXXOPTS ${CARBIN_CXX_OPTIONS}
+    )
+endforeach ()
+
+carbin_cc_test_library(
+        NAMESPACE turbo
+        NAME exception_safety_testing
+        SOURCES exception_safety_testing.cc
+        LINKS
+        turbo::turbo
+        GTest::gtest
+        GTest::gmock
+        INCLUDES "/opt/EA/inf/include"
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
 
 carbin_cc_test(
-        NAME
-        math_test
+        NAME exception_safety_testing_test
         MODULE base
-        SOURCES
-        "math_test.cc"
-        CXXOPTS
-        ${CARBIN_CXX_OPTIONS}
+        SOURCES exception_safety_testing_test.cc
         LINKS
-        ${CARBIN_DEPS_LINK}
         turbo::turbo
+        GTest::gtest
+        GTest::gmock
+        GTest::gmock_main
+        exception_safety_testing_static
+        ${CARBIN_DEPS_LINK}
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
 )
 
+carbin_cc_test_library(
+        NAMESPACE turbo
+        NAME inline_variable_test_a
+        SOURCES inline_variable_test_a.cc
+        LINKS
+        turbo::turbo
+        GTest::gtest
+        GTest::gmock
+        INCLUDES "/opt/EA/inf/include"
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+
+carbin_cc_test_library(
+        NAMESPACE turbo
+        NAME inline_variable_test_b
+        SOURCES inline_variable_test_b.cc
+        LINKS
+        turbo::turbo
+        GTest::gtest
+        GTest::gmock
+        INCLUDES "/opt/EA/inf/include"
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+
+carbin_cc_test(
+        NAME inline_variable_test
+        MODULE base
+        SOURCES inline_variable_test.cc
+        LINKS
+        turbo::turbo
+        inline_variable_test_a_static
+        inline_variable_test_b_static
+        GTest::gtest
+        GTest::gmock
+        GTest::gmock_main
+        exception_safety_testing_static
+        ${CARBIN_DEPS_LINK}
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)

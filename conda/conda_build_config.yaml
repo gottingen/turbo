@@ -11,6 +11,6 @@ python:
   - 3.7
   - 3.8
 channel_sources:
-  - mgottingen
+  - titan-search
   - conda-forge
   - default

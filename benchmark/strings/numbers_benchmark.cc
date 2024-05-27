@@ -1,28 +1,33 @@
-// Copyright 2018 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #include <cstdint>
+#include <limits>
 #include <random>
 #include <string>
 #include <type_traits>
 #include <vector>
 
-#include "benchmark/benchmark.h"
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/random/fwd.h"
-#include "turbo/random/random.h"
-#include "turbo/strings/numbers.h"
+#include <benchmark/benchmark.h>
+#include <turbo/base/internal/raw_logging.h>
+#include <turbo/random/distributions.h>
+#include <turbo/random/random.h>
+#include <turbo/strings/numbers.h>
+#include <turbo/strings/string_view.h>
 
 namespace {
 
@@ -212,11 +217,11 @@ void BM_SimpleAtof(benchmark::State& state) {
   float value;
   for (auto _ : state) {
     for (const T& input : inputs) {
-      benchmark::DoNotOptimize(turbo::simple_atof(input, &value));
+      benchmark::DoNotOptimize(turbo::SimpleAtof(input, &value));
     }
   }
 }
-BENCHMARK_TEMPLATE(BM_SimpleAtof, std::string_view)
+BENCHMARK_TEMPLATE(BM_SimpleAtof, turbo::string_view)
     ->ArgPair(10, 1)
     ->ArgPair(10, 2)
     ->ArgPair(10, 4)
@@ -242,11 +247,11 @@ void BM_SimpleAtod(benchmark::State& state) {
   double value;
   for (auto _ : state) {
     for (const T& input : inputs) {
-      benchmark::DoNotOptimize(turbo::simple_atod(input, &value));
+      benchmark::DoNotOptimize(turbo::SimpleAtod(input, &value));
     }
   }
 }
-BENCHMARK_TEMPLATE(BM_SimpleAtod, std::string_view)
+BENCHMARK_TEMPLATE(BM_SimpleAtod, turbo::string_view)
     ->ArgPair(10, 1)
     ->ArgPair(10, 2)
     ->ArgPair(10, 4)
@@ -269,7 +274,7 @@ void BM_FastHexToBufferZeroPad16(benchmark::State& state) {
   auto min = std::numeric_limits<uint64_t>::min();
   auto max = std::numeric_limits<uint64_t>::max();
   for (auto& num : nums) {
-    num = turbo::log_uniform(rng, min, max);
+    num = turbo::LogUniform(rng, min, max);
   }
 
   char buf[16];

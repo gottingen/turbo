@@ -1,393 +1,348 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/strings/str_replace.h"
+#include <turbo/strings/str_replace.h>
 
 #include <list>
 #include <map>
+#include <string>
 #include <tuple>
+#include <utility>
+#include <vector>
 
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include <gtest/gtest.h>
+#include <turbo/strings/str_cat.h>
+#include <turbo/strings/str_split.h>
+#include <turbo/strings/string_view.h>
 
-#include "turbo/testing/test.h"
+TEST(StrReplaceAll, OneReplacement) {
+  std::string s;
 
-#include "turbo/format/format.h"
-#include "turbo/strings/str_split.h"
+  // Empty string.
+  s = turbo::StrReplaceAll(s, {{"", ""}});
+  EXPECT_EQ(s, "");
+  s = turbo::StrReplaceAll(s, {{"x", ""}});
+  EXPECT_EQ(s, "");
+  s = turbo::StrReplaceAll(s, {{"", "y"}});
+  EXPECT_EQ(s, "");
+  s = turbo::StrReplaceAll(s, {{"x", "y"}});
+  EXPECT_EQ(s, "");
 
-struct Cont {
-    Cont() {}
+  // Empty substring.
+  s = turbo::StrReplaceAll("abc", {{"", ""}});
+  EXPECT_EQ(s, "abc");
+  s = turbo::StrReplaceAll("abc", {{"", "y"}});
+  EXPECT_EQ(s, "abc");
+  s = turbo::StrReplaceAll("abc", {{"x", ""}});
+  EXPECT_EQ(s, "abc");
 
-    explicit Cont(std::string_view src) : data(src) {}
+  // Substring not found.
+  s = turbo::StrReplaceAll("abc", {{"xyz", "123"}});
+  EXPECT_EQ(s, "abc");
 
-    std::string_view data;
-};
+  // Replace entire string.
+  s = turbo::StrReplaceAll("abc", {{"abc", "xyz"}});
+  EXPECT_EQ(s, "xyz");
 
-template<int index>
-std::string_view get(const Cont &c) {
-    auto splitter = turbo::str_split(c.data, ':');
-    auto it = splitter.begin();
-    for (int i = 0; i < index; ++i) ++it;
+  // Replace once at the start.
+  s = turbo::StrReplaceAll("abc", {{"a", "x"}});
+  EXPECT_EQ(s, "xbc");
 
-    return *it;
+  // Replace once in the middle.
+  s = turbo::StrReplaceAll("abc", {{"b", "x"}});
+  EXPECT_EQ(s, "axc");
+
+  // Replace once at the end.
+  s = turbo::StrReplaceAll("abc", {{"c", "x"}});
+  EXPECT_EQ(s, "abx");
+
+  // Replace multiple times with varying lengths of original/replacement.
+  s = turbo::StrReplaceAll("ababa", {{"a", "xxx"}});
+  EXPECT_EQ(s, "xxxbxxxbxxx");
+
+  s = turbo::StrReplaceAll("ababa", {{"b", "xxx"}});
+  EXPECT_EQ(s, "axxxaxxxa");
+
+  s = turbo::StrReplaceAll("aaabaaabaaa", {{"aaa", "x"}});
+  EXPECT_EQ(s, "xbxbx");
+
+  s = turbo::StrReplaceAll("abbbabbba", {{"bbb", "x"}});
+  EXPECT_EQ(s, "axaxa");
+
+  // Overlapping matches are replaced greedily.
+  s = turbo::StrReplaceAll("aaa", {{"aa", "x"}});
+  EXPECT_EQ(s, "xa");
+
+  // The replacements are not recursive.
+  s = turbo::StrReplaceAll("aaa", {{"aa", "a"}});
+  EXPECT_EQ(s, "aa");
 }
 
-TEST_CASE("str_replace_all") {
-    SUBCASE("OneReplacement") {
-        std::string s;
+TEST(StrReplaceAll, ManyReplacements) {
+  std::string s;
 
-        // Empty string.
-        s = turbo::str_replace_all(s, {{"", ""}});
-        REQUIRE_EQ(s, "");
-        s = turbo::str_replace_all(s, {{"x", ""}});
-        REQUIRE_EQ(s, "");
-        s = turbo::str_replace_all(s, {{"", "y"}});
-        REQUIRE_EQ(s, "");
-        s = turbo::str_replace_all(s, {{"x", "y"}});
-        REQUIRE_EQ(s, "");
+  // Empty string.
+  s = turbo::StrReplaceAll("", {{"", ""}, {"x", ""}, {"", "y"}, {"x", "y"}});
+  EXPECT_EQ(s, "");
 
-        // Empty substring.
-        s = turbo::str_replace_all("abc", {{"", ""}});
-        REQUIRE_EQ(s, "abc");
-        s = turbo::str_replace_all("abc", {{"", "y"}});
-        REQUIRE_EQ(s, "abc");
-        s = turbo::str_replace_all("abc", {{"x", ""}});
-        REQUIRE_EQ(s, "abc");
+  // Empty substring.
+  s = turbo::StrReplaceAll("abc", {{"", ""}, {"", "y"}, {"x", ""}});
+  EXPECT_EQ(s, "abc");
 
-        // Substring not found.
-        s = turbo::str_replace_all("abc", {{"xyz", "123"}});
-        REQUIRE_EQ(s, "abc");
+  // Replace entire string, one char at a time
+  s = turbo::StrReplaceAll("abc", {{"a", "x"}, {"b", "y"}, {"c", "z"}});
+  EXPECT_EQ(s, "xyz");
+  s = turbo::StrReplaceAll("zxy", {{"z", "x"}, {"x", "y"}, {"y", "z"}});
+  EXPECT_EQ(s, "xyz");
 
-        // Replace entire string.
-        s = turbo::str_replace_all("abc", {{"abc", "xyz"}});
-        REQUIRE_EQ(s, "xyz");
+  // Replace once at the start (longer matches take precedence)
+  s = turbo::StrReplaceAll("abc", {{"a", "x"}, {"ab", "xy"}, {"abc", "xyz"}});
+  EXPECT_EQ(s, "xyz");
 
-        // Replace once at the start.
-        s = turbo::str_replace_all("abc", {{"a", "x"}});
-        REQUIRE_EQ(s, "xbc");
+  // Replace once in the middle.
+  s = turbo::StrReplaceAll(
+      "Abc!", {{"a", "x"}, {"ab", "xy"}, {"b", "y"}, {"bc", "yz"}, {"c", "z"}});
+  EXPECT_EQ(s, "Ayz!");
 
-        // Replace once in the middle.
-        s = turbo::str_replace_all("abc", {{"b", "x"}});
-        REQUIRE_EQ(s, "axc");
+  // Replace once at the end.
+  s = turbo::StrReplaceAll(
+      "Abc!",
+      {{"a", "x"}, {"ab", "xy"}, {"b", "y"}, {"bc!", "yz?"}, {"c!", "z;"}});
+  EXPECT_EQ(s, "Ayz?");
 
-        // Replace once at the end.
-        s = turbo::str_replace_all("abc", {{"c", "x"}});
-        REQUIRE_EQ(s, "abx");
+  // Replace multiple times with varying lengths of original/replacement.
+  s = turbo::StrReplaceAll("ababa", {{"a", "xxx"}, {"b", "XXXX"}});
+  EXPECT_EQ(s, "xxxXXXXxxxXXXXxxx");
 
-        // Replace multiple times with varying lengths of original/replacement.
-        s = turbo::str_replace_all("ababa", {{"a", "xxx"}});
-        REQUIRE_EQ(s, "xxxbxxxbxxx");
+  // Overlapping matches are replaced greedily.
+  s = turbo::StrReplaceAll("aaa", {{"aa", "x"}, {"a", "X"}});
+  EXPECT_EQ(s, "xX");
+  s = turbo::StrReplaceAll("aaa", {{"a", "X"}, {"aa", "x"}});
+  EXPECT_EQ(s, "xX");
 
-        s = turbo::str_replace_all("ababa", {{"b", "xxx"}});
-        REQUIRE_EQ(s, "axxxaxxxa");
+  // Two well-known sentences
+  s = turbo::StrReplaceAll("the quick brown fox jumped over the lazy dogs",
+                          {
+                              {"brown", "box"},
+                              {"dogs", "jugs"},
+                              {"fox", "with"},
+                              {"jumped", "five"},
+                              {"over", "dozen"},
+                              {"quick", "my"},
+                              {"the", "pack"},
+                              {"the lazy", "liquor"},
+                          });
+  EXPECT_EQ(s, "pack my box with five dozen liquor jugs");
+}
 
-        s = turbo::str_replace_all("aaabaaabaaa", {{"aaa", "x"}});
-        REQUIRE_EQ(s, "xbxbx");
+TEST(StrReplaceAll, ManyReplacementsInMap) {
+  std::map<const char *, const char *> replacements;
+  replacements["$who"] = "Bob";
+  replacements["$count"] = "5";
+  replacements["#Noun"] = "Apples";
+  std::string s = turbo::StrReplaceAll("$who bought $count #Noun. Thanks $who!",
+                                      replacements);
+  EXPECT_EQ("Bob bought 5 Apples. Thanks Bob!", s);
+}
 
-        s = turbo::str_replace_all("abbbabbba", {{"bbb", "x"}});
-        REQUIRE_EQ(s, "axaxa");
+TEST(StrReplaceAll, ReplacementsInPlace) {
+  std::string s = std::string("$who bought $count #Noun. Thanks $who!");
+  int count;
+  count = turbo::StrReplaceAll({{"$count", turbo::StrCat(5)},
+                              {"$who", "Bob"},
+                              {"#Noun", "Apples"}}, &s);
+  EXPECT_EQ(count, 4);
+  EXPECT_EQ("Bob bought 5 Apples. Thanks Bob!", s);
+}
 
-        // Overlapping matches are replaced greedily.
-        s = turbo::str_replace_all("aaa", {{"aa", "x"}});
-        REQUIRE_EQ(s, "xa");
+TEST(StrReplaceAll, ReplacementsInPlaceInMap) {
+  std::string s = std::string("$who bought $count #Noun. Thanks $who!");
+  std::map<turbo::string_view, turbo::string_view> replacements;
+  replacements["$who"] = "Bob";
+  replacements["$count"] = "5";
+  replacements["#Noun"] = "Apples";
+  int count;
+  count = turbo::StrReplaceAll(replacements, &s);
+  EXPECT_EQ(count, 4);
+  EXPECT_EQ("Bob bought 5 Apples. Thanks Bob!", s);
+}
 
-        // The replacements are not recursive.
-        s = turbo::str_replace_all("aaa", {{"aa", "a"}});
-        REQUIRE_EQ(s, "aa");
-    }
+struct Cont {
+  Cont() = default;
+  explicit Cont(turbo::string_view src) : data(src) {}
 
-    SUBCASE("ManyReplacements") {
-        std::string s;
+  turbo::string_view data;
+};
 
-        // Empty string.
-        s = turbo::str_replace_all("", {{"",  ""},
-                                        {"x", ""},
-                                        {"",  "y"},
-                                        {"x", "y"}});
-        REQUIRE_EQ(s, "");
+template <int index>
+turbo::string_view get(const Cont& c) {
+  auto splitter = turbo::StrSplit(c.data, ':');
+  auto it = splitter.begin();
+  for (int i = 0; i < index; ++i) ++it;
 
-        // Empty substring.
-        s = turbo::str_replace_all("abc", {{"",  ""},
-                                           {"",  "y"},
-                                           {"x", ""}});
-        REQUIRE_EQ(s, "abc");
+  return *it;
+}
 
-        // Replace entire string, one char at a time
-        s = turbo::str_replace_all("abc", {{"a", "x"},
-                                           {"b", "y"},
-                                           {"c", "z"}});
-        REQUIRE_EQ(s, "xyz");
-        s = turbo::str_replace_all("zxy", {{"z", "x"},
-                                           {"x", "y"},
-                                           {"y", "z"}});
-        REQUIRE_EQ(s, "xyz");
+TEST(StrReplaceAll, VariableNumber) {
+  std::string s;
+  {
+    std::vector<std::pair<std::string, std::string>> replacements;
 
-        // Replace once at the start (longer matches take precedence)
-        s = turbo::str_replace_all("abc", {{"a",   "x"},
-                                           {"ab",  "xy"},
-                                           {"abc", "xyz"}});
-        REQUIRE_EQ(s, "xyz");
+    s = "abc";
+    EXPECT_EQ(0, turbo::StrReplaceAll(replacements, &s));
+    EXPECT_EQ("abc", s);
 
-        // Replace once in the middle.
-        s = turbo::str_replace_all(
-                "Abc!", {{"a",  "x"},
-                         {"ab", "xy"},
-                         {"b",  "y"},
-                         {"bc", "yz"},
-                         {"c",  "z"}});
-        REQUIRE_EQ(s, "Ayz!");
+    s = "abc";
+    replacements.push_back({"a", "A"});
+    EXPECT_EQ(1, turbo::StrReplaceAll(replacements, &s));
+    EXPECT_EQ("Abc", s);
 
-        // Replace once at the end.
-        s = turbo::str_replace_all(
-                "Abc!",
-                {{"a",   "x"},
-                 {"ab",  "xy"},
-                 {"b",   "y"},
-                 {"bc!", "yz?"},
-                 {"c!",  "z;"}});
-        REQUIRE_EQ(s, "Ayz?");
+    s = "abc";
+    replacements.push_back({"b", "B"});
+    EXPECT_EQ(2, turbo::StrReplaceAll(replacements, &s));
+    EXPECT_EQ("ABc", s);
 
-        // Replace multiple times with varying lengths of original/replacement.
-        s = turbo::str_replace_all("ababa", {{"a", "xxx"},
-                                             {"b", "XXXX"}});
-        REQUIRE_EQ(s, "xxxXXXXxxxXXXXxxx");
+    s = "abc";
+    replacements.push_back({"d", "D"});
+    EXPECT_EQ(2, turbo::StrReplaceAll(replacements, &s));
+    EXPECT_EQ("ABc", s);
 
-        // Overlapping matches are replaced greedily.
-        s = turbo::str_replace_all("aaa", {{"aa", "x"},
-                                           {"a",  "X"}});
-        REQUIRE_EQ(s, "xX");
-        s = turbo::str_replace_all("aaa", {{"a",  "X"},
-                                           {"aa", "x"}});
-        REQUIRE_EQ(s, "xX");
+    EXPECT_EQ("ABcABc", turbo::StrReplaceAll("abcabc", replacements));
+  }
 
-        // Two well-known sentences
-        s = turbo::str_replace_all("the quick brown fox jumped over the lazy dogs",
-                                   {
-                                           {"brown",    "box"},
-                                           {"dogs",     "jugs"},
-                                           {"fox",      "with"},
-                                           {"jumped",   "five"},
-                                           {"over",     "dozen"},
-                                           {"quick",    "my"},
-                                           {"the",      "pack"},
-                                           {"the lazy", "liquor"},
-                                   });
-        REQUIRE_EQ(s, "pack my box with five dozen liquor jugs");
-    }
+  {
+    std::map<const char*, const char*> replacements;
+    replacements["aa"] = "x";
+    replacements["a"] = "X";
+    s = "aaa";
+    EXPECT_EQ(2, turbo::StrReplaceAll(replacements, &s));
+    EXPECT_EQ("xX", s);
 
-    SUBCASE("ManyReplacementsInMap") {
-        std::map<const char *, const char *> replacements;
-        replacements["$who"] = "Bob";
-        replacements["$count"] = "5";
-        replacements["#Noun"] = "Apples";
-        std::string s = turbo::str_replace_all("$who bought $count #Noun. Thanks $who!",
-                                               replacements);
-        REQUIRE_EQ("Bob bought 5 Apples. Thanks Bob!", s);
-    }
+    EXPECT_EQ("xxX", turbo::StrReplaceAll("aaaaa", replacements));
+  }
 
-    SUBCASE("ReplacementsInPlace") {
-        std::string s = std::string("$who bought $count #Noun. Thanks $who!");
-        int count;
-        count = turbo::str_replace_all({{"$count", turbo::format(5)},
-                                        {"$who",   "Bob"},
-                                        {"#Noun",  "Apples"}}, &s);
-        REQUIRE_EQ(count, 4);
-        REQUIRE_EQ("Bob bought 5 Apples. Thanks Bob!", s);
-    }
+  {
+    std::list<std::pair<turbo::string_view, turbo::string_view>> replacements = {
+        {"a", "x"}, {"b", "y"}, {"c", "z"}};
 
-    SUBCASE("ReplacementsInPlaceInMap") {
-        std::string s = std::string("$who bought $count #Noun. Thanks $who!");
-        std::map<std::string_view, std::string_view> replacements;
-        replacements["$who"] = "Bob";
-        replacements["$count"] = "5";
-        replacements["#Noun"] = "Apples";
-        int count;
-        count = turbo::str_replace_all(replacements, &s);
-        REQUIRE_EQ(count, 4);
-        REQUIRE_EQ("Bob bought 5 Apples. Thanks Bob!", s);
-    }
+    std::string s = turbo::StrReplaceAll("abc", replacements);
+    EXPECT_EQ(s, "xyz");
+  }
 
-    SUBCASE("VariableNumber") {
-        std::string s;
-        {
-            std::vector<std::pair<std::string, std::string>> replacements;
+  {
+    using X = std::tuple<turbo::string_view, std::string, int>;
+    std::vector<X> replacements(3);
+    replacements[0] = X{"a", "x", 1};
+    replacements[1] = X{"b", "y", 0};
+    replacements[2] = X{"c", "z", -1};
 
-            s = "abc";
-            REQUIRE_EQ(0, turbo::str_replace_all(replacements, &s));
-            REQUIRE_EQ("abc", s);
+    std::string s = turbo::StrReplaceAll("abc", replacements);
+    EXPECT_EQ(s, "xyz");
+  }
 
-            s = "abc";
-            replacements.push_back({"a", "A"});
-            REQUIRE_EQ(1, turbo::str_replace_all(replacements, &s));
-            REQUIRE_EQ("Abc", s);
+  {
+    std::vector<Cont> replacements(3);
+    replacements[0] = Cont{"a:x"};
+    replacements[1] = Cont{"b:y"};
+    replacements[2] = Cont{"c:z"};
 
-            s = "abc";
-            replacements.push_back({"b", "B"});
-            REQUIRE_EQ(2, turbo::str_replace_all(replacements, &s));
-            REQUIRE_EQ("ABc", s);
+    std::string s = turbo::StrReplaceAll("abc", replacements);
+    EXPECT_EQ(s, "xyz");
+  }
+}
 
-            s = "abc";
-            replacements.push_back({"d", "D"});
-            REQUIRE_EQ(2, turbo::str_replace_all(replacements, &s));
-            REQUIRE_EQ("ABc", s);
-
-            REQUIRE_EQ("ABcABc", turbo::str_replace_all("abcabc", replacements));
-        }
-
-        {
-            std::map<const char *, const char *> replacements;
-            replacements["aa"] = "x";
-            replacements["a"] = "X";
-            s = "aaa";
-            REQUIRE_EQ(2, turbo::str_replace_all(replacements, &s));
-            REQUIRE_EQ("xX", s);
-
-            REQUIRE_EQ("xxX", turbo::str_replace_all("aaaaa", replacements));
-        }
-
-        {
-            std::list<std::pair<std::string_view, std::string_view>> replacements = {
-                    {"a", "x"},
-                    {"b", "y"},
-                    {"c", "z"}};
-
-            std::string s = turbo::str_replace_all("abc", replacements);
-            REQUIRE_EQ(s, "xyz");
-        }
-
-        {
-            using X = std::tuple<std::string_view, std::string, int>;
-            std::vector<X> replacements(3);
-            replacements[0] = X{"a", "x", 1};
-            replacements[1] = X{"b", "y", 0};
-            replacements[2] = X{"c", "z", -1};
-
-            std::string s = turbo::str_replace_all("abc", replacements);
-            REQUIRE_EQ(s, "xyz");
-        }
-
-        {
-            std::vector<Cont> replacements(3);
-            replacements[0] = Cont{"a:x"};
-            replacements[1] = Cont{"b:y"};
-            replacements[2] = Cont{"c:z"};
-
-            std::string s = turbo::str_replace_all("abc", replacements);
-            REQUIRE_EQ(s, "xyz");
-        }
-    }
-
-// Same as above, but using the in-place variant of turbo::str_replace_all,
+// Same as above, but using the in-place variant of turbo::StrReplaceAll,
 // that returns the # of replacements performed.
-    SUBCASE("Inplace") {
-        std::string s;
-        int reps;
+TEST(StrReplaceAll, Inplace) {
+  std::string s;
+  int reps;
 
-        // Empty string.
-        s = "";
-        reps = turbo::str_replace_all({{"",  ""},
-                                       {"x", ""},
-                                       {"",  "y"},
-                                       {"x", "y"}}, &s);
-        REQUIRE_EQ(reps, 0);
-        REQUIRE_EQ(s, "");
+  // Empty string.
+  s = "";
+  reps = turbo::StrReplaceAll({{"", ""}, {"x", ""}, {"", "y"}, {"x", "y"}}, &s);
+  EXPECT_EQ(reps, 0);
+  EXPECT_EQ(s, "");
 
-        // Empty substring.
-        s = "abc";
-        reps = turbo::str_replace_all({{"",  ""},
-                                       {"",  "y"},
-                                       {"x", ""}}, &s);
-        REQUIRE_EQ(reps, 0);
-        REQUIRE_EQ(s, "abc");
+  // Empty substring.
+  s = "abc";
+  reps = turbo::StrReplaceAll({{"", ""}, {"", "y"}, {"x", ""}}, &s);
+  EXPECT_EQ(reps, 0);
+  EXPECT_EQ(s, "abc");
 
-        // Replace entire string, one char at a time
-        s = "abc";
-        reps = turbo::str_replace_all({{"a", "x"},
-                                       {"b", "y"},
-                                       {"c", "z"}}, &s);
-        REQUIRE_EQ(reps, 3);
-        REQUIRE_EQ(s, "xyz");
-        s = "zxy";
-        reps = turbo::str_replace_all({{"z", "x"},
-                                       {"x", "y"},
-                                       {"y", "z"}}, &s);
-        REQUIRE_EQ(reps, 3);
-        REQUIRE_EQ(s, "xyz");
+  // Replace entire string, one char at a time
+  s = "abc";
+  reps = turbo::StrReplaceAll({{"a", "x"}, {"b", "y"}, {"c", "z"}}, &s);
+  EXPECT_EQ(reps, 3);
+  EXPECT_EQ(s, "xyz");
+  s = "zxy";
+  reps = turbo::StrReplaceAll({{"z", "x"}, {"x", "y"}, {"y", "z"}}, &s);
+  EXPECT_EQ(reps, 3);
+  EXPECT_EQ(s, "xyz");
 
-        // Replace once at the start (longer matches take precedence)
-        s = "abc";
-        reps = turbo::str_replace_all({{"a",   "x"},
-                                       {"ab",  "xy"},
-                                       {"abc", "xyz"}}, &s);
-        REQUIRE_EQ(reps, 1);
-        REQUIRE_EQ(s, "xyz");
+  // Replace once at the start (longer matches take precedence)
+  s = "abc";
+  reps = turbo::StrReplaceAll({{"a", "x"}, {"ab", "xy"}, {"abc", "xyz"}}, &s);
+  EXPECT_EQ(reps, 1);
+  EXPECT_EQ(s, "xyz");
 
-        // Replace once in the middle.
-        s = "Abc!";
-        reps = turbo::str_replace_all(
-                {{"a",  "x"},
-                 {"ab", "xy"},
-                 {"b",  "y"},
-                 {"bc", "yz"},
-                 {"c",  "z"}}, &s);
-        REQUIRE_EQ(reps, 1);
-        REQUIRE_EQ(s, "Ayz!");
+  // Replace once in the middle.
+  s = "Abc!";
+  reps = turbo::StrReplaceAll(
+      {{"a", "x"}, {"ab", "xy"}, {"b", "y"}, {"bc", "yz"}, {"c", "z"}}, &s);
+  EXPECT_EQ(reps, 1);
+  EXPECT_EQ(s, "Ayz!");
 
-        // Replace once at the end.
-        s = "Abc!";
-        reps = turbo::str_replace_all(
-                {{"a",   "x"},
-                 {"ab",  "xy"},
-                 {"b",   "y"},
-                 {"bc!", "yz?"},
-                 {"c!",  "z;"}}, &s);
-        REQUIRE_EQ(reps, 1);
-        REQUIRE_EQ(s, "Ayz?");
+  // Replace once at the end.
+  s = "Abc!";
+  reps = turbo::StrReplaceAll(
+      {{"a", "x"}, {"ab", "xy"}, {"b", "y"}, {"bc!", "yz?"}, {"c!", "z;"}}, &s);
+  EXPECT_EQ(reps, 1);
+  EXPECT_EQ(s, "Ayz?");
 
-        // Replace multiple times with varying lengths of original/replacement.
-        s = "ababa";
-        reps = turbo::str_replace_all({{"a", "xxx"},
-                                       {"b", "XXXX"}}, &s);
-        REQUIRE_EQ(reps, 5);
-        REQUIRE_EQ(s, "xxxXXXXxxxXXXXxxx");
+  // Replace multiple times with varying lengths of original/replacement.
+  s = "ababa";
+  reps = turbo::StrReplaceAll({{"a", "xxx"}, {"b", "XXXX"}}, &s);
+  EXPECT_EQ(reps, 5);
+  EXPECT_EQ(s, "xxxXXXXxxxXXXXxxx");
 
-        // Overlapping matches are replaced greedily.
-        s = "aaa";
-        reps = turbo::str_replace_all({{"aa", "x"},
-                                       {"a",  "X"}}, &s);
-        REQUIRE_EQ(reps, 2);
-        REQUIRE_EQ(s, "xX");
-        s = "aaa";
-        reps = turbo::str_replace_all({{"a",  "X"},
-                                       {"aa", "x"}}, &s);
-        REQUIRE_EQ(reps, 2);
-        REQUIRE_EQ(s, "xX");
+  // Overlapping matches are replaced greedily.
+  s = "aaa";
+  reps = turbo::StrReplaceAll({{"aa", "x"}, {"a", "X"}}, &s);
+  EXPECT_EQ(reps, 2);
+  EXPECT_EQ(s, "xX");
+  s = "aaa";
+  reps = turbo::StrReplaceAll({{"a", "X"}, {"aa", "x"}}, &s);
+  EXPECT_EQ(reps, 2);
+  EXPECT_EQ(s, "xX");
 
-        // Two well-known sentences
-        s = "the quick brown fox jumped over the lazy dogs";
-        reps = turbo::str_replace_all(
-                {
-                        {"brown",    "box"},
-                        {"dogs",     "jugs"},
-                        {"fox",      "with"},
-                        {"jumped",   "five"},
-                        {"over",     "dozen"},
-                        {"quick",    "my"},
-                        {"the",      "pack"},
-                        {"the lazy", "liquor"},
-                },
-                &s);
-        REQUIRE_EQ(reps, 8);
-        REQUIRE_EQ(s, "pack my box with five dozen liquor jugs");
-    }
+  // Two well-known sentences
+  s = "the quick brown fox jumped over the lazy dogs";
+  reps = turbo::StrReplaceAll(
+      {
+          {"brown", "box"},
+          {"dogs", "jugs"},
+          {"fox", "with"},
+          {"jumped", "five"},
+          {"over", "dozen"},
+          {"quick", "my"},
+          {"the", "pack"},
+          {"the lazy", "liquor"},
+      },
+      &s);
+  EXPECT_EQ(reps, 8);
+  EXPECT_EQ(s, "pack my box with five dozen liquor jugs");
 }

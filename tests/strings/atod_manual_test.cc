@@ -1,18 +1,21 @@
-// Copyright 2022 The Turbo Authors
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//     https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-// This program tests the turbo::simple_atod and turbo::simple_atof functions. Run
+// This program tests the turbo::SimpleAtod and turbo::SimpleAtof functions. Run
 // it as "atod_manual_test pnftd/data/*.txt" where the pnftd directory is a
 // local checkout of the https://github.com/nigeltao/parse-number-fxx-test-data
 // repository. The test suite lives in a separate repository because its more
@@ -40,12 +43,12 @@
 #include <cstdint>
 #include <cstdio>
 #include <string>
-#include <optional>
 
-#include "turbo/base/casts.h"
-#include "turbo/strings/numbers.h"
-#include "turbo/format/format.h"
-#include "turbo/strings/string_view.h"
+#include <turbo/base/casts.h>
+#include <turbo/strings/numbers.h>
+#include <turbo/strings/str_format.h>
+#include <turbo/strings/string_view.h>
+#include <turbo/types/optional.h>
 
 static constexpr uint8_t kUnhex[256] = {
     0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,  //
@@ -85,10 +88,10 @@ static constexpr uint8_t kUnhex[256] = {
     0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,  //
 };
 
-static std::optional<std::string> ReadFileToString(const char* filename) {
+static turbo::optional<std::string> ReadFileToString(const char* filename) {
   FILE* f = fopen(filename, "rb");
   if (!f) {
-    return std::nullopt;
+    return turbo::nullopt;
   }
   fseek(f, 0, SEEK_END);
   size_t size = ftell(f);
@@ -97,30 +100,30 @@ static std::optional<std::string> ReadFileToString(const char* filename) {
   size_t n = fread(&s[0], 1, size, f);
   fclose(f);
   if (n != size) {
-    return std::nullopt;
+    return turbo::nullopt;
   }
   return s;
 }
 
 static bool ProcessOneTestFile(const char* filename) {
-  std::optional<std::string> contents = ReadFileToString(filename);
+  turbo::optional<std::string> contents = ReadFileToString(filename);
   if (!contents) {
     turbo::FPrintF(stderr, "Invalid file: %s\n", filename);
     return false;
   }
 
   int num_cases = 0;
-  for (std::string_view v(*contents); !v.empty();) {
+  for (turbo::string_view v(*contents); !v.empty();) {
     size_t new_line = v.find('\n');
-    if ((new_line == std::string_view::npos) || (new_line < 32)) {
+    if ((new_line == turbo::string_view::npos) || (new_line < 32)) {
       break;
     }
-    std::string_view input = v.substr(31, new_line - 31);
+    turbo::string_view input = v.substr(31, new_line - 31);
 
-    // Test turbo::simple_atof.
+    // Test turbo::SimpleAtof.
     {
       float f;
-      if (!turbo::simple_atof(input, &f)) {
+      if (!turbo::SimpleAtof(input, &f)) {
         turbo::FPrintF(stderr, "Could not parse \"%s\" in %s\n", input,
                       filename);
         return false;
@@ -134,17 +137,17 @@ static bool ProcessOneTestFile(const char* filename) {
 
       if (have32 != want32) {
         turbo::FPrintF(stderr,
-                      "turbo::simple_atof failed parsing \"%s\" in %s\n  have  "
+                      "turbo::SimpleAtof failed parsing \"%s\" in %s\n  have  "
                       "%08X\n  want  %08X\n",
                       input, filename, have32, want32);
         return false;
       }
     }
 
-    // Test turbo::simple_atod.
+    // Test turbo::SimpleAtod.
     {
       double d;
-      if (!turbo::simple_atod(input, &d)) {
+      if (!turbo::SimpleAtod(input, &d)) {
         turbo::FPrintF(stderr, "Could not parse \"%s\" in %s\n", input,
                       filename);
         return false;
@@ -158,7 +161,7 @@ static bool ProcessOneTestFile(const char* filename) {
 
       if (have64 != want64) {
         turbo::FPrintF(stderr,
-                      "turbo::simple_atod failed parsing \"%s\" in %s\n  have  "
+                      "turbo::SimpleAtod failed parsing \"%s\" in %s\n  have  "
                       "%016X\n  want  %016X\n",
                       input, filename, have64, want64);
         return false;

@@ -1,18 +1,21 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/random/poisson_distribution.h"
+#include <turbo/random/poisson_distribution.h>
 
 #include <algorithm>
 #include <cstddef>
@@ -23,19 +26,20 @@
 #include <string>
 #include <vector>
 
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/container/flat_hash_map.h"
-#include "turbo/platform/port.h"
-#include "tests/random/chi_square.h"
-#include "tests/random/distribution_test_util.h"
-#include "turbo/random/internal/pcg_engine.h"
-#include "turbo/random/internal/sequence_urbg.h"
-#include "turbo/random/random.h"
-#include "turbo/format/format.h"
-#include "turbo/strings/str_replace.h"
-#include "turbo/strings/str_strip.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include <turbo/base/macros.h>
+#include <turbo/container/flat_hash_map.h>
+#include <turbo/log/log.h>
+#include <tests/random/chi_square.h>
+#include <tests/random/distribution_test_util.h>
+#include <turbo/random/internal/pcg_engine.h>
+#include <turbo/random/internal/sequence_urbg.h>
+#include <turbo/random/random.h>
+#include <turbo/strings/str_cat.h>
+#include <turbo/strings/str_format.h>
+#include <turbo/strings/str_replace.h>
+#include <turbo/strings/strip.h>
 
 // Notes about generating poisson variates:
 //
@@ -133,8 +137,8 @@ TYPED_TEST(PoissonDistributionInterfaceTest, SerializeTest) {
       if (sample < sample_min) sample_min = sample;
     }
 
-    TURBO_INTERNAL_LOG(INFO, turbo::format("Range {{{}}}: {}, {}", param.mean(),
-                                         +sample_min,+sample_max));
+    LOG(INFO) << "Range {" << param.mean() << "}: " << sample_min << ", "
+              << sample_max;
 
     // Validate stream serialization.
     std::stringstream ss;
@@ -187,10 +191,9 @@ class PoissonModel {
   }
 
   void LogCDF() {
-    TURBO_INTERNAL_LOG(INFO, turbo::format("CDF (mean = {})", mean_));
+    LOG(INFO) << "CDF (mean = " << mean_ << ")";
     for (const auto c : cdf_) {
-      TURBO_INTERNAL_LOG(INFO,
-                        turbo::format("{}: pmf={} cdf={}", c.index,c.pmf, c.cdf));
+      LOG(INFO) << c.index << ": pmf=" << c.pmf << " cdf=" << c.cdf;
     }
   }
 
@@ -285,16 +288,15 @@ bool PoissonDistributionZTest::SingleZTest(const double p,
   const bool pass = turbo::random_internal::Near("z", z, 0.0, max_err);
 
   if (!pass) {
-    TURBO_INTERNAL_LOG(
-        INFO, turbo::format("p={} max_err={}\n"
-                              " mean={} vs. {}\n"
-                              " stddev={} vs. {}\n"
-                              " skewness={} vs. {}\n"
-                              " kurtosis={} vs. {}\n"
-                              " z={}",
-                              p, max_err, m.mean, mean(), std::sqrt(m.variance),
-                              stddev(), m.skewness, skew(), m.kurtosis,
-                              kurtosis(), z));
+    // clang-format off
+    LOG(INFO)
+        << "p=" << p << " max_err=" << max_err << "\n"
+           " mean=" << m.mean << " vs. " << mean() << "\n"
+           " stddev=" << std::sqrt(m.variance) << " vs. " << stddev() << "\n"
+           " skewness=" << m.skewness << " vs. " << skew() << "\n"
+           " kurtosis=" << m.kurtosis << " vs. " << kurtosis() << "\n"
+           " z=" << z;
+    // clang-format on
   }
   return pass;
 }
@@ -338,8 +340,8 @@ std::vector<ZParam> GetZParams() {
 
 std::string ZParamName(const ::testing::TestParamInfo<ZParam>& info) {
   const auto& p = info.param;
-  std::string name = turbo::format("mean_{:.6g}", p.mean);
-  return turbo::str_replace_all(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
+  std::string name = turbo::StrCat("mean_", turbo::SixDigits(p.mean));
+  return turbo::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
 }
 
 INSTANTIATE_TEST_SUITE_P(All, PoissonDistributionZTest,
@@ -438,16 +440,16 @@ double PoissonDistributionChiSquaredTest::ChiSquaredTestImpl() {
   if (chi_square > threshold) {
     LogCDF();
 
-    TURBO_INTERNAL_LOG(INFO, turbo::format("VALUES  buckets={} samples={}", counts.size(), kSamples));
+    LOG(INFO) << "VALUES  buckets=" << counts.size()
+              << "  samples=" << kSamples;
     for (size_t i = 0; i < counts.size(); i++) {
-      TURBO_INTERNAL_LOG(
-          INFO, turbo::format("{}: {} vs. E={}", cutoffs_[i], counts[i], e[i]));
+      LOG(INFO) << cutoffs_[i] << ": " << counts[i] << " vs. E=" << e[i];
     }
 
-    TURBO_INTERNAL_LOG(
-        INFO,
-        turbo::format("{}(data, dof={}) = {} ({})\n vs. \n {}  @ 0.98 = {}", kChiSquared,  dof, chi_square,
-                     p,  kChiSquared, threshold));
+    LOG(INFO) << kChiSquared << "(data, dof=" << dof << ") = " << chi_square
+              << " (" << p << ")\n"
+              << " vs.\n"
+              << kChiSquared << " @ 0.98 = " << threshold;
   }
   return p;
 }

@@ -1,17 +1,19 @@
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Copyright 2020 The Turbo Authors.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 //
 
 // Allow dynamic symbol lookup in the kernel VDSO page.
@@ -41,8 +43,8 @@
 
 #include <atomic>
 
-#include "turbo/debugging/internal/elf_mem_image.h"
-#include "turbo/platform/port.h"
+#include <turbo/base/attributes.h>
+#include <turbo/debugging/internal/elf_mem_image.h>
 
 #ifdef TURBO_HAVE_ELF_MEM_IMAGE
 
@@ -52,111 +54,106 @@
 #define TURBO_HAVE_VDSO_SUPPORT 1
 #endif
 
-namespace turbo::debugging_internal {
+namespace turbo {
+TURBO_NAMESPACE_BEGIN
+namespace debugging_internal {
 
-    // NOTE: this class may be used from within tcmalloc, and can not
-    // use any memory allocation routines.
-    class VDSOSupport {
-    public:
-        VDSOSupport();
+// NOTE: this class may be used from within tcmalloc, and can not
+// use any memory allocation routines.
+class VDSOSupport {
+ public:
+  VDSOSupport();
 
-        typedef ElfMemImage::SymbolInfo SymbolInfo;
-        typedef ElfMemImage::SymbolIterator SymbolIterator;
+  typedef ElfMemImage::SymbolInfo SymbolInfo;
+  typedef ElfMemImage::SymbolIterator SymbolIterator;
 
-        // On PowerPC64 VDSO symbols can either be of type STT_FUNC or STT_NOTYPE
-        // depending on how the kernel is built.  The kernel is normally built with
-        // STT_NOTYPE type VDSO symbols.  Let's make things simpler first by using a
-        // compile-time constant.
+  // On PowerPC64 VDSO symbols can either be of type STT_FUNC or STT_NOTYPE
+  // depending on how the kernel is built.  The kernel is normally built with
+  // STT_NOTYPE type VDSO symbols.  Let's make things simpler first by using a
+  // compile-time constant.
 #ifdef __powerpc64__
-        enum { kVDSOSymbolType = STT_NOTYPE };
+  enum { kVDSOSymbolType = STT_NOTYPE };
 #else
-        enum {
-            kVDSOSymbolType = STT_FUNC
-        };
+  enum { kVDSOSymbolType = STT_FUNC };
 #endif
 
-        // Answers whether we have a vdso at all.
-        bool IsPresent() const { return image_.IsPresent(); }
+  // Answers whether we have a vdso at all.
+  bool IsPresent() const { return image_.IsPresent(); }
 
-        // Allow to iterate over all VDSO symbols.
-        SymbolIterator begin() const { return image_.begin(); }
+  // Allow to iterate over all VDSO symbols.
+  SymbolIterator begin() const { return image_.begin(); }
+  SymbolIterator end() const { return image_.end(); }
 
-        SymbolIterator end() const { return image_.end(); }
+  // Look up versioned dynamic symbol in the kernel VDSO.
+  // Returns false if VDSO is not present, or doesn't contain given
+  // symbol/version/type combination.
+  // If info_out != nullptr, additional details are filled in.
+  bool LookupSymbol(const char *name, const char *version,
+                    int symbol_type, SymbolInfo *info_out) const;
 
-        // Look up versioned dynamic symbol in the kernel VDSO.
-        // Returns false if VDSO is not present, or doesn't contain given
-        // symbol/version/type combination.
-        // If info_out != nullptr, additional details are filled in.
-        bool LookupSymbol(const char *name, const char *version,
-                          int symbol_type, SymbolInfo *info_out) const;
+  // Find info about symbol (if any) which overlaps given address.
+  // Returns true if symbol was found; false if VDSO isn't present
+  // or doesn't have a symbol overlapping given address.
+  // If info_out != nullptr, additional details are filled in.
+  bool LookupSymbolByAddress(const void *address, SymbolInfo *info_out) const;
 
-        // Find info about symbol (if any) which overlaps given address.
-        // Returns true if symbol was found; false if VDSO isn't present
-        // or doesn't have a symbol overlapping given address.
-        // If info_out != nullptr, additional details are filled in.
-        bool LookupSymbolByAddress(const void *address, SymbolInfo *info_out) const;
+  // Used only for testing. Replace real VDSO base with a mock.
+  // Returns previous value of vdso_base_. After you are done testing,
+  // you are expected to call SetBase() with previous value, in order to
+  // reset state to the way it was.
+  const void *SetBase(const void *s);
 
-        // Used only for testing. Replace real VDSO base with a mock.
-        // Returns previous value of vdso_base_. After you are done testing,
-        // you are expected to call SetBase() with previous value, in order to
-        // reset state to the way it was.
-        const void *SetBase(const void *s);
+  // Computes vdso_base_ and returns it. Should be called as early as
+  // possible; before any thread creation, chroot or setuid.
+  static const void *Init();
 
-        // Computes vdso_base_ and returns it. Should be called as early as
-        // possible; before any thread creation, chroot or setuid.
-        static const void *initialize();
+ private:
+  // image_ represents VDSO ELF image in memory.
+  // image_.ehdr_ == nullptr implies there is no VDSO.
+  ElfMemImage image_;
 
-    private:
-        // image_ represents VDSO ELF image in memory.
-        // image_.ehdr_ == nullptr implies there is no VDSO.
-        ElfMemImage image_;
+  // Cached value of auxv AT_SYSINFO_EHDR, computed once.
+  // This is a tri-state:
+  //   kInvalidBase   => value hasn't been determined yet.
+  //              0   => there is no VDSO.
+  //           else   => vma of VDSO Elf{32,64}_Ehdr.
+  //
+  // When testing with mock VDSO, low bit is set.
+  // The low bit is always available because vdso_base_ is
+  // page-aligned.
+  static std::atomic<const void *> vdso_base_;
 
-        // Cached value of auxv AT_SYSINFO_EHDR, computed once.
-        // This is a tri-state:
-        //   kInvalidBase   => value hasn't been determined yet.
-        //              0   => there is no VDSO.
-        //           else   => vma of VDSO Elf{32,64}_Ehdr.
-        //
-        // When testing with mock VDSO, low bit is set.
-        // The low bit is always available because vdso_base_ is
-        // page-aligned.
-        static std::atomic<const void *> vdso_base_;
+  // NOLINT on 'long' because these routines mimic kernel api.
+  // The 'cache' parameter may be used by some versions of the kernel,
+  // and should be nullptr or point to a static buffer containing at
+  // least two 'long's.
+  static long InitAndGetCPU(unsigned *cpu, void *cache,     // NOLINT 'long'.
+                            void *unused);
+  static long GetCPUViaSyscall(unsigned *cpu, void *cache,  // NOLINT 'long'.
+                               void *unused);
+  typedef long (*GetCpuFn)(unsigned *cpu, void *cache,      // NOLINT 'long'.
+                           void *unused);
 
-        // NOLINT on 'long' because these routines mimic kernel api.
-        // The 'cache' parameter may be used by some versions of the kernel,
-        // and should be nullptr or point to a static buffer containing at
-        // least two 'long's.
-        static long init_and_get_cpu(unsigned *cpu, void *cache,     // NOLINT 'long'.
-                                  void *unused);
+  // This function pointer may point to InitAndGetCPU,
+  // GetCPUViaSyscall, or __vdso_getcpu at different stages of initialization.
+  TURBO_CONST_INIT static std::atomic<GetCpuFn> getcpu_fn_;
 
-        static long get_cpu_via_syscall(unsigned *cpu, void *cache,  // NOLINT 'long'.
-                                     void *unused);
+  friend int GetCPU(void);  // Needs access to getcpu_fn_.
 
-        typedef long (*GetCpuFn)(unsigned *cpu, void *cache,      // NOLINT 'long'.
-                                 void *unused);
+  VDSOSupport(const VDSOSupport&) = delete;
+  VDSOSupport& operator=(const VDSOSupport&) = delete;
+};
 
-        // This function pointer may point to init_and_get_cpu,
-        // get_cpu_via_syscall, or __vdso_getcpu at different stages of initialization.
-        TURBO_CONST_INIT static std::atomic<GetCpuFn> getcpu_fn_;
+// Same as sched_getcpu() on later glibc versions.
+// Return current CPU, using (fast) __vdso_getcpu@LINUX_2.6 if present,
+// otherwise use syscall(SYS_getcpu,...).
+// May return -1 with errno == ENOSYS if the kernel doesn't
+// support SYS_getcpu.
+int GetCPU();
 
-        friend int GetCPU(void);  // Needs access to getcpu_fn_.
-        friend int get_node_and_cpu(unsigned &cpu, unsigned &node);  // NOLINT(runtime/int)
-
-        VDSOSupport(const VDSOSupport &) = delete;
-
-        VDSOSupport &operator=(const VDSOSupport &) = delete;
-    };
-
-    // Same as sched_getcpu() on later glibc versions.
-    // Return current CPU, using (fast) __vdso_getcpu@LINUX_2.6 if present,
-    // otherwise use syscall(SYS_getcpu,...).
-    // May return -1 with errno == ENOSYS if the kernel doesn't
-    // support SYS_getcpu.
-    int GetCPU();
-
-    int get_node_and_cpu(unsigned &cpu, unsigned &node);  // NOLINT(runtime/int)
-
-}  // namespace turbo::debugging_internal
+}  // namespace debugging_internal
+TURBO_NAMESPACE_END
+}  // namespace turbo
 
 #endif  // TURBO_HAVE_ELF_MEM_IMAGE
 

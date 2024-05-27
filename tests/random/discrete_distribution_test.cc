@@ -1,18 +1,21 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/random/discrete_distribution.h"
+#include <turbo/random/discrete_distribution.h>
 
 #include <cmath>
 #include <cstddef>
@@ -24,16 +27,16 @@
 #include <string>
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/base/internal/raw_logging.h"
-#include "tests/random/chi_square.h"
-#include "tests/random/distribution_test_util.h"
-#include "turbo/random/internal/pcg_engine.h"
-#include "turbo/random/internal/sequence_urbg.h"
-#include "turbo/random/random.h"
-#include "turbo/strings/str_strip.h"
-#include "turbo/format/format.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include <turbo/log/log.h>
+#include <tests/random/chi_square.h>
+#include <tests/random/distribution_test_util.h>
+#include <turbo/random/internal/pcg_engine.h>
+#include <turbo/random/internal/sequence_urbg.h>
+#include <turbo/random/random.h>
+#include <turbo/strings/str_cat.h>
+#include <turbo/strings/strip.h>
 
 namespace {
 
@@ -146,7 +149,7 @@ TEST(DiscreteDistributionTest, ChiSquaredTest50) {
   using turbo::random_internal::kChiSquared;
 
   constexpr size_t kTrials = 10000;
-  constexpr int kBuckets = 50;  // inclusive, so actally +1
+  constexpr int kBuckets = 50;  // inclusive, so actually +1
 
   // 1-in-100000 threshold, but remember, there are about 8 tests
   // in this file. And the test could fail for other reasons.
@@ -189,12 +192,12 @@ TEST(DiscreteDistributionTest, ChiSquaredTest50) {
     // Chi-squared test failed. Output does not appear to be uniform.
     std::string msg;
     for (size_t i = 0; i < counts.size(); i++) {
-      turbo::format_append(&msg, "{}: {} vs {}\n", i, counts[i],  weights[i]);
+      turbo::StrAppend(&msg, i, ": ", counts[i], " vs ", weights[i], "\n");
     }
-    turbo::format_append(&msg, "{} p-value {}\n", kChiSquared, p_value);
-    turbo::format_append(&msg, "High {} value: {} > {}", kChiSquared, chi_square,
+    turbo::StrAppend(&msg, kChiSquared, " p-value ", p_value, "\n");
+    turbo::StrAppend(&msg, "High ", kChiSquared, " value: ", chi_square, " > ",
                     kThreshold);
-    TURBO_RAW_LOG(INFO, "%s", msg.c_str());
+    LOG(INFO) << msg;
     FAIL() << msg;
   }
 }

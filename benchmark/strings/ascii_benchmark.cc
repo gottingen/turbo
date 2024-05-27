@@ -1,25 +1,30 @@
-// Copyright 2018 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/strings/ascii.h"
+#include <turbo/strings/ascii.h>
 
+#include <algorithm>
 #include <cctype>
+#include <cstddef>
 #include <string>
 #include <array>
 #include <random>
 
-#include "benchmark/benchmark.h"
+#include <benchmark/benchmark.h>
 
 namespace {
 
@@ -69,52 +74,62 @@ inline char Noop(unsigned char b) { return static_cast<char>(b); }
 
 BENCHMARK_TEMPLATE(BM_Ascii, Noop);
 BENCHMARK_TEMPLATE(BM_Ascii, std::isalpha);
-BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_is_alpha);
+BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_isalpha);
 BENCHMARK_TEMPLATE(BM_Ascii, std::isdigit);
-BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_is_digit);
+BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_isdigit);
 BENCHMARK_TEMPLATE(BM_Ascii, std::isalnum);
-BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_is_alnum);
+BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_isalnum);
 BENCHMARK_TEMPLATE(BM_Ascii, std::isspace);
-BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_is_space);
+BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_isspace);
 BENCHMARK_TEMPLATE(BM_Ascii, std::ispunct);
-BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_is_punct);
+BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_ispunct);
 BENCHMARK_TEMPLATE(BM_Ascii, std::isblank);
-BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_is_blank);
+BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_isblank);
 BENCHMARK_TEMPLATE(BM_Ascii, std::iscntrl);
-BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_is_cntrl);
+BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_iscntrl);
 BENCHMARK_TEMPLATE(BM_Ascii, std::isxdigit);
-BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_is_xdigit);
+BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_isxdigit);
 BENCHMARK_TEMPLATE(BM_Ascii, std::isprint);
-BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_is_print);
+BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_isprint);
 BENCHMARK_TEMPLATE(BM_Ascii, std::isgraph);
-BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_is_graph);
+BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_isgraph);
 BENCHMARK_TEMPLATE(BM_Ascii, std::isupper);
-BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_is_upper);
+BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_isupper);
 BENCHMARK_TEMPLATE(BM_Ascii, std::islower);
-BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_is_lower);
+BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_islower);
 BENCHMARK_TEMPLATE(BM_Ascii, isascii);
-BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_is_ascii);
+BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_isascii);
 BENCHMARK_TEMPLATE(BM_Ascii, std::tolower);
-BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_to_lower);
+BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_tolower);
 BENCHMARK_TEMPLATE(BM_Ascii, std::toupper);
-BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_to_upper);
+BENCHMARK_TEMPLATE(BM_Ascii, turbo::ascii_toupper);
 
 static void BM_StrToLower(benchmark::State& state) {
   const int size = state.range(0);
   std::string s(size, 'X');
   for (auto _ : state) {
-    benchmark::DoNotOptimize(turbo::str_to_lower(s));
+    benchmark::DoNotOptimize(s);
+    std::string res = turbo::AsciiStrToLower(s);
+    benchmark::DoNotOptimize(res);
   }
 }
-BENCHMARK(BM_StrToLower)->Range(1, 1 << 20);
+BENCHMARK(BM_StrToLower)
+    ->DenseRange(0, 32)
+    ->RangeMultiplier(2)
+    ->Range(64, 1 << 26);
 
 static void BM_StrToUpper(benchmark::State& state) {
   const int size = state.range(0);
   std::string s(size, 'x');
   for (auto _ : state) {
-    benchmark::DoNotOptimize(turbo::str_to_upper(s));
+    benchmark::DoNotOptimize(s);
+    std::string res = turbo::AsciiStrToUpper(s);
+    benchmark::DoNotOptimize(res);
   }
 }
-BENCHMARK(BM_StrToUpper)->Range(1, 1 << 20);
+BENCHMARK(BM_StrToUpper)
+    ->DenseRange(0, 32)
+    ->RangeMultiplier(2)
+    ->Range(64, 1 << 26);
 
 }  // namespace

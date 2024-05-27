@@ -1,31 +1,43 @@
 //
-// Copyright 2019 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #ifndef TURBO_RANDOM_INTERNAL_MOCK_HELPERS_H_
 #define TURBO_RANDOM_INTERNAL_MOCK_HELPERS_H_
 
-#include <tuple>
-#include <type_traits>
 #include <utility>
-#include <optional>
 
-#include "turbo/base/internal/fast_type_id.h"
+#include <turbo/base/config.h>
+#include <turbo/base/internal/fast_type_id.h>
+#include <turbo/types/optional.h>
 
 namespace turbo {
-
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
+
+// A no-op validator meeting the ValidatorT requirements for MockHelpers.
+//
+// Custom validators should follow a similar structure, passing the type to
+// MockHelpers::MockFor<KeyT>(m, CustomValidatorT()).
+struct NoOpValidator {
+  // Default validation: do nothing.
+  template <typename ResultT, typename... Args>
+  static void Validate(ResultT, Args&&...) {}
+};
 
 // MockHelpers works in conjunction with MockOverloadSet, MockingBitGen, and
 // BitGenRef to enable the mocking capability for turbo distribution functions.
@@ -62,14 +74,14 @@ class MockHelpers {
   // Empty implementation of InvokeMock.
   template <typename KeyT, typename ReturnT, typename ArgTupleT, typename URBG,
             typename... Args>
-  static std::optional<ReturnT> InvokeMockImpl(char, URBG*, Args&&...) {
-    return std::nullopt;
+  static turbo::optional<ReturnT> InvokeMockImpl(char, URBG*, Args&&...) {
+    return turbo::nullopt;
   }
 
   // Non-empty implementation of InvokeMock.
   template <typename KeyT, typename ReturnT, typename ArgTupleT, typename URBG,
             typename = invoke_mock_t<URBG>, typename... Args>
-  static std::optional<ReturnT> InvokeMockImpl(int, URBG* urbg,
+  static turbo::optional<ReturnT> InvokeMockImpl(int, URBG* urbg,
                                                 Args&&... args) {
     ArgTupleT arg_tuple(std::forward<Args>(args)...);
     ReturnT result;
@@ -77,7 +89,7 @@ class MockHelpers {
                          &result)) {
       return result;
     }
-    return std::nullopt;
+    return turbo::nullopt;
   }
 
  public:
@@ -100,13 +112,36 @@ class MockHelpers {
   // the underlying mechanism requires a pointer to an argument tuple.
   template <typename KeyT, typename URBG, typename... Args>
   static auto MaybeInvokeMock(URBG* urbg, Args&&... args)
-      -> std::optional<typename KeySignature<KeyT>::result_type> {
-    // Use function overloading to dispatch to the implemenation since
+      -> turbo::optional<typename KeySignature<KeyT>::result_type> {
+    // Use function overloading to dispatch to the implementation since
     // more modern patterns (e.g. require + constexpr) are not supported in all
     // compiler configurations.
     return InvokeMockImpl<KeyT, typename KeySignature<KeyT>::result_type,
                           typename KeySignature<KeyT>::arg_tuple_type, URBG>(
         0, urbg, std::forward<Args>(args)...);
+  }
+
+  // Acquire a mock for the KeyT (may or may not be a signature), set up to use
+  // the ValidatorT to verify that the result is in the range of the RNG
+  // function.
+  //
+  // KeyT is used to generate a typeid-based lookup for the mock.
+  // KeyT is a signature of the form:
+  //   result_type(discriminator_type, std::tuple<args...>)
+  // The mocked function signature will be composed from KeyT as:
+  //   result_type(args...)
+  // ValidatorT::Validate will be called after the result of the RNG. The
+  //   signature is expected to be of the form:
+  //      ValidatorT::Validate(result, args...)
+  template <typename KeyT, typename ValidatorT, typename MockURBG>
+  static auto MockFor(MockURBG& m, ValidatorT)
+      -> decltype(m.template RegisterMock<
+                  typename KeySignature<KeyT>::result_type,
+                  typename KeySignature<KeyT>::arg_tuple_type>(
+          m, std::declval<IdType>(), ValidatorT())) {
+    return m.template RegisterMock<typename KeySignature<KeyT>::result_type,
+                                   typename KeySignature<KeyT>::arg_tuple_type>(
+        m, ::turbo::base_internal::FastTypeId<KeyT>(), ValidatorT());
   }
 
   // Acquire a mock for the KeyT (may or may not be a signature).
@@ -117,19 +152,13 @@ class MockHelpers {
   // The mocked function signature will be composed from KeyT as:
   //   result_type(args...)
   template <typename KeyT, typename MockURBG>
-  static auto MockFor(MockURBG& m)
-      -> decltype(m.template RegisterMock<
-                  typename KeySignature<KeyT>::result_type,
-                  typename KeySignature<KeyT>::arg_tuple_type>(
-          m, std::declval<IdType>())) {
-    return m.template RegisterMock<typename KeySignature<KeyT>::result_type,
-                                   typename KeySignature<KeyT>::arg_tuple_type>(
-        m, ::turbo::base_internal::FastTypeId<KeyT>());
+  static decltype(auto) MockFor(MockURBG& m) {
+    return MockFor<KeyT>(m, NoOpValidator());
   }
 };
 
 }  // namespace random_internal
-
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_INTERNAL_MOCK_HELPERS_H_

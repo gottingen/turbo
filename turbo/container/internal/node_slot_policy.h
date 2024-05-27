@@ -1,16 +1,19 @@
-// Copyright 2018 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 //
 // Adapts a policy for nodes.
 //
@@ -39,50 +42,57 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/platform/port.h"
+#include <turbo/base/config.h>
 
-namespace turbo::container_internal {
+namespace turbo {
+TURBO_NAMESPACE_BEGIN
+namespace container_internal {
 
-    template<class Reference, class Policy>
-    struct node_slot_policy {
-        static_assert(std::is_lvalue_reference<Reference>::value, "");
+template <class Reference, class Policy>
+struct node_slot_policy {
+  static_assert(std::is_lvalue_reference<Reference>::value, "");
 
-        using slot_type = typename std::remove_cv<
-                typename std::remove_reference<Reference>::type>::type *;
+  using slot_type = typename std::remove_cv<
+      typename std::remove_reference<Reference>::type>::type*;
 
-        template<class Alloc, class... Args>
-        static void construct(Alloc *alloc, slot_type *slot, Args &&... args) {
-            *slot = Policy::new_element(alloc, std::forward<Args>(args)...);
-        }
+  template <class Alloc, class... Args>
+  static void construct(Alloc* alloc, slot_type* slot, Args&&... args) {
+    *slot = Policy::new_element(alloc, std::forward<Args>(args)...);
+  }
 
-        template<class Alloc>
-        static void destroy(Alloc *alloc, slot_type *slot) {
-            Policy::delete_element(alloc, *slot);
-        }
+  template <class Alloc>
+  static void destroy(Alloc* alloc, slot_type* slot) {
+    Policy::delete_element(alloc, *slot);
+  }
 
-        template<class Alloc>
-        static void transfer(Alloc *, slot_type *new_slot, slot_type *old_slot) {
-            *new_slot = *old_slot;
-        }
+  // Returns true_type to indicate that transfer can use memcpy.
+  template <class Alloc>
+  static std::true_type transfer(Alloc*, slot_type* new_slot,
+                                 slot_type* old_slot) {
+    *new_slot = *old_slot;
+    return {};
+  }
 
-        static size_t space_used(const slot_type *slot) {
-            if (slot == nullptr) return Policy::element_space_used(nullptr);
-            return Policy::element_space_used(*slot);
-        }
+  static size_t space_used(const slot_type* slot) {
+    if (slot == nullptr) return Policy::element_space_used(nullptr);
+    return Policy::element_space_used(*slot);
+  }
 
-        static Reference element(slot_type *slot) { return **slot; }
+  static Reference element(slot_type* slot) { return **slot; }
 
-        template<class T, class P = Policy>
-        static auto value(T *elem) -> decltype(P::value(elem)) {
-            return P::value(elem);
-        }
+  template <class T, class P = Policy>
+  static auto value(T* elem) -> decltype(P::value(elem)) {
+    return P::value(elem);
+  }
 
-        template<class... Ts, class P = Policy>
-        static auto apply(Ts &&... ts) -> decltype(P::apply(std::forward<Ts>(ts)...)) {
-            return P::apply(std::forward<Ts>(ts)...);
-        }
-    };
+  template <class... Ts, class P = Policy>
+  static auto apply(Ts&&... ts) -> decltype(P::apply(std::forward<Ts>(ts)...)) {
+    return P::apply(std::forward<Ts>(ts)...);
+  }
+};
 
-}  // namespace turbo::container_internal
+}  // namespace container_internal
+TURBO_NAMESPACE_END
+}  // namespace turbo
 
 #endif  // TURBO_CONTAINER_INTERNAL_NODE_SLOT_POLICY_H_

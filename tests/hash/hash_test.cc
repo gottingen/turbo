@@ -1,105 +1,69 @@
-// Copyright 2018 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/hash/hash.h"
+#include <turbo/hash/hash.h>
 
 #include <algorithm>
 #include <array>
 #include <bitset>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
 #include <cstring>
-#include <deque>
-#include <forward_list>
 #include <functional>
 #include <initializer_list>
-#include <iterator>
+#include <ios>
 #include <limits>
-#include <list>
-#include <map>
 #include <memory>
-#include <numeric>
-#include <random>
+#include <ostream>
 #include <set>
 #include <string>
 #include <tuple>
 #include <type_traits>
 #include <unordered_map>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/container/btree_map.h"
-#include "turbo/container/btree_set.h"
-#include "turbo/container/flat_hash_map.h"
-#include "turbo/container/flat_hash_set.h"
-#include "turbo/container/node_hash_map.h"
-#include "turbo/container/node_hash_set.h"
-#include "hash_testing.h"
-#include "spy_hash_state.h"
-#include "turbo/meta/type_traits.h"
-#include "turbo/base/int128.h"
-#include "tests/strings/cord_test_helpers.h"
+#include <gtest/gtest.h>
+#include <turbo/base/config.h>
+#include <turbo/container/flat_hash_set.h>
+#include <tests/hash/hash_testing.h>
+#include <tests/hash/hash_test.h>
+#include <turbo/hash/internal/spy_hash_state.h>
+#include <turbo/memory/memory.h>
+#include <turbo/meta/type_traits.h>
+#include <tests/strings/cord_test_helpers.h>
+#include <turbo/strings/string_view.h>
+#include <turbo/types/optional.h>
+#include <turbo/types/variant.h>
+
+#ifdef TURBO_INTERNAL_STD_FILESYSTEM_PATH_HASH_AVAILABLE
+#include <filesystem>  // NOLINT
+#endif
+
+#ifdef TURBO_HAVE_STD_STRING_VIEW
+#include <string_view>
+#endif
 
 namespace {
 
-// Utility wrapper of T for the purposes of testing the `TurboHash` type erasure
-// mechanism.  `TypeErasedValue<T>` can be constructed with a `T`, and can
-// be compared and hashed.  However, all hashing goes through the hashing
-// type-erasure framework.
-template <typename T>
-class TypeErasedValue {
- public:
-  TypeErasedValue() = default;
-  TypeErasedValue(const TypeErasedValue&) = default;
-  TypeErasedValue(TypeErasedValue&&) = default;
-  explicit TypeErasedValue(const T& n) : n_(n) {}
-
-  template <typename H>
-  friend H hash_value(H hash_state, const TypeErasedValue& v) {
-    v.HashValue(turbo::HashState::Create(&hash_state));
-    return hash_state;
-  }
-
-  void HashValue(turbo::HashState state) const {
-    turbo::HashState::combine(std::move(state), n_);
-  }
-
-  bool operator==(const TypeErasedValue& rhs) const { return n_ == rhs.n_; }
-  bool operator!=(const TypeErasedValue& rhs) const { return !(*this == rhs); }
-
- private:
-  T n_;
-};
-
-// A TypeErasedValue refinement, for containers.  It exposes the wrapped
-// `value_type` and is constructible from an initializer list.
-template <typename T>
-class TypeErasedContainer : public TypeErasedValue<T> {
- public:
-  using value_type = typename T::value_type;
-  TypeErasedContainer() = default;
-  TypeErasedContainer(const TypeErasedContainer&) = default;
-  TypeErasedContainer(TypeErasedContainer&&) = default;
-  explicit TypeErasedContainer(const T& n) : TypeErasedValue<T>(n) {}
-  TypeErasedContainer(std::initializer_list<value_type> init_list)
-      : TypeErasedContainer(T(init_list.begin(), init_list.end())) {}
-  // one-argument constructor of value type T, to appease older toolchains that
-  // get confused by one-element initializer lists in some contexts
-  explicit TypeErasedContainer(const value_type& v)
-      : TypeErasedContainer(T(&v, &v + 1)) {}
-};
+using ::turbo::hash_test_internal::is_hashable;
+using ::turbo::hash_test_internal::TypeErasedContainer;
+using ::turbo::hash_test_internal::TypeErasedValue;
 
 template <typename T>
 using TypeErasedVector = TypeErasedContainer<std::vector<T>>;
@@ -116,11 +80,6 @@ template <typename T>
 SpyHashState SpyHash(const T& value) {
   return SpyHashState::combine(SpyHashState(), value);
 }
-
-// Helper trait to verify if T is hashable. We use turbo::Hash's poison status to
-// detect it.
-template <typename T>
-using is_hashable = std::is_default_constructible<turbo::Hash<T>>;
 
 TYPED_TEST_P(HashValueIntTest, BasicUsage) {
   EXPECT_TRUE((is_hashable<TypeParam>::value));
@@ -387,7 +346,7 @@ TEST(HashValueTest, SmartPointers) {
   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::forward_as_tuple(&i, nullptr,                    //
                             unique1, unique2, unique_null,  //
-                            std::make_unique<int>(),       //
+                            turbo::make_unique<int>(),       //
                             shared1, shared2, shared_null,  //
                             std::make_shared<int>()),
       SmartPointerEq{}));
@@ -409,18 +368,18 @@ struct WrapInTuple {
   }
 };
 
-turbo::Cord FlatCord(std::string_view sv) {
+turbo::Cord FlatCord(turbo::string_view sv) {
   turbo::Cord c(sv);
-  c.flatten();
+  c.Flatten();
   return c;
 }
 
-turbo::Cord FragmentedCord(std::string_view sv) {
+turbo::Cord FragmentedCord(turbo::string_view sv) {
   if (sv.size() < 2) {
     return turbo::Cord(sv);
   }
   size_t halfway = sv.size() / 2;
-  std::vector<std::string_view> parts = {sv.substr(0, halfway),
+  std::vector<turbo::string_view> parts = {sv.substr(0, halfway),
                                           sv.substr(halfway)};
   return turbo::MakeFragmentedCord(parts);
 }
@@ -434,34 +393,30 @@ TEST(HashValueTest, Strings) {
   const std::string huge = std::string(5000, 'a');   // not a multiple
 
   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(  //
-      std::string(), std::string_view(), turbo::Cord(),                     //
-      std::string(""), std::string_view(""), turbo::Cord(""),               //
-      std::string(small), std::string_view(small), turbo::Cord(small),      //
-      std::string(dup), std::string_view(dup), turbo::Cord(dup),            //
-      std::string(large), std::string_view(large), turbo::Cord(large),      //
-      std::string(huge), std::string_view(huge), FlatCord(huge),           //
+      std::string(), turbo::string_view(), turbo::Cord(),                     //
+      std::string(""), turbo::string_view(""), turbo::Cord(""),               //
+      std::string(small), turbo::string_view(small), turbo::Cord(small),      //
+      std::string(dup), turbo::string_view(dup), turbo::Cord(dup),            //
+      std::string(large), turbo::string_view(large), turbo::Cord(large),      //
+      std::string(huge), turbo::string_view(huge), FlatCord(huge),           //
       FragmentedCord(huge))));
 
   // Also check that nested types maintain the same hash.
   const WrapInTuple t{};
   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(  //
-      t(std::string()), t(std::string_view()), t(turbo::Cord()),            //
-      t(std::string("")), t(std::string_view("")), t(turbo::Cord("")),      //
-      t(std::string(small)), t(std::string_view(small)),                   //
+      t(std::string()), t(turbo::string_view()), t(turbo::Cord()),            //
+      t(std::string("")), t(turbo::string_view("")), t(turbo::Cord("")),      //
+      t(std::string(small)), t(turbo::string_view(small)),                   //
           t(turbo::Cord(small)),                                             //
-      t(std::string(dup)), t(std::string_view(dup)), t(turbo::Cord(dup)),   //
-      t(std::string(large)), t(std::string_view(large)),                   //
+      t(std::string(dup)), t(turbo::string_view(dup)), t(turbo::Cord(dup)),   //
+      t(std::string(large)), t(turbo::string_view(large)),                   //
           t(turbo::Cord(large)),                                             //
-      t(std::string(huge)), t(std::string_view(huge)),                     //
+      t(std::string(huge)), t(turbo::string_view(huge)),                     //
           t(FlatCord(huge)), t(FragmentedCord(huge)))));
 
   // Make sure that hashing a `const char*` does not use its string-value.
   EXPECT_NE(SpyHash(static_cast<const char*>("ABC")),
-            SpyHash(std::string_view("ABC")));
-  EXPECT_NE(SpyHash(static_cast<const char*>("ABC")),
-            SpyHash(std::string_view("ABC")));
-  EXPECT_EQ(turbo::Hash<std::string_view>{}("ABC"),
-            turbo::Hash<std::string_view>{}("ABC"));
+            SpyHash(turbo::string_view("ABC")));
 }
 
 TEST(HashValueTest, WString) {
@@ -489,6 +444,84 @@ TEST(HashValueTest, U32String) {
       std::u32string(), std::u32string(U"ABC"), std::u32string(U"ABC"),
       std::u32string(U"Some other different string"),
       std::u32string(U"Iñtërnâtiônàlizætiøn"))));
+}
+
+TEST(HashValueTest, WStringView) {
+#ifndef TURBO_HAVE_STD_STRING_VIEW
+  GTEST_SKIP();
+#else
+  EXPECT_TRUE((is_hashable<std::wstring_view>::value));
+
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
+      std::wstring_view(), std::wstring_view(L"ABC"), std::wstring_view(L"ABC"),
+      std::wstring_view(L"Some other different string_view"),
+      std::wstring_view(L"Iñtërnâtiônàlizætiøn"))));
+#endif
+}
+
+TEST(HashValueTest, U16StringView) {
+#ifndef TURBO_HAVE_STD_STRING_VIEW
+  GTEST_SKIP();
+#else
+  EXPECT_TRUE((is_hashable<std::u16string_view>::value));
+
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
+      std::make_tuple(std::u16string_view(), std::u16string_view(u"ABC"),
+                      std::u16string_view(u"ABC"),
+                      std::u16string_view(u"Some other different string_view"),
+                      std::u16string_view(u"Iñtërnâtiônàlizætiøn"))));
+#endif
+}
+
+TEST(HashValueTest, U32StringView) {
+#ifndef TURBO_HAVE_STD_STRING_VIEW
+  GTEST_SKIP();
+#else
+  EXPECT_TRUE((is_hashable<std::u32string_view>::value));
+
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
+      std::make_tuple(std::u32string_view(), std::u32string_view(U"ABC"),
+                      std::u32string_view(U"ABC"),
+                      std::u32string_view(U"Some other different string_view"),
+                      std::u32string_view(U"Iñtërnâtiônàlizætiøn"))));
+#endif
+}
+
+TEST(HashValueTest, StdFilesystemPath) {
+#ifndef TURBO_INTERNAL_STD_FILESYSTEM_PATH_HASH_AVAILABLE
+  GTEST_SKIP() << "std::filesystem::path is unavailable on this platform";
+#else
+  EXPECT_TRUE((is_hashable<std::filesystem::path>::value));
+
+  // clang-format off
+  const auto kTestCases = std::make_tuple(
+      std::filesystem::path(),
+      std::filesystem::path("/"),
+#ifndef __GLIBCXX__
+      // libstdc++ has a known issue normalizing "//".
+      // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=106452
+      std::filesystem::path("//"),
+#endif
+      std::filesystem::path("/a/b"),
+      std::filesystem::path("/a//b"),
+      std::filesystem::path("a/b"),
+      std::filesystem::path("a/b/"),
+      std::filesystem::path("a//b"),
+      std::filesystem::path("a//b/"),
+      std::filesystem::path("c:/"),
+      std::filesystem::path("c:\\"),
+      std::filesystem::path("c:\\/"),
+      std::filesystem::path("c:\\//"),
+      std::filesystem::path("c://"),
+      std::filesystem::path("c://\\"),
+      std::filesystem::path("/e/p"),
+      std::filesystem::path("/s/../e/p"),
+      std::filesystem::path("e/p"),
+      std::filesystem::path("s/../e/p"));
+  // clang-format on
+
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(kTestCases));
+#endif
 }
 
 TEST(HashValueTest, StdArray) {
@@ -524,129 +557,14 @@ TEST(HashValueTest, StdBitset) {
        std::bitset<kNumBits>(bit_strings[5].c_str())}));
 }  // namespace
 
-// Dummy type with unordered equality and hashing semantics.  This preserves
-// input order internally, and is used below to ensure we get test coverage
-// for equal sequences with different iteraton orders.
-template <typename T>
-class UnorderedSequence {
- public:
-  UnorderedSequence() = default;
-  template <typename TT>
-  UnorderedSequence(std::initializer_list<TT> l)
-      : values_(l.begin(), l.end()) {}
-  template <typename ForwardIterator,
-            typename std::enable_if<!std::is_integral<ForwardIterator>::value,
-                                    bool>::type = true>
-  UnorderedSequence(ForwardIterator begin, ForwardIterator end)
-      : values_(begin, end) {}
-  // one-argument constructor of value type T, to appease older toolchains that
-  // get confused by one-element initializer lists in some contexts
-  explicit UnorderedSequence(const T& v) : values_(&v, &v + 1) {}
-
-  using value_type = T;
-
-  size_t size() const { return values_.size(); }
-  typename std::vector<T>::const_iterator begin() const {
-    return values_.begin();
-  }
-  typename std::vector<T>::const_iterator end() const { return values_.end(); }
-
-  friend bool operator==(const UnorderedSequence& lhs,
-                         const UnorderedSequence& rhs) {
-    return lhs.size() == rhs.size() &&
-           std::is_permutation(lhs.begin(), lhs.end(), rhs.begin());
-  }
-  friend bool operator!=(const UnorderedSequence& lhs,
-                         const UnorderedSequence& rhs) {
-    return !(lhs == rhs);
-  }
-  template <typename H>
-  friend H hash_value(H h, const UnorderedSequence& u) {
-    return H::combine(H::combine_unordered(std::move(h), u.begin(), u.end()),
-                      u.size());
-  }
-
- private:
-  std::vector<T> values_;
-};
-
-template <typename T>
-class HashValueSequenceTest : public testing::Test {
-};
-TYPED_TEST_SUITE_P(HashValueSequenceTest);
-
-TYPED_TEST_P(HashValueSequenceTest, BasicUsage) {
-  EXPECT_TRUE((is_hashable<TypeParam>::value));
-
-  using IntType = typename TypeParam::value_type;
-  auto a = static_cast<IntType>(0);
-  auto b = static_cast<IntType>(23);
-  auto c = static_cast<IntType>(42);
-
-  std::vector<TypeParam> exemplars = {
-      TypeParam(),        TypeParam(),        TypeParam{a, b, c},
-      TypeParam{a, c, b}, TypeParam{c, a, b}, TypeParam{a},
-      TypeParam{a, a},    TypeParam{a, a, a}, TypeParam{a, a, b},
-      TypeParam{a, b, a}, TypeParam{b, a, a}, TypeParam{a, b},
-      TypeParam{b, c}};
-  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(exemplars));
-}
-
-REGISTER_TYPED_TEST_SUITE_P(HashValueSequenceTest, BasicUsage);
-using IntSequenceTypes = testing::Types<
-    std::deque<int>, std::forward_list<int>, std::list<int>, std::vector<int>,
-    std::vector<bool>, TypeErasedContainer<std::vector<int>>, std::set<int>,
-    std::multiset<int>, UnorderedSequence<int>,
-    TypeErasedContainer<UnorderedSequence<int>>, std::unordered_set<int>,
-    std::unordered_multiset<int>, turbo::flat_hash_set<int>,
-    turbo::node_hash_set<int>, turbo::btree_set<int>>;
-INSTANTIATE_TYPED_TEST_SUITE_P(My, HashValueSequenceTest, IntSequenceTypes);
-
-template <typename T>
-class HashValueNestedSequenceTest : public testing::Test {};
-TYPED_TEST_SUITE_P(HashValueNestedSequenceTest);
-
-TYPED_TEST_P(HashValueNestedSequenceTest, BasicUsage) {
-  using T = TypeParam;
-  using V = typename T::value_type;
-  std::vector<T> exemplars = {
-      // empty case
-      T{},
-      // sets of empty sets
-      T{V{}}, T{V{}, V{}}, T{V{}, V{}, V{}},
-      // multisets of different values
-      T{V{1}}, T{V{1, 1}, V{1, 1}}, T{V{1, 1, 1}, V{1, 1, 1}, V{1, 1, 1}},
-      // various orderings of same nested sets
-      T{V{}, V{1, 2}}, T{V{}, V{2, 1}}, T{V{1, 2}, V{}}, T{V{2, 1}, V{}},
-      // various orderings of various nested sets, case 2
-      T{V{1, 2}, V{3, 4}}, T{V{1, 2}, V{4, 3}}, T{V{1, 3}, V{2, 4}},
-      T{V{1, 3}, V{4, 2}}, T{V{1, 4}, V{2, 3}}, T{V{1, 4}, V{3, 2}},
-      T{V{2, 3}, V{1, 4}}, T{V{2, 3}, V{4, 1}}, T{V{2, 4}, V{1, 3}},
-      T{V{2, 4}, V{3, 1}}, T{V{3, 4}, V{1, 2}}, T{V{3, 4}, V{2, 1}}};
-  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(exemplars));
-}
-
-REGISTER_TYPED_TEST_SUITE_P(HashValueNestedSequenceTest, BasicUsage);
-template <typename T>
-using TypeErasedSet = TypeErasedContainer<UnorderedSequence<T>>;
-
-using NestedIntSequenceTypes = testing::Types<
-    std::vector<std::vector<int>>, std::vector<UnorderedSequence<int>>,
-    std::vector<TypeErasedSet<int>>, UnorderedSequence<std::vector<int>>,
-    UnorderedSequence<UnorderedSequence<int>>,
-    UnorderedSequence<TypeErasedSet<int>>, TypeErasedSet<std::vector<int>>,
-    TypeErasedSet<UnorderedSequence<int>>, TypeErasedSet<TypeErasedSet<int>>>;
-INSTANTIATE_TYPED_TEST_SUITE_P(My, HashValueNestedSequenceTest,
-                              NestedIntSequenceTypes);
-
-// Private type that only supports hash_value to make sure our chosen hash
+// Private type that only supports turbo_hash_value to make sure our chosen hash
 // implementation is recursive within turbo::Hash.
 // It uses std::abs() on the value to provide different bitwise representations
 // of the same logical value.
 struct Private {
   int i;
   template <typename H>
-  friend H hash_value(H h, Private p) {
+  friend H turbo_hash_value(H h, Private p) {
     return H::combine(std::move(h), std::abs(p.i));
   }
 
@@ -659,24 +577,24 @@ struct Private {
   }
 };
 
-// Test helper for combine_piecewise_buffer.  It holds a std::string_view to the
-// buffer-to-be-hashed.  Its hash_value specialization will split up its
+// Test helper for combine_piecewise_buffer.  It holds a string_view to the
+// buffer-to-be-hashed.  Its turbo_hash_value specialization will split up its
 // contents at the character offsets requested.
 class PiecewiseHashTester {
  public:
   // Create a hash view of a buffer to be hashed contiguously.
-  explicit PiecewiseHashTester(std::string_view buf)
+  explicit PiecewiseHashTester(turbo::string_view buf)
       : buf_(buf), piecewise_(false), split_locations_() {}
 
   // Create a hash view of a buffer to be hashed piecewise, with breaks at the
   // given locations.
-  PiecewiseHashTester(std::string_view buf, std::set<size_t> split_locations)
+  PiecewiseHashTester(turbo::string_view buf, std::set<size_t> split_locations)
       : buf_(buf),
         piecewise_(true),
         split_locations_(std::move(split_locations)) {}
 
   template <typename H>
-  friend H hash_value(H h, const PiecewiseHashTester& p) {
+  friend H turbo_hash_value(H h, const PiecewiseHashTester& p) {
     if (!p.piecewise_) {
       return H::combine_contiguous(std::move(h), p.buf_.data(), p.buf_.size());
     }
@@ -687,11 +605,11 @@ class PiecewiseHashTester {
     }
     size_t begin = 0;
     for (size_t next : p.split_locations_) {
-      std::string_view chunk = p.buf_.substr(begin, next - begin);
+      turbo::string_view chunk = p.buf_.substr(begin, next - begin);
       h = combiner.add_buffer(std::move(h), chunk.data(), chunk.size());
       begin = next;
     }
-    std::string_view last_chunk = p.buf_.substr(begin);
+    turbo::string_view last_chunk = p.buf_.substr(begin);
     if (!last_chunk.empty()) {
       h = combiner.add_buffer(std::move(h), last_chunk.data(),
                               last_chunk.size());
@@ -700,7 +618,7 @@ class PiecewiseHashTester {
   }
 
  private:
-  std::string_view buf_;
+  turbo::string_view buf_;
   bool piecewise_;
   std::set<size_t> split_locations_;
 };
@@ -709,7 +627,7 @@ class PiecewiseHashTester {
 // by "bar"
 struct DummyFooBar {
   template <typename H>
-  friend H hash_value(H h, const DummyFooBar&) {
+  friend H turbo_hash_value(H h, const DummyFooBar&) {
     const char* foo = "foo";
     const char* bar = "bar";
     h = H::combine_contiguous(std::move(h), foo, 3);
@@ -777,15 +695,15 @@ TEST(HashValueTest, PrivateSanity) {
 }
 
 TEST(HashValueTest, Optional) {
-  EXPECT_TRUE(is_hashable<std::optional<Private>>::value);
+  EXPECT_TRUE(is_hashable<turbo::optional<Private>>::value);
 
-  using O = std::optional<Private>;
+  using O = turbo::optional<Private>;
   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::make_tuple(O{}, O{{1}}, O{{-1}}, O{{10}})));
 }
 
 TEST(HashValueTest, Variant) {
-  using V = std::variant<Private, std::string>;
+  using V = turbo::variant<Private, std::string>;
   EXPECT_TRUE(is_hashable<V>::value);
 
   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
@@ -793,67 +711,9 @@ TEST(HashValueTest, Variant) {
 
 #if TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
   struct S {};
-  EXPECT_FALSE(is_hashable<std::variant<S>>::value);
+  EXPECT_FALSE(is_hashable<turbo::variant<S>>::value);
 #endif
 }
-
-template <typename T>
-class HashValueAssociativeMapTest : public testing::Test {};
-TYPED_TEST_SUITE_P(HashValueAssociativeMapTest);
-
-TYPED_TEST_P(HashValueAssociativeMapTest, BasicUsage) {
-  using M = TypeParam;
-  using V = typename M::value_type;
-  std::vector<M> exemplars{M{},
-                           M{V{0, "foo"}},
-                           M{V{1, "foo"}},
-                           M{V{0, "bar"}},
-                           M{V{1, "bar"}},
-                           M{V{0, "foo"}, V{42, "bar"}},
-                           M{V{42, "bar"}, V{0, "foo"}},
-                           M{V{1, "foo"}, V{42, "bar"}},
-                           M{V{1, "foo"}, V{43, "bar"}},
-                           M{V{1, "foo"}, V{43, "baz"}}};
-  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(exemplars));
-}
-
-REGISTER_TYPED_TEST_SUITE_P(HashValueAssociativeMapTest, BasicUsage);
-using AssociativeMapTypes = testing::Types<
-    std::map<int, std::string>, std::unordered_map<int, std::string>,
-    turbo::flat_hash_map<int, std::string>,
-    turbo::node_hash_map<int, std::string>, turbo::btree_map<int, std::string>,
-    UnorderedSequence<std::pair<const int, std::string>>>;
-INSTANTIATE_TYPED_TEST_SUITE_P(My, HashValueAssociativeMapTest,
-                              AssociativeMapTypes);
-
-template <typename T>
-class HashValueAssociativeMultimapTest : public testing::Test {};
-TYPED_TEST_SUITE_P(HashValueAssociativeMultimapTest);
-
-TYPED_TEST_P(HashValueAssociativeMultimapTest, BasicUsage) {
-  using MM = TypeParam;
-  using V = typename MM::value_type;
-  std::vector<MM> exemplars{MM{},
-                            MM{V{0, "foo"}},
-                            MM{V{1, "foo"}},
-                            MM{V{0, "bar"}},
-                            MM{V{1, "bar"}},
-                            MM{V{0, "foo"}, V{0, "bar"}},
-                            MM{V{0, "bar"}, V{0, "foo"}},
-                            MM{V{0, "foo"}, V{42, "bar"}},
-                            MM{V{1, "foo"}, V{42, "bar"}},
-                            MM{V{1, "foo"}, V{1, "foo"}, V{43, "bar"}},
-                            MM{V{1, "foo"}, V{43, "bar"}, V{1, "foo"}},
-                            MM{V{1, "foo"}, V{43, "baz"}}};
-  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(exemplars));
-}
-
-REGISTER_TYPED_TEST_SUITE_P(HashValueAssociativeMultimapTest, BasicUsage);
-using AssociativeMultimapTypes =
-    testing::Types<std::multimap<int, std::string>,
-                   std::unordered_multimap<int, std::string>>;
-INSTANTIATE_TYPED_TEST_SUITE_P(My, HashValueAssociativeMultimapTest,
-                              AssociativeMultimapTypes);
 
 TEST(HashValueTest, ReferenceWrapper) {
   EXPECT_TRUE(is_hashable<std::reference_wrapper<Private>>::value);
@@ -877,14 +737,14 @@ template <typename T, typename = void>
 struct IsHashCallable : std::false_type {};
 
 template <typename T>
-struct IsHashCallable<T, std::void_t<decltype(std::declval<turbo::Hash<T>>()(
+struct IsHashCallable<T, turbo::void_t<decltype(std::declval<turbo::Hash<T>>()(
                             std::declval<const T&>()))>> : std::true_type {};
 
 template <typename T, typename = void>
 struct IsAggregateInitializable : std::false_type {};
 
 template <typename T>
-struct IsAggregateInitializable<T, std::void_t<decltype(T{})>>
+struct IsAggregateInitializable<T, turbo::void_t<decltype(T{})>>
     : std::true_type {};
 
 TEST(IsHashableTest, ValidHash) {
@@ -892,8 +752,8 @@ TEST(IsHashableTest, ValidHash) {
   EXPECT_TRUE(std::is_default_constructible<turbo::Hash<int>>::value);
   EXPECT_TRUE(std::is_copy_constructible<turbo::Hash<int>>::value);
   EXPECT_TRUE(std::is_move_constructible<turbo::Hash<int>>::value);
-  EXPECT_TRUE(std::is_copy_assignable<turbo::Hash<int>>::value);
-  EXPECT_TRUE(std::is_move_assignable<turbo::Hash<int>>::value);
+  EXPECT_TRUE(turbo::is_copy_assignable<turbo::Hash<int>>::value);
+  EXPECT_TRUE(turbo::is_move_assignable<turbo::Hash<int>>::value);
   EXPECT_TRUE(IsHashCallable<int>::value);
   EXPECT_TRUE(IsAggregateInitializable<turbo::Hash<int>>::value);
 }
@@ -905,8 +765,8 @@ TEST(IsHashableTest, PoisonHash) {
   EXPECT_FALSE(std::is_default_constructible<turbo::Hash<X>>::value);
   EXPECT_FALSE(std::is_copy_constructible<turbo::Hash<X>>::value);
   EXPECT_FALSE(std::is_move_constructible<turbo::Hash<X>>::value);
-  EXPECT_FALSE(std::is_copy_assignable<turbo::Hash<X>>::value);
-  EXPECT_FALSE(std::is_move_assignable<turbo::Hash<X>>::value);
+  EXPECT_FALSE(turbo::is_copy_assignable<turbo::Hash<X>>::value);
+  EXPECT_FALSE(turbo::is_move_assignable<turbo::Hash<X>>::value);
   EXPECT_FALSE(IsHashCallable<X>::value);
 #if !defined(__GNUC__) || defined(__clang__)
   // TODO(b/144368551): As of GCC 8.4 this does not compile.
@@ -917,18 +777,18 @@ TEST(IsHashableTest, PoisonHash) {
 
 // Hashable types
 //
-// These types exist simply to exercise various hash_value behaviors, so
-// they are named by what their hash_value overload does.
+// These types exist simply to exercise various turbo_hash_value behaviors, so
+// they are named by what their turbo_hash_value overload does.
 struct NoOp {
   template <typename HashCode>
-  friend HashCode hash_value(HashCode h, NoOp n) {
+  friend HashCode turbo_hash_value(HashCode h, NoOp n) {
     return h;
   }
 };
 
 struct EmptyCombine {
   template <typename HashCode>
-  friend HashCode hash_value(HashCode h, EmptyCombine e) {
+  friend HashCode turbo_hash_value(HashCode h, EmptyCombine e) {
     return HashCode::combine(std::move(h));
   }
 };
@@ -936,7 +796,7 @@ struct EmptyCombine {
 template <typename Int>
 struct CombineIterative {
   template <typename HashCode>
-  friend HashCode hash_value(HashCode h, CombineIterative c) {
+  friend HashCode turbo_hash_value(HashCode h, CombineIterative c) {
     for (int i = 0; i < 5; ++i) {
       h = HashCode::combine(std::move(h), Int(i));
     }
@@ -947,7 +807,7 @@ struct CombineIterative {
 template <typename Int>
 struct CombineVariadic {
   template <typename HashCode>
-  friend HashCode hash_value(HashCode h, CombineVariadic c) {
+  friend HashCode turbo_hash_value(HashCode h, CombineVariadic c) {
     return HashCode::combine(std::move(h), Int(0), Int(1), Int(2), Int(3),
                              Int(4));
   }
@@ -982,13 +842,13 @@ struct CustomHashType {
 
 template <InvokeTag allowed, InvokeTag... tags>
 struct EnableIfContained
-    : std::enable_if<std::disjunction<
+    : std::enable_if<turbo::disjunction<
           std::integral_constant<bool, allowed == tags>...>::value> {};
 
 template <
     typename H, InvokeTag... Tags,
     typename = typename EnableIfContained<InvokeTag::kHashValue, Tags...>::type>
-H hash_value(H state, CustomHashType<Tags...> t) {
+H turbo_hash_value(H state, CustomHashType<Tags...> t) {
   static_assert(MinTag<Tags...>::value == InvokeTag::kHashValue, "");
   return H::combine(std::move(state),
                     t.value + static_cast<int>(InvokeTag::kHashValue));
@@ -997,7 +857,7 @@ H hash_value(H state, CustomHashType<Tags...> t) {
 }  // namespace
 
 namespace turbo {
-
+TURBO_NAMESPACE_BEGIN
 namespace hash_internal {
 template <InvokeTag... Tags>
 struct is_uniquely_represented<
@@ -1005,7 +865,7 @@ struct is_uniquely_represented<
     typename EnableIfContained<InvokeTag::kUniquelyRepresented, Tags...>::type>
     : std::true_type {};
 }  // namespace hash_internal
-
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #if TURBO_HASH_INTERNAL_SUPPORT_LEGACY_HASH_
@@ -1102,7 +962,7 @@ struct StructWithPadding {
   int i;
 
   template <typename H>
-  friend H hash_value(H hash_state, const StructWithPadding& s) {
+  friend H turbo_hash_value(H hash_state, const StructWithPadding& s) {
     return H::combine(std::move(hash_state), s.c, s.i);
   }
 };
@@ -1120,7 +980,7 @@ struct ArraySlice {
   T* end;
 
   template <typename H>
-  friend H hash_value(H hash_state, const ArraySlice& slice) {
+  friend H turbo_hash_value(H hash_state, const ArraySlice& slice) {
     for (auto t = slice.begin; t != slice.end; ++t) {
       hash_state = H::combine(std::move(hash_state), *t);
     }
@@ -1168,7 +1028,7 @@ struct ConvertibleFromNoOp {
   ConvertibleFromNoOp(NoOp) {}  // NOLINT(runtime/explicit)
 
   template <typename H>
-  friend H hash_value(H hash_state, ConvertibleFromNoOp) {
+  friend H turbo_hash_value(H hash_state, ConvertibleFromNoOp) {
     return H::combine(std::move(hash_state), 1);
   }
 };
@@ -1192,7 +1052,7 @@ struct IntAndString {
   std::string s;
 
   template <typename H>
-  friend H hash_value(H hash_state, IntAndString int_and_string) {
+  friend H turbo_hash_value(H hash_state, IntAndString int_and_string) {
     return H::combine(std::move(hash_state), int_and_string.s,
                       int_and_string.i);
   }
@@ -1243,30 +1103,40 @@ TEST(HashTest, DoesNotUseImplicitConversionsToBool) {
             turbo::Hash<ValueWithBoolConversion>()(ValueWithBoolConversion{1}));
 }
 
-TEST(hash_of, MatchesHashForSingleArgument) {
+TEST(HashOf, MatchesHashForSingleArgument) {
   std::string s = "forty two";
-  int i = 42;
   double d = 42.0;
   std::tuple<int, int> t{4, 2};
+  int i = 42;
+  int neg_i = -42;
+  int16_t i16 = 42;
+  int16_t neg_i16 = -42;
+  int8_t i8 = 42;
+  int8_t neg_i8 = -42;
 
-  EXPECT_EQ(turbo::hash_of(s), turbo::Hash<std::string>{}(s));
-  EXPECT_EQ(turbo::hash_of(i), turbo::Hash<int>{}(i));
-  EXPECT_EQ(turbo::hash_of(d), turbo::Hash<double>{}(d));
-  EXPECT_EQ(turbo::hash_of(t), (turbo::Hash<std::tuple<int, int>>{}(t)));
+  EXPECT_EQ(turbo::HashOf(s), turbo::Hash<std::string>{}(s));
+  EXPECT_EQ(turbo::HashOf(d), turbo::Hash<double>{}(d));
+  EXPECT_EQ(turbo::HashOf(t), (turbo::Hash<std::tuple<int, int>>{}(t)));
+  EXPECT_EQ(turbo::HashOf(i), turbo::Hash<int>{}(i));
+  EXPECT_EQ(turbo::HashOf(neg_i), turbo::Hash<int>{}(neg_i));
+  EXPECT_EQ(turbo::HashOf(i16), turbo::Hash<int16_t>{}(i16));
+  EXPECT_EQ(turbo::HashOf(neg_i16), turbo::Hash<int16_t>{}(neg_i16));
+  EXPECT_EQ(turbo::HashOf(i8), turbo::Hash<int8_t>{}(i8));
+  EXPECT_EQ(turbo::HashOf(neg_i8), turbo::Hash<int8_t>{}(neg_i8));
 }
 
-TEST(hash_of, MatchesHashOfTupleForMultipleArguments) {
+TEST(HashOf, MatchesHashOfTupleForMultipleArguments) {
   std::string hello = "hello";
   std::string world = "world";
 
-  EXPECT_EQ(turbo::hash_of(), turbo::hash_of(std::make_tuple()));
-  EXPECT_EQ(turbo::hash_of(hello), turbo::hash_of(std::make_tuple(hello)));
-  EXPECT_EQ(turbo::hash_of(hello, world),
-            turbo::hash_of(std::make_tuple(hello, world)));
+  EXPECT_EQ(turbo::HashOf(), turbo::HashOf(std::make_tuple()));
+  EXPECT_EQ(turbo::HashOf(hello), turbo::HashOf(std::make_tuple(hello)));
+  EXPECT_EQ(turbo::HashOf(hello, world),
+            turbo::HashOf(std::make_tuple(hello, world)));
 }
 
 template <typename T>
-std::true_type HashOfExplicitParameter(decltype(turbo::hash_of<T>(0))) {
+std::true_type HashOfExplicitParameter(decltype(turbo::HashOf<T>(0))) {
   return {};
 }
 template <typename T>
@@ -1274,7 +1144,7 @@ std::false_type HashOfExplicitParameter(size_t) {
   return {};
 }
 
-TEST(hash_of, CantPassExplicitTemplateParameters) {
+TEST(HashOf, CantPassExplicitTemplateParameters) {
   EXPECT_FALSE(HashOfExplicitParameter<int>(0));
 }
 

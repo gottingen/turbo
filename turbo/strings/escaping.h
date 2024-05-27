@@ -1,17 +1,19 @@
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Copyright 2020 The Turbo Authors.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 //
 // -----------------------------------------------------------------------------
 // File: escaping.h
@@ -27,232 +29,160 @@
 #include <string>
 #include <vector>
 
-#include "turbo/platform/port.h"
-#include "turbo/strings/ascii.h"
-#include "turbo/strings/string_view.h"
-#include "turbo/strings/internal/escaping.h"
+#include <turbo/base/attributes.h>
+#include <turbo/base/macros.h>
+#include <turbo/base/nullability.h>
+#include <turbo/strings/ascii.h>
+#include <turbo/strings/str_join.h>
+#include <turbo/strings/string_view.h>
 
 namespace turbo {
+TURBO_NAMESPACE_BEGIN
 
-    /**
-     * @brief c_decode unescapes a `source` string and copies it into `dest`, rewriting C-style
-     *        escape sequences (https://en.cppreference.com/w/cpp/language/escape) into
-     *        their proper code point equivalents, returning `true` if successful.
-     *        The following unescape sequences can be handled:
-     *        * ASCII escape sequences ('\n','\r','\\', etc.) to their ASCII equivalents
-     *        * Octal escape sequences ('\nnn') to byte nnn. The unescaped value must
-     *        resolve to a single byte or an error will occur. E.g. values greater than
-     *        0xff will produce an error.
-     *        * Hexadecimal escape sequences ('\xnn') to byte nn. While an arbitrary
-     *        number of following digits are allowed, the unescaped value must resolve
-     *        to a single byte or an error will occur. E.g. '\x0045' is equivalent to
-     *        '\x45', but '\x1234' will produce an error.
-     *        * Unicode escape sequences ('\unnnn' for exactly four hex digits or
-     *        '\Unnnnnnnn' for exactly eight hex digits, which will be encoded in
-     *        UTF-8. (E.g., `\u2019` unescapes to the three bytes 0xE2, 0x80, and
-     *        0x99).
-     *        If any errors are encountered, this function returns `false`, leaving the
-     *        `dest` output parameter in an unspecified state, and stores the first
-     *        encountered error in `error`. To disable error reporting, set `error` to
-     *        `nullptr` or use the overload with no error reporting below.
-     *        Example:
-     * @code
-     *        std::string s = "foo\\rbar\\nbaz\\t";
-     *        std::string unescaped_s;
-     *        if (!turbo::c_decode(s, &unescaped_s) {
-     *        ...
-     *        }
-     *        EXPECT_EQ(unescaped_s, "foo\rbar\nbaz\t");
-     * @endcode
-     * @param source [input] the string to unescape.
-     * @param dest [output] the unescaped string.
-     * @param error [output] the error message.
-     * @return true if successful, otherwise false.
-     */
-    bool c_decode(std::string_view source, std::string *dest, std::string *error);
+// CUnescape()
+//
+// Unescapes a `source` string and copies it into `dest`, rewriting C-style
+// escape sequences (https://en.cppreference.com/w/cpp/language/escape) into
+// their proper code point equivalents, returning `true` if successful.
+//
+// The following unescape sequences can be handled:
+//
+//   * ASCII escape sequences ('\n','\r','\\', etc.) to their ASCII equivalents
+//   * Octal escape sequences ('\nnn') to byte nnn. The unescaped value must
+//     resolve to a single byte or an error will occur. E.g. values greater than
+//     0xff will produce an error.
+//   * Hexadecimal escape sequences ('\xnn') to byte nn. While an arbitrary
+//     number of following digits are allowed, the unescaped value must resolve
+//     to a single byte or an error will occur. E.g. '\x0045' is equivalent to
+//     '\x45', but '\x1234' will produce an error.
+//   * Unicode escape sequences ('\unnnn' for exactly four hex digits or
+//     '\Unnnnnnnn' for exactly eight hex digits, which will be encoded in
+//     UTF-8. (E.g., `\u2019` unescapes to the three bytes 0xE2, 0x80, and
+//     0x99).
+//
+// If any errors are encountered, this function returns `false`, leaving the
+// `dest` output parameter in an unspecified state, and stores the first
+// encountered error in `error`. To disable error reporting, set `error` to
+// `nullptr` or use the overload with no error reporting below.
+//
+// Example:
+//
+//   std::string s = "foo\\rbar\\nbaz\\t";
+//   std::string unescaped_s;
+//   if (!turbo::CUnescape(s, &unescaped_s)) {
+//     ...
+//   }
+//   EXPECT_EQ(unescaped_s, "foo\rbar\nbaz\t");
+bool CUnescape(turbo::string_view source, turbo::Nonnull<std::string*> dest,
+               turbo::Nullable<std::string*> error);
 
-    // Overload of `c_decode()` with no error reporting.
-    inline bool c_decode(std::string_view source, std::string *dest) {
-        return c_decode(source, dest, nullptr);
-    }
+// Overload of `CUnescape()` with no error reporting.
+inline bool CUnescape(turbo::string_view source,
+                      turbo::Nonnull<std::string*> dest) {
+  return CUnescape(source, dest, nullptr);
+}
 
-    /**
-     * @ingroup turbo_strings_convert
-     * @brief c_encode escapes a `src` string using C-style escapes sequences
-     *        (https://en.cppreference.com/w/cpp/language/escape), escaping other
-     *        non-printable/non-whitespace bytes as octal sequences (e.g. "\377").
-     *        Example:
-     * @code
-     *     std::string s = "foo\rbar\tbaz\010\011\012\013\014\x0d\n";
-     *     std::string escaped_s = turbo::c_encode(s);
-     *     EXPECT_EQ(escaped_s, "foo\\rbar\\tbaz\\010\\t\\n\\013\\014\\r\\n");
-     * @endcode
-     * @param src [input] the string to escape.
-     * @return the escaped string.
-     */
-    std::string c_encode(std::string_view src);
+// CEscape()
+//
+// Escapes a 'src' string using C-style escapes sequences
+// (https://en.cppreference.com/w/cpp/language/escape), escaping other
+// non-printable/non-whitespace bytes as octal sequences (e.g. "\377").
+//
+// Example:
+//
+//   std::string s = "foo\rbar\tbaz\010\011\012\013\014\x0d\n";
+//   std::string escaped_s = turbo::CEscape(s);
+//   EXPECT_EQ(escaped_s, "foo\\rbar\\tbaz\\010\\t\\n\\013\\014\\r\\n");
+std::string CEscape(turbo::string_view src);
 
-    /**
-     * @ingroup turbo_strings_convert
-     * @brief c_hex_encode escapes a `src` string using C-style escape sequences,
-     *        escaping other non-printable/non-whitespace bytes as hexadecimal
-     *        sequences (e.g. "\xFF").
-     *
-     *        Example:
-     *        @code
-     *          std::string s = "foo\rbar\tbaz\010\011\012\013\014\x0d\n";
-     *          std::string escaped_s = turbo::c_hex_encode(s);
-     *          EXPECT_EQ(escaped_s, "foo\\rbar\\tbaz\\x08\\t\\n\\x0b\\x0c\\r\\n");
-     *       @endcode
-     * @param src [input] the string to escape.
-     * @return the escaped string.
-     */
-    std::string c_hex_encode(std::string_view src);
+// CHexEscape()
+//
+// Escapes a 'src' string using C-style escape sequences, escaping
+// other non-printable/non-whitespace bytes as hexadecimal sequences (e.g.
+// "\xFF").
+//
+// Example:
+//
+//   std::string s = "foo\rbar\tbaz\010\011\012\013\014\x0d\n";
+//   std::string escaped_s = turbo::CHexEscape(s);
+//   EXPECT_EQ(escaped_s, "foo\\rbar\\tbaz\\x08\\t\\n\\x0b\\x0c\\r\\n");
+std::string CHexEscape(turbo::string_view src);
 
-    /**
-     * @ingroup turbo_strings_convert
-     * @brief utf8_safe_c_encode escapes a `src` string using C-style escape sequences,
-     *        escaping bytes as octal sequences, and passing through UTF-8 characters
-     *        without conversion. I.e., when encountering any bytes with their high bit
-     *        set, this function will not escape those values, whether or not they are
-     *        valid UTF-8.
-     * @param src [input] the string to escape.
-     * @return the escaped string.
-     */
-    std::string utf8_safe_c_encode(std::string_view src);
+// Utf8SafeCEscape()
+//
+// Escapes a 'src' string using C-style escape sequences, escaping bytes as
+// octal sequences, and passing through UTF-8 characters without conversion.
+// I.e., when encountering any bytes with their high bit set, this function
+// will not escape those values, whether or not they are valid UTF-8.
+std::string Utf8SafeCEscape(turbo::string_view src);
 
-    /**
-     * @ingroup turbo_strings_convert
-     * @brief utf8_safe_c_hex_encode escapes a `src` string using C-style escape sequences,
-     *        escaping bytes as hexadecimal sequences, and passing through UTF-8 characters
-     *        without conversion. I.e., when encountering any bytes with their high bit
-     *        set, this function will not escape those values, whether or not they are
-     *        valid UTF-8.
-     * @param src [input] the string to escape.
-     * @return the escaped string.
-     */
-    std::string utf8_safe_c_hex_encode(std::string_view src);
+// Utf8SafeCHexEscape()
+//
+// Escapes a 'src' string using C-style escape sequences, escaping bytes as
+// hexadecimal sequences, and passing through UTF-8 characters without
+// conversion.
+std::string Utf8SafeCHexEscape(turbo::string_view src);
 
-    /**
-     * @ingroup turbo_strings_convert
-     * @brief base64_encode encodes a `src` string into a base64-encoded 'dest' string with padding
-     *        characters. This function conforms with RFC 4648 section 4 (base64) and RFC
-     *        2045.
-     * @param src [input] the string to encode.
-     * @param dest [output] the encoded string.
-     */
-    template<typename String>
-    typename std::enable_if<turbo::is_string_type<String>::value>::type
-    base64_encode(std::string_view src, String *dest);
+// Base64Escape()
+//
+// Encodes a `src` string into a base64-encoded 'dest' string with padding
+// characters. This function conforms with RFC 4648 section 4 (base64) and RFC
+// 2045.
+void Base64Escape(turbo::string_view src, turbo::Nonnull<std::string*> dest);
+std::string Base64Escape(turbo::string_view src);
 
-    template<typename String = std::string>
-    typename std::enable_if<turbo::is_string_type<String>::value, String>::type
-    base64_encode(std::string_view src) {
-        String dest;
-        strings_internal::base64_encode_internal(
-                reinterpret_cast<const unsigned char *>(src.data()), src.size(), &dest,
-                true, strings_internal::kBase64Chars);
-        return dest;
-    }
+// WebSafeBase64Escape()
+//
+// Encodes a `src` string into a base64 string, like Base64Escape() does, but
+// outputs '-' instead of '+' and '_' instead of '/', and does not pad 'dest'.
+// This function conforms with RFC 4648 section 5 (base64url).
+void WebSafeBase64Escape(turbo::string_view src,
+                         turbo::Nonnull<std::string*> dest);
+std::string WebSafeBase64Escape(turbo::string_view src);
 
-    /**
-     * @ingroup turbo_strings_convert
-     * @brief web_safe_base64_encode encodes a `src` string into a base64-encoded 'dest' string
-     *        without padding characters. This function conforms with RFC 4648 section 5
-     *        (base64url).
-     * @param src [input] the string to encode.
-     * @param dest [output] the encoded string.
-     */
-    template<typename String>
-    typename std::enable_if<turbo::is_string_type<String>::value>::type
-    web_safe_base64_encode(std::string_view src, String *dest);
+// Base64Unescape()
+//
+// Converts a `src` string encoded in Base64 (RFC 4648 section 4) to its binary
+// equivalent, writing it to a `dest` buffer, returning `true` on success. If
+// `src` contains invalid characters, `dest` is cleared and returns `false`.
+// If padding is included (note that `Base64Escape()` does produce it), it must
+// be correct. In the padding, '=' and '.' are treated identically.
+bool Base64Unescape(turbo::string_view src, turbo::Nonnull<std::string*> dest);
 
-    /**
-     * @ingroup turbo_strings_convert
-     * @brief web_safe_base64_encode encodes a `src` string into a base64-encoded 'dest' string
-     *        without padding characters. This function conforms with RFC 4648 section 5
-     *        (base64url).
-     * @param src [input] the string to encode.
-     * @param dest [output] the encoded string.
-     */
-    template<typename String = std::string>
-    typename std::enable_if<turbo::is_string_type<String>::value, String>::type
-    web_safe_base64_encode(std::string_view src) {
-        String dest;
-        web_safe_base64_encode(src, &dest);
-        return dest;
-    }
+// WebSafeBase64Unescape()
+//
+// Converts a `src` string encoded in "web safe" Base64 (RFC 4648 section 5) to
+// its binary equivalent, writing it to a `dest` buffer. If `src` contains
+// invalid characters, `dest` is cleared and returns `false`. If padding is
+// included (note that `WebSafeBase64Escape()` does not produce it), it must be
+// correct. In the padding, '=' and '.' are treated identically.
+bool WebSafeBase64Unescape(turbo::string_view src,
+                           turbo::Nonnull<std::string*> dest);
 
-    /**
-     * @ingroup turbo_strings_convert
-     * @brief base64_decode decodes a `src` string encoded in Base64 (RFC 4648 section 4) to its
-     *        binary equivalent, writing it to a `dest` buffer, returning `true` on
-     *        success. If `src` contains invalid characters, `dest` is cleared and
-     *        returns `false`. If padding is included (note that `base64_encode()`
-     *        does produce it), it must be correct. In the padding, '=' and '.' are
-     *        treated identically.
-     * @param src [input] the string to decode.
-     * @param dest [output] the decoded string.
-     * @return true if successful, otherwise false.
-     */
-    template<typename String>
-    typename std::enable_if<turbo::is_string_type<String>::value, bool>::type
-    base64_decode(std::string_view src, String *dest);
+// HexStringToBytes()
+//
+// Converts the hexadecimal encoded data in `hex` into raw bytes in the `bytes`
+// output string.  If `hex` does not consist of valid hexadecimal data, this
+// function returns false and leaves `bytes` in an unspecified state. Returns
+// true on success.
+TURBO_MUST_USE_RESULT bool HexStringToBytes(turbo::string_view hex,
+                                           turbo::Nonnull<std::string*> bytes);
 
-    /**
-     * @ingroup turbo_strings_convert
-     * @brief web_safe_base64_decode decodes a `src` string encoded in "web safe" Base64 (RFC 4648
-     *        section 5) to its binary equivalent, writing it to a `dest` buffer. If
-     *        `src` contains invalid characters, `dest` is cleared and returns
-     *        `false`. If padding is included (note that `web_safe_base64_encode()`
-     *        does not produce it), it must be correct. In the padding, '=' and '.'
-     *        are treated identically.
-     * @param src [input] the string to decode.
-     * @param dest [output] the decoded string.
-     * @return true if successful, otherwise false.
-     */
-    template<typename String>
-    typename std::enable_if<turbo::is_string_type<String>::value, bool>::type
-    web_safe_base64_decode(std::string_view src, String *dest);
+// HexStringToBytes()
+//
+// Converts an ASCII hex string into bytes, returning binary data of length
+// `from.size()/2`. The input must be valid hexadecimal data, otherwise the
+// return value is unspecified.
+TURBO_DEPRECATED("Use the HexStringToBytes() that returns a bool")
+std::string HexStringToBytes(turbo::string_view from);
 
-    /**
-     * @ingroup turbo_strings_convert
-     * @brief hex_to_bytes converts an ASCII hex string into bytes, returning binary data of length
-     *        `from.size()/2`.
-     * @param from [input] the string to convert.
-     * @param dest [output] the converted string.
-     */
-    template<typename String>
-    typename std::enable_if<turbo::is_string_type<String>::value>::type
-    hex_to_bytes(std::string_view from, String *dest);
+// BytesToHexString()
+//
+// Converts binary data into an ASCII text string, returning a string of size
+// `2*from.size()`.
+std::string BytesToHexString(turbo::string_view from);
 
-    template<typename String = std::string>
-    typename std::enable_if<turbo::is_string_type<String>::value, String>::type
-    hex_to_bytes(std::string_view from) {
-        String result;
-        hex_to_bytes(from, &result);
-        return result;
-    }
-
-    /**
-     * @ingroup turbo_strings_convert
-     * @brief bytes_to_hex converts binary data into an ASCII text string, returning a string of size
-     *        `2*from.size()`.
-     * @param from [input] the string to convert.
-     * @param dest [output] the converted string.
-     */
-    template<typename String>
-    typename std::enable_if<turbo::is_string_type<String>::value>::type
-    bytes_to_hex(std::string_view from, String *dest);
-
-    template<typename String = std::string>
-    typename std::enable_if<turbo::is_string_type<String>::value, String>::type
-    bytes_to_hex(std::string_view from) {
-        String result;
-        bytes_to_hex(from, &result);
-        return result;
-    }
-
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_ESCAPING_H_

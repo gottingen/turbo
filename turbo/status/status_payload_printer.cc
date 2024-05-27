@@ -1,33 +1,39 @@
-// Copyright 2019 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-#include "status_payload_printer.h"
+#include <turbo/status/status_payload_printer.h>
 
-#include <atomic>
+#include <turbo/base/config.h>
+#include <turbo/base/internal/atomic_hook.h>
 
-#include "turbo/platform/port.h"
-#include "turbo/platform/internal/atomic_hook.h"
+namespace turbo {
+TURBO_NAMESPACE_BEGIN
+namespace status_internal {
 
-namespace turbo::status_internal {
-    TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
-    static turbo::base_internal::AtomicHook<StatusPayloadPrinter> storage;
+TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
+static turbo::base_internal::AtomicHook<StatusPayloadPrinter> storage;
 
-    void SetStatusPayloadPrinter(StatusPayloadPrinter printer) {
-        storage.Store(printer);
-    }
+void SetStatusPayloadPrinter(StatusPayloadPrinter printer) {
+  storage.Store(printer);
+}
 
-    StatusPayloadPrinter GetStatusPayloadPrinter() {
-        return storage.Load();
-    }
+StatusPayloadPrinter GetStatusPayloadPrinter() {
+  return storage.Load();
+}
 
-}  // namespace turbo::status_internal
+}  // namespace status_internal
+TURBO_NAMESPACE_END
+}  // namespace turbo

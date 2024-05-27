@@ -1,96 +1,99 @@
-// Copyright 2018 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <string>
+#include <tuple>
 #include <type_traits>
 #include <typeindex>
 #include <utility>
 #include <vector>
 
-#include "benchmark/benchmark.h"
-#include "turbo/container/flat_hash_set.h"
-#include "turbo/hash/hash.h"
-#include "turbo/platform/port.h"
-#include "turbo/random/random.h"
-#include "turbo/strings/cord.h"
-#include "turbo/strings/string_view.h"
+#include <turbo/base/attributes.h>
+#include <turbo/container/flat_hash_set.h>
+#include <turbo/hash/hash.h>
+#include <turbo/random/random.h>
+#include <turbo/strings/cord.h>
+#include <tests/strings/cord_test_helpers.h>
+#include <turbo/strings/string_view.h>
+#include <benchmark/benchmark.h>
 
 namespace {
 
-    using turbo::Hash;
+using turbo::Hash;
 
-    template<template<typename> class H, typename T>
-    void RunBenchmark(benchmark::State &state, T value) {
-        H<T> h;
-        for (auto _: state) {
-            benchmark::DoNotOptimize(value);
-            benchmark::DoNotOptimize(h(value));
-        }
-    }
+template <template <typename> class H, typename T>
+void RunBenchmark(benchmark::State& state, T value) {
+  H<T> h;
+  for (auto _ : state) {
+    benchmark::DoNotOptimize(value);
+    benchmark::DoNotOptimize(h(value));
+  }
+}
 
 }  // namespace
 
-template<typename T>
+template <typename T>
 using TurboHash = turbo::Hash<T>;
 
 class TypeErasedInterface {
-public:
-    virtual ~TypeErasedInterface() = default;
+ public:
+  virtual ~TypeErasedInterface() = default;
 
-    template<typename H>
-    friend H hash_value(H state, const TypeErasedInterface &wrapper) {
-        state = H::combine(std::move(state), std::type_index(typeid(wrapper)));
-        wrapper.HashValue(turbo::HashState::Create(&state));
-        return state;
-    }
+  template <typename H>
+  friend H turbo_hash_value(H state, const TypeErasedInterface& wrapper) {
+    state = H::combine(std::move(state), std::type_index(typeid(wrapper)));
+    wrapper.HashValue(turbo::HashState::Create(&state));
+    return state;
+  }
 
-private:
-    virtual void HashValue(turbo::HashState state) const = 0;
+ private:
+  virtual void HashValue(turbo::HashState state) const = 0;
 };
 
-template<typename T>
+template <typename T>
 struct TypeErasedTurboHash {
-    class Wrapper : public TypeErasedInterface {
-    public:
-        explicit Wrapper(const T &value) : value_(value) {}
+  class Wrapper : public TypeErasedInterface {
+   public:
+    explicit Wrapper(const T& value) : value_(value) {}
 
-    private:
-        void HashValue(turbo::HashState state) const override {
-            turbo::HashState::combine(std::move(state), value_);
-        }
-
-        const T &value_;
-    };
-
-    size_t operator()(const T &value) {
-        return turbo::Hash<Wrapper>{}(Wrapper(value));
+   private:
+    void HashValue(turbo::HashState state) const override {
+      turbo::HashState::combine(std::move(state), value_);
     }
-};
 
-template<typename FuncType>
-inline FuncType *ODRUseFunction(FuncType *ptr) {
-    volatile FuncType *dummy = ptr;
-    return dummy;
-}
+    const T& value_;
+  };
+
+  size_t operator()(const T& value) {
+    return turbo::Hash<Wrapper>{}(Wrapper(value));
+  }
+};
 
 turbo::Cord FlatCord(size_t size) {
-    turbo::Cord result(std::string(size, 'a'));
-    result.flatten();
-    return result;
+  turbo::Cord result(std::string(size, 'a'));
+  result.Flatten();
+  return result;
 }
 
-/*
 turbo::Cord FragmentedCord(size_t size) {
   const size_t orig_size = size;
   std::vector<std::string> chunks;
@@ -102,49 +105,48 @@ turbo::Cord FragmentedCord(size_t size) {
   if (size > 0) {
     chunks.push_back(std::string(size, 'a'));
   }
-  turbo::Cord result = turbo::make_fragmented_cord(chunks);
+  turbo::Cord result = turbo::MakeFragmentedCord(chunks);
   (void) orig_size;
   assert(result.size() == orig_size);
   return result;
-}*/
+}
 
-template<typename T>
+template <typename T>
 std::vector<T> Vector(size_t count) {
-    std::vector<T> result;
-    for (size_t v = 0; v < count; ++v) {
-        result.push_back(v);
-    }
-    return result;
+  std::vector<T> result;
+  for (size_t v = 0; v < count; ++v) {
+    result.push_back(v);
+  }
+  return result;
 }
 
 // Bogus type that replicates an unorderd_set's bit mixing, but with
 // vector-speed iteration. This is intended to measure the overhead of unordered
 // hashing without counting the speed of unordered_set iteration.
-template<typename T>
+template <typename T>
 struct FastUnorderedSet {
-    explicit FastUnorderedSet(size_t count) {
-        for (size_t v = 0; v < count; ++v) {
-            values.push_back(v);
-        }
+  explicit FastUnorderedSet(size_t count) {
+    for (size_t v = 0; v < count; ++v) {
+      values.push_back(v);
     }
+  }
+  std::vector<T> values;
 
-    std::vector<T> values;
-
-    template<typename H>
-    friend H hash_value(H h, const FastUnorderedSet &fus) {
-        return H::combine(H::combine_unordered(std::move(h), fus.values.begin(),
-                                               fus.values.end()),
-                          fus.values.size());
-    }
+  template <typename H>
+  friend H turbo_hash_value(H h, const FastUnorderedSet& fus) {
+    return H::combine(H::combine_unordered(std::move(h), fus.values.begin(),
+                                           fus.values.end()),
+                      fus.values.size());
+  }
 };
 
-template<typename T>
+template <typename T>
 turbo::flat_hash_set<T> FlatHashSet(size_t count) {
-    turbo::flat_hash_set<T> result;
-    for (size_t v = 0; v < count; ++v) {
-        result.insert(v);
-    }
-    return result;
+  turbo::flat_hash_set<T> result;
+  for (size_t v = 0; v < count; ++v) {
+    result.insert(v);
+  }
+  return result;
 }
 
 // Generates a benchmark and a codegen method for the provided types.  The
@@ -161,7 +163,7 @@ turbo::flat_hash_set<T> FlatHashSet(size_t count) {
     return hash<decltype(__VA_ARGS__)>{}(arg);                   \
   }                                                              \
   bool turbo_hash_test_odr_use##hash##name =                      \
-      ODRUseFunction(&Codegen##hash##name);
+      (benchmark::DoNotOptimize(&Codegen##hash##name), false)
 
 MAKE_BENCHMARK(TurboHash, Int32, int32_t{});
 MAKE_BENCHMARK(TurboHash, Int64, int64_t{});
@@ -183,8 +185,8 @@ MAKE_BENCHMARK(TurboHash, Cord_Flat_30, FlatCord(30));
 MAKE_BENCHMARK(TurboHash, Cord_Flat_90, FlatCord(90));
 MAKE_BENCHMARK(TurboHash, Cord_Flat_200, FlatCord(200));
 MAKE_BENCHMARK(TurboHash, Cord_Flat_5000, FlatCord(5000));
-//MAKE_BENCHMARK(TurboHash, Cord_Fragmented_200, FragmentedCord(200));
-//MAKE_BENCHMARK(TurboHash, Cord_Fragmented_5000, FragmentedCord(5000));
+MAKE_BENCHMARK(TurboHash, Cord_Fragmented_200, FragmentedCord(200));
+MAKE_BENCHMARK(TurboHash, Cord_Fragmented_5000, FragmentedCord(5000));
 MAKE_BENCHMARK(TurboHash, VectorInt64_10, Vector<int64_t>(10));
 MAKE_BENCHMARK(TurboHash, VectorInt64_100, Vector<int64_t>(100));
 MAKE_BENCHMARK(TurboHash, VectorInt64_1000, Vector<int64_t>(1000));
@@ -265,42 +267,42 @@ namespace {
 // 16kb fits in L1 cache of most CPUs we care about. Keeping memory latency low
 // will allow us to attribute most time to CPU which means more accurate
 // measurements.
-    static constexpr size_t kEntropySize = 16 << 10;
-    static char entropy[kEntropySize + 1024];
-    TURBO_MAYBE_UNUSED static const bool kInitialized = [] {
-        turbo::BitGen gen;
-        static_assert(sizeof(entropy) % sizeof(uint64_t) == 0, "");
-        for (int i = 0; i != sizeof(entropy); i += sizeof(uint64_t)) {
-            auto rand = turbo::uniform<uint64_t>(gen);
-            memcpy(&entropy[i], &rand, sizeof(uint64_t));
-        }
-        return true;
-    }();
+static constexpr size_t kEntropySize = 16 << 10;
+static char entropy[kEntropySize + 1024];
+TURBO_ATTRIBUTE_UNUSED static const bool kInitialized = [] {
+  turbo::BitGen gen;
+  static_assert(sizeof(entropy) % sizeof(uint64_t) == 0, "");
+  for (int i = 0; i != sizeof(entropy); i += sizeof(uint64_t)) {
+    auto rand = turbo::Uniform<uint64_t>(gen);
+    memcpy(&entropy[i], &rand, sizeof(uint64_t));
+  }
+  return true;
+}();
 }  // namespace
 
-template<class T>
+template <class T>
 struct PodRand {
-    static_assert(std::is_pod<T>::value, "");
-    static_assert(kEntropySize + sizeof(T) < sizeof(entropy), "");
+  static_assert(std::is_pod<T>::value, "");
+  static_assert(kEntropySize + sizeof(T) < sizeof(entropy), "");
 
-    T Get(size_t i) const {
-        T v;
-        memcpy(&v, &entropy[i % kEntropySize], sizeof(T));
-        return v;
-    }
+  T Get(size_t i) const {
+    T v;
+    memcpy(&v, &entropy[i % kEntropySize], sizeof(T));
+    return v;
+  }
 };
 
-template<size_t N>
+template <size_t N>
 struct StringRand {
-    static_assert(kEntropySize + N < sizeof(entropy), "");
+  static_assert(kEntropySize + N < sizeof(entropy), "");
 
-    std::string_view Get(size_t i) const {
-        // This has a small bias towards small numbers. Because max N is ~200 this
-        // is very small and prefer to be very fast instead of absolutely accurate.
-        // Also we pass N = 2^K+1 so that mod reduces to a bitand.
-        size_t s = (i % (N - 1)) + 1;
-        return {&entropy[i % kEntropySize], s};
-    }
+  turbo::string_view Get(size_t i) const {
+    // This has a small bias towards small numbers. Because max N is ~200 this
+    // is very small and prefer to be very fast instead of absolutely accurate.
+    // Also we pass N = 2^K+1 so that mod reduces to a bitand.
+    size_t s = (i % (N - 1)) + 1;
+    return {&entropy[i % kEntropySize], s};
+  }
 };
 
 #define MAKE_LATENCY_BENCHMARK(hash, name, ...)              \
@@ -316,9 +318,9 @@ struct StringRand {
   BENCHMARK(BM_latency_##hash##_##name);                     \
   }  // namespace
 
-MAKE_LATENCY_BENCHMARK(TurboHash, Int32, PodRand<int32_t>);
-MAKE_LATENCY_BENCHMARK(TurboHash, Int64, PodRand<int64_t>);
-MAKE_LATENCY_BENCHMARK(TurboHash, String9, StringRand<9>);
-MAKE_LATENCY_BENCHMARK(TurboHash, String33, StringRand<33>);
-MAKE_LATENCY_BENCHMARK(TurboHash, String65, StringRand<65>);
-MAKE_LATENCY_BENCHMARK(TurboHash, String257, StringRand<257>);
+MAKE_LATENCY_BENCHMARK(TurboHash, Int32, PodRand<int32_t>)
+MAKE_LATENCY_BENCHMARK(TurboHash, Int64, PodRand<int64_t>)
+MAKE_LATENCY_BENCHMARK(TurboHash, String9, StringRand<9>)
+MAKE_LATENCY_BENCHMARK(TurboHash, String33, StringRand<33>)
+MAKE_LATENCY_BENCHMARK(TurboHash, String65, StringRand<65>)
+MAKE_LATENCY_BENCHMARK(TurboHash, String257, StringRand<257>)

@@ -1,33 +1,38 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-#include "turbo/strings/escaping.h"
+#include <turbo/strings/escaping.h>
 
 #include <array>
+#include <cstddef>
 #include <cstdio>
 #include <cstring>
+#include <initializer_list>
 #include <memory>
+#include <string>
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/container/fixed_array.h"
+#include <gtest/gtest.h>
+#include <turbo/log/check.h>
+#include <turbo/strings/str_cat.h>
 
-#include "escaping_test_common.h"
+#include <turbo/strings/internal/escaping_test_common.h>
+#include <turbo/strings/string_view.h>
 
-
-///TODO(mulan.wang) inlined_string test
 namespace {
 
 struct epair {
@@ -35,7 +40,7 @@ struct epair {
   std::string unescaped;
 };
 
-TEST(c_encode, EscapeAndUnescape) {
+TEST(CEscape, EscapeAndUnescape) {
   const std::string inputs[] = {
       std::string("foo\nxx\r\b\0023"),
       std::string(""),
@@ -57,30 +62,30 @@ TEST(c_encode, EscapeAndUnescape) {
       std::string escaped;
       switch (kind) {
         case 0:
-          escaped = turbo::c_encode(original);
+          escaped = turbo::CEscape(original);
           break;
         case 1:
-          escaped = turbo::c_hex_encode(original);
+          escaped = turbo::CHexEscape(original);
           break;
         case 2:
-          escaped = turbo::utf8_safe_c_encode(original);
+          escaped = turbo::Utf8SafeCEscape(original);
           break;
         case 3:
-          escaped = turbo::utf8_safe_c_hex_encode(original);
+          escaped = turbo::Utf8SafeCHexEscape(original);
           break;
       }
       std::string unescaped_str;
-      EXPECT_TRUE(turbo::c_decode(escaped, &unescaped_str));
+      EXPECT_TRUE(turbo::CUnescape(escaped, &unescaped_str));
       EXPECT_EQ(unescaped_str, original);
 
       unescaped_str.erase();
       std::string error;
-      EXPECT_TRUE(turbo::c_decode(escaped, &unescaped_str, &error));
+      EXPECT_TRUE(turbo::CUnescape(escaped, &unescaped_str, &error));
       EXPECT_EQ(error, "");
 
       // Check in-place unescaping
       std::string s = escaped;
-      EXPECT_TRUE(turbo::c_decode(s, &s));
+      EXPECT_TRUE(turbo::CUnescape(s, &s));
       ASSERT_EQ(s, original);
     }
   }
@@ -92,15 +97,15 @@ TEST(c_encode, EscapeAndUnescape) {
       chars[0] = char0;
       chars[1] = char1;
       std::string s(chars, 2);
-      std::string escaped = turbo::c_hex_encode(s);
+      std::string escaped = turbo::CHexEscape(s);
       std::string unescaped;
-      EXPECT_TRUE(turbo::c_decode(escaped, &unescaped));
+      EXPECT_TRUE(turbo::CUnescape(escaped, &unescaped));
       EXPECT_EQ(s, unescaped);
     }
   }
 }
 
-TEST(c_encode, BasicEscaping) {
+TEST(CEscape, BasicEscaping) {
   epair oct_values[] = {
       {"foo\\rbar\\nbaz\\t", "foo\rbar\nbaz\t"},
       {"\\'full of \\\"sound\\\" and \\\"fury\\\"\\'",
@@ -137,19 +142,19 @@ TEST(c_encode, BasicEscaping) {
   };
 
   for (const epair& val : oct_values) {
-    std::string escaped = turbo::c_encode(val.unescaped);
+    std::string escaped = turbo::CEscape(val.unescaped);
     EXPECT_EQ(escaped, val.escaped);
   }
   for (const epair& val : hex_values) {
-    std::string escaped = turbo::c_hex_encode(val.unescaped);
+    std::string escaped = turbo::CHexEscape(val.unescaped);
     EXPECT_EQ(escaped, val.escaped);
   }
   for (const epair& val : utf8_oct_values) {
-    std::string escaped = turbo::utf8_safe_c_encode(val.unescaped);
+    std::string escaped = turbo::Utf8SafeCEscape(val.unescaped);
     EXPECT_EQ(escaped, val.escaped);
   }
   for (const epair& val : utf8_hex_values) {
-    std::string escaped = turbo::utf8_safe_c_hex_encode(val.unescaped);
+    std::string escaped = turbo::Utf8SafeCHexEscape(val.unescaped);
     EXPECT_EQ(escaped, val.escaped);
   }
 }
@@ -164,7 +169,7 @@ TEST(Unescape, BasicFunction) {
      {"\\U0010FFFD", "\xF4\x8F\xBF\xBD"}};
   for (const epair& val : tests) {
     std::string out;
-    EXPECT_TRUE(turbo::c_decode(val.escaped, &out));
+    EXPECT_TRUE(turbo::CUnescape(val.escaped, &out));
     EXPECT_EQ(out, val.unescaped);
   }
   std::string bad[] = {"\\u1",         // too short
@@ -178,11 +183,11 @@ TEST(Unescape, BasicFunction) {
   for (const std::string& e : bad) {
     std::string error;
     std::string out;
-    EXPECT_FALSE(turbo::c_decode(e, &out, &error));
+    EXPECT_FALSE(turbo::CUnescape(e, &out, &error));
     EXPECT_FALSE(error.empty());
 
     out.erase();
-    EXPECT_FALSE(turbo::c_decode(e, &out));
+    EXPECT_FALSE(turbo::CUnescape(e, &out));
   }
 }
 
@@ -216,55 +221,55 @@ const char CUnescapeTest::kStringWithMultipleUnicodeNulls[] =
 
 TEST_F(CUnescapeTest, Unescapes1CharOctalNull) {
   std::string original_string = "\\0";
-  EXPECT_TRUE(turbo::c_decode(original_string, &result_string_));
+  EXPECT_TRUE(turbo::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0", 1), result_string_);
 }
 
 TEST_F(CUnescapeTest, Unescapes2CharOctalNull) {
   std::string original_string = "\\00";
-  EXPECT_TRUE(turbo::c_decode(original_string, &result_string_));
+  EXPECT_TRUE(turbo::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0", 1), result_string_);
 }
 
 TEST_F(CUnescapeTest, Unescapes3CharOctalNull) {
   std::string original_string = "\\000";
-  EXPECT_TRUE(turbo::c_decode(original_string, &result_string_));
+  EXPECT_TRUE(turbo::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0", 1), result_string_);
 }
 
 TEST_F(CUnescapeTest, Unescapes1CharHexNull) {
   std::string original_string = "\\x0";
-  EXPECT_TRUE(turbo::c_decode(original_string, &result_string_));
+  EXPECT_TRUE(turbo::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0", 1), result_string_);
 }
 
 TEST_F(CUnescapeTest, Unescapes2CharHexNull) {
   std::string original_string = "\\x00";
-  EXPECT_TRUE(turbo::c_decode(original_string, &result_string_));
+  EXPECT_TRUE(turbo::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0", 1), result_string_);
 }
 
 TEST_F(CUnescapeTest, Unescapes3CharHexNull) {
   std::string original_string = "\\x000";
-  EXPECT_TRUE(turbo::c_decode(original_string, &result_string_));
+  EXPECT_TRUE(turbo::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0", 1), result_string_);
 }
 
 TEST_F(CUnescapeTest, Unescapes4CharUnicodeNull) {
   std::string original_string = "\\u0000";
-  EXPECT_TRUE(turbo::c_decode(original_string, &result_string_));
+  EXPECT_TRUE(turbo::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0", 1), result_string_);
 }
 
 TEST_F(CUnescapeTest, Unescapes8CharUnicodeNull) {
   std::string original_string = "\\U00000000";
-  EXPECT_TRUE(turbo::c_decode(original_string, &result_string_));
+  EXPECT_TRUE(turbo::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0", 1), result_string_);
 }
 
 TEST_F(CUnescapeTest, UnescapesMultipleOctalNulls) {
   std::string original_string(kStringWithMultipleOctalNulls);
-  EXPECT_TRUE(turbo::c_decode(original_string, &result_string_));
+  EXPECT_TRUE(turbo::CUnescape(original_string, &result_string_));
   // All escapes, including newlines and null escapes, should have been
   // converted to the equivalent characters.
   EXPECT_EQ(std::string("\0\n"
@@ -278,7 +283,7 @@ TEST_F(CUnescapeTest, UnescapesMultipleOctalNulls) {
 
 TEST_F(CUnescapeTest, UnescapesMultipleHexNulls) {
   std::string original_string(kStringWithMultipleHexNulls);
-  EXPECT_TRUE(turbo::c_decode(original_string, &result_string_));
+  EXPECT_TRUE(turbo::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0\n"
                         "0\n"
                         "\0\n"
@@ -289,7 +294,7 @@ TEST_F(CUnescapeTest, UnescapesMultipleHexNulls) {
 
 TEST_F(CUnescapeTest, UnescapesMultipleUnicodeNulls) {
   std::string original_string(kStringWithMultipleUnicodeNulls);
-  EXPECT_TRUE(turbo::c_decode(original_string, &result_string_));
+  EXPECT_TRUE(turbo::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0\n"
                         "0\n"
                         "\0",
@@ -298,8 +303,8 @@ TEST_F(CUnescapeTest, UnescapesMultipleUnicodeNulls) {
 }
 
 static struct {
-  std::string_view plaintext;
-  std::string_view cyphertext;
+  turbo::string_view plaintext;
+  turbo::string_view cyphertext;
 } const base64_tests[] = {
     // Empty string.
     {{"", 0}, {"", 0}},
@@ -563,52 +568,57 @@ template <typename StringType>
 void TestEscapeAndUnescape() {
   // Check the short strings; this tests the math (and boundaries)
   for (const auto& tc : base64_tests) {
+    // Test plain base64.
     StringType encoded("this junk should be ignored");
-    turbo::base64_encode(tc.plaintext, &encoded);
+    turbo::Base64Escape(tc.plaintext, &encoded);
     EXPECT_EQ(encoded, tc.cyphertext);
-    EXPECT_EQ(turbo::base64_encode(tc.plaintext), tc.cyphertext);
+    EXPECT_EQ(turbo::Base64Escape(tc.plaintext), tc.cyphertext);
 
     StringType decoded("this junk should be ignored");
-    EXPECT_TRUE(turbo::base64_decode(encoded, &decoded));
+    EXPECT_TRUE(turbo::Base64Unescape(encoded, &decoded));
     EXPECT_EQ(decoded, tc.plaintext);
 
-    StringType websafe(tc.cyphertext);
-    for (int c = 0; c < websafe.size(); ++c) {
-      if ('+' == websafe[c]) websafe[c] = '-';
-      if ('/' == websafe[c]) websafe[c] = '_';
+    StringType websafe_with_padding(tc.cyphertext);
+    for (unsigned int c = 0; c < websafe_with_padding.size(); ++c) {
+      if ('+' == websafe_with_padding[c]) websafe_with_padding[c] = '-';
+      if ('/' == websafe_with_padding[c]) websafe_with_padding[c] = '_';
+      // Intentionally keeping padding aka '='.
+    }
+
+    // Test plain websafe (aka without padding).
+    StringType websafe(websafe_with_padding);
+    for (unsigned int c = 0; c < websafe.size(); ++c) {
       if ('=' == websafe[c]) {
         websafe.resize(c);
         break;
       }
     }
-
     encoded = "this junk should be ignored";
-    turbo::web_safe_base64_encode(tc.plaintext, &encoded);
+    turbo::WebSafeBase64Escape(tc.plaintext, &encoded);
     EXPECT_EQ(encoded, websafe);
-    EXPECT_EQ(turbo::web_safe_base64_encode(tc.plaintext), websafe);
+    EXPECT_EQ(turbo::WebSafeBase64Escape(tc.plaintext), websafe);
 
-    // Let's try the string version of the decoder
     decoded = "this junk should be ignored";
-    EXPECT_TRUE(turbo::web_safe_base64_decode(websafe, &decoded));
+    EXPECT_TRUE(turbo::WebSafeBase64Unescape(websafe, &decoded));
     EXPECT_EQ(decoded, tc.plaintext);
   }
 
   // Now try the long strings, this tests the streaming
   for (const auto& tc : turbo::strings_internal::base64_strings()) {
     StringType buffer;
-    turbo::web_safe_base64_encode(tc.plaintext, &buffer);
+    turbo::WebSafeBase64Escape(tc.plaintext, &buffer);
     EXPECT_EQ(tc.cyphertext, buffer);
-    EXPECT_EQ(turbo::web_safe_base64_encode(tc.plaintext), tc.cyphertext);
+    EXPECT_EQ(turbo::WebSafeBase64Escape(tc.plaintext), tc.cyphertext);
   }
 
   // Verify the behavior when decoding bad data
   {
-    std::string_view data_set[] = {"ab-/", std::string_view("\0bcd", 4),
-                                    std::string_view("abc.\0", 5)};
-    for (std::string_view bad_data : data_set) {
+    turbo::string_view data_set[] = {"ab-/", turbo::string_view("\0bcd", 4),
+                                    turbo::string_view("abc.\0", 5)};
+    for (turbo::string_view bad_data : data_set) {
       StringType buf;
-      EXPECT_FALSE(turbo::base64_decode(bad_data, &buf));
-      EXPECT_FALSE(turbo::web_safe_base64_decode(bad_data, &buf));
+      EXPECT_FALSE(turbo::Base64Unescape(bad_data, &buf));
+      EXPECT_FALSE(turbo::WebSafeBase64Unescape(bad_data, &buf));
       EXPECT_TRUE(buf.empty());
     }
   }
@@ -621,22 +631,22 @@ TEST(Base64, EscapeAndUnescape) {
 TEST(Base64, Padding) {
   // Padding is optional.
   // '.' is an acceptable padding character, just like '='.
-  std::initializer_list<std::string_view> good_padding = {
+  std::initializer_list<turbo::string_view> good_padding = {
     "YQ",
     "YQ==",
     "YQ=.",
     "YQ.=",
     "YQ..",
   };
-  for (std::string_view b64 : good_padding) {
+  for (turbo::string_view b64 : good_padding) {
     std::string decoded;
-    EXPECT_TRUE(turbo::base64_decode(b64, &decoded));
+    EXPECT_TRUE(turbo::Base64Unescape(b64, &decoded));
     EXPECT_EQ(decoded, "a");
     std::string websafe_decoded;
-    EXPECT_TRUE(turbo::web_safe_base64_decode(b64, &websafe_decoded));
+    EXPECT_TRUE(turbo::WebSafeBase64Unescape(b64, &websafe_decoded));
     EXPECT_EQ(websafe_decoded, "a");
   }
-  std::initializer_list<std::string_view> bad_padding = {
+  std::initializer_list<turbo::string_view> bad_padding = {
     "YQ=",
     "YQ.",
     "YQ===",
@@ -652,11 +662,11 @@ TEST(Base64, Padding) {
     "YQ=====",
     "YQ.....",
   };
-  for (std::string_view b64 : bad_padding) {
+  for (turbo::string_view b64 : bad_padding) {
     std::string decoded;
-    EXPECT_FALSE(turbo::base64_decode(b64, &decoded));
+    EXPECT_FALSE(turbo::Base64Unescape(b64, &decoded));
     std::string websafe_decoded;
-    EXPECT_FALSE(turbo::web_safe_base64_decode(b64, &websafe_decoded));
+    EXPECT_FALSE(turbo::WebSafeBase64Unescape(b64, &websafe_decoded));
   }
 }
 
@@ -666,7 +676,7 @@ TEST(Base64, DISABLED_HugeData) {
   const std::string huge(kSize, 'x');
 
   std::string escaped;
-  turbo::base64_encode(huge, &escaped);
+  turbo::Base64Escape(huge, &escaped);
 
   // Generates the string that should match a base64 encoded "xxx..." string.
   // "xxx" in base64 is "eHh4".
@@ -678,8 +688,44 @@ TEST(Base64, DISABLED_HugeData) {
   EXPECT_EQ(expected_encoding, escaped);
 
   std::string unescaped;
-  EXPECT_TRUE(turbo::base64_decode(escaped, &unescaped));
+  EXPECT_TRUE(turbo::Base64Unescape(escaped, &unescaped));
   EXPECT_EQ(huge, unescaped);
+}
+
+TEST(Escaping, HexStringToBytesBackToHex) {
+  std::string bytes, hex;
+
+  constexpr turbo::string_view kTestHexLower =  "1c2f0032f40123456789abcdef";
+  constexpr turbo::string_view kTestHexUpper =  "1C2F0032F40123456789ABCDEF";
+  constexpr turbo::string_view kTestBytes = turbo::string_view(
+      "\x1c\x2f\x00\x32\xf4\x01\x23\x45\x67\x89\xab\xcd\xef", 13);
+
+  EXPECT_TRUE(turbo::HexStringToBytes(kTestHexLower, &bytes));
+  EXPECT_EQ(bytes, kTestBytes);
+
+  EXPECT_TRUE(turbo::HexStringToBytes(kTestHexUpper, &bytes));
+  EXPECT_EQ(bytes, kTestBytes);
+
+  hex = turbo::BytesToHexString(kTestBytes);
+  EXPECT_EQ(hex, kTestHexLower);
+
+  // Same buffer.
+  // We do not care if this works since we do not promise it in the contract.
+  // The purpose of this test is to to see if the program will crash or if
+  // sanitizers will catch anything.
+  bytes = std::string(kTestHexUpper);
+  (void)turbo::HexStringToBytes(bytes, &bytes);
+
+  // Length not a multiple of two.
+  EXPECT_FALSE(turbo::HexStringToBytes("1c2f003", &bytes));
+
+  // Not hex.
+  EXPECT_FALSE(turbo::HexStringToBytes("1c2f00ft", &bytes));
+
+  // Empty input.
+  bytes = "abc";
+  EXPECT_TRUE(turbo::HexStringToBytes("", &bytes));
+  EXPECT_EQ("", bytes);  // Results in empty output.
 }
 
 TEST(HexAndBack, HexStringToBytes_and_BytesToHexString) {
@@ -687,20 +733,20 @@ TEST(HexAndBack, HexStringToBytes_and_BytesToHexString) {
   std::string bytes_expected = "\x01\x23\x45\x67\x89\xab\xcd\xef\xAB\xCD\xEF";
   std::string hex_only_lower = "0123456789abcdefabcdef";
 
-  std::string bytes_result = turbo::hex_to_bytes(hex_mixed);
+  std::string bytes_result = turbo::HexStringToBytes(hex_mixed);
   EXPECT_EQ(bytes_expected, bytes_result);
 
   std::string prefix_valid = hex_mixed + "?";
-  std::string prefix_valid_result = turbo::hex_to_bytes(
-      std::string_view(prefix_valid.data(), prefix_valid.size() - 1));
+  std::string prefix_valid_result = turbo::HexStringToBytes(
+      turbo::string_view(prefix_valid.data(), prefix_valid.size() - 1));
   EXPECT_EQ(bytes_expected, prefix_valid_result);
 
   std::string infix_valid = "?" + hex_mixed + "???";
-  std::string infix_valid_result = turbo::hex_to_bytes(
-      std::string_view(infix_valid.data() + 1, hex_mixed.size()));
+  std::string infix_valid_result = turbo::HexStringToBytes(
+      turbo::string_view(infix_valid.data() + 1, hex_mixed.size()));
   EXPECT_EQ(bytes_expected, infix_valid_result);
 
-  std::string hex_result = turbo::bytes_to_hex(bytes_expected);
+  std::string hex_result = turbo::BytesToHexString(bytes_expected);
   EXPECT_EQ(hex_only_lower, hex_result);
 }
 

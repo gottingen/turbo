@@ -1,33 +1,42 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-//      https://www.apache.org/licenses/LICENSE-2.0
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 //
 
 #ifndef TURBO_BASE_INTERNAL_IDENTITY_H_
 #define TURBO_BASE_INTERNAL_IDENTITY_H_
 
-#include "turbo/platform/port.h"
+#include <turbo/base/config.h>
 
-namespace turbo::internal {
+namespace turbo {
+TURBO_NAMESPACE_BEGIN
+namespace internal {
 
-    template<typename T>
-    struct identity {
-        typedef T type;
-    };
+// This is a back-fill of C++20's `std::type_identity`.
+template <typename T>
+struct type_identity {
+  typedef T type;
+};
 
-    template<typename T>
-    using identity_t = typename identity<T>::type;
+// This is a back-fill of C++20's `std::type_identity_t`.
+template <typename T>
+using type_identity_t = typename type_identity<T>::type;
 
-}  // namespace turbo::internal
+}  // namespace internal
+TURBO_NAMESPACE_END
+}  // namespace turbo
 
 #endif  // TURBO_BASE_INTERNAL_IDENTITY_H_
