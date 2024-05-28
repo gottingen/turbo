@@ -19,6 +19,7 @@
 
 #include <turbo/log/internal/append_file.h>
 #include <turbo/base/internal/strerror.h>
+#include <turbo/log/internal/fs_helper.h>
 #include <cerrno>
 #include <fstream>
 #include <cstring>
@@ -32,14 +33,14 @@ namespace turbo::log_internal {
     }
 
     int AppendFile::initialize(turbo::string_view path) {
-        if (_file != nullptr) {
-            return 0;
-        }
+        close();
         _path.assign(path.data(), path.size());
+        create_dir(dir_name(_path));
         _file = fopen(_path.c_str(), "ab");
         if (_file == nullptr) {
             return errno;
         }
+        _written = filesize(_file);
         ::setbuffer(_file, _buffer, sizeof(_buffer));
         return 0;
     }
@@ -49,10 +50,12 @@ namespace turbo::log_internal {
             ::fclose(_file);
             _file = nullptr;
         }
+        create_dir(dir_name(_path));
         _file = fopen(_path.c_str(), "ab");
         if (_file == nullptr) {
             return errno;
         }
+        _written = filesize(_file);
         ::setbuffer(_file, _buffer, sizeof(_buffer));
         return 0;
     }
@@ -75,6 +78,9 @@ namespace turbo::log_internal {
                 }
             }
             written += n;
+        }
+        if(written > 0) {
+            _written += written;
         }
 
         return written;

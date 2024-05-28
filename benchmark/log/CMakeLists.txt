@@ -32,6 +32,14 @@ carbin_cc_bm(
 )
 
 carbin_cc_bm(
+        NAME file_log_benchmark
+        MODULE log
+        SOURCES file_log_benchmark.cc
+        LINKS turbo::turbo benchmark::benchmark benchmark::benchmark_main ${CARBIN_DEPS_LINK}
+        CXXOPTS ${USER_CXX_FLAGS}
+)
+
+carbin_cc_bm(
         NAME vlog_config_benchmark
         MODULE log
         SOURCES vlog_config_benchmark.cc

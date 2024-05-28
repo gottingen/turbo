@@ -26,17 +26,24 @@
 #include <turbo/log/log_sink.h>
 #include <turbo/log/log_sink_registry.h>
 #include <turbo/log/vlog_is_on.h>
+#include <turbo/log/logging.h>
 #include <benchmark/benchmark.h>
 
 namespace {
 
-class NullLogSink : public turbo::LogSink {
- public:
-  NullLogSink() { turbo::add_log_sink(this); }
+    class NullLogSink : public turbo::LogSink {
+    public:
+        NullLogSink() { turbo::add_log_sink(this); }
 
-  ~NullLogSink() override { turbo::remove_log_sink(this); }
+        ~NullLogSink() override { turbo::remove_log_sink(this); }
 
-  void Send(const turbo::LogEntry&) override {}
+        void Send(const turbo::LogEntry&) override {}
+    };
+class FileSinkIniter {
+public:
+    FileSinkIniter() {
+        turbo::setup_daily_file_sink("log_file.txt");
+    }
 };
 
 constexpr int x = -1;
@@ -91,7 +98,7 @@ static void BM_EnabledLogOverhead(benchmark::State& state) {
       turbo::LogSeverityAtLeast::kInfinity);
   turbo::log_internal::ScopedMinLogLevel scoped_min_log_level(
       turbo::LogSeverityAtLeast::kInfo);
-  TURBO_ATTRIBUTE_UNUSED NullLogSink null_sink;
+  TURBO_ATTRIBUTE_UNUSED FileSinkIniter null_sink;
   for (auto _ : state) {
     LOG(INFO);
   }

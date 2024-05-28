@@ -182,7 +182,7 @@ TEST(ScopedMockLogTest, RejectsUnexpectedLogs) {
 }
 
 TEST(ScopedMockLogTest, CapturesLogsAfterStartCapturingLogs) {
-  turbo::SetStderrThreshold(turbo::LogSeverityAtLeast::kInfinity);
+  turbo::set_stderr_threshold(turbo::LogSeverityAtLeast::kInfinity);
   turbo::ScopedMockLog log;
 
   // The ScopedMockLog object shouldn't see these LOGs, as it hasn't

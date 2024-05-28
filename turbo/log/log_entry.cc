@@ -21,11 +21,10 @@
 #include <turbo/base/config.h>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 
 #ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
-constexpr int LogEntry::kNoVerbosityLevel;
-constexpr int LogEntry::kNoVerboseLevel;
+    constexpr int LogEntry::kNoVerbosityLevel;
+    constexpr int LogEntry::kNoVerboseLevel;
 #endif
 
 // https://github.com/abseil/abseil-cpp/issues/1465
@@ -34,11 +33,10 @@ constexpr int LogEntry::kNoVerboseLevel;
 // but since this library is conditionally empty, including a single
 // variable is an easy workaround.
 #ifdef __APPLE__
-namespace log_internal {
-extern const char kAvoidEmptyLogEntryLibraryWarning;
-const char kAvoidEmptyLogEntryLibraryWarning = 0;
-}  // namespace log_internal
+    namespace log_internal {
+    extern const char kAvoidEmptyLogEntryLibraryWarning;
+    const char kAvoidEmptyLogEntryLibraryWarning = 0;
+    }  // namespace log_internal
 #endif  // __APPLE__
 
-TURBO_NAMESPACE_END
 }  // namespace turbo

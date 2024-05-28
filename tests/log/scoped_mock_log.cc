@@ -68,7 +68,7 @@ void ScopedMockLog::StartCapturingLogs() {
 
   is_capturing_logs_ = true;
   is_triggered_.store(true, std::memory_order_relaxed);
-  turbo::AddLogSink(&sink_);
+  turbo::add_log_sink(&sink_);
 }
 
 void ScopedMockLog::StopCapturingLogs() {
@@ -77,7 +77,7 @@ void ScopedMockLog::StopCapturingLogs() {
                  "turbo::ScopedMockLog object is capturing logs.");
 
   is_capturing_logs_ = false;
-  turbo::RemoveLogSink(&sink_);
+  turbo::remove_log_sink(&sink_);
 }
 
 turbo::LogSink& ScopedMockLog::UseAsLocalSink() {

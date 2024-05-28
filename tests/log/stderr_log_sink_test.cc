@@ -50,7 +50,7 @@ MATCHER_P2(HasSubstrTimes, substr, expected_count, "") {
 TEST(StderrLogSinkDeathTest, InfoMessagesInStderr) {
   EXPECT_DEATH_IF_SUPPORTED(
       {
-        turbo::SetStderrThreshold(turbo::LogSeverityAtLeast::kInfo);
+        turbo::set_stderr_threshold(turbo::LogSeverityAtLeast::kInfo);
         LOG(INFO) << "INFO message";
         exit(1);
       },
@@ -60,7 +60,7 @@ TEST(StderrLogSinkDeathTest, InfoMessagesInStderr) {
 TEST(StderrLogSinkDeathTest, WarningMessagesInStderr) {
   EXPECT_DEATH_IF_SUPPORTED(
       {
-        turbo::SetStderrThreshold(turbo::LogSeverityAtLeast::kInfo);
+        turbo::set_stderr_threshold(turbo::LogSeverityAtLeast::kInfo);
         LOG(WARNING) << "WARNING message";
         exit(1);
       },
@@ -70,7 +70,7 @@ TEST(StderrLogSinkDeathTest, WarningMessagesInStderr) {
 TEST(StderrLogSinkDeathTest, ErrorMessagesInStderr) {
   EXPECT_DEATH_IF_SUPPORTED(
       {
-        turbo::SetStderrThreshold(turbo::LogSeverityAtLeast::kInfo);
+        turbo::set_stderr_threshold(turbo::LogSeverityAtLeast::kInfo);
         LOG(ERROR) << "ERROR message";
         exit(1);
       },
@@ -85,7 +85,7 @@ TEST(StderrLogSinkDeathTest, FatalMessagesInStderr) {
 
   EXPECT_DEATH_IF_SUPPORTED(
       {
-        turbo::SetStderrThreshold(turbo::LogSeverityAtLeast::kInfo);
+        turbo::set_stderr_threshold(turbo::LogSeverityAtLeast::kInfo);
         LOG(FATAL) << message;
       },
       AllOf(HasSubstrTimes(message, expected_count), HasSubstr(stacktrace)));
@@ -99,7 +99,7 @@ TEST(StderrLogSinkDeathTest, SecondaryFatalMessagesInStderr) {
 
   EXPECT_DEATH_IF_SUPPORTED(
       {
-        turbo::SetStderrThreshold(turbo::LogSeverityAtLeast::kInfo);
+        turbo::set_stderr_threshold(turbo::LogSeverityAtLeast::kInfo);
         LOG(FATAL) << MessageGen();
       },
       "Internal failure");

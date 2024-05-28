@@ -33,7 +33,7 @@ namespace log_internal {
 
 // Returns true if a globally-registered `LogSink`'s `Send()` is currently
 // being invoked on this thread.
-bool ThreadIsLoggingToLogSink();
+bool thread_is_logging_to_log_sink();
 
 // This function may log to two sets of sinks:
 //
@@ -41,14 +41,14 @@ bool ThreadIsLoggingToLogSink();
 //   `LogMessage::ToSinkAlso` and `LogMessage::ToSinkOnly` are used to attach
 //    extra sinks to the entry.
 // * Otherwise it will also log to the global sinks set. This set is managed
-//   by `turbo::AddLogSink` and `turbo::RemoveLogSink`.
-void LogToSinks(const turbo::LogEntry& entry,
+//   by `turbo::add_log_sink` and `turbo::remove_log_sink`.
+void log_to_sinks(const turbo::LogEntry& entry,
                 turbo::Span<turbo::LogSink*> extra_sinks, bool extra_sinks_only);
 
 // Implementation for operations with log sink set.
-void AddLogSink(turbo::LogSink* sink);
-void RemoveLogSink(turbo::LogSink* sink);
-void FlushLogSinks();
+void add_log_sink(turbo::LogSink* sink);
+void remove_log_sink(turbo::LogSink* sink);
+void flush_log_sinks();
 
 }  // namespace log_internal
 TURBO_NAMESPACE_END

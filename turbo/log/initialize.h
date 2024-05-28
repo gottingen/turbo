@@ -19,17 +19,16 @@
 // File: log/initialize.h
 // -----------------------------------------------------------------------------
 //
-// This header declares the Turbo Log initialization routine InitializeLog().
+// This header declares the Turbo Log initialization routine initialize_log().
 
-#ifndef TURBO_LOG_INITIALIZE_H_
-#define TURBO_LOG_INITIALIZE_H_
+#pragma once
 
 #include <turbo/base/config.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 
-// InitializeLog()
+// initialize_log()
 //
 // Initializes the Turbo logging library.
 //
@@ -40,9 +39,7 @@ TURBO_NAMESPACE_BEGIN
 // It is an error to call this function twice.
 //
 // There is no corresponding function to shut down the logging library.
-void InitializeLog();
+void initialize_log();
 
 TURBO_NAMESPACE_END
 }  // namespace turbo
-
-#endif  // TURBO_LOG_INITIALIZE_H_

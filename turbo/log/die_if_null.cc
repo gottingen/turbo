@@ -16,20 +16,15 @@
 //
 
 #include <turbo/log/die_if_null.h>
-
 #include <turbo/base/config.h>
 #include <turbo/log/log.h>
 #include <turbo/strings/str_cat.h>
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace log_internal {
+namespace turbo::log_internal {
 
-void DieBecauseNull(const char* file, int line, const char* exprtext) {
-  LOG(FATAL).AtLocation(file, line)
-      << turbo::StrCat("Check failed: '", exprtext, "' Must be non-null");
-}
+    void DieBecauseNull(const char *file, int line, const char *exprtext) {
+        LOG(FATAL).AtLocation(file, line)
+                          << turbo::StrCat("Check failed: '", exprtext, "' Must be non-null");
+    }
 
-}  // namespace log_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::log_internal

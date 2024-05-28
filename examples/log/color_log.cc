@@ -1,3 +1,4 @@
+//
 // Copyright (C) 2024 EA group inc.
 // Author: Jeff.li lijippy@163.com
 // All rights reserved.
@@ -15,13 +16,41 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/log/log_sink.h>
+#include <turbo/log/logging.h>
 
-#include <turbo/base/config.h>
+void call0() {
+    int x = 3, y = 5;
+    CHECK_EQ(2 * x, y) << "oops!";
+}
+void call1() {
+    call0();
+}
+void call2() {
+    call1();
+}
+void call3() {
+    LOG(INFO) << "hello world call3"<<"sd";
+    call2();
+}
+void call4() {
+    call3();
+}
+void call5() {
+    call4();
+    LOG(INFO) << "hello world call5";
+}
+void call6() {
+    LOG(INFO) << "hello world call6";
+    call5();
+}
+int main() {
 
-namespace turbo {
-    TURBO_NAMESPACE_BEGIN
-    void LogSink::KeyFunction() const {}
-
-    TURBO_NAMESPACE_END
-}  // namespace turbo
+    //turbo::initialize_log();
+       turbo::setup_color_stderr_sink();
+    for(int i = 0; i < 100; i++) {
+        LOG(INFO) << "hello world "<<i;
+        LOG(WARNING) << "hello world";
+        LOG(ERROR) << "hello world";
+    }
+    call6();
+}

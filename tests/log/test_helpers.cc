@@ -33,9 +33,9 @@ TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 
 // Returns false if the specified severity level is disabled by
-// `TURBO_MIN_LOG_LEVEL` or `turbo::MinLogLevel()`.
+// `TURBO_MIN_LOG_LEVEL` or `turbo::min_log_level()`.
 bool LoggingEnabledAt(turbo::LogSeverity severity) {
-  return severity >= kTurboMinLogLevel && severity >= turbo::MinLogLevel();
+  return severity >= kTurboMinLogLevel && severity >= turbo::min_log_level();
 }
 
 // -----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ bool DiedOfQFatal(int exit_status) {
 
 void LogTestEnvironment::SetUp() {
   if (!turbo::log_internal::IsInitialized()) {
-    turbo::InitializeLog();
+    turbo::initialize_log();
   }
 }
 

@@ -56,9 +56,18 @@ namespace turbo::log_internal {
         // Close the file writer.
         void close() override;
 
+        size_t file_size() const override {
+            return _written;
+        }
+
+        std::string file_path() const override {
+            return _path;
+        }
+
     private:
         std::string _path;
         char _buffer[64 * 1024];
+        std::size_t _written = 0;
         FILE *_file = nullptr;
 
     };

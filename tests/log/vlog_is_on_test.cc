@@ -39,7 +39,7 @@ turbo::optional<int> MaxLogVerbosity() {
 #endif
 }
 
-turbo::optional<int> MinLogLevel() {
+turbo::optional<int> min_log_level() {
 #ifdef TURBO_MIN_LOG_LEVEL
   return static_cast<int>(TURBO_MIN_LOG_LEVEL);
 #else
@@ -48,11 +48,11 @@ turbo::optional<int> MinLogLevel() {
 }
 
 TEST(VLogIsOn, GlobalWorksWithoutMaxVerbosityAndMinLogLevel) {
-  if (MaxLogVerbosity().has_value() || MinLogLevel().has_value()) {
+  if (MaxLogVerbosity().has_value() || min_log_level().has_value()) {
     GTEST_SKIP();
   }
 
-  turbo::SetGlobalVLogLevel(3);
+  turbo::set_global_vlog_level(3);
   turbo::ScopedMockLog log(turbo::MockLogDefault::kDisallowUnexpected);
 
   EXPECT_CALL(log, Log(turbo::LogSeverity::kInfo, _, "important"));
@@ -63,11 +63,11 @@ TEST(VLogIsOn, GlobalWorksWithoutMaxVerbosityAndMinLogLevel) {
 }
 
 TEST(VLogIsOn, FileWorksWithoutMaxVerbosityAndMinLogLevel) {
-  if (MaxLogVerbosity().has_value() || MinLogLevel().has_value()) {
+  if (MaxLogVerbosity().has_value() || min_log_level().has_value()) {
     GTEST_SKIP();
   }
 
-  turbo::SetVLogLevel("vlog_is_on_test", 3);
+  turbo::set_vlog_level("vlog_is_on_test", 3);
   turbo::ScopedMockLog log(turbo::MockLogDefault::kDisallowUnexpected);
 
   EXPECT_CALL(log, Log(turbo::LogSeverity::kInfo, _, "important"));
@@ -78,11 +78,11 @@ TEST(VLogIsOn, FileWorksWithoutMaxVerbosityAndMinLogLevel) {
 }
 
 TEST(VLogIsOn, PatternWorksWithoutMaxVerbosityAndMinLogLevel) {
-  if (MaxLogVerbosity().has_value() || MinLogLevel().has_value()) {
+  if (MaxLogVerbosity().has_value() || min_log_level().has_value()) {
     GTEST_SKIP();
   }
 
-  turbo::SetVLogLevel("vlog_is_on*", 3);
+  turbo::set_vlog_level("vlog_is_on*", 3);
   turbo::ScopedMockLog log(turbo::MockLogDefault::kDisallowUnexpected);
 
   EXPECT_CALL(log, Log(turbo::LogSeverity::kInfo, _, "important"));
@@ -98,7 +98,7 @@ TEST(VLogIsOn, GlobalDoesNotFilterBelowMaxVerbosity) {
   }
 
   // Set an arbitrary high value to avoid filtering VLOGs in tests by default.
-  turbo::SetGlobalVLogLevel(1000);
+  turbo::set_global_vlog_level(1000);
   turbo::ScopedMockLog log(turbo::MockLogDefault::kDisallowUnexpected);
 
   EXPECT_CALL(log, Log(turbo::LogSeverity::kInfo, _, "asdf"));
@@ -113,7 +113,7 @@ TEST(VLogIsOn, FileDoesNotFilterBelowMaxVerbosity) {
   }
 
   // Set an arbitrary high value to avoid filtering VLOGs in tests by default.
-  turbo::SetVLogLevel("vlog_is_on_test", 1000);
+  turbo::set_vlog_level("vlog_is_on_test", 1000);
   turbo::ScopedMockLog log(turbo::MockLogDefault::kDisallowUnexpected);
 
   EXPECT_CALL(log, Log(turbo::LogSeverity::kInfo, _, "asdf"));
@@ -128,7 +128,7 @@ TEST(VLogIsOn, PatternDoesNotFilterBelowMaxVerbosity) {
   }
 
   // Set an arbitrary high value to avoid filtering VLOGs in tests by default.
-  turbo::SetVLogLevel("vlog_is_on*", 1000);
+  turbo::set_vlog_level("vlog_is_on*", 1000);
   turbo::ScopedMockLog log(turbo::MockLogDefault::kDisallowUnexpected);
 
   EXPECT_CALL(log, Log(turbo::LogSeverity::kInfo, _, "asdf"));
@@ -143,7 +143,7 @@ TEST(VLogIsOn, GlobalFiltersAboveMaxVerbosity) {
   }
 
   // Set an arbitrary high value to avoid filtering VLOGs in tests by default.
-  turbo::SetGlobalVLogLevel(1000);
+  turbo::set_global_vlog_level(1000);
   turbo::ScopedMockLog log(turbo::MockLogDefault::kDisallowUnexpected);
 
   log.StartCapturingLogs();
@@ -156,7 +156,7 @@ TEST(VLogIsOn, FileFiltersAboveMaxVerbosity) {
   }
 
   // Set an arbitrary high value to avoid filtering VLOGs in tests by default.
-  turbo::SetVLogLevel("vlog_is_on_test", 1000);
+  turbo::set_vlog_level("vlog_is_on_test", 1000);
   turbo::ScopedMockLog log(turbo::MockLogDefault::kDisallowUnexpected);
 
   log.StartCapturingLogs();
@@ -169,7 +169,7 @@ TEST(VLogIsOn, PatternFiltersAboveMaxVerbosity) {
   }
 
   // Set an arbitrary high value to avoid filtering VLOGs in tests by default.
-  turbo::SetVLogLevel("vlog_is_on*", 1000);
+  turbo::set_vlog_level("vlog_is_on*", 1000);
   turbo::ScopedMockLog log(turbo::MockLogDefault::kDisallowUnexpected);
 
   log.StartCapturingLogs();

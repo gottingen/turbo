@@ -21,33 +21,43 @@
 
 #include <turbo/log/log_sink.h>
 #include <deque>
+#include <memory>
+#include <mutex>
 #include <turbo/time/time.h>
+#include <turbo/log/internal/append_file.h>
+#include <turbo/container/circular_queue.h>
+#include <turbo/log/log_sink_registry.h>
 
 namespace turbo {
 
-    class DailyFileSink : public LogSink {
+    class HourlyFileSink : public LogSink {
     public:
-        DailyFileSink(turbo::string_view base_filename,
-                      int rotation_hour,
-                      int rotation_minute,
+        HourlyFileSink(turbo::string_view base_filename,
+                      int rotation_minute = 0,
+                      int check_interval_s = 60,
                       bool truncate = false,
                       uint16_t max_files = 0);
 
-        ~DailyFileSink() override;
+        ~HourlyFileSink() override;
 
         void Send(const LogEntry& entry) override;
 
         void Flush() override;
     private:
-        turbo::Time next_rotation_time() const;
+        turbo::Time next_rotation_time(turbo::Time stamp) const;
+        void init_file_queue();
+        void rotate_file(turbo::Time stamp);
     private:
         std::string _base_filename;
-        int _rotation_hour;
         int _rotation_minute;
         bool _truncate;
         uint16_t _max_files;
+        int  _check_interval_s;
+        turbo::Time _next_check_time;
         turbo::Time _next_rotation_time;
-        std::deque<std::string> _files;
+        circular_queue<std::string> _files;
+        std::unique_ptr<FileWriter> _file_writer;
+        std::mutex _mutex;
 
     };
 }  // namespace  turbo
