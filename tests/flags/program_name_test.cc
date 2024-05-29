@@ -56,8 +56,8 @@ TEST(FlagsPathUtilTest, TestProgamNameInterfaces) {
 
   flags::SetProgramInvocationName(not_null_terminated);
 
-  EXPECT_EQ(flags::ProgramInvocationName(), "bsl/aaa/bb");
-  EXPECT_EQ(flags::ShortProgramInvocationName(), "bb");
+  EXPECT_EQ(flags::ProgramInvocationName(), "urbo/aaa/b")<< flags::ProgramInvocationName();
+  EXPECT_EQ(flags::ShortProgramInvocationName(), "b")<< flags::ShortProgramInvocationName();
 }
 
 }  // namespace

@@ -198,7 +198,7 @@ TEST_F(UsageReportingTest, TestFlagsHelpHRF) {
   std::string usage_test_flags_out =
       R"(usage_test: Custom usage message
 
-  Flags from turbo/flags/internal/usage_test.cc:
+  Flags from turbo/tests/flags/usage_test.cc:
     --usage_reporting_test_flag_01 (usage_reporting_test_flag_01 help message);
       default: 101;
     --usage_reporting_test_flag_02 (usage_reporting_test_flag_02 help message);
@@ -230,9 +230,9 @@ path.
   EXPECT_EQ(test_buf_01.str(), usage_test_flags_out);
 
   std::stringstream test_buf_02;
-  flags::FlagsHelp(test_buf_02, "flags/internal/usage_test.cc",
+  flags::FlagsHelp(test_buf_02, "turbo/tests/flags/usage_test.cc",
                    flags::HelpFormat::kHumanReadable, kTestUsageMessage);
-  EXPECT_EQ(test_buf_02.str(), usage_test_flags_out);
+  EXPECT_EQ(test_buf_02.str(), usage_test_flags_out)<< test_buf_02.str();
 
   std::stringstream test_buf_03;
   flags::FlagsHelp(test_buf_03, "usage_test", flags::HelpFormat::kHumanReadable,
@@ -260,7 +260,7 @@ path.
   EXPECT_TRUE(
       turbo::StartsWith(test_out_str, "usage_test: Custom usage message"));
   EXPECT_TRUE(turbo::StrContains(
-      test_out_str, "Flags from turbo/flags/internal/usage_test.cc:"));
+      test_out_str, "Flags from turbo/tests/flags/usage_test.cc:"));
   EXPECT_TRUE(
       turbo::StrContains(test_out_str, "-usage_reporting_test_flag_01 "));
 }
@@ -285,7 +285,7 @@ TEST_F(UsageReportingTest, TestUsageFlag_helpshort) {
       test_buf.str(),
       R"(usage_test: Custom usage message
 
-  Flags from turbo/flags/internal/usage_test.cc:
+  Flags from turbo/tests/flags/usage_test.cc:
     --usage_reporting_test_flag_01 (usage_reporting_test_flag_01 help message);
       default: 101;
     --usage_reporting_test_flag_02 (usage_reporting_test_flag_02 help message);
@@ -324,7 +324,7 @@ TEST_F(UsageReportingTest, TestUsageFlag_help_simple) {
       test_buf.str(),
       R"(usage_test: Custom usage message
 
-  Flags from turbo/flags/internal/usage_test.cc:
+  Flags from turbo/tests/flags/usage_test.cc:
     --usage_reporting_test_flag_01 (usage_reporting_test_flag_01 help message);
       default: 101;
     --usage_reporting_test_flag_02 (usage_reporting_test_flag_02 help message);
@@ -363,7 +363,7 @@ TEST_F(UsageReportingTest, TestUsageFlag_help_one_flag) {
   EXPECT_EQ(test_buf.str(),
             R"(usage_test: Custom usage message
 
-  Flags from turbo/flags/internal/usage_test.cc:
+  Flags from turbo/tests/flags/usage_test.cc:
     --usage_reporting_test_flag_06 (usage_reporting_test_flag_06 help message.
 
       Some more help.
@@ -389,7 +389,7 @@ TEST_F(UsageReportingTest, TestUsageFlag_help_multiple_flag) {
       test_buf.str(),
       R"(usage_test: Custom usage message
 
-  Flags from turbo/flags/internal/usage_test.cc:
+  Flags from turbo/tests/flags/usage_test.cc:
     --usage_reporting_test_flag_01 (usage_reporting_test_flag_01 help message);
       default: 101;
     --usage_reporting_test_flag_02 (usage_reporting_test_flag_02 help message);
@@ -428,7 +428,7 @@ TEST_F(UsageReportingTest, TestUsageFlag_helppackage) {
       test_buf.str(),
       R"(usage_test: Custom usage message
 
-  Flags from turbo/flags/internal/usage_test.cc:
+  Flags from turbo/tests/flags/usage_test.cc:
     --usage_reporting_test_flag_01 (usage_reporting_test_flag_01 help message);
       default: 101;
     --usage_reporting_test_flag_02 (usage_reporting_test_flag_02 help message);
@@ -509,7 +509,7 @@ path.
       test_buf_02.str(),
       R"(usage_test: Custom usage message
 
-  Flags from turbo/flags/internal/usage_test.cc:
+  Flags from turbo/tests/flags/usage_test.cc:
     --usage_reporting_test_flag_01 (usage_reporting_test_flag_01 help message);
       default: 101;
     --usage_reporting_test_flag_02 (usage_reporting_test_flag_02 help message);
