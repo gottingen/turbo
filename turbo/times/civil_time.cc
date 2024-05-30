@@ -62,7 +62,7 @@ namespace turbo {
             const TimeZone utc = UTCTimeZone();
             Time t;
             if (Time::parse(StrCat("%Y", fmt), norm, utc, &t, nullptr)) {
-                const auto cs = ToCivilSecond(t, utc);
+                const auto cs = Time::to_civil_second(t, utc);
                 *c = CivilT(y, cs.month(), cs.day(), cs.hour(), cs.minute(), cs.second());
                 return true;
             }

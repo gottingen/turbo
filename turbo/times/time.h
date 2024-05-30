@@ -879,6 +879,7 @@ namespace turbo {
 
         template<typename T = int64_t>
         static T current_seconds();
+
     public:
         TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Time from_nanoseconds(int64_t ns);
 
@@ -930,8 +931,20 @@ namespace turbo {
         // happened.
         TURBO_ATTRIBUTE_PURE_FUNCTION static Time from_tm(const struct tm &tm, TimeZone tz);
 
+        // Time::from_civil()
+        //
+        // Helper for TimeZone::At(CivilSecond) that provides "order-preserving
+        // semantics." If the civil time maps to a unique time, that time is
+        // returned. If the civil time is repeated in the given time zone, the
+        // time using the pre-transition offset is returned. Otherwise, the
+        // civil time is skipped in the given time zone, and the transition time
+        // is returned. This means that for any two civil times, ct1 and ct2,
+        // (ct1 < ct2) => (Time::from_civil(ct1) <= Time::from_civil(ct2)), the equal case
+        // being when two non-existent civil times map to the same transition time.
+        //
+        // Note: Accepts civil times of any alignment.
         TURBO_ATTRIBUTE_PURE_FUNCTION static Time from_civil(CivilSecond ct,
-                                                            TimeZone tz);
+                                                             TimeZone tz);
 
         // Time::from_unix_epoch()
         //
@@ -943,6 +956,7 @@ namespace turbo {
         // Returns the `turbo::Time` representing "0001-01-01 00:00:00.0 +0000", the
         // epoch of the ICU Universal Time Scale.
         TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Time from_universal_epoch();
+
     public:
         // future_infinite()
         //
@@ -954,6 +968,73 @@ namespace turbo {
         //
         // Returns an `turbo::Time` that is infinitely far in the past.
         TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Time past_infinite();
+
+    public:
+        // Converts an `turbo::Time` to a variety of other representations.  See
+        // https://unicode-org.github.io/icu/userguide/datetime/universaltimescale.html
+        //
+        // Note that these operations round down toward negative infinity where
+        // necessary to adjust to the resolution of the result type.  Beware of
+        // possible time_t over/underflow in ToTime{T,val,spec}() on 32-bit platforms.
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t to_nanoseconds(Time t);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t to_microseconds(Time t);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t to_milliseconds(Time t);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t to_seconds(Time t);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static time_t to_time_t(Time t);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static double to_udate(Time t);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t to_universal(Time t);
+        // Time::to_chrono()
+        //
+        // Converts an turbo::Time to a std::chrono::system_clock::time_point. If
+        // overflow would occur, the returned value will saturate at the min/max time
+        // point value instead.
+        //
+        // Example:
+        //
+        //   turbo::Time t = turbo::Time::from_time_t(123);
+        //   auto tp = turbo::Time::to_chrono(t);
+        //   // tp == std::chrono::system_clock::from_time_t(123);
+        TURBO_ATTRIBUTE_CONST_FUNCTION static std::chrono::system_clock::time_point to_chrono(Time);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static timespec to_timespec(Time t);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static timeval to_timeval(Time t);
+
+        // Helpers for TimeZone::At(Time) to return particularly aligned civil times.
+        //
+        // Example:
+        //
+        //   turbo::Time t = ...;
+        //   turbo::TimeZone tz = ...;
+        //   const auto cd = turbo::Time::to_civil_day(t, tz);
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilSecond to_civil_second(Time t,
+                                                                       TimeZone tz);
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilMinute to_civil_minute(Time t, TimeZone tz);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilHour to_civil_hour(Time t, TimeZone tz);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilDay to_civil_day(Time t, TimeZone tz);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilMonth to_civil_month(Time t, TimeZone tz);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilYear to_civil_year(Time t, TimeZone tz);
+
+        // Time::to_tm()
+        //
+        // Converts the given `turbo::Time` to a struct tm using the given time zone.
+        // See ctime(3) for a description of the values of the tm fields.
+        TURBO_ATTRIBUTE_PURE_FUNCTION static struct tm to_tm(Time t, TimeZone tz);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static struct tm to_utc_tm(Time t);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static struct tm to_local_tm(Time t);
+
     public:
         // Time::parse()
         //
@@ -1005,7 +1086,7 @@ namespace turbo {
         // `turbo::Time::past_infinite()` and `true` will be returned.
         //
         static bool parse(turbo::string_view format, turbo::string_view input, Time *time,
-                       std::string *err);
+                          std::string *err);
 
         // Like Time::parse() above, but if the format string does not contain a UTC
         // offset specification (%z/%Ez/%E*z) then the input is interpreted in the
@@ -1015,7 +1096,7 @@ namespace turbo {
         // by TimeZone::TimeInfo) is returned.  For these reasons we recommend that
         // all date/time strings include a UTC offset so they're context independent.
         static bool parse(turbo::string_view format, turbo::string_view input, TimeZone tz,
-                       Time *time, std::string *err);
+                          Time *time, std::string *err);
 
         // Time::format()
         //
@@ -1055,7 +1136,7 @@ namespace turbo {
         // In both cases the given format string and `turbo::TimeZone` are ignored.
         //
         TURBO_ATTRIBUTE_PURE_FUNCTION static std::string format(turbo::string_view format,
-                                                             Time t, TimeZone tz);
+                                                                Time t, TimeZone tz);
 
         // Convenience functions that format the given time using the RFC3339_full
         // format.  The first overload uses the provided TimeZone, while the second
@@ -1063,6 +1144,7 @@ namespace turbo {
         TURBO_ATTRIBUTE_PURE_FUNCTION static std::string format(Time t, TimeZone tz);
 
         TURBO_ATTRIBUTE_PURE_FUNCTION static std::string format(Time t);
+
     public:
         template<typename H>
         friend H turbo_hash_value(H h, Time t) {
@@ -1127,34 +1209,6 @@ namespace turbo {
         return lhs.rep_ - rhs.rep_;
     }
 
-    // ToUnixNanos()
-    // ToUnixMicros()
-    // ToUnixMillis()
-    // ToUnixSeconds()
-    // ToTimeT()
-    // ToUDate()
-    // ToUniversal()
-    //
-    // Converts an `turbo::Time` to a variety of other representations.  See
-    // https://unicode-org.github.io/icu/userguide/datetime/universaltimescale.html
-    //
-    // Note that these operations round down toward negative infinity where
-    // necessary to adjust to the resolution of the result type.  Beware of
-    // possible time_t over/underflow in ToTime{T,val,spec}() on 32-bit platforms.
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToUnixNanos(Time t);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToUnixMicros(Time t);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToUnixMillis(Time t);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToUnixSeconds(Time t);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION time_t ToTimeT(Time t);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION double ToUDate(Time t);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToUniversal(Time t);
-
     // DurationFromTimespec()
     // DurationFromTimeval()
     // ToTimespec()
@@ -1177,23 +1231,6 @@ namespace turbo {
 
     TURBO_ATTRIBUTE_CONST_FUNCTION timeval ToTimeval(Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION timespec ToTimespec(Time t);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION timeval ToTimeval(Time t);
-
-    // ToChronoTime()
-    //
-    // Converts an turbo::Time to a std::chrono::system_clock::time_point. If
-    // overflow would occur, the returned value will saturate at the min/max time
-    // point value instead.
-    //
-    // Example:
-    //
-    //   turbo::Time t = turbo::Time::from_time_t(123);
-    //   auto tp = turbo::ToChronoTime(t);
-    //   // tp == std::chrono::system_clock::from_time_t(123);
-    TURBO_ATTRIBUTE_CONST_FUNCTION std::chrono::system_clock::time_point
-    ToChronoTime(Time);
 
     // turbo_parse_flag()
     //
@@ -1459,72 +1496,6 @@ namespace turbo {
     inline TimeZone LocalTimeZone() {
         return TimeZone(time_internal::cctz::local_time_zone());
     }
-
-    // ToCivilSecond()
-    // ToCivilMinute()
-    // ToCivilHour()
-    // ToCivilDay()
-    // ToCivilMonth()
-    // ToCivilYear()
-    //
-    // Helpers for TimeZone::At(Time) to return particularly aligned civil times.
-    //
-    // Example:
-    //
-    //   turbo::Time t = ...;
-    //   turbo::TimeZone tz = ...;
-    //   const auto cd = turbo::ToCivilDay(t, tz);
-    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilSecond ToCivilSecond(Time t,
-                                                                   TimeZone tz) {
-        return tz.At(t).cs;  // already a CivilSecond
-    }
-
-    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilMinute ToCivilMinute(Time t,
-                                                                   TimeZone tz) {
-        return CivilMinute(tz.At(t).cs);
-    }
-
-    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilHour ToCivilHour(Time t, TimeZone tz) {
-        return CivilHour(tz.At(t).cs);
-    }
-
-    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilDay ToCivilDay(Time t, TimeZone tz) {
-        return CivilDay(tz.At(t).cs);
-    }
-
-    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilMonth ToCivilMonth(Time t,
-                                                                 TimeZone tz) {
-        return CivilMonth(tz.At(t).cs);
-    }
-
-    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilYear ToCivilYear(Time t, TimeZone tz) {
-        return CivilYear(tz.At(t).cs);
-    }
-
-    // Time::from_civil()
-    //
-    // Helper for TimeZone::At(CivilSecond) that provides "order-preserving
-    // semantics." If the civil time maps to a unique time, that time is
-    // returned. If the civil time is repeated in the given time zone, the
-    // time using the pre-transition offset is returned. Otherwise, the
-    // civil time is skipped in the given time zone, and the transition time
-    // is returned. This means that for any two civil times, ct1 and ct2,
-    // (ct1 < ct2) => (Time::from_civil(ct1) <= Time::from_civil(ct2)), the equal case
-    // being when two non-existent civil times map to the same transition time.
-    //
-    // Note: Accepts civil times of any alignment.
-    TURBO_ATTRIBUTE_PURE_FUNCTION inline Time Time::from_civil(CivilSecond ct,
-                                                        TimeZone tz) {
-        const auto ti = tz.At(ct);
-        if (ti.kind == TimeZone::TimeInfo::SKIPPED) return ti.trans;
-        return ti.pre;
-    }
-
-    // ToTM()
-    //
-    // Converts the given `turbo::Time` to a struct tm using the given time zone.
-    // See ctime(3) for a description of the values of the tm fields.
-    TURBO_ATTRIBUTE_PURE_FUNCTION struct tm ToTM(Time t, TimeZone tz);
 
     // RFC3339_full
     // RFC3339_sec
@@ -1852,6 +1823,13 @@ namespace turbo {
         return time_internal::FromUnixDuration(Seconds(t));
     }
 
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline Time Time::from_civil(CivilSecond ct,
+                                                               TimeZone tz) {
+        const auto ti = tz.At(ct);
+        if (ti.kind == TimeZone::TimeInfo::SKIPPED) return ti.trans;
+        return ti.pre;
+    }
+
     // future_infinite()
     //
     // Returns an `turbo::Time` that is infinitely far in the future.
@@ -1882,6 +1860,41 @@ namespace turbo {
         // assuming the Gregorian calendar.
         return Time(
                 time_internal::MakeDuration(-24 * 719162 * int64_t{3600}, uint32_t{0}));
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilSecond Time::to_civil_second(Time t,
+                                                                   TimeZone tz) {
+        return tz.At(t).cs;  // already a CivilSecond
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilMinute Time::to_civil_minute(Time t, TimeZone tz) {
+        return CivilMinute(tz.At(t).cs);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilHour Time::to_civil_hour(Time t, TimeZone tz) {
+        return CivilHour(tz.At(t).cs);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilDay Time::to_civil_day(Time t, TimeZone tz) {
+        return CivilDay(tz.At(t).cs);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilMonth Time::to_civil_month(Time t,
+                                                                         TimeZone tz) {
+        return CivilMonth(tz.At(t).cs);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilYear Time::to_civil_year(Time t, TimeZone tz) {
+        return CivilYear(tz.At(t).cs);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline struct tm Time::to_utc_tm(Time t) {
+        return to_tm(t, UTCTimeZone());
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline struct tm Time::to_local_tm(Time t) {
+        return to_tm(t, LocalTimeZone());
+
     }
 }
 

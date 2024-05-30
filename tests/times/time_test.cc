@@ -252,45 +252,45 @@ namespace {
   EXPECT_EQ(-1, TO(FROM(-1000)));       \
   EXPECT_EQ(-2, TO(FROM(-1001)));
 
-        TEST_FLOOR_CONVERSION(turbo::ToUnixMicros, turbo::Time::from_nanoseconds);
-        TEST_FLOOR_CONVERSION(turbo::ToUnixMillis, turbo::Time::from_microseconds);
-        TEST_FLOOR_CONVERSION(turbo::ToUnixSeconds, turbo::Time::from_milliseconds);
-        TEST_FLOOR_CONVERSION(turbo::ToTimeT, turbo::Time::from_milliseconds);
+        TEST_FLOOR_CONVERSION(turbo::Time::to_microseconds, turbo::Time::from_nanoseconds);
+        TEST_FLOOR_CONVERSION(turbo::Time::to_milliseconds, turbo::Time::from_microseconds);
+        TEST_FLOOR_CONVERSION(turbo::Time::to_seconds, turbo::Time::from_milliseconds);
+        TEST_FLOOR_CONVERSION(turbo::Time::to_time_t, turbo::Time::from_milliseconds);
 
 #undef TEST_FLOOR_CONVERSION
 
-        // Tests ToUnixNanos.
-        EXPECT_EQ(1, turbo::ToUnixNanos(turbo::Time::from_unix_epoch() + turbo::Nanoseconds(3) / 2));
-        EXPECT_EQ(1, turbo::ToUnixNanos(turbo::Time::from_unix_epoch() + turbo::Nanoseconds(1)));
-        EXPECT_EQ(0, turbo::ToUnixNanos(turbo::Time::from_unix_epoch() + turbo::Nanoseconds(1) / 2));
-        EXPECT_EQ(0, turbo::ToUnixNanos(turbo::Time::from_unix_epoch() + turbo::ZeroDuration()));
+        // Tests Time::to_nanoseconds.
+        EXPECT_EQ(1, turbo::Time::to_nanoseconds(turbo::Time::from_unix_epoch() + turbo::Nanoseconds(3) / 2));
+        EXPECT_EQ(1, turbo::Time::to_nanoseconds(turbo::Time::from_unix_epoch() + turbo::Nanoseconds(1)));
+        EXPECT_EQ(0, turbo::Time::to_nanoseconds(turbo::Time::from_unix_epoch() + turbo::Nanoseconds(1) / 2));
+        EXPECT_EQ(0, turbo::Time::to_nanoseconds(turbo::Time::from_unix_epoch() + turbo::ZeroDuration()));
         EXPECT_EQ(-1,
-                  turbo::ToUnixNanos(turbo::Time::from_unix_epoch() - turbo::Nanoseconds(1) / 2));
-        EXPECT_EQ(-1, turbo::ToUnixNanos(turbo::Time::from_unix_epoch() - turbo::Nanoseconds(1)));
+                  turbo::Time::to_nanoseconds(turbo::Time::from_unix_epoch() - turbo::Nanoseconds(1) / 2));
+        EXPECT_EQ(-1, turbo::Time::to_nanoseconds(turbo::Time::from_unix_epoch() - turbo::Nanoseconds(1)));
         EXPECT_EQ(-2,
-                  turbo::ToUnixNanos(turbo::Time::from_unix_epoch() - turbo::Nanoseconds(3) / 2));
+                  turbo::Time::to_nanoseconds(turbo::Time::from_unix_epoch() - turbo::Nanoseconds(3) / 2));
 
-        // Tests ToUniversal, which uses a different epoch than the tests above.
+        // Tests Time::to_universal, which uses a different epoch than the tests above.
         EXPECT_EQ(1,
-                  turbo::ToUniversal(turbo::Time::from_universal_epoch() + turbo::Nanoseconds(101)));
+                  turbo::Time::to_universal(turbo::Time::from_universal_epoch() + turbo::Nanoseconds(101)));
         EXPECT_EQ(1,
-                  turbo::ToUniversal(turbo::Time::from_universal_epoch() + turbo::Nanoseconds(100)));
+                  turbo::Time::to_universal(turbo::Time::from_universal_epoch() + turbo::Nanoseconds(100)));
         EXPECT_EQ(0,
-                  turbo::ToUniversal(turbo::Time::from_universal_epoch() + turbo::Nanoseconds(99)));
+                  turbo::Time::to_universal(turbo::Time::from_universal_epoch() + turbo::Nanoseconds(99)));
         EXPECT_EQ(0,
-                  turbo::ToUniversal(turbo::Time::from_universal_epoch() + turbo::Nanoseconds(1)));
+                  turbo::Time::to_universal(turbo::Time::from_universal_epoch() + turbo::Nanoseconds(1)));
         EXPECT_EQ(0,
-                  turbo::ToUniversal(turbo::Time::from_universal_epoch() + turbo::ZeroDuration()));
+                  turbo::Time::to_universal(turbo::Time::from_universal_epoch() + turbo::ZeroDuration()));
         EXPECT_EQ(-1,
-                  turbo::ToUniversal(turbo::Time::from_universal_epoch() + turbo::Nanoseconds(-1)));
+                  turbo::Time::to_universal(turbo::Time::from_universal_epoch() + turbo::Nanoseconds(-1)));
         EXPECT_EQ(-1,
-                  turbo::ToUniversal(turbo::Time::from_universal_epoch() + turbo::Nanoseconds(-99)));
+                  turbo::Time::to_universal(turbo::Time::from_universal_epoch() + turbo::Nanoseconds(-99)));
         EXPECT_EQ(
-                -1, turbo::ToUniversal(turbo::Time::from_universal_epoch() + turbo::Nanoseconds(-100)));
+                -1, turbo::Time::to_universal(turbo::Time::from_universal_epoch() + turbo::Nanoseconds(-100)));
         EXPECT_EQ(
-                -2, turbo::ToUniversal(turbo::Time::from_universal_epoch() + turbo::Nanoseconds(-101)));
+                -2, turbo::Time::to_universal(turbo::Time::from_universal_epoch() + turbo::Nanoseconds(-101)));
 
-        // Tests ToTimespec()/Time::from_timespec()
+        // Tests Time::to_timespec()/Time::from_timespec()
         const struct {
             turbo::Time t;
             timespec ts;
@@ -307,7 +307,7 @@ namespace {
                 {turbo::Time::from_seconds(-1) - turbo::Nanoseconds(1) / 2, {-2, 999999999}},
         };
         for (const auto &test: to_ts) {
-            EXPECT_THAT(turbo::ToTimespec(test.t), TimespecMatcher(test.ts));
+            EXPECT_THAT(turbo::Time::to_timespec(test.t), TimespecMatcher(test.ts));
         }
         const struct {
             timespec ts;
@@ -327,7 +327,7 @@ namespace {
             EXPECT_EQ(test.t, turbo::Time::from_timespec(test.ts));
         }
 
-        // Tests  turbo::ToTimeval()/Time::from_timeval() (same as timespec above)
+        // Tests  turbo::Time::to_timeval()/Time::from_timeval() (same as timespec above)
         const struct {
             turbo::Time t;
             timeval tv;
@@ -344,7 +344,7 @@ namespace {
                 {turbo::Time::from_seconds(-1) - turbo::Microseconds(1) / 2, {-2, 999999}},
         };
         for (const auto &test: to_tv) {
-            EXPECT_THAT(turbo::ToTimeval(test.t), TimevalMatcher(test.tv));
+            EXPECT_THAT(turbo::Time::to_timeval(test.t), TimevalMatcher(test.tv));
         }
         const struct {
             timeval tv;
@@ -366,21 +366,21 @@ namespace {
 
         // Tests flooring near negative infinity.
         const int64_t min_plus_1 = std::numeric_limits<int64_t>::min() + 1;
-        EXPECT_EQ(min_plus_1, turbo::ToUnixSeconds(turbo::Time::from_seconds(min_plus_1)));
+        EXPECT_EQ(min_plus_1, turbo::Time::to_seconds(turbo::Time::from_seconds(min_plus_1)));
         EXPECT_EQ(std::numeric_limits<int64_t>::min(),
-                  turbo::ToUnixSeconds(turbo::Time::from_seconds(min_plus_1) -
+                  turbo::Time::to_seconds(turbo::Time::from_seconds(min_plus_1) -
                                        turbo::Nanoseconds(1) / 2));
 
         // Tests flooring near positive infinity.
         EXPECT_EQ(std::numeric_limits<int64_t>::max(),
-                  turbo::ToUnixSeconds(
+                  turbo::Time::to_seconds(
                           turbo::Time::from_seconds(std::numeric_limits<int64_t>::max()) +
                           turbo::Nanoseconds(1) / 2));
         EXPECT_EQ(std::numeric_limits<int64_t>::max(),
-                  turbo::ToUnixSeconds(
+                  turbo::Time::to_seconds(
                           turbo::Time::from_seconds(std::numeric_limits<int64_t>::max())));
         EXPECT_EQ(std::numeric_limits<int64_t>::max() - 1,
-                  turbo::ToUnixSeconds(
+                  turbo::Time::to_seconds(
                           turbo::Time::from_seconds(std::numeric_limits<int64_t>::max()) -
                           turbo::Nanoseconds(1) / 2));
     }
@@ -389,139 +389,139 @@ namespace {
 #define TEST_CONVERSION_ROUND_TRIP(SOURCE, FROM, TO, MATCHER) \
   EXPECT_THAT(TO(FROM(SOURCE)), MATCHER(SOURCE))
 
-        // Time::from_nanoseconds() and ToUnixNanos()
+        // Time::from_nanoseconds() and Time::to_nanoseconds()
         int64_t now_ns = turbo::GetCurrentTimeNanos();
-        TEST_CONVERSION_ROUND_TRIP(-1, turbo::Time::from_nanoseconds, turbo::ToUnixNanos,
+        TEST_CONVERSION_ROUND_TRIP(-1, turbo::Time::from_nanoseconds, turbo::Time::to_nanoseconds,
                                    testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(0, turbo::Time::from_nanoseconds, turbo::ToUnixNanos,
+        TEST_CONVERSION_ROUND_TRIP(0, turbo::Time::from_nanoseconds, turbo::Time::to_nanoseconds,
                                    testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(1, turbo::Time::from_nanoseconds, turbo::ToUnixNanos,
+        TEST_CONVERSION_ROUND_TRIP(1, turbo::Time::from_nanoseconds, turbo::Time::to_nanoseconds,
                                    testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(now_ns, turbo::Time::from_nanoseconds, turbo::ToUnixNanos,
+        TEST_CONVERSION_ROUND_TRIP(now_ns, turbo::Time::from_nanoseconds, turbo::Time::to_nanoseconds,
                                    testing::Eq)
                             << now_ns;
 
-        // Time::from_microseconds() and ToUnixMicros()
+        // Time::from_microseconds() and Time::to_microseconds()
         int64_t now_us = turbo::GetCurrentTimeNanos() / 1000;
-        TEST_CONVERSION_ROUND_TRIP(-1, turbo::Time::from_microseconds, turbo::ToUnixMicros,
+        TEST_CONVERSION_ROUND_TRIP(-1, turbo::Time::from_microseconds, turbo::Time::to_microseconds,
                                    testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(0, turbo::Time::from_microseconds, turbo::ToUnixMicros,
+        TEST_CONVERSION_ROUND_TRIP(0, turbo::Time::from_microseconds, turbo::Time::to_microseconds,
                                    testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(1, turbo::Time::from_microseconds, turbo::ToUnixMicros,
+        TEST_CONVERSION_ROUND_TRIP(1, turbo::Time::from_microseconds, turbo::Time::to_microseconds,
                                    testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(now_us, turbo::Time::from_microseconds, turbo::ToUnixMicros,
+        TEST_CONVERSION_ROUND_TRIP(now_us, turbo::Time::from_microseconds, turbo::Time::to_microseconds,
                                    testing::Eq)
                             << now_us;
 
-        // Time::from_milliseconds() and ToUnixMillis()
+        // Time::from_milliseconds() and Time::to_milliseconds()
         int64_t now_ms = turbo::GetCurrentTimeNanos() / 1000000;
-        TEST_CONVERSION_ROUND_TRIP(-1, turbo::Time::from_milliseconds, turbo::ToUnixMillis,
+        TEST_CONVERSION_ROUND_TRIP(-1, turbo::Time::from_milliseconds, turbo::Time::to_milliseconds,
                                    testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(0, turbo::Time::from_milliseconds, turbo::ToUnixMillis,
+        TEST_CONVERSION_ROUND_TRIP(0, turbo::Time::from_milliseconds, turbo::Time::to_milliseconds,
                                    testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(1, turbo::Time::from_milliseconds, turbo::ToUnixMillis,
+        TEST_CONVERSION_ROUND_TRIP(1, turbo::Time::from_milliseconds, turbo::Time::to_milliseconds,
                                    testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(now_ms, turbo::Time::from_milliseconds, turbo::ToUnixMillis,
+        TEST_CONVERSION_ROUND_TRIP(now_ms, turbo::Time::from_milliseconds, turbo::Time::to_milliseconds,
                                    testing::Eq)
                             << now_ms;
 
-        // Time::from_seconds() and ToUnixSeconds()
+        // Time::from_seconds() and Time::to_seconds()
         int64_t now_s = std::time(nullptr);
-        TEST_CONVERSION_ROUND_TRIP(-1, turbo::Time::from_seconds, turbo::ToUnixSeconds,
+        TEST_CONVERSION_ROUND_TRIP(-1, turbo::Time::from_seconds, turbo::Time::to_seconds,
                                    testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(0, turbo::Time::from_seconds, turbo::ToUnixSeconds,
+        TEST_CONVERSION_ROUND_TRIP(0, turbo::Time::from_seconds, turbo::Time::to_seconds,
                                    testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(1, turbo::Time::from_seconds, turbo::ToUnixSeconds,
+        TEST_CONVERSION_ROUND_TRIP(1, turbo::Time::from_seconds, turbo::Time::to_seconds,
                                    testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(now_s, turbo::Time::from_seconds, turbo::ToUnixSeconds,
+        TEST_CONVERSION_ROUND_TRIP(now_s, turbo::Time::from_seconds, turbo::Time::to_seconds,
                                    testing::Eq)
                             << now_s;
 
         // Time::from_time_t() and ToTimeT()
         time_t now_time_t = std::time(nullptr);
-        TEST_CONVERSION_ROUND_TRIP(-1, turbo::Time::from_time_t, turbo::ToTimeT, testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(0, turbo::Time::from_time_t, turbo::ToTimeT, testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(1, turbo::Time::from_time_t, turbo::ToTimeT, testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(now_time_t, turbo::Time::from_time_t, turbo::ToTimeT,
+        TEST_CONVERSION_ROUND_TRIP(-1, turbo::Time::from_time_t, turbo::Time::to_time_t, testing::Eq);
+        TEST_CONVERSION_ROUND_TRIP(0, turbo::Time::from_time_t, turbo::Time::to_time_t, testing::Eq);
+        TEST_CONVERSION_ROUND_TRIP(1, turbo::Time::from_time_t, turbo::Time::to_time_t, testing::Eq);
+        TEST_CONVERSION_ROUND_TRIP(now_time_t, turbo::Time::from_time_t, turbo::Time::to_time_t,
                                    testing::Eq)
                             << now_time_t;
 
-        // Time::from_timeval() and  turbo::ToTimeval()
+        // Time::from_timeval() and  turbo::Time::to_timeval()
         timeval tv;
         tv.tv_sec = -1;
         tv.tv_usec = 0;
-        TEST_CONVERSION_ROUND_TRIP(tv, turbo::Time::from_timeval, turbo::ToTimeval,
+        TEST_CONVERSION_ROUND_TRIP(tv, turbo::Time::from_timeval, turbo::Time::to_timeval,
                                    TimevalMatcher);
         tv.tv_sec = -1;
         tv.tv_usec = 999999;
-        TEST_CONVERSION_ROUND_TRIP(tv, turbo::Time::from_timeval, turbo::ToTimeval,
+        TEST_CONVERSION_ROUND_TRIP(tv, turbo::Time::from_timeval, turbo::Time::to_timeval,
                                    TimevalMatcher);
         tv.tv_sec = 0;
         tv.tv_usec = 0;
-        TEST_CONVERSION_ROUND_TRIP(tv, turbo::Time::from_timeval, turbo::ToTimeval,
+        TEST_CONVERSION_ROUND_TRIP(tv, turbo::Time::from_timeval, turbo::Time::to_timeval,
                                    TimevalMatcher);
         tv.tv_sec = 0;
         tv.tv_usec = 1;
-        TEST_CONVERSION_ROUND_TRIP(tv, turbo::Time::from_timeval, turbo::ToTimeval,
+        TEST_CONVERSION_ROUND_TRIP(tv, turbo::Time::from_timeval, turbo::Time::to_timeval,
                                    TimevalMatcher);
         tv.tv_sec = 1;
         tv.tv_usec = 0;
-        TEST_CONVERSION_ROUND_TRIP(tv, turbo::Time::from_timeval, turbo::ToTimeval,
+        TEST_CONVERSION_ROUND_TRIP(tv, turbo::Time::from_timeval, turbo::Time::to_timeval,
                                    TimevalMatcher);
 
-        // Time::from_timespec() and ToTimespec()
+        // Time::from_timespec() and Time::to_timespec()
         timespec ts;
         ts.tv_sec = -1;
         ts.tv_nsec = 0;
-        TEST_CONVERSION_ROUND_TRIP(ts, turbo::Time::from_timespec, turbo::ToTimespec,
+        TEST_CONVERSION_ROUND_TRIP(ts, turbo::Time::from_timespec, turbo::Time::to_timespec,
                                    TimespecMatcher);
         ts.tv_sec = -1;
         ts.tv_nsec = 999999999;
-        TEST_CONVERSION_ROUND_TRIP(ts, turbo::Time::from_timespec, turbo::ToTimespec,
+        TEST_CONVERSION_ROUND_TRIP(ts, turbo::Time::from_timespec, turbo::Time::to_timespec,
                                    TimespecMatcher);
         ts.tv_sec = 0;
         ts.tv_nsec = 0;
-        TEST_CONVERSION_ROUND_TRIP(ts, turbo::Time::from_timespec, turbo::ToTimespec,
+        TEST_CONVERSION_ROUND_TRIP(ts, turbo::Time::from_timespec, turbo::Time::to_timespec,
                                    TimespecMatcher);
         ts.tv_sec = 0;
         ts.tv_nsec = 1;
-        TEST_CONVERSION_ROUND_TRIP(ts, turbo::Time::from_timespec, turbo::ToTimespec,
+        TEST_CONVERSION_ROUND_TRIP(ts, turbo::Time::from_timespec, turbo::Time::to_timespec,
                                    TimespecMatcher);
         ts.tv_sec = 1;
         ts.tv_nsec = 0;
-        TEST_CONVERSION_ROUND_TRIP(ts, turbo::Time::from_timespec, turbo::ToTimespec,
+        TEST_CONVERSION_ROUND_TRIP(ts, turbo::Time::from_timespec, turbo::Time::to_timespec,
                                    TimespecMatcher);
 
-        // Time::from_udate() and ToUDate()
+        // Time::from_udate() and Time::to_udate()
         double now_ud = turbo::GetCurrentTimeNanos() / 1000000;
-        TEST_CONVERSION_ROUND_TRIP(-1.5, turbo::Time::from_udate, turbo::ToUDate,
+        TEST_CONVERSION_ROUND_TRIP(-1.5, turbo::Time::from_udate, turbo::Time::to_udate,
                                    testing::DoubleEq);
-        TEST_CONVERSION_ROUND_TRIP(-1, turbo::Time::from_udate, turbo::ToUDate,
+        TEST_CONVERSION_ROUND_TRIP(-1, turbo::Time::from_udate, turbo::Time::to_udate,
                                    testing::DoubleEq);
-        TEST_CONVERSION_ROUND_TRIP(-0.5, turbo::Time::from_udate, turbo::ToUDate,
+        TEST_CONVERSION_ROUND_TRIP(-0.5, turbo::Time::from_udate, turbo::Time::to_udate,
                                    testing::DoubleEq);
-        TEST_CONVERSION_ROUND_TRIP(0, turbo::Time::from_udate, turbo::ToUDate,
+        TEST_CONVERSION_ROUND_TRIP(0, turbo::Time::from_udate, turbo::Time::to_udate,
                                    testing::DoubleEq);
-        TEST_CONVERSION_ROUND_TRIP(0.5, turbo::Time::from_udate, turbo::ToUDate,
+        TEST_CONVERSION_ROUND_TRIP(0.5, turbo::Time::from_udate, turbo::Time::to_udate,
                                    testing::DoubleEq);
-        TEST_CONVERSION_ROUND_TRIP(1, turbo::Time::from_udate, turbo::ToUDate,
+        TEST_CONVERSION_ROUND_TRIP(1, turbo::Time::from_udate, turbo::Time::to_udate,
                                    testing::DoubleEq);
-        TEST_CONVERSION_ROUND_TRIP(1.5, turbo::Time::from_udate, turbo::ToUDate,
+        TEST_CONVERSION_ROUND_TRIP(1.5, turbo::Time::from_udate, turbo::Time::to_udate,
                                    testing::DoubleEq);
-        TEST_CONVERSION_ROUND_TRIP(now_ud, turbo::Time::from_udate, turbo::ToUDate,
+        TEST_CONVERSION_ROUND_TRIP(now_ud, turbo::Time::from_udate, turbo::Time::to_udate,
                                    testing::DoubleEq)
                             << std::fixed << std::setprecision(17) << now_ud;
 
-        // Time::from_universal() and ToUniversal()
+        // Time::from_universal() and Time::to_universal()
         int64_t now_uni = ((719162LL * (24 * 60 * 60)) * (1000 * 1000 * 10)) +
                           (turbo::GetCurrentTimeNanos() / 100);
-        TEST_CONVERSION_ROUND_TRIP(-1, turbo::Time::from_universal, turbo::ToUniversal,
+        TEST_CONVERSION_ROUND_TRIP(-1, turbo::Time::from_universal, turbo::Time::to_universal,
                                    testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(0, turbo::Time::from_universal, turbo::ToUniversal,
+        TEST_CONVERSION_ROUND_TRIP(0, turbo::Time::from_universal, turbo::Time::to_universal,
                                    testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(1, turbo::Time::from_universal, turbo::ToUniversal,
+        TEST_CONVERSION_ROUND_TRIP(1, turbo::Time::from_universal, turbo::Time::to_universal,
                                    testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(now_uni, turbo::Time::from_universal, turbo::ToUniversal,
+        TEST_CONVERSION_ROUND_TRIP(now_uni, turbo::Time::from_universal, turbo::Time::to_universal,
                                    testing::Eq)
                             << now_uni;
 
@@ -561,31 +561,31 @@ namespace {
 
         // Roundtrip them both back to chrono.
         EXPECT_EQ(chrono_future,
-                  turbo::ToChronoTime(turbo::Time::from_seconds(century_sec)));
+                  turbo::Time::to_chrono(turbo::Time::from_seconds(century_sec)));
         EXPECT_EQ(chrono_past,
-                  turbo::ToChronoTime(turbo::Time::from_seconds(-century_sec)));
+                  turbo::Time::to_chrono(turbo::Time::from_seconds(-century_sec)));
     }
 
-    TEST(Time, ToChronoTime) {
+    TEST(Time, to_chrono_time) {
         EXPECT_EQ(std::chrono::system_clock::from_time_t(-1),
-                  turbo::ToChronoTime(turbo::Time::from_time_t(-1)));
+                  turbo::Time::to_chrono(turbo::Time::from_time_t(-1)));
         EXPECT_EQ(std::chrono::system_clock::from_time_t(0),
-                  turbo::ToChronoTime(turbo::Time::from_time_t(0)));
+                  turbo::Time::to_chrono(turbo::Time::from_time_t(0)));
         EXPECT_EQ(std::chrono::system_clock::from_time_t(1),
-                  turbo::ToChronoTime(turbo::Time::from_time_t(1)));
+                  turbo::Time::to_chrono(turbo::Time::from_time_t(1)));
 
         EXPECT_EQ(MakeChronoUnixTime(std::chrono::milliseconds(-1)),
-                  turbo::ToChronoTime(turbo::Time::from_milliseconds(-1)));
+                  turbo::Time::to_chrono(turbo::Time::from_milliseconds(-1)));
         EXPECT_EQ(MakeChronoUnixTime(std::chrono::milliseconds(0)),
-                  turbo::ToChronoTime(turbo::Time::from_milliseconds(0)));
+                  turbo::Time::to_chrono(turbo::Time::from_milliseconds(0)));
         EXPECT_EQ(MakeChronoUnixTime(std::chrono::milliseconds(1)),
-                  turbo::ToChronoTime(turbo::Time::from_milliseconds(1)));
+                  turbo::Time::to_chrono(turbo::Time::from_milliseconds(1)));
 
         // Time before the Unix epoch should floor, not trunc.
         const auto tick = turbo::Nanoseconds(1) / 4;
         EXPECT_EQ(std::chrono::system_clock::from_time_t(0) -
                   std::chrono::system_clock::duration(1),
-                  turbo::ToChronoTime(turbo::Time::from_unix_epoch() - tick));
+                  turbo::Time::to_chrono(turbo::Time::from_unix_epoch() - tick));
     }
 
     // Check that turbo::int128 works as a std::chrono::duration representation.
@@ -609,7 +609,7 @@ namespace {
         // but floor() is only available since c++17.
         for (const auto tp: {std::chrono::system_clock::time_point::min(),
                              std::chrono::system_clock::time_point::max()}) {
-            EXPECT_EQ(tp, turbo::ToChronoTime(turbo::Time::from_chrono(tp)));
+            EXPECT_EQ(tp, turbo::Time::to_chrono(turbo::Time::from_chrono(tp)));
             EXPECT_EQ(tp, std::chrono::time_point_cast<
                     std::chrono::system_clock::time_point::duration>(
                     std::chrono::time_point_cast<Timestamp::duration>(tp)));
@@ -679,7 +679,7 @@ namespace {
         turbo::CivilSecond minus1(1969, 12, 31, 18, 59, 59);
         const auto minus1_cl = nyc.At(minus1);
         EXPECT_EQ(turbo::TimeZone::TimeInfo::UNIQUE, minus1_cl.kind);
-        EXPECT_EQ(-1, turbo::ToTimeT(minus1_cl.pre));
+        EXPECT_EQ(-1, turbo::Time::to_time_t(minus1_cl.pre));
         EXPECT_EQ("Wed, 31 Dec 1969 18:59:59 -0500 (EST)",
                   turbo::Time::format(fmt, minus1_cl.pre, nyc));
         EXPECT_EQ("Wed, 31 Dec 1969 23:59:59 +0000 (UTC)",
@@ -738,8 +738,8 @@ namespace {
         const turbo::Time end =
                 turbo::Time::from_civil(turbo::CivilSecond(2014, 1, 5, 3, 4, 5), utc);
         for (turbo::Time t = start; t < end; t += turbo::Seconds(30)) {
-            const struct tm tm_bt = turbo::ToTM(t, utc);
-            const time_t tt = turbo::ToTimeT(t);
+            const struct tm tm_bt = turbo::Time::to_tm(t, utc);
+            const time_t tt = turbo::Time::to_time_t(t);
             struct tm tm_lc;
 #ifdef _WIN32
             gmtime_s(&tm_lc, &tt);
@@ -763,16 +763,16 @@ namespace {
         const turbo::TimeZone nyc =
                 turbo::time_internal::LoadTimeZone("America/New_York");
         turbo::Time t = turbo::Time::from_civil(turbo::CivilSecond(2014, 3, 1, 0, 0, 0), nyc);
-        struct tm tm = turbo::ToTM(t, nyc);
+        struct tm tm = turbo::Time::to_tm(t, nyc);
         EXPECT_FALSE(tm.tm_isdst);
 
         // Checks that the tm_isdst field is correct when in daylight time.
         t = turbo::Time::from_civil(turbo::CivilSecond(2014, 4, 1, 0, 0, 0), nyc);
-        tm = turbo::ToTM(t, nyc);
+        tm = turbo::Time::to_tm(t, nyc);
         EXPECT_TRUE(tm.tm_isdst);
 
         // Checks overflow.
-        tm = turbo::ToTM(turbo::Time::future_infinite(), nyc);
+        tm = turbo::Time::to_tm(turbo::Time::future_infinite(), nyc);
         EXPECT_EQ(std::numeric_limits<int>::max() - 1900, tm.tm_year);
         EXPECT_EQ(11, tm.tm_mon);
         EXPECT_EQ(31, tm.tm_mday);
@@ -784,7 +784,7 @@ namespace {
         EXPECT_FALSE(tm.tm_isdst);
 
         // Checks underflow.
-        tm = turbo::ToTM(turbo::Time::past_infinite(), nyc);
+        tm = turbo::Time::to_tm(turbo::Time::past_infinite(), nyc);
         EXPECT_EQ(std::numeric_limits<int>::min(), tm.tm_year);
         EXPECT_EQ(0, tm.tm_mon);
         EXPECT_EQ(1, tm.tm_mday);
@@ -886,7 +886,7 @@ namespace {
         turbo::Time start = turbo::Time::from_civil(turbo::CivilHour(2014, 3, 9, 0), nyc);
         turbo::Time end = turbo::Time::from_civil(turbo::CivilHour(2014, 3, 9, 4), nyc);
         for (turbo::Time t = start; t < end; t += turbo::Minutes(1)) {
-            struct tm tm = turbo::ToTM(t, nyc);
+            struct tm tm = turbo::Time::to_tm(t, nyc);
             turbo::Time rt = turbo::Time::from_tm(tm, nyc);
             EXPECT_EQ(rt, t);
         }
@@ -895,7 +895,7 @@ namespace {
         start = turbo::Time::from_civil(turbo::CivilHour(2014, 11, 2, 0), nyc);
         end = turbo::Time::from_civil(turbo::CivilHour(2014, 11, 2, 4), nyc);
         for (turbo::Time t = start; t < end; t += turbo::Minutes(1)) {
-            struct tm tm = turbo::ToTM(t, nyc);
+            struct tm tm = turbo::Time::to_tm(t, nyc);
             turbo::Time rt = turbo::Time::from_tm(tm, nyc);
             EXPECT_EQ(rt, t);
         }
@@ -904,7 +904,7 @@ namespace {
         start = turbo::Time::from_civil(turbo::CivilHour(2014, 6, 27, 22), nyc);
         end = turbo::Time::from_civil(turbo::CivilHour(2014, 6, 28, 4), nyc);
         for (turbo::Time t = start; t < end; t += turbo::Minutes(1)) {
-            struct tm tm = turbo::ToTM(t, nyc);
+            struct tm tm = turbo::Time::to_tm(t, nyc);
             turbo::Time rt = turbo::Time::from_tm(tm, nyc);
             EXPECT_EQ(rt, t);
         }
@@ -965,24 +965,24 @@ namespace {
         const auto min_time_t = std::numeric_limits<time_t>::min();
         time_t tt = max_time_t - 1;
         t = turbo::Time::from_time_t(tt);
-        tt = turbo::ToTimeT(t);
+        tt = turbo::Time::to_time_t(t);
         EXPECT_EQ(max_time_t - 1, tt);
         t += turbo::Seconds(1);
-        tt = turbo::ToTimeT(t);
+        tt = turbo::Time::to_time_t(t);
         EXPECT_EQ(max_time_t, tt);
         t += turbo::Seconds(1);  // no effect
-        tt = turbo::ToTimeT(t);
+        tt = turbo::Time::to_time_t(t);
         EXPECT_EQ(max_time_t, tt);
 
         tt = min_time_t + 1;
         t = turbo::Time::from_time_t(tt);
-        tt = turbo::ToTimeT(t);
+        tt = turbo::Time::to_time_t(t);
         EXPECT_EQ(min_time_t + 1, tt);
         t -= turbo::Seconds(1);
-        tt = turbo::ToTimeT(t);
+        tt = turbo::Time::to_time_t(t);
         EXPECT_EQ(min_time_t, tt);
         t -= turbo::Seconds(1);  // no effect
-        tt = turbo::ToTimeT(t);
+        tt = turbo::Time::to_time_t(t);
         EXPECT_EQ(min_time_t, tt);
 
         const auto max_timeval_sec =
@@ -993,30 +993,30 @@ namespace {
         tv.tv_sec = max_timeval_sec;
         tv.tv_usec = 999998;
         t = turbo::Time::from_timeval(tv);
-        tv = turbo::ToTimeval(t);
+        tv = turbo::Time::to_timeval(t);
         EXPECT_EQ(max_timeval_sec, tv.tv_sec);
         EXPECT_EQ(999998, tv.tv_usec);
         t += turbo::Microseconds(1);
-        tv = turbo::ToTimeval(t);
+        tv = turbo::Time::to_timeval(t);
         EXPECT_EQ(max_timeval_sec, tv.tv_sec);
         EXPECT_EQ(999999, tv.tv_usec);
         t += turbo::Microseconds(1);  // no effect
-        tv = turbo::ToTimeval(t);
+        tv = turbo::Time::to_timeval(t);
         EXPECT_EQ(max_timeval_sec, tv.tv_sec);
         EXPECT_EQ(999999, tv.tv_usec);
 
         tv.tv_sec = min_timeval_sec;
         tv.tv_usec = 1;
         t = turbo::Time::from_timeval(tv);
-        tv = turbo::ToTimeval(t);
+        tv = turbo::Time::to_timeval(t);
         EXPECT_EQ(min_timeval_sec, tv.tv_sec);
         EXPECT_EQ(1, tv.tv_usec);
         t -= turbo::Microseconds(1);
-        tv = turbo::ToTimeval(t);
+        tv = turbo::Time::to_timeval(t);
         EXPECT_EQ(min_timeval_sec, tv.tv_sec);
         EXPECT_EQ(0, tv.tv_usec);
         t -= turbo::Microseconds(1);  // no effect
-        tv = turbo::ToTimeval(t);
+        tv = turbo::Time::to_timeval(t);
         EXPECT_EQ(min_timeval_sec, tv.tv_sec);
         EXPECT_EQ(0, tv.tv_usec);
 
@@ -1028,30 +1028,30 @@ namespace {
         ts.tv_sec = max_timespec_sec;
         ts.tv_nsec = 999999998;
         t = turbo::Time::from_timespec(ts);
-        ts = turbo::ToTimespec(t);
+        ts = turbo::Time::to_timespec(t);
         EXPECT_EQ(max_timespec_sec, ts.tv_sec);
         EXPECT_EQ(999999998, ts.tv_nsec);
         t += turbo::Nanoseconds(1);
-        ts = turbo::ToTimespec(t);
+        ts = turbo::Time::to_timespec(t);
         EXPECT_EQ(max_timespec_sec, ts.tv_sec);
         EXPECT_EQ(999999999, ts.tv_nsec);
         t += turbo::Nanoseconds(1);  // no effect
-        ts = turbo::ToTimespec(t);
+        ts = turbo::Time::to_timespec(t);
         EXPECT_EQ(max_timespec_sec, ts.tv_sec);
         EXPECT_EQ(999999999, ts.tv_nsec);
 
         ts.tv_sec = min_timespec_sec;
         ts.tv_nsec = 1;
         t = turbo::Time::from_timespec(ts);
-        ts = turbo::ToTimespec(t);
+        ts = turbo::Time::to_timespec(t);
         EXPECT_EQ(min_timespec_sec, ts.tv_sec);
         EXPECT_EQ(1, ts.tv_nsec);
         t -= turbo::Nanoseconds(1);
-        ts = turbo::ToTimespec(t);
+        ts = turbo::Time::to_timespec(t);
         EXPECT_EQ(min_timespec_sec, ts.tv_sec);
         EXPECT_EQ(0, ts.tv_nsec);
         t -= turbo::Nanoseconds(1);  // no effect
-        ts = turbo::ToTimespec(t);
+        ts = turbo::Time::to_timespec(t);
         EXPECT_EQ(min_timespec_sec, ts.tv_sec);
         EXPECT_EQ(0, ts.tv_nsec);
 

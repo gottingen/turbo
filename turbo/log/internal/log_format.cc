@@ -101,7 +101,7 @@ size_t FormatBoundedFields(turbo::LogSeverity severity, turbo::Time timestamp,
     // logging library has been initialized, we fallback to a simpler, slower
     // method. Just report the raw Unix time in seconds. We cram this into the
     // normal time format for the benefit of parsers.
-    auto tv = turbo::ToTimeval(timestamp);
+    auto tv = turbo::Time::to_timeval(timestamp);
     int snprintf_result = turbo::SNPrintF(
         buf.data(), buf.size(), "%c0000 00:00:%02d.%06d %7d ",
         turbo::LogSeverityName(severity)[0], static_cast<int>(tv.tv_sec),

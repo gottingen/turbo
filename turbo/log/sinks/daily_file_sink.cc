@@ -63,7 +63,7 @@ namespace turbo {
             init_file_queue();
         }
         auto now = turbo::Time::current_time();
-        auto filename = calc_filename(_base_filename, turbo::ToTM(now, turbo::LocalTimeZone()));
+        auto filename = calc_filename(_base_filename, turbo::Time::to_tm(now, turbo::LocalTimeZone()));
         _file_writer = std::make_unique<log_internal::AppendFile>();
         if (_truncate) {
             ::remove(filename.c_str());
@@ -100,7 +100,7 @@ namespace turbo {
         _files = circular_queue<std::string>(static_cast<size_t>(_max_files));
         auto now = turbo::Time::current_time();
         while (filenames.size() < _max_files) {
-            auto filename = calc_filename(_base_filename, turbo::ToTM(now, turbo::LocalTimeZone()));
+            auto filename = calc_filename(_base_filename, turbo::Time::to_tm(now, turbo::LocalTimeZone()));
             if (!log_internal::path_exists(filename)) {
                 break;
             }
@@ -122,7 +122,7 @@ namespace turbo {
             return;
         }
         _next_rotation_time = next_rotation_time(stamp);
-        auto filename = calc_filename(_base_filename, turbo::ToTM(stamp, turbo::LocalTimeZone()));
+        auto filename = calc_filename(_base_filename, turbo::Time::to_tm(stamp, turbo::LocalTimeZone()));
         _file_writer->close();
         _file_writer.reset();
         _file_writer = std::make_unique<log_internal::AppendFile>();
@@ -145,7 +145,7 @@ namespace turbo {
     }
 
     turbo::Time DailyFileSink::next_rotation_time(turbo::Time stamp) const {
-        auto tm = turbo::ToTM(stamp, turbo::LocalTimeZone());
+        auto tm = turbo::Time::to_tm(stamp, turbo::LocalTimeZone());
         tm.tm_hour = _rotation_hour;
         tm.tm_min = _rotation_minute;
         tm.tm_sec = 0;

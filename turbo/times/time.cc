@@ -142,7 +142,7 @@ namespace turbo {
                                     cctz::time_zone::civil_transition *trans) const,
                             Time t, TimeZone::CivilTransition *trans) {
             // Transitions are second-aligned, so we can discard any fractional part.
-            const auto tp = unix_epoch_cctz() + cctz::seconds(ToUnixSeconds(t));
+            const auto tp = unix_epoch_cctz() + cctz::seconds(Time::to_seconds(t));
             cctz::time_zone::civil_transition tr;
             if (!(tz.*find_transition)(tp, &tr)) return false;
             trans->from = CivilSecond(tr.from);
@@ -168,7 +168,7 @@ namespace turbo {
         return turbo::Time::from_universal_epoch() + 100 * turbo::Nanoseconds(universal);
     }
 
-    int64_t ToUnixNanos(Time t) {
+    int64_t Time::to_nanoseconds(Time t) {
         if (time_internal::GetRepHi(time_internal::ToUnixDuration(t)) >= 0 &&
             time_internal::GetRepHi(time_internal::ToUnixDuration(t)) >> 33 == 0) {
             return (time_internal::GetRepHi(time_internal::ToUnixDuration(t)) *
@@ -178,7 +178,7 @@ namespace turbo {
         return FloorToUnit(time_internal::ToUnixDuration(t), turbo::Nanoseconds(1));
     }
 
-    int64_t ToUnixMicros(Time t) {
+    int64_t Time::to_microseconds(Time t) {
         if (time_internal::GetRepHi(time_internal::ToUnixDuration(t)) >= 0 &&
             time_internal::GetRepHi(time_internal::ToUnixDuration(t)) >> 43 == 0) {
             return (time_internal::GetRepHi(time_internal::ToUnixDuration(t)) *
@@ -188,7 +188,7 @@ namespace turbo {
         return FloorToUnit(time_internal::ToUnixDuration(t), turbo::Microseconds(1));
     }
 
-    int64_t ToUnixMillis(Time t) {
+    int64_t Time::to_milliseconds(Time t) {
         if (time_internal::GetRepHi(time_internal::ToUnixDuration(t)) >= 0 &&
             time_internal::GetRepHi(time_internal::ToUnixDuration(t)) >> 53 == 0) {
             return (time_internal::GetRepHi(time_internal::ToUnixDuration(t)) * 1000) +
@@ -198,18 +198,18 @@ namespace turbo {
         return FloorToUnit(time_internal::ToUnixDuration(t), turbo::Milliseconds(1));
     }
 
-    int64_t ToUnixSeconds(Time t) {
+    int64_t Time::to_seconds(Time t) {
         return time_internal::GetRepHi(time_internal::ToUnixDuration(t));
     }
 
-    time_t ToTimeT(Time t) { return turbo::ToTimespec(t).tv_sec; }
+    time_t Time::to_time_t(Time t) { return turbo::Time::to_timespec(t).tv_sec; }
 
-    double ToUDate(Time t) {
+    double Time::to_udate(Time t) {
         return turbo::FDivDuration(time_internal::ToUnixDuration(t),
                                    turbo::Milliseconds(1));
     }
 
-    int64_t ToUniversal(turbo::Time t) {
+    int64_t Time::to_universal(turbo::Time t) {
         return turbo::FloorToUnit(t - turbo::Time::from_universal_epoch(), turbo::Nanoseconds(100));
     }
 
@@ -221,7 +221,7 @@ namespace turbo {
         return time_internal::FromUnixDuration(turbo::DurationFromTimeval(tv));
     }
 
-    timespec ToTimespec(Time t) {
+    timespec Time::to_timespec(Time t) {
         timespec ts;
         turbo::Duration d = time_internal::ToUnixDuration(t);
         if (!time_internal::IsInfiniteDuration(d)) {
@@ -241,9 +241,9 @@ namespace turbo {
         return ts;
     }
 
-    timeval ToTimeval(Time t) {
+    timeval Time::to_timeval(Time t) {
         timeval tv;
-        timespec ts = turbo::ToTimespec(t);
+        timespec ts = turbo::Time::to_timespec(t);
         tv.tv_sec = static_cast<decltype(tv.tv_sec)>(ts.tv_sec);
         if (tv.tv_sec != ts.tv_sec) {  // narrowing
             if (ts.tv_sec < 0) {
@@ -264,7 +264,7 @@ namespace turbo {
                 tp - std::chrono::system_clock::from_time_t(0)));
     }
 
-    std::chrono::system_clock::time_point ToChronoTime(turbo::Time t) {
+    std::chrono::system_clock::time_point Time::to_chrono(turbo::Time t) {
         using D = std::chrono::system_clock::duration;
         auto d = time_internal::ToUnixDuration(t);
         if (d < ZeroDuration()) d = Floor(d, FromChrono(D{1}));
@@ -272,9 +272,9 @@ namespace turbo {
                time_internal::ToChronoDuration<D>(d);
     }
 
-//
-// TimeZone
-//
+    //
+    // TimeZone
+    //
 
     turbo::TimeZone::CivilInfo TimeZone::At(Time t) const {
         if (t == turbo::Time::future_infinite()) return InfiniteFutureCivilInfo();
@@ -339,7 +339,7 @@ namespace turbo {
         return tm.tm_isdst == 0 ? ti.post : ti.pre;
     }
 
-    struct tm ToTM(turbo::Time t, turbo::TimeZone tz) {
+    struct tm Time::to_tm(turbo::Time t, turbo::TimeZone tz) {
         struct tm tm = {};
 
         const auto ci = tz.At(t);

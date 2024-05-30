@@ -153,7 +153,7 @@ namespace {
     void BM_Time_ToUnixNanos(benchmark::State &state) {
         const turbo::Time t = turbo::Time::from_unix_epoch() + turbo::Seconds(123);
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(ToUnixNanos(t));
+            benchmark::DoNotOptimize(turbo::Time::to_nanoseconds(t));
         }
     }
 
@@ -162,7 +162,7 @@ namespace {
     void BM_Time_ToUnixMicros(benchmark::State &state) {
         const turbo::Time t = turbo::Time::from_unix_epoch() + turbo::Seconds(123);
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(ToUnixMicros(t));
+            benchmark::DoNotOptimize(turbo::Time::to_microseconds(t));
         }
     }
 
@@ -171,7 +171,7 @@ namespace {
     void BM_Time_ToUnixMillis(benchmark::State &state) {
         const turbo::Time t = turbo::Time::from_unix_epoch() + turbo::Seconds(123);
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(ToUnixMillis(t));
+            benchmark::DoNotOptimize(turbo::Time::to_milliseconds(t));
         }
     }
 
@@ -180,7 +180,7 @@ namespace {
     void BM_Time_ToUnixSeconds(benchmark::State &state) {
         const turbo::Time t = turbo::Time::from_unix_epoch() + turbo::Seconds(123);
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::ToUnixSeconds(t));
+            benchmark::DoNotOptimize(turbo::Time::to_seconds(t));
         }
     }
 
@@ -306,14 +306,14 @@ namespace {
     void BM_Time_ToTimespec(benchmark::State &state) {
         turbo::Time now = turbo::Time::current_time();
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::ToTimespec(now));
+            benchmark::DoNotOptimize(turbo::Time::to_timespec(now));
         }
     }
 
     BENCHMARK(BM_Time_ToTimespec);
 
     void BM_Time_FromTimespec(benchmark::State &state) {
-        timespec ts = turbo::ToTimespec(turbo::Time::current_time());
+        timespec ts = turbo::Time::to_timespec(turbo::Time::current_time());
         while (state.KeepRunning()) {
             if (++ts.tv_nsec == 1000 * 1000 * 1000) {
                 ++ts.tv_sec;

@@ -371,7 +371,7 @@ namespace {
     TEST(KernelTimeout, OverflowNanos) {
         // Test what happens when KernelTimeout is constructed with an turbo::Duration
         // that would overflow now_nanos + duration.
-        int64_t now_nanos = turbo::ToUnixNanos(turbo::Time::current_time());
+        int64_t now_nanos = turbo::Time::to_nanoseconds(turbo::Time::current_time());
         int64_t limit = std::numeric_limits<int64_t>::max() - now_nanos;
         turbo::Duration duration = turbo::Nanoseconds(limit) + turbo::Seconds(1);
         KernelTimeout t(duration);
