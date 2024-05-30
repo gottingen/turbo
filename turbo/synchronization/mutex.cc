@@ -1529,12 +1529,12 @@ void Mutex::Lock() {
   GraphId id = DebugOnlyDeadlockCheck(this);
   intptr_t v = mu_.load(std::memory_order_relaxed);
   // try fast acquire, then spin loop
-  if (TURBO_PREDICT_FALSE((v & (kMuWriter | kMuReader | kMuEvent)) != 0) ||
-      TURBO_PREDICT_FALSE(!mu_.compare_exchange_strong(
+  if (TURBO_UNLIKELY((v & (kMuWriter | kMuReader | kMuEvent)) != 0) ||
+      TURBO_UNLIKELY(!mu_.compare_exchange_strong(
           v, kMuWriter | v, std::memory_order_acquire,
           std::memory_order_relaxed))) {
     // try spin acquire, then slow loop
-    if (TURBO_PREDICT_FALSE(!TryAcquireWithSpinning(&this->mu_))) {
+    if (TURBO_UNLIKELY(!TryAcquireWithSpinning(&this->mu_))) {
       this->LockSlow(kExclusive, nullptr, 0);
     }
   }
@@ -1548,13 +1548,13 @@ void Mutex::ReaderLock() {
   intptr_t v = mu_.load(std::memory_order_relaxed);
   for (;;) {
     // If there are non-readers holding the lock, use the slow loop.
-    if (TURBO_PREDICT_FALSE(v & (kMuWriter | kMuWait | kMuEvent)) != 0) {
+    if (TURBO_UNLIKELY(v & (kMuWriter | kMuWait | kMuEvent)) != 0) {
       this->LockSlow(kShared, nullptr, 0);
       break;
     }
     // We can avoid the loop and only use the CAS when the lock is free or
     // only held by readers.
-    if (TURBO_PREDICT_TRUE(mu_.compare_exchange_weak(
+    if (TURBO_LIKELY(mu_.compare_exchange_weak(
             v, (kMuReader | v) + kMuOne, std::memory_order_acquire,
             std::memory_order_relaxed))) {
       break;
@@ -1606,15 +1606,15 @@ bool Mutex::TryLock() {
   TURBO_TSAN_MUTEX_PRE_LOCK(this, __tsan_mutex_try_lock);
   intptr_t v = mu_.load(std::memory_order_relaxed);
   // Try fast acquire.
-  if (TURBO_PREDICT_TRUE((v & (kMuWriter | kMuReader | kMuEvent)) == 0)) {
-    if (TURBO_PREDICT_TRUE(mu_.compare_exchange_strong(
+  if (TURBO_LIKELY((v & (kMuWriter | kMuReader | kMuEvent)) == 0)) {
+    if (TURBO_LIKELY(mu_.compare_exchange_strong(
             v, kMuWriter | v, std::memory_order_acquire,
             std::memory_order_relaxed))) {
       DebugOnlyLockEnter(this);
       TURBO_TSAN_MUTEX_POST_LOCK(this, __tsan_mutex_try_lock, 0);
       return true;
     }
-  } else if (TURBO_PREDICT_FALSE((v & kMuEvent) != 0)) {
+  } else if (TURBO_UNLIKELY((v & kMuEvent) != 0)) {
     // We're recording events.
     return TryLockSlow();
   }
@@ -1654,10 +1654,10 @@ bool Mutex::ReaderTryLock() {
   // changing (typically because the reader count changes) under the CAS.
   // We limit the number of attempts to avoid having to think about livelock.
   for (int loop_limit = 5; loop_limit != 0; loop_limit--) {
-    if (TURBO_PREDICT_FALSE((v & (kMuWriter | kMuWait | kMuEvent)) != 0)) {
+    if (TURBO_UNLIKELY((v & (kMuWriter | kMuWait | kMuEvent)) != 0)) {
       break;
     }
-    if (TURBO_PREDICT_TRUE(mu_.compare_exchange_strong(
+    if (TURBO_LIKELY(mu_.compare_exchange_strong(
             v, (kMuReader | v) + kMuOne, std::memory_order_acquire,
             std::memory_order_relaxed))) {
       DebugOnlyLockEnter(this);
@@ -1666,7 +1666,7 @@ bool Mutex::ReaderTryLock() {
       return true;
     }
   }
-  if (TURBO_PREDICT_TRUE((v & kMuEvent) == 0)) {
+  if (TURBO_LIKELY((v & kMuEvent) == 0)) {
     TURBO_TSAN_MUTEX_POST_LOCK(this,
                               __tsan_mutex_read_lock | __tsan_mutex_try_lock |
                                   __tsan_mutex_try_lock_failed,
@@ -1759,14 +1759,14 @@ void Mutex::ReaderUnlock() {
   intptr_t v = mu_.load(std::memory_order_relaxed);
   assert((v & (kMuWriter | kMuReader)) == kMuReader);
   for (;;) {
-    if (TURBO_PREDICT_FALSE((v & (kMuReader | kMuWait | kMuEvent)) !=
+    if (TURBO_UNLIKELY((v & (kMuReader | kMuWait | kMuEvent)) !=
                            kMuReader)) {
       this->UnlockSlow(nullptr /*no waitp*/);  // take slow path
       break;
     }
     // fast reader release (reader with no waiters)
     intptr_t clear = ExactlyOneReader(v) ? kMuReader | kMuOne : kMuOne;
-    if (TURBO_PREDICT_TRUE(
+    if (TURBO_LIKELY(
             mu_.compare_exchange_strong(v, v - clear, std::memory_order_release,
                                         std::memory_order_relaxed))) {
       break;
@@ -1812,7 +1812,7 @@ TURBO_ATTRIBUTE_NOINLINE void Mutex::LockSlow(MuHow how, const Condition* cond,
   // uninitialized (meaning no spinning) in all initial uncontended Lock calls
   // and in the first contended call. After that we will have
   // spinloop_iterations properly initialized.
-  if (TURBO_PREDICT_FALSE(
+  if (TURBO_UNLIKELY(
           globals.spinloop_iterations.load(std::memory_order_relaxed) == 0)) {
     if (turbo::base_internal::NumCPUs() > 1) {
       // If this is multiprocessor, allow spinning.
@@ -1942,7 +1942,7 @@ bool Mutex::LockSlowWithDeadline(MuHow how, const Condition* cond,
 // Arguments after the first are not evaluated unless the condition is true.
 #define RAW_CHECK_FMT(cond, ...)                                   \
   do {                                                             \
-    if (TURBO_PREDICT_FALSE(!(cond))) {                             \
+    if (TURBO_UNLIKELY(!(cond))) {                             \
       TURBO_RAW_LOG(FATAL, "Check " #cond " failed: " __VA_ARGS__); \
     }                                                              \
   } while (0)
@@ -1960,7 +1960,7 @@ static void CheckForMutexCorruption(intptr_t v, const char* label) {
   // save a branch in the common (correct) case of them not being coincident.
   static_assert(kMuReader << 3 == kMuWriter, "must match");
   static_assert(kMuWait << 3 == kMuWrWait, "must match");
-  if (TURBO_PREDICT_TRUE((w & (w << 3) & (kMuWriter | kMuWrWait)) == 0)) return;
+  if (TURBO_LIKELY((w & (w << 3) & (kMuWriter | kMuWrWait)) == 0)) return;
   RAW_CHECK_FMT((v & (kMuWriter | kMuReader)) != (kMuWriter | kMuReader),
                 "%s: Mutex corrupt: both reader and writer lock held: %p",
                 label, reinterpret_cast<void*>(v));

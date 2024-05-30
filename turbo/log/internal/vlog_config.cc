@@ -58,14 +58,14 @@ bool ModuleIsPath(turbo::string_view module_pattern) {
 }  // namespace
 
 bool VLogSite::SlowIsEnabled(int stale_v, int level) {
-  if (TURBO_PREDICT_TRUE(stale_v != kUninitialized)) {
+  if (TURBO_LIKELY(stale_v != kUninitialized)) {
     // Because of the prerequisites to this function, we know that stale_v is
     // either uninitialized or >= level. If it's not uninitialized, that means
     // it must be >= level, thus we should log.
     return true;
   }
   stale_v = log_internal::RegisterAndInitialize(this);
-  return TURBO_PREDICT_FALSE(stale_v >= level);
+  return TURBO_UNLIKELY(stale_v >= level);
 }
 
 bool VLogSite::SlowIsEnabled0(int stale_v) { return SlowIsEnabled(stale_v, 0); }

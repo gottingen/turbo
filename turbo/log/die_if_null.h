@@ -62,7 +62,7 @@ namespace turbo::log_internal {
     template<typename T>
     TURBO_MUST_USE_RESULT T DieIfNull(const char *file, int line,
                                       const char *exprtext, T &&t) {
-        if (TURBO_PREDICT_FALSE(t == nullptr)) {
+        if (TURBO_UNLIKELY(t == nullptr)) {
             // Call a non-inline helper function for a small code size improvement.
             DieBecauseNull(file, line, exprtext);
         }

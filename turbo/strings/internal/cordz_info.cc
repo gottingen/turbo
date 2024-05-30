@@ -328,7 +328,7 @@ CordzInfo::CordzInfo(CordRep* rep, const CordzInfo* src,
 CordzInfo::~CordzInfo() {
   // `rep_` is potentially kept alive if CordzInfo is included
   // in a collection snapshot (which should be rare).
-  if (TURBO_PREDICT_FALSE(rep_)) {
+  if (TURBO_UNLIKELY(rep_)) {
     CordRep::Unref(rep_);
   }
 }

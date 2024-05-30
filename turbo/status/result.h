@@ -59,7 +59,6 @@
 #include <turbo/utility/utility.h>
 
 namespace turbo {
-
     // BadResultAccess
     //
     // This class defines the type of object to throw (if exceptions are enabled),
@@ -672,10 +671,10 @@ namespace turbo {
         return os;
     }
 
-// As above, but supports `str_cat`, `str_format`, etc.
-//
-// Requires `T` has `turbo_stringify`.  Do not rely on the output format which
-// may change without notice.
+    // As above, but supports `str_cat`, `str_format`, etc.
+    //
+    // Requires `T` has `turbo_stringify`.  Do not rely on the output format which
+    // may change without notice.
     template<
             typename Sink, typename T,
             typename std::enable_if<turbo::HasTurboStringify<T>::value, int>::type = 0>
@@ -690,11 +689,11 @@ namespace turbo {
         }
     }
 
-//------------------------------------------------------------------------------
-// Implementation details for Result<T>
-//------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------
+    // Implementation details for Result<T>
+    //------------------------------------------------------------------------------
 
-// TODO(sbenza): avoid the string here completely.
+    // TODO(sbenza): avoid the string here completely.
     template<typename T>
     Result<T>::Result() : Base(Status(turbo::StatusCode::kUnknown, "")) {}
 
@@ -825,5 +824,52 @@ namespace turbo {
     void Result<T>::ignore_error() const {
         // no-op
     }
+    namespace internal {
+
+        template <typename T>
+        inline const Status& generic_to_status(const Result<T>& res) {
+            return res.status();
+        }
+
+        template <typename T>
+        inline Status generic_to_status(Result<T>&& res) {
+            return std::move(res).status();
+        }
+
+    }  // namespace internal
 
 }  // namespace turbo
+
+#define TURBO_ASSIGN_OR_RETURN_IMPL(result_name, lhs, rexpr)                              \
+  auto&& result_name = (rexpr);                                                           \
+  TURBO_RETURN_IF_(!(result_name).ok(), (result_name).status(), TURBO_STRINGIFY(rexpr)); \
+  lhs = result_name.value();
+
+#define TURBO_ASSIGN_OR_RETURN_NAME(x, y) TURBO_CONCAT(x, y)
+
+/// \brief Execute an expression that returns a Result, extracting its value
+/// into the variable defined by `lhs` (or returning a Status on error).
+///
+/// Example: Assigning to a new value:
+///   TURBO_ASSIGN_OR_RETURN(auto value, MaybeGetValue(arg));
+///
+/// Example: Assigning to an existing value:
+///   ValueType value;
+///   TURBO_ASSIGN_OR_RETURN(value, MaybeGetValue(arg));
+///
+/// WARNING: TURBO_ASSIGN_OR_RETURN expands into multiple statements;
+/// it cannot be used in a single statement (e.g. as the body of an if
+/// statement without {})!
+///
+/// WARNING: TURBO_ASSIGN_OR_RETURN `std::move`s its right operand. If you have
+/// an lvalue Result which you *don't* want to move out of cast appropriately.
+///
+/// WARNING: TURBO_ASSIGN_OR_RETURN is not a single expression; it will not
+/// maintain lifetimes of all temporaries in `rexpr` (e.g.
+/// `TURBO_ASSIGN_OR_RETURN(auto x, MakeTemp().GetResultRef());`
+/// will most likely segfault)!
+#define TURBO_ASSIGN_OR_RETURN(lhs, rexpr)                                              \
+  TURBO_ASSIGN_OR_RETURN_IMPL(TURBO_ASSIGN_OR_RETURN_NAME(_error_or_value, __COUNTER__), \
+                             lhs, rexpr);
+
+

@@ -142,7 +142,7 @@ class FutexImpl {
   static int Wake(std::atomic<int32_t>* v, int32_t count) {
     auto err = syscall(SYS_futex, reinterpret_cast<int32_t*>(v),
                        FUTEX_WAKE | FUTEX_PRIVATE_FLAG, count);
-    if (TURBO_PREDICT_FALSE(err < 0)) {
+    if (TURBO_UNLIKELY(err < 0)) {
       return -errno;
     }
     return 0;

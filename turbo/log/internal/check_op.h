@@ -134,13 +134,13 @@
        turbo_log_internal_check_ok_goo.first =                            \
            ::turbo::log_internal::AsStatus(val),                          \
        turbo_log_internal_check_ok_goo.second =                           \
-           TURBO_PREDICT_TRUE(turbo_log_internal_check_ok_goo.first->ok()) \
+           TURBO_LIKELY(turbo_log_internal_check_ok_goo.first->ok()) \
                ? nullptr                                                 \
                : ::turbo::status_internal::MakeCheckFailString(           \
                      turbo_log_internal_check_ok_goo.first,               \
                      TURBO_LOG_INTERNAL_STRIP_STRING_LITERAL(val_text     \
                                                             " is OK")),  \
-       !TURBO_PREDICT_TRUE(turbo_log_internal_check_ok_goo.first->ok());)  \
+       !TURBO_LIKELY(turbo_log_internal_check_ok_goo.first->ok());)  \
     TURBO_LOG_INTERNAL_CONDITION_FATAL(STATELESS, true)                   \
   TURBO_LOG_INTERNAL_CHECK(*turbo_log_internal_check_ok_goo.second)        \
       .InternalStream()
@@ -150,13 +150,13 @@
        turbo_log_internal_qcheck_ok_goo.first =                            \
            ::turbo::log_internal::AsStatus(val),                           \
        turbo_log_internal_qcheck_ok_goo.second =                           \
-           TURBO_PREDICT_TRUE(turbo_log_internal_qcheck_ok_goo.first->ok()) \
+           TURBO_LIKELY(turbo_log_internal_qcheck_ok_goo.first->ok()) \
                ? nullptr                                                  \
                : ::turbo::status_internal::MakeCheckFailString(            \
                      turbo_log_internal_qcheck_ok_goo.first,               \
                      TURBO_LOG_INTERNAL_STRIP_STRING_LITERAL(val_text      \
                                                             " is OK")),   \
-       !TURBO_PREDICT_TRUE(turbo_log_internal_qcheck_ok_goo.first->ok());)  \
+       !TURBO_LIKELY(turbo_log_internal_qcheck_ok_goo.first->ok());)  \
     TURBO_LOG_INTERNAL_CONDITION_QFATAL(STATELESS, true)                   \
   TURBO_LOG_INTERNAL_QCHECK(*turbo_log_internal_qcheck_ok_goo.second)       \
       .InternalStream()
@@ -393,7 +393,7 @@ TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const void*);
                                              const char* exprtext) {       \
     using U1 = CheckOpStreamType<T1>;                                      \
     using U2 = CheckOpStreamType<T2>;                                      \
-    return TURBO_PREDICT_TRUE(v1 op v2)                                     \
+    return TURBO_LIKELY(v1 op v2)                                     \
                ? nullptr                                                   \
                : TURBO_LOG_INTERNAL_CHECK_OP_IMPL_RESULT(U1, U2, U1(v1),    \
                                                         U2(v2), exprtext); \

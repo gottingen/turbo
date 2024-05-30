@@ -84,7 +84,7 @@ namespace turbo {
             return;
         }
         // Write to the current file
-        if(TURBO_PREDICT_TRUE(entry.log_severity() != LogSeverity::kFatal)) {
+        if(TURBO_LIKELY(entry.log_severity() != LogSeverity::kFatal)) {
             _file_writer->write(entry.text_message_with_prefix_and_newline());
         } else {
             if(!entry.stacktrace().empty()) {

@@ -1237,7 +1237,7 @@ inline uint64_t MixingHashState::CombineContiguousImpl(
   // multiplicative hash.
   uint64_t v;
   if (len > 8) {
-    if (TURBO_PREDICT_FALSE(len > PiecewiseChunkSize())) {
+    if (TURBO_UNLIKELY(len > PiecewiseChunkSize())) {
       return CombineLargeContiguousImpl32(state, first, len);
     }
     v = hash_internal::CityHash32(reinterpret_cast<const char*>(first), len);
@@ -1260,7 +1260,7 @@ inline uint64_t MixingHashState::CombineContiguousImpl(
   // for small ones we just use a multiplicative hash.
   uint64_t v;
   if (len > 16) {
-    if (TURBO_PREDICT_FALSE(len > PiecewiseChunkSize())) {
+    if (TURBO_UNLIKELY(len > PiecewiseChunkSize())) {
       return CombineLargeContiguousImpl64(state, first, len);
     }
     v = Hash64(first, len);

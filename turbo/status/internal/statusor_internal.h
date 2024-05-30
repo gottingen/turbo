@@ -349,11 +349,11 @@ namespace turbo {
             }
 
             void EnsureOk() const {
-                if (TURBO_PREDICT_FALSE(!ok())) Helper::Crash(status_);
+                if (TURBO_UNLIKELY(!ok())) Helper::Crash(status_);
             }
 
             void EnsureNotOk() {
-                if (TURBO_PREDICT_FALSE(ok())) Helper::HandleInvalidStatusCtorArg(&status_);
+                if (TURBO_UNLIKELY(ok())) Helper::HandleInvalidStatusCtorArg(&status_);
             }
 
             // Construct the value (ie. data_) through placement new with the passed

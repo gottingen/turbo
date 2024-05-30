@@ -158,7 +158,7 @@ size_t GetPoolID() {
 
 #ifdef TURBO_HAVE_THREAD_LOCAL
   static thread_local size_t my_pool_id = kPoolSize;
-  if (TURBO_PREDICT_FALSE(my_pool_id == kPoolSize)) {
+  if (TURBO_UNLIKELY(my_pool_id == kPoolSize)) {
     my_pool_id = (sequence++ % kPoolSize);
   }
   return my_pool_id;
@@ -176,7 +176,7 @@ size_t GetPoolID() {
   // value is 0, so add +1 to distinguish from the null value.
   uintptr_t my_pool_id =
       reinterpret_cast<uintptr_t>(pthread_getspecific(tid_key));
-  if (TURBO_PREDICT_FALSE(my_pool_id == 0)) {
+  if (TURBO_UNLIKELY(my_pool_id == 0)) {
     // No allocated ID, allocate the next value, cache it, and return.
     my_pool_id = (sequence++ % kPoolSize) + 1;
     int err = pthread_setspecific(tid_key, reinterpret_cast<void*>(my_pool_id));

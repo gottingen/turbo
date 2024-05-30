@@ -18,3 +18,34 @@
 //
 // Created by jeff on 24-5-31.
 //
+
+#include <turbo/status/result.h>
+
+turbo::Result<int> not_ok() {
+    return turbo::internal_error("not ok");
+}
+
+turbo::Result<int> ok() {
+    return 1;
+}
+
+turbo::Status call_ok() {
+    TURBO_ASSIGN_OR_RETURN(auto r, ok());
+    (void)r;
+    std::cout << "this should be 1: " << r << std::endl;
+    return turbo::OkStatus();
+}
+
+turbo::Status call_not_ok() {
+    TURBO_ASSIGN_OR_RETURN(auto r, not_ok());
+    std::cout << "this should not be printed" << std::endl;
+    return turbo::OkStatus();
+}
+
+int main() {
+    auto r = call_ok();
+    (void)r;
+    r = call_not_ok();
+    (void)r;
+    return 0;
+}

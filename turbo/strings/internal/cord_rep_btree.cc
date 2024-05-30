@@ -277,7 +277,7 @@ struct StackOperations {
       case CordRepBtree::kPopped:
         tree = edge_type == kBack ? CordRepBtree::New(tree, result.tree)
                                   : CordRepBtree::New(result.tree, tree);
-        if (TURBO_PREDICT_FALSE(tree->height() > CordRepBtree::kMaxHeight)) {
+        if (TURBO_UNLIKELY(tree->height() > CordRepBtree::kMaxHeight)) {
           tree = CordRepBtree::Rebuild(tree);
           TURBO_RAW_CHECK(tree->height() <= CordRepBtree::kMaxHeight,
                          "Max height exceeded");
@@ -611,7 +611,7 @@ turbo::string_view CordRepBtree::AddData<kFront>(turbo::string_view data,
 template <EdgeType edge_type>
 CordRepBtree* CordRepBtree::AddData(CordRepBtree* tree, turbo::string_view data,
                                     size_t extra) {
-  if (TURBO_PREDICT_FALSE(data.empty())) return tree;
+  if (TURBO_UNLIKELY(data.empty())) return tree;
 
   const size_t original_data_size = data.size();
   int depth = tree->height();
@@ -846,10 +846,10 @@ CordRep* CordRepBtree::RemoveSuffix(CordRepBtree* tree, size_t n) {
   assert(tree != nullptr);
   assert(n <= tree->length);
   const size_t len = tree->length;
-  if (TURBO_PREDICT_FALSE(n == 0)) {
+  if (TURBO_UNLIKELY(n == 0)) {
     return tree;
   }
-  if (TURBO_PREDICT_FALSE(n >= len)) {
+  if (TURBO_UNLIKELY(n >= len)) {
     CordRepBtree::Unref(tree);
     return nullptr;
   }
@@ -908,7 +908,7 @@ CordRep* CordRepBtree::RemoveSuffix(CordRepBtree* tree, size_t n) {
 CordRep* CordRepBtree::SubTree(size_t offset, size_t n) {
   assert(n <= this->length);
   assert(offset <= this->length - n);
-  if (TURBO_PREDICT_FALSE(n == 0)) return nullptr;
+  if (TURBO_UNLIKELY(n == 0)) return nullptr;
 
   CordRepBtree* node = this;
   int height = node->height();
@@ -985,7 +985,7 @@ bool CordRepBtree::IsFlat(size_t offset, const size_t n,
                           turbo::string_view* fragment) const {
   assert(n <= this->length);
   assert(offset <= this->length - n);
-  if (TURBO_PREDICT_FALSE(n == 0)) return false;
+  if (TURBO_UNLIKELY(n == 0)) return false;
   int height = this->height();
   const CordRepBtree* node = this;
   for (;;) {
@@ -1065,7 +1065,7 @@ CordRepBtree* CordRepBtree::CreateSlow(CordRep* rep) {
 }
 
 CordRepBtree* CordRepBtree::AppendSlow(CordRepBtree* tree, CordRep* rep) {
-  if (TURBO_PREDICT_TRUE(rep->IsBtree())) {
+  if (TURBO_LIKELY(rep->IsBtree())) {
     return MergeTrees(tree, rep->btree());
   }
   auto consume = [&tree](CordRep* r, size_t offset, size_t length) {
@@ -1077,7 +1077,7 @@ CordRepBtree* CordRepBtree::AppendSlow(CordRepBtree* tree, CordRep* rep) {
 }
 
 CordRepBtree* CordRepBtree::PrependSlow(CordRepBtree* tree, CordRep* rep) {
-  if (TURBO_PREDICT_TRUE(rep->IsBtree())) {
+  if (TURBO_LIKELY(rep->IsBtree())) {
     return MergeTrees(rep->btree(), tree);
   }
   auto consume = [&tree](CordRep* r, size_t offset, size_t length) {

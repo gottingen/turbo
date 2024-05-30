@@ -381,7 +381,7 @@ class InlinedVector {
   // NOTE: if `i` is not within the required range of `InlinedVector::at(...)`,
   // in both debug and non-debug builds, `std::out_of_range` will be thrown.
   reference at(size_type i) TURBO_ATTRIBUTE_LIFETIME_BOUND {
-    if (TURBO_PREDICT_FALSE(i >= size())) {
+    if (TURBO_UNLIKELY(i >= size())) {
       base_internal::ThrowStdOutOfRange(
           "`InlinedVector::at(size_type)` failed bounds check");
     }
@@ -394,7 +394,7 @@ class InlinedVector {
   // NOTE: if `i` is not within the required range of `InlinedVector::at(...)`,
   // in both debug and non-debug builds, `std::out_of_range` will be thrown.
   const_reference at(size_type i) const TURBO_ATTRIBUTE_LIFETIME_BOUND {
-    if (TURBO_PREDICT_FALSE(i >= size())) {
+    if (TURBO_UNLIKELY(i >= size())) {
       base_internal::ThrowStdOutOfRange(
           "`InlinedVector::at(size_type) const` failed bounds check");
     }
@@ -533,7 +533,7 @@ class InlinedVector {
   // Overload of `InlinedVector::operator=(...)` that replaces the elements of
   // the inlined vector with copies of the elements of `other`.
   InlinedVector& operator=(const InlinedVector& other) {
-    if (TURBO_PREDICT_TRUE(this != std::addressof(other))) {
+    if (TURBO_LIKELY(this != std::addressof(other))) {
       const_pointer other_data = other.data();
       assign(other_data, other_data + other.size());
     }
@@ -547,7 +547,7 @@ class InlinedVector {
   // NOTE: as a result of calling this overload, `other` is left in a valid but
   // unspecified state.
   InlinedVector& operator=(InlinedVector&& other) {
-    if (TURBO_PREDICT_TRUE(this != std::addressof(other))) {
+    if (TURBO_LIKELY(this != std::addressof(other))) {
       MoveAssignment(MoveAssignmentPolicy{}, std::move(other));
     }
 
@@ -639,7 +639,7 @@ class InlinedVector {
     TURBO_HARDENING_ASSERT(pos >= begin());
     TURBO_HARDENING_ASSERT(pos <= end());
 
-    if (TURBO_PREDICT_TRUE(n != 0)) {
+    if (TURBO_LIKELY(n != 0)) {
       value_type dealias = v;
       // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=102329#c2
       // It appears that GCC thinks that since `pos` is a const pointer and may
@@ -680,7 +680,7 @@ class InlinedVector {
     TURBO_HARDENING_ASSERT(pos >= begin());
     TURBO_HARDENING_ASSERT(pos <= end());
 
-    if (TURBO_PREDICT_TRUE(first != last)) {
+    if (TURBO_LIKELY(first != last)) {
       return storage_.Insert(
           pos, IteratorValueAdapter<A, ForwardIterator>(first),
           static_cast<size_type>(std::distance(first, last)));
@@ -805,7 +805,7 @@ class InlinedVector {
     TURBO_HARDENING_ASSERT(from <= to);
     TURBO_HARDENING_ASSERT(to <= end());
 
-    if (TURBO_PREDICT_TRUE(from != to)) {
+    if (TURBO_LIKELY(from != to)) {
       return storage_.Erase(from, to);
     } else {
       return const_cast<iterator>(from);
@@ -847,7 +847,7 @@ class InlinedVector {
   //
   // Swaps the contents of the inlined vector with `other`.
   void swap(InlinedVector& other) {
-    if (TURBO_PREDICT_TRUE(this != std::addressof(other))) {
+    if (TURBO_LIKELY(this != std::addressof(other))) {
       storage_.Swap(std::addressof(other.storage_));
     }
   }

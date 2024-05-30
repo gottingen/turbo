@@ -310,7 +310,7 @@ namespace turbo {
         assert(&src != this);
         assert(is_tree() || src.is_tree());
         auto constexpr method = CordzUpdateTracker::kAssignCord;
-        if (TURBO_PREDICT_TRUE(!is_tree())) {
+        if (TURBO_LIKELY(!is_tree())) {
             EmplaceTree(CordRep::Ref(src.as_tree()), src.data_, method);
             return;
         }

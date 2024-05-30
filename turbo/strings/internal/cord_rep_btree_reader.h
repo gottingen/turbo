@@ -187,7 +187,7 @@ inline turbo::string_view CordRepBtreeReader::Skip(size_t skip) {
   // need to skip the current edge as well as `skip`.
   const size_t edge_length = navigator_.Current()->length;
   CordRepBtreeNavigator::Position pos = navigator_.Skip(skip + edge_length);
-  if (TURBO_PREDICT_FALSE(pos.edge == nullptr)) {
+  if (TURBO_UNLIKELY(pos.edge == nullptr)) {
     remaining_ = 0;
     return {};
   }
@@ -199,7 +199,7 @@ inline turbo::string_view CordRepBtreeReader::Skip(size_t skip) {
 
 inline turbo::string_view CordRepBtreeReader::Seek(size_t offset) {
   const CordRepBtreeNavigator::Position pos = navigator_.Seek(offset);
-  if (TURBO_PREDICT_FALSE(pos.edge == nullptr)) {
+  if (TURBO_UNLIKELY(pos.edge == nullptr)) {
     remaining_ = 0;
     return {};
   }

@@ -75,7 +75,7 @@ namespace turbo::log_internal {
             bool* thread_is_logging_ptr =
                 reinterpret_cast<bool*>(pthread_getspecific(thread_is_logging_key));
 
-            if (TURBO_PREDICT_FALSE(!thread_is_logging_ptr)) {
+            if (TURBO_UNLIKELY(!thread_is_logging_ptr)) {
               thread_is_logging_ptr = new bool{false};
               if (pthread_setspecific(thread_is_logging_key, thread_is_logging_ptr)) {
                 perror("pthread_setspecific failed");

@@ -151,39 +151,39 @@ class HashtablezInfoHandle {
   // We do not have a destructor. Caller is responsible for calling Unregister
   // before destroying the handle.
   void Unregister() {
-    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_LIKELY(info_ == nullptr)) return;
     UnsampleSlow(info_);
   }
 
-  inline bool IsSampled() const { return TURBO_PREDICT_FALSE(info_ != nullptr); }
+  inline bool IsSampled() const { return TURBO_UNLIKELY(info_ != nullptr); }
 
   inline void RecordStorageChanged(size_t size, size_t capacity) {
-    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_LIKELY(info_ == nullptr)) return;
     RecordStorageChangedSlow(info_, size, capacity);
   }
 
   inline void RecordRehash(size_t total_probe_length) {
-    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_LIKELY(info_ == nullptr)) return;
     RecordRehashSlow(info_, total_probe_length);
   }
 
   inline void RecordReservation(size_t target_capacity) {
-    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_LIKELY(info_ == nullptr)) return;
     RecordReservationSlow(info_, target_capacity);
   }
 
   inline void RecordClearedReservation() {
-    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_LIKELY(info_ == nullptr)) return;
     RecordClearedReservationSlow(info_);
   }
 
   inline void RecordInsert(size_t hash, size_t distance_from_desired) {
-    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_LIKELY(info_ == nullptr)) return;
     RecordInsertSlow(info_, hash, distance_from_desired);
   }
 
   inline void RecordErase() {
-    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_LIKELY(info_ == nullptr)) return;
     RecordEraseSlow(info_);
   }
 
@@ -229,7 +229,7 @@ inline HashtablezInfoHandle Sample(
     TURBO_ATTRIBUTE_UNUSED size_t value_size,
     TURBO_ATTRIBUTE_UNUSED uint16_t soo_capacity) {
 #if defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
-  if (TURBO_PREDICT_TRUE(--global_next_sample.next_sample > 0)) {
+  if (TURBO_LIKELY(--global_next_sample.next_sample > 0)) {
     return HashtablezInfoHandle(nullptr);
   }
   return HashtablezInfoHandle(SampleSlow(global_next_sample,

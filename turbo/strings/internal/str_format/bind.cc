@@ -228,7 +228,7 @@ std::ostream& Streamable::Print(std::ostream& os) const {
 std::string& AppendPack(std::string* out, const UntypedFormatSpecImpl format,
                         turbo::Span<const FormatArgImpl> args) {
   size_t orig = out->size();
-  if (TURBO_PREDICT_FALSE(!format_untyped(out, format, args))) {
+  if (TURBO_UNLIKELY(!format_untyped(out, format, args))) {
     out->erase(orig);
   }
   return *out;
@@ -237,7 +237,7 @@ std::string& AppendPack(std::string* out, const UntypedFormatSpecImpl format,
 std::string FormatPack(UntypedFormatSpecImpl format,
                        turbo::Span<const FormatArgImpl> args) {
   std::string out;
-  if (TURBO_PREDICT_FALSE(!format_untyped(&out, format, args))) {
+  if (TURBO_UNLIKELY(!format_untyped(&out, format, args))) {
     out.clear();
   }
   return out;

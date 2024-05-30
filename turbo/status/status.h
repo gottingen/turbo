@@ -983,5 +983,32 @@ namespace turbo {
     turbo::Nonnull<const char *> StatusMessageAsCStr(
             const Status &status TURBO_ATTRIBUTE_LIFETIME_BOUND);
 
+    namespace internal {
+
+        // Extract Status from Status or Result<T>
+        // Useful for the status check macros such as RETURN_NOT_OK.
+        inline const Status &generic_to_status(const Status &st) { return st; }
+
+        inline Status generic_to_status(Status &&st) { return std::move(st); }
+
+    }  // namespace internal
+
 }  // namespace turbo
 
+#ifndef TURBO_RETURN_NOT_OK
+
+#define TURBO_RETURN_IF_(condition, status, _) \
+  do {                                         \
+    if (TURBO_UNLIKELY(condition)) {      \
+      return (status);                         \
+    }                                          \
+  } while (0)
+
+/// \brief Propagate any non-successful Status to the caller
+#define TURBO_RETURN_NOT_OK(status)                                   \
+  do {                                                                \
+    ::collie::Status __s = ::turbo::internal::generic_to_status(status); \
+    TURBO_RETURN_IF_(!__s.ok(), __s, TURBO_STRINGIFY(status));        \
+  } while (false)
+
+#endif  // TURBO_RETURN_NOT_OK

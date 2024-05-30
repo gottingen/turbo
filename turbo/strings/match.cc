@@ -79,18 +79,18 @@ turbo::string_view find_longest_common_prefix(turbo::string_view a,
   const char* const pb = b.data();
   turbo::string_view::size_type count = (unsigned) 0;
 
-  if (TURBO_PREDICT_FALSE(limit < 8)) {
-    while (TURBO_PREDICT_TRUE(count + 2 <= limit)) {
+  if (TURBO_UNLIKELY(limit < 8)) {
+    while (TURBO_LIKELY(count + 2 <= limit)) {
       uint16_t xor_bytes = turbo::little_endian::Load16(pa + count) ^
                            turbo::little_endian::Load16(pb + count);
-      if (TURBO_PREDICT_FALSE(xor_bytes != 0)) {
-        if (TURBO_PREDICT_TRUE((xor_bytes & 0xff) == 0)) ++count;
+      if (TURBO_UNLIKELY(xor_bytes != 0)) {
+        if (TURBO_LIKELY((xor_bytes & 0xff) == 0)) ++count;
         return turbo::string_view(pa, count);
       }
       count += 2;
     }
-    if (TURBO_PREDICT_TRUE(count != limit)) {
-      if (TURBO_PREDICT_TRUE(pa[count] == pb[count])) ++count;
+    if (TURBO_LIKELY(count != limit)) {
+      if (TURBO_LIKELY(pa[count] == pb[count])) ++count;
     }
     return turbo::string_view(pa, count);
   }
@@ -98,17 +98,17 @@ turbo::string_view find_longest_common_prefix(turbo::string_view a,
   do {
     uint64_t xor_bytes = turbo::little_endian::Load64(pa + count) ^
                          turbo::little_endian::Load64(pb + count);
-    if (TURBO_PREDICT_FALSE(xor_bytes != 0)) {
+    if (TURBO_UNLIKELY(xor_bytes != 0)) {
       count += static_cast<uint64_t>(turbo::countr_zero(xor_bytes) >> 3);
       return turbo::string_view(pa, count);
     }
     count += 8;
-  } while (TURBO_PREDICT_TRUE(count + 8 < limit));
+  } while (TURBO_LIKELY(count + 8 < limit));
 
   count = limit - 8;
   uint64_t xor_bytes = turbo::little_endian::Load64(pa + count) ^
                        turbo::little_endian::Load64(pb + count);
-  if (TURBO_PREDICT_TRUE(xor_bytes != 0)) {
+  if (TURBO_LIKELY(xor_bytes != 0)) {
     count += static_cast<uint64_t>(turbo::countr_zero(xor_bytes) >> 3);
     return turbo::string_view(pa, count);
   }

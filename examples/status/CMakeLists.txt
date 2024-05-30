@@ -17,8 +17,8 @@
 #
 
 carbin_cc_binary(
-        NAME time_ex
-        SOURCES time_ex.cc
+        NAME result_ex
+        SOURCES result.cc
         LINKS turbo::turbo
         CXXOPTS ${CARBIN_CXX_OPTIONS}
 )
