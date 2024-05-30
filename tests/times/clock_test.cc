@@ -66,7 +66,7 @@ bool SleepForBounded(turbo::Duration d, turbo::Duration lower_bound,
     if (alarm_policy == AlarmPolicy::kWithAlarm) {
       alarm_handler_invoked = false;
       old_alarm = signal(SIGALRM, AlarmHandler);
-      alarm(turbo::ToInt64Seconds(d / 2));
+      alarm(turbo::Duration::to_seconds(d / 2));
     }
 #else
     EXPECT_EQ(alarm_policy, AlarmPolicy::kWithoutAlarm);

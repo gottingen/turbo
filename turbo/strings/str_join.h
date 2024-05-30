@@ -75,12 +75,12 @@ TURBO_NAMESPACE_BEGIN
 // work with arbitrary types.
 //
 // The following is an example of a custom Formatter that uses
-// `turbo::FormatDuration` to join a list of `turbo::Duration`s.
+// `turbo::Duration::format` to join a list of `turbo::Duration`s.
 //
 //   std::vector<turbo::Duration> v = {turbo::Seconds(1), turbo::Milliseconds(10)};
 //   std::string s =
 //       turbo::StrJoin(v, ", ", [](std::string* out, turbo::Duration dur) {
-//         turbo::StrAppend(out, turbo::FormatDuration(dur));
+//         turbo::StrAppend(out, turbo::Duration::format(dur));
 //       });
 //   EXPECT_EQ(s, "1s, 10ms");
 //

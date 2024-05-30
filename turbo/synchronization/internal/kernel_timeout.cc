@@ -87,7 +87,7 @@ namespace turbo {
                 return;
             }
 
-            int64_t nanos = turbo::ToInt64Nanoseconds(d);
+            int64_t nanos = turbo::Duration::to_nanoseconds(d);
 
             // Negative durations are normalized to 0.
             // In theory implementations should expire these timeouts immediately.

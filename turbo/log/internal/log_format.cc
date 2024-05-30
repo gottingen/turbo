@@ -132,7 +132,7 @@ size_t FormatBoundedFields(turbo::LogSeverity severity, turbo::Time timestamp,
                                        p);
   p += 2;
   *p++ = '.';
-  const int64_t usecs = turbo::ToInt64Microseconds(ci.subsecond);
+  const int64_t usecs = turbo::Duration::to_microseconds(ci.subsecond);
   turbo::numbers_internal::PutTwoDigits(static_cast<uint32_t>(usecs / 10000), p);
   p += 2;
   turbo::numbers_internal::PutTwoDigits(static_cast<uint32_t>(usecs / 100 % 100),
@@ -179,7 +179,7 @@ std::string FormatLogMessage(turbo::LogSeverity severity,
       "%c%02d%02d %02d:%02d:%02d.%06d %7d %s:%d] %s%s",
       turbo::LogSeverityName(severity)[0], civil_second.month(),
       civil_second.day(), civil_second.hour(), civil_second.minute(),
-      civil_second.second(), turbo::ToInt64Microseconds(subsecond), tid,
+      civil_second.second(), turbo::Duration::to_microseconds(subsecond), tid,
       basename, line, format == PrefixFormat::kRaw ? "RAW: " : "", message);
 }
 

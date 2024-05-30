@@ -106,7 +106,7 @@ namespace {
                       turbo::Milliseconds(5));
             EXPECT_LE(turbo::Duration::abs(turbo::Time::from_chrono(t.ToChronoTimePoint()) - when),
                       turbo::Microseconds(1));
-            EXPECT_LE(turbo::Duration::abs(turbo::FromChrono(t.ToChronoDuration()) -
+            EXPECT_LE(turbo::Duration::abs(turbo::Duration::from_chrono(t.ToChronoDuration()) -
                                          std::max(duration, turbo::Duration::zero())),
                       kTimingBound);
         }
@@ -272,7 +272,7 @@ namespace {
                                          turbo::Time::from_chrono(t.ToChronoTimePoint())),
                       kTimingBound);
             EXPECT_LE(
-                    turbo::Duration::abs(turbo::FromChrono(t.ToChronoDuration()) - duration),
+                    turbo::Duration::abs(turbo::Duration::from_chrono(t.ToChronoDuration()) - duration),
                     kTimingBound);
         }
     }

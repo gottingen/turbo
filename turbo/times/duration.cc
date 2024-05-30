@@ -554,7 +554,7 @@ namespace turbo {
     // Conversion to other duration types.
     //
 
-    int64_t ToInt64Nanoseconds(Duration d) {
+    int64_t Duration::to_nanoseconds(Duration d) {
         if (time_internal::GetRepHi(d) >= 0 &&
             time_internal::GetRepHi(d) >> 33 == 0) {
             return (time_internal::GetRepHi(d) * 1000 * 1000 * 1000) +
@@ -563,7 +563,7 @@ namespace turbo {
         return d / Nanoseconds(1);
     }
 
-    int64_t ToInt64Microseconds(Duration d) {
+    int64_t Duration::to_microseconds(Duration d) {
         if (time_internal::GetRepHi(d) >= 0 &&
             time_internal::GetRepHi(d) >> 43 == 0) {
             return (time_internal::GetRepHi(d) * 1000 * 1000) +
@@ -572,7 +572,7 @@ namespace turbo {
         return d / Microseconds(1);
     }
 
-    int64_t ToInt64Milliseconds(Duration d) {
+    int64_t Duration::to_milliseconds(Duration d) {
         if (time_internal::GetRepHi(d) >= 0 &&
             time_internal::GetRepHi(d) >> 53 == 0) {
             return (time_internal::GetRepHi(d) * 1000) +
@@ -581,44 +581,44 @@ namespace turbo {
         return d / Milliseconds(1);
     }
 
-    int64_t ToInt64Seconds(Duration d) {
+    int64_t Duration::to_seconds(Duration d) {
         int64_t hi = time_internal::GetRepHi(d);
         if (time_internal::IsInfiniteDuration(d)) return hi;
         if (hi < 0 && time_internal::GetRepLo(d) != 0) ++hi;
         return hi;
     }
 
-    int64_t ToInt64Minutes(Duration d) {
+    int64_t Duration::to_minutes(Duration d) {
         int64_t hi = time_internal::GetRepHi(d);
         if (time_internal::IsInfiniteDuration(d)) return hi;
         if (hi < 0 && time_internal::GetRepLo(d) != 0) ++hi;
         return hi / 60;
     }
 
-    int64_t ToInt64Hours(Duration d) {
+    int64_t Duration::to_hours(Duration d) {
         int64_t hi = time_internal::GetRepHi(d);
         if (time_internal::IsInfiniteDuration(d)) return hi;
         if (hi < 0 && time_internal::GetRepLo(d) != 0) ++hi;
         return hi / (60 * 60);
     }
 
-    double ToDoubleNanoseconds(Duration d) {
+    double Duration::to_double_nanoseconds(Duration d) {
         return Duration::fdiv(d, Nanoseconds(1));
     }
 
-    double ToDoubleMicroseconds(Duration d) {
+    double Duration::to_double_microseconds(Duration d) {
         return Duration::fdiv(d, Microseconds(1));
     }
 
-    double ToDoubleMilliseconds(Duration d) {
+    double Duration::to_double_milliseconds(Duration d) {
         return Duration::fdiv(d, Milliseconds(1));
     }
 
-    double ToDoubleSeconds(Duration d) { return Duration::fdiv(d, Seconds(1)); }
+    double Duration::to_double_seconds(Duration d) { return Duration::fdiv(d, Seconds(1)); }
 
-    double ToDoubleMinutes(Duration d) { return Duration::fdiv(d, Minutes(1)); }
+    double Duration::to_double_minutes(Duration d) { return Duration::fdiv(d, Minutes(1)); }
 
-    double ToDoubleHours(Duration d) { return Duration::fdiv(d, Hours(1)); }
+    double Duration::to_double_hours(Duration d) { return Duration::fdiv(d, Hours(1)); }
 
     timespec ToTimespec(Duration d) {
         timespec ts;
@@ -677,39 +677,39 @@ namespace turbo {
         return tv;
     }
 
-    std::chrono::nanoseconds ToChronoNanoseconds(Duration d) {
+    std::chrono::nanoseconds Duration::to_chrono_nanoseconds(Duration d) {
         return time_internal::ToChronoDuration<std::chrono::nanoseconds>(d);
     }
 
-    std::chrono::microseconds ToChronoMicroseconds(Duration d) {
+    std::chrono::microseconds Duration::to_chrono_microseconds(Duration d) {
         return time_internal::ToChronoDuration<std::chrono::microseconds>(d);
     }
 
-    std::chrono::milliseconds ToChronoMilliseconds(Duration d) {
+    std::chrono::milliseconds Duration::to_chrono_milliseconds(Duration d) {
         return time_internal::ToChronoDuration<std::chrono::milliseconds>(d);
     }
 
-    std::chrono::seconds ToChronoSeconds(Duration d) {
+    std::chrono::seconds Duration::to_chrono_seconds(Duration d) {
         return time_internal::ToChronoDuration<std::chrono::seconds>(d);
     }
 
-    std::chrono::minutes ToChronoMinutes(Duration d) {
+    std::chrono::minutes Duration::to_chrono_minutes(Duration d) {
         return time_internal::ToChronoDuration<std::chrono::minutes>(d);
     }
 
-    std::chrono::hours ToChronoHours(Duration d) {
+    std::chrono::hours Duration::to_chrono_hours(Duration d) {
         return time_internal::ToChronoDuration<std::chrono::hours>(d);
     }
 
-//
-// To/From string formatting.
-//
+    //
+    // To/From string formatting.
+    //
 
     namespace {
 
-// Formats a positive 64-bit integer in the given field width.  Note that
-// it is up to the caller of Format64() to ensure that there is sufficient
-// space before ep to hold the conversion.
+        // Formats a positive 64-bit integer in the given field width.  Note that
+        // it is up to the caller of Format64() to ensure that there is sufficient
+        // space before ep to hold the conversion.
         char *Format64(char *ep, int width, int64_t v) {
             do {
                 --width;
@@ -719,19 +719,19 @@ namespace turbo {
             return ep;
         }
 
-// Helpers for FormatDuration() that format 'n' and append it to 'out'
-// followed by the given 'unit'.  If 'n' formats to "0", nothing is
-// appended (not even the unit).
+        // Helpers for Duration::format() that format 'n' and append it to 'out'
+        // followed by the given 'unit'.  If 'n' formats to "0", nothing is
+        // appended (not even the unit).
 
-// A type that encapsulates how to display a value of a particular unit. For
-// values that are displayed with fractional parts, the precision indicates
-// where to round the value. The precision varies with the display unit because
-// a Duration can hold only quarters of a nanosecond, so displaying information
-// beyond that is just noise.
-//
-// For example, a microsecond value of 42.00025xxxxx should not display beyond 5
-// fractional digits, because it is in the noise of what a Duration can
-// represent.
+        // A type that encapsulates how to display a value of a particular unit. For
+        // values that are displayed with fractional parts, the precision indicates
+        // where to round the value. The precision varies with the display unit because
+        // a Duration can hold only quarters of a nanosecond, so displaying information
+        // beyond that is just noise.
+        //
+        // For example, a microsecond value of 42.00025xxxxx should not display beyond 5
+        // fractional digits, because it is in the noise of what a Duration can
+        // represent.
         struct DisplayUnit {
             turbo::string_view abbr;
             int prec;
@@ -780,14 +780,14 @@ namespace turbo {
 
     }  // namespace
 
-// From Go's doc at https://golang.org/pkg/time/#Duration.String
-//   [FormatDuration] returns a string representing the duration in the
-//   form "72h3m0.5s". Leading zero units are omitted.  As a special
-//   case, durations less than one second format use a smaller unit
-//   (milli-, micro-, or nanoseconds) to ensure that the leading digit
-//   is non-zero.
-// Unlike Go, we format the zero duration as 0, with no unit.
-    std::string FormatDuration(Duration d) {
+    // From Go's doc at https://golang.org/pkg/time/#Duration.String
+    //   [Duration::format] returns a string representing the duration in the
+    //   form "72h3m0.5s". Leading zero units are omitted.  As a special
+    //   case, durations less than one second format use a smaller unit
+    //   (milli-, micro-, or nanoseconds) to ensure that the leading digit
+    //   is non-zero.
+    // Unlike Go, we format the zero duration as 0, with no unit.
+    std::string Duration::format(Duration d) {
         constexpr Duration kMinDuration = Seconds(kint64min);
         std::string s;
         if (d == kMinDuration) {
@@ -825,7 +825,7 @@ namespace turbo {
 
     namespace {
 
-        // A helper for ParseDuration() that parses a leading number from the given
+        // A helper for Duration::parse() that parses a leading number from the given
         // string and stores the result in *int_part/*frac_part/*frac_scale.  The
         // given string pointer is modified to point to the first unconsumed char.
         bool ConsumeDurationNumber(const char **dpp, const char *ep, int64_t *int_part,
@@ -858,7 +858,7 @@ namespace turbo {
             return !int_part_empty || *frac_scale != 1;
         }
 
-        // A helper for ParseDuration() that parses a leading unit designator (e.g.,
+        // A helper for Duration::parse() that parses a leading unit designator (e.g.,
         // ns, us, ms, s, m, h) from the given string and stores the resulting unit
         // in "*unit".  The given string pointer is modified to point to the first
         // unconsumed char.
@@ -916,12 +916,12 @@ namespace turbo {
 
     }  // namespace
 
-// From Go's doc at https://golang.org/pkg/time/#ParseDuration
-//   [ParseDuration] parses a duration string. A duration string is
-//   a possibly signed sequence of decimal numbers, each with optional
-//   fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
-//   Valid time units are "ns", "us" "ms", "s", "m", "h".
-    bool ParseDuration(turbo::string_view dur_sv, Duration *d) {
+    // From Go's doc at https://golang.org/pkg/time/#ParseDuration
+    //   [Duration::parse] parses a duration string. A duration string is
+    //   a possibly signed sequence of decimal numbers, each with optional
+    //   fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
+    //   Valid time units are "ns", "us" "ms", "s", "m", "h".
+    bool Duration::parse(turbo::string_view dur_sv, Duration *d) {
         int sign = 1;
         if (turbo::ConsumePrefix(&dur_sv, "-")) {
             sign = -1;
@@ -963,16 +963,10 @@ namespace turbo {
     }
 
     bool turbo_parse_flag(turbo::string_view text, Duration *dst, std::string *) {
-        return ParseDuration(text, dst);
+        return Duration::parse(text, dst);
     }
 
-    std::string turbo_unparse_flag(Duration d) { return FormatDuration(d); }
-
-    bool ParseFlag(const std::string &text, Duration *dst, std::string *) {
-        return ParseDuration(text, dst);
-    }
-
-    std::string UnparseFlag(Duration d) { return FormatDuration(d); }
+    std::string turbo_unparse_flag(Duration d) { return Duration::format(d); }
 
     TURBO_NAMESPACE_END
 }  // namespace turbo

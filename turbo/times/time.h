@@ -178,7 +178,7 @@ namespace turbo {
     // how to access the fractional parts of the quotient.
     //
     // Alternatively, conversions can be performed using helpers such as
-    // `ToInt64Microseconds()` and `ToDoubleSeconds()`.
+    // `Duration::to_microseconds()` and `Duration::to_double_seconds()`.
     class Duration {
     public:
         // Value semantics.
@@ -247,6 +247,7 @@ namespace turbo {
         friend H turbo_hash_value(H h, Duration d) {
             return H::combine(std::move(h), d.rep_hi_.Get(), d.rep_lo_);
         }
+
     public:
         // Duration::idiv()
         //
@@ -291,6 +292,7 @@ namespace turbo {
         //   double d = turbo::Duration::fdiv(turbo::Milliseconds(1500), turbo::Seconds(1));
         //   // d == 1.5
         TURBO_ATTRIBUTE_CONST_FUNCTION static double fdiv(Duration num, Duration den);
+
     public:
         // Duration::zero()
         //
@@ -332,6 +334,7 @@ namespace turbo {
         // The examples involving the `/` operator above also apply to `Duration::idiv()`
         // and `Duration::fdiv()`.
         TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Duration max_infinite();
+
         TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Duration min_infinite();
         // Duration::abs()
         //
@@ -370,6 +373,110 @@ namespace turbo {
         //   turbo::Duration c = turbo::Duration::ceil(d, turbo::Microseconds(1));   // 123457us
         TURBO_ATTRIBUTE_CONST_FUNCTION static Duration ceil(Duration d, Duration unit);
 
+    public:
+        // Helper functions that convert a Duration to an integral count of the
+        // indicated unit. These return the same results as the `Duration::idiv()`
+        // function, though they usually do so more efficiently; see the
+        // documentation of `Duration::idiv()` for details about overflow, etc.
+        //
+        // Example:
+        //
+        //   turbo::Duration d = turbo::Milliseconds(1500);
+        //   int64_t isec = turbo::Duration::to_seconds(d);  // isec == 1
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t to_nanoseconds(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t to_microseconds(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t to_milliseconds(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t to_seconds(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t to_minutes(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t to_hours(Duration d);
+        // Helper functions that convert a Duration to a floating point count of the
+        // indicated unit. These functions are shorthand for the `Duration::fdiv()`
+        // function above; see its documentation for details about overflow, etc.
+        //
+        // Example:
+        //
+        //   turbo::Duration d = turbo::Milliseconds(1500);
+        //   double dsec = turbo::Duration::to_double_seconds(d);  // dsec == 1.5
+        TURBO_ATTRIBUTE_CONST_FUNCTION static double to_double_nanoseconds(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static double to_double_microseconds(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static double to_double_milliseconds(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static double to_double_seconds(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static double to_double_minutes(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static double to_double_hours(Duration d);
+        //
+        // Converts an turbo::Duration to any of the pre-defined std::chrono durations.
+        // If overflow would occur, the returned value will saturate at the min/max
+        // chrono duration value instead.
+        //
+        // Example:
+        //
+        //   turbo::Duration d = turbo::Microseconds(123);
+        //   auto x = turbo::Duration::to_chrono_microseconds(d);
+        //   auto y = turbo::Duration::to_chrono_nanoseconds(d);  // x == y
+        //   auto z = turbo::Duration::to_chrono_seconds(turbo::Duration::max_infinite());
+        //   // z == std::chrono::seconds::max()
+        TURBO_ATTRIBUTE_CONST_FUNCTION static std::chrono::nanoseconds to_chrono_nanoseconds(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static std::chrono::microseconds to_chrono_microseconds(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static std::chrono::milliseconds to_chrono_milliseconds(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static std::chrono::seconds to_chrono_seconds(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static std::chrono::minutes to_chrono_minutes(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static std::chrono::hours to_chrono_hours(Duration d);
+    public:
+        // Duration::from_chrono()
+        //
+        // Converts any of the pre-defined std::chrono durations to an turbo::Duration.
+        //
+        // Example:
+        //
+        //   std::chrono::milliseconds ms(123);
+        //   turbo::Duration d = turbo::Duration::from_chrono(ms);
+        TURBO_ATTRIBUTE_PURE_FUNCTION static constexpr Duration from_chrono(
+                const std::chrono::nanoseconds &d);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static constexpr Duration from_chrono(
+                const std::chrono::microseconds &d);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static constexpr Duration from_chrono(
+                const std::chrono::milliseconds &d);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static constexpr Duration from_chrono(
+                const std::chrono::seconds &d);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static constexpr Duration from_chrono(
+                const std::chrono::minutes &d);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static constexpr Duration from_chrono(
+                const std::chrono::hours &d);
+
+    public:
+        // Duration::format()
+        //
+        // Returns a string representing the duration in the form "72h3m0.5s".
+        // Returns "inf" or "-inf" for +/- `Duration::max_infinite()`.
+        TURBO_ATTRIBUTE_CONST_FUNCTION static std::string format(Duration d);
+        // Duration::parse()
+        //
+        // Parses a duration string consisting of a possibly signed sequence of
+        // decimal numbers, each with an optional fractional part and a unit
+        // suffix.  The valid suffixes are "ns", "us" "ms", "s", "m", and "h".
+        // Simple examples include "300ms", "-1.5h", and "2h45m".  Parses "0" as
+        // `Duration::zero()`. Parses "inf" and "-inf" as +/- `Duration::max_infinite()`.
+        static bool parse(turbo::string_view dur_string, Duration *d);
 
     private:
         friend constexpr int64_t time_internal::GetRepHi(Duration d);
@@ -458,7 +565,7 @@ namespace turbo {
         uint32_t rep_lo_;
     };
 
-// Relational Operators
+    // Relational Operators
     TURBO_ATTRIBUTE_CONST_FUNCTION constexpr bool operator<(Duration lhs,
                                                             Duration rhs);
 
@@ -518,7 +625,7 @@ namespace turbo {
     TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t operator/(Duration lhs,
                                                             Duration rhs) {
         return Duration::idiv(lhs, rhs,
-                            &lhs);  // trunc towards zero
+                              &lhs);  // trunc towards zero
     }
 
     TURBO_ATTRIBUTE_CONST_FUNCTION inline Duration operator%(Duration lhs,
@@ -626,167 +733,30 @@ namespace turbo {
         return n * Hours(1);
     }
 
-    // ToInt64Nanoseconds()
-    // ToInt64Microseconds()
-    // ToInt64Milliseconds()
-    // ToInt64Seconds()
-    // ToInt64Minutes()
-    // ToInt64Hours()
-    //
-    // Helper functions that convert a Duration to an integral count of the
-    // indicated unit. These return the same results as the `Duration::idiv()`
-    // function, though they usually do so more efficiently; see the
-    // documentation of `Duration::idiv()` for details about overflow, etc.
-    //
-    // Example:
-    //
-    //   turbo::Duration d = turbo::Milliseconds(1500);
-    //   int64_t isec = turbo::ToInt64Seconds(d);  // isec == 1
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToInt64Nanoseconds(Duration d);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToInt64Microseconds(Duration d);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToInt64Milliseconds(Duration d);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToInt64Seconds(Duration d);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToInt64Minutes(Duration d);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToInt64Hours(Duration d);
-
-    // ToDoubleNanoseconds()
-    // ToDoubleMicroseconds()
-    // ToDoubleMilliseconds()
-    // ToDoubleSeconds()
-    // ToDoubleMinutes()
-    // ToDoubleHours()
-    //
-    // Helper functions that convert a Duration to a floating point count of the
-    // indicated unit. These functions are shorthand for the `Duration::fdiv()`
-    // function above; see its documentation for details about overflow, etc.
-    //
-    // Example:
-    //
-    //   turbo::Duration d = turbo::Milliseconds(1500);
-    //   double dsec = turbo::ToDoubleSeconds(d);  // dsec == 1.5
-    TURBO_ATTRIBUTE_CONST_FUNCTION double ToDoubleNanoseconds(Duration d);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION double ToDoubleMicroseconds(Duration d);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION double ToDoubleMilliseconds(Duration d);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION double ToDoubleSeconds(Duration d);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION double ToDoubleMinutes(Duration d);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION double ToDoubleHours(Duration d);
-
-    // FromChrono()
-    //
-    // Converts any of the pre-defined std::chrono durations to an turbo::Duration.
-    //
-    // Example:
-    //
-    //   std::chrono::milliseconds ms(123);
-    //   turbo::Duration d = turbo::FromChrono(ms);
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
-            const std::chrono::nanoseconds &d);
-
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
-            const std::chrono::microseconds &d);
-
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
-            const std::chrono::milliseconds &d);
-
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
-            const std::chrono::seconds &d);
-
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
-            const std::chrono::minutes &d);
-
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
-            const std::chrono::hours &d);
-
-    // ToChronoNanoseconds()
-    // ToChronoMicroseconds()
-    // ToChronoMilliseconds()
-    // ToChronoSeconds()
-    // ToChronoMinutes()
-    // ToChronoHours()
-    //
-    // Converts an turbo::Duration to any of the pre-defined std::chrono durations.
-    // If overflow would occur, the returned value will saturate at the min/max
-    // chrono duration value instead.
-    //
-    // Example:
-    //
-    //   turbo::Duration d = turbo::Microseconds(123);
-    //   auto x = turbo::ToChronoMicroseconds(d);
-    //   auto y = turbo::ToChronoNanoseconds(d);  // x == y
-    //   auto z = turbo::ToChronoSeconds(turbo::Duration::max_infinite());
-    //   // z == std::chrono::seconds::max()
-    TURBO_ATTRIBUTE_CONST_FUNCTION std::chrono::nanoseconds ToChronoNanoseconds(
-            Duration d);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION std::chrono::microseconds ToChronoMicroseconds(
-            Duration d);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION std::chrono::milliseconds ToChronoMilliseconds(
-            Duration d);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION std::chrono::seconds ToChronoSeconds(Duration d);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION std::chrono::minutes ToChronoMinutes(Duration d);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION std::chrono::hours ToChronoHours(Duration d);
-
-    // FormatDuration()
-    //
-    // Returns a string representing the duration in the form "72h3m0.5s".
-    // Returns "inf" or "-inf" for +/- `Duration::max_infinite()`.
-    TURBO_ATTRIBUTE_CONST_FUNCTION std::string FormatDuration(Duration d);
-
     // Output stream operator.
     inline std::ostream &operator<<(std::ostream &os, Duration d) {
-        return os << FormatDuration(d);
+        return os << Duration::format(d);
     }
 
     // Support for StrFormat(), StrCat() etc.
     template<typename Sink>
     void turbo_stringify(Sink &sink, Duration d) {
-        sink.Append(FormatDuration(d));
+        sink.Append(Duration::format(d));
     }
-
-    // ParseDuration()
-    //
-    // Parses a duration string consisting of a possibly signed sequence of
-    // decimal numbers, each with an optional fractional part and a unit
-    // suffix.  The valid suffixes are "ns", "us" "ms", "s", "m", and "h".
-    // Simple examples include "300ms", "-1.5h", and "2h45m".  Parses "0" as
-    // `Duration::zero()`. Parses "inf" and "-inf" as +/- `Duration::max_infinite()`.
-    bool ParseDuration(turbo::string_view dur_string, Duration *d);
 
     // turbo_parse_flag()
     //
     // Parses a command-line flag string representation `text` into a Duration
     // value. Duration flags must be specified in a format that is valid input for
-    // `turbo::ParseDuration()`.
+    // `turbo::Duration::parse()`.
     bool turbo_parse_flag(turbo::string_view text, Duration *dst, std::string *error);
 
 
     // turbo_unparse_flag()
     //
     // Unparses a Duration value into a command-line string representation using
-    // the format specified by `turbo::ParseDuration()`.
+    // the format specified by `turbo::Duration::parse()`.
     std::string turbo_unparse_flag(Duration d);
-
-    TURBO_DEPRECATED("Use turbo_parse_flag() instead.")
-
-    bool ParseFlag(const std::string &text, Duration *dst, std::string *error);
-
-    TURBO_DEPRECATED("Use turbo_unparse_flag() instead.")
-
-    std::string UnparseFlag(Duration d);
 
     // Time
     //
@@ -901,14 +871,14 @@ namespace turbo {
         TURBO_ATTRIBUTE_CONST_FUNCTION static Time from_timespec(timespec ts);
 
         TURBO_ATTRIBUTE_CONST_FUNCTION static Time from_timeval(timeval tv);
-        // FromChrono()
+        // Time::from_chrono()
         //
         // Converts a std::chrono::system_clock::time_point to an turbo::Time.
         //
         // Example:
         //
         //   auto tp = std::chrono::system_clock::from_time_t(123);
-        //   turbo::Time t = turbo::FromChrono(tp);
+        //   turbo::Time t = turbo::Time::from_chrono(tp);
         //   // t == turbo::Time::from_time_t(123)
         TURBO_ATTRIBUTE_PURE_FUNCTION static Time from_chrono(const std::chrono::system_clock::time_point &tp);
 
@@ -1716,34 +1686,34 @@ namespace turbo {
         TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToInt64(Duration d, Ratio) {
             // Note: This may be used on MSVC, which may have a system_clock period of
             // std::ratio<1, 10 * 1000 * 1000>
-            return ToInt64Seconds(d * Ratio::den / Ratio::num);
+            return Duration::to_seconds(d * Ratio::den / Ratio::num);
         }
         // Fastpath implementations for the 6 common duration units.
         TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t ToInt64(Duration d, std::nano) {
-            return ToInt64Nanoseconds(d);
+            return Duration::to_nanoseconds(d);
         }
 
         TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t ToInt64(Duration d, std::micro) {
-            return ToInt64Microseconds(d);
+            return Duration::to_microseconds(d);
         }
 
         TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t ToInt64(Duration d, std::milli) {
-            return ToInt64Milliseconds(d);
+            return Duration::to_milliseconds(d);
         }
 
         TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t ToInt64(Duration d,
                                                               std::ratio<1>) {
-            return ToInt64Seconds(d);
+            return Duration::to_seconds(d);
         }
 
         TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t ToInt64(Duration d,
                                                               std::ratio<60>) {
-            return ToInt64Minutes(d);
+            return Duration::to_minutes(d);
         }
 
         TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t ToInt64(Duration d,
                                                               std::ratio<3600>) {
-            return ToInt64Hours(d);
+            return Duration::to_hours(d);
         }
 
         // Converts an turbo::Duration to a chrono duration of type T.
@@ -1803,37 +1773,6 @@ namespace turbo {
                                 time_internal::kTicksPerSecond -
                                 time_internal::GetRepLo(d));
     }
-
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
-            const std::chrono::nanoseconds &d) {
-        return time_internal::FromChrono(d);
-    }
-
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
-            const std::chrono::microseconds &d) {
-        return time_internal::FromChrono(d);
-    }
-
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
-            const std::chrono::milliseconds &d) {
-        return time_internal::FromChrono(d);
-    }
-
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
-            const std::chrono::seconds &d) {
-        return time_internal::FromChrono(d);
-    }
-
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
-            const std::chrono::minutes &d) {
-        return time_internal::FromChrono(d);
-    }
-
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
-            const std::chrono::hours &d) {
-        return time_internal::FromChrono(d);
-    }
-
     TURBO_NAMESPACE_END
 }  // namespace turbo
 
@@ -1861,6 +1800,36 @@ namespace turbo {
 
     TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration Duration::min_infinite() {
         return -max_infinite();
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration Duration::from_chrono(
+            const std::chrono::nanoseconds &d) {
+        return time_internal::FromChrono(d);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration Duration::from_chrono(
+            const std::chrono::microseconds &d) {
+        return time_internal::FromChrono(d);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration Duration::from_chrono(
+            const std::chrono::milliseconds &d) {
+        return time_internal::FromChrono(d);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration Duration::from_chrono(
+            const std::chrono::seconds &d) {
+        return time_internal::FromChrono(d);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration Duration::from_chrono(
+            const std::chrono::minutes &d) {
+        return time_internal::FromChrono(d);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration Duration::from_chrono(
+            const std::chrono::hours &d) {
+        return time_internal::FromChrono(d);
     }
 
 }  // namespace turbo

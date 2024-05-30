@@ -267,7 +267,7 @@ namespace turbo {
     std::chrono::system_clock::time_point Time::to_chrono(turbo::Time t) {
         using D = std::chrono::system_clock::duration;
         auto d = time_internal::ToUnixDuration(t);
-        if (d < Duration::zero()) d = Duration::floor(d, FromChrono(D{1}));
+        if (d < Duration::zero()) d = Duration::floor(d, Duration::from_chrono(D{1}));
         return std::chrono::system_clock::from_time_t(0) +
                time_internal::ToChronoDuration<D>(d);
     }

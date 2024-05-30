@@ -788,7 +788,7 @@
 //
 // Example:
 //
-//  TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToInt64Milliseconds(Duration d);
+//  TURBO_ATTRIBUTE_CONST_FUNCTION int64_t Duration::to_milliseconds(Duration d);
 #if defined(_MSC_VER) && !defined(__clang__)
 // Put the MSVC case first since MSVC seems to parse const as a C++ keyword.
 #define TURBO_ATTRIBUTE_CONST_FUNCTION TURBO_ATTRIBUTE_PURE_FUNCTION

@@ -317,7 +317,7 @@ BENCHMARK(BM_Duration_Modulo_FastPath);
 void BM_Duration_ToInt64Nanoseconds(benchmark::State& state) {
   turbo::Duration d = turbo::Seconds(100000);
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::ToInt64Nanoseconds(d));
+    benchmark::DoNotOptimize(turbo::Duration::to_nanoseconds(d));
   }
 }
 BENCHMARK(BM_Duration_ToInt64Nanoseconds);
@@ -325,7 +325,7 @@ BENCHMARK(BM_Duration_ToInt64Nanoseconds);
 void BM_Duration_ToInt64Microseconds(benchmark::State& state) {
   turbo::Duration d = turbo::Seconds(100000);
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::ToInt64Microseconds(d));
+    benchmark::DoNotOptimize(turbo::Duration::to_microseconds(d));
   }
 }
 BENCHMARK(BM_Duration_ToInt64Microseconds);
@@ -333,7 +333,7 @@ BENCHMARK(BM_Duration_ToInt64Microseconds);
 void BM_Duration_ToInt64Milliseconds(benchmark::State& state) {
   turbo::Duration d = turbo::Seconds(100000);
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::ToInt64Milliseconds(d));
+    benchmark::DoNotOptimize(turbo::Duration::to_milliseconds(d));
   }
 }
 BENCHMARK(BM_Duration_ToInt64Milliseconds);
@@ -341,7 +341,7 @@ BENCHMARK(BM_Duration_ToInt64Milliseconds);
 void BM_Duration_ToInt64Seconds(benchmark::State& state) {
   turbo::Duration d = turbo::Seconds(100000);
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::ToInt64Seconds(d));
+    benchmark::DoNotOptimize(turbo::Duration::to_seconds(d));
   }
 }
 BENCHMARK(BM_Duration_ToInt64Seconds);
@@ -349,7 +349,7 @@ BENCHMARK(BM_Duration_ToInt64Seconds);
 void BM_Duration_ToInt64Minutes(benchmark::State& state) {
   turbo::Duration d = turbo::Seconds(100000);
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::ToInt64Minutes(d));
+    benchmark::DoNotOptimize(turbo::Duration::to_minutes(d));
   }
 }
 BENCHMARK(BM_Duration_ToInt64Minutes);
@@ -357,7 +357,7 @@ BENCHMARK(BM_Duration_ToInt64Minutes);
 void BM_Duration_ToInt64Hours(benchmark::State& state) {
   turbo::Duration d = turbo::Seconds(100000);
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::ToInt64Hours(d));
+    benchmark::DoNotOptimize(turbo::Duration::to_hours(d));
   }
 }
 BENCHMARK(BM_Duration_ToInt64Hours);
@@ -437,9 +437,9 @@ void BM_Duration_FormatDuration(benchmark::State& state) {
   const std::string s = kDurations[state.range(0)];
   state.SetLabel(s);
   turbo::Duration d;
-  turbo::ParseDuration(kDurations[state.range(0)], &d);
+  turbo::Duration::parse(kDurations[state.range(0)], &d);
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::FormatDuration(d));
+    benchmark::DoNotOptimize(turbo::Duration::format(d));
   }
 }
 BENCHMARK(BM_Duration_FormatDuration)->DenseRange(0, kNumDurations - 1);
@@ -449,7 +449,7 @@ void BM_Duration_ParseDuration(benchmark::State& state) {
   state.SetLabel(s);
   turbo::Duration d;
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::ParseDuration(s, &d));
+    benchmark::DoNotOptimize(turbo::Duration::parse(s, &d));
   }
 }
 BENCHMARK(BM_Duration_ParseDuration)->DenseRange(0, kNumDurations - 1);
