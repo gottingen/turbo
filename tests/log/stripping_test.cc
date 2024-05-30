@@ -483,7 +483,7 @@ TEST_F(StrippingTest, CheckOk) {
   auto U3RyaXBwaW5nVGVzdENoZWNrT2tWYXIx = turbo::OkStatus();
   if (x) {
     U3RyaXBwaW5nVGVzdENoZWNrT2tWYXIx =
-        turbo::InvalidArgumentError("Stripping this is not my job!");
+        turbo::invalid_argument_error("Stripping this is not my job!");
   }
   if (kReallyDie) {
     CHECK_OK(U3RyaXBwaW5nVGVzdENoZWNrT2tWYXIx)

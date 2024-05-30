@@ -30,10 +30,10 @@ namespace turbo {
         }
 
         std::string basename, ext;
-        char buff[256];
         std::tie(basename, ext) = log_internal::split_by_extension(filename);
-        turbo::SNPrintF(buff, sizeof(buff), "%s.%zu%s", basename.c_str(), index, ext.c_str());
-        return buff;
+        std::string fname;
+        turbo::format(&fname,"%s.%zu%s", basename.c_str(), index, ext.c_str());
+        return fname;
     }
 
     RotatingFileSink::RotatingFileSink(turbo::string_view base_filename,std::size_t max_size,

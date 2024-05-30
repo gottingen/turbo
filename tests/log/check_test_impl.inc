@@ -168,8 +168,8 @@ TEST(CHECKTest, TestMacroExpansionStrCompare) {
 
 TEST(CHECKTest, TestMacroExpansionStatus) {
   EXPECT_DEATH(
-      TURBO_TEST_CHECK_OK(IDENTITY(turbo::FailedPreconditionError("message"))),
-      HasSubstr("IDENTITY(turbo::FailedPreconditionError(\"message\"))"));
+      TURBO_TEST_CHECK_OK(IDENTITY(turbo::failed_precondition_error("message"))),
+      HasSubstr("IDENTITY(turbo::failed_precondition_error(\"message\"))"));
 }
 
 TEST(CHECKTest, TestMacroExpansionComma) {

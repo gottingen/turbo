@@ -40,10 +40,10 @@ namespace turbo {
     static std::string calc_hourly_filename(const std::string &filename, const tm &now_tm) {
         std::string basename, ext;
         std::tie(basename, ext) = log_internal::split_by_extension(filename);
-        char buff[256];
-        turbo::SNPrintF(buff, sizeof(buff), "%s_%04d-%02d-%02d%s", basename.c_str(),
-                        now_tm.tm_year + 1900, now_tm.tm_mon + 1, now_tm.tm_mday, ext.c_str());
-        return buff;
+        std::string fname;
+        turbo::format(&fname,"%s_%04d-%02d-%02d%s", basename.c_str(),
+                      now_tm.tm_year + 1900, now_tm.tm_mon + 1, now_tm.tm_mday, ext.c_str());
+        return fname;
     }
 
     HourlyFileSink::HourlyFileSink(turbo::string_view base_filename,

@@ -1,3 +1,4 @@
+//
 // Copyright (C) 2024 EA group inc.
 // Author: Jeff.li lijippy@163.com
 // All rights reserved.
@@ -14,22 +15,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-#include <turbo/status/status_payload_printer.h>
-
-#include <turbo/base/config.h>
-#include <turbo/base/internal/atomic_hook.h>
-
-namespace turbo::status_internal {
-
-    TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
-    static turbo::base_internal::AtomicHook<StatusPayloadPrinter> storage;
-
-    void SetStatusPayloadPrinter(StatusPayloadPrinter printer) {
-        storage.Store(printer);
-    }
-
-    StatusPayloadPrinter GetStatusPayloadPrinter() {
-        return storage.Load();
-    }
-
-}  // namespace turbo::status_internal
+//
+// Created by jeff on 24-5-31.
+//

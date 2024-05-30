@@ -60,7 +60,7 @@ carbin_cc_test(
 carbin_cc_test(
         NAME statusor_test
         MODULE status
-        SOURCES statusor_test.cc
+        SOURCES result_test.cc
         LINKS
         turbo::turbo
         status_matchers_static
