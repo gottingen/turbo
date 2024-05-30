@@ -20,20 +20,22 @@
 // -----------------------------------------------------------------------------
 //
 // This file contains functions for splitting strings. It defines the main
-// `StrSplit()` function, several delimiters for determining the boundaries on
+// `str_split()` function, several delimiters for determining the boundaries on
 // which to split the string, and predicates for filtering delimited results.
-// `StrSplit()` adapts the returned collection to the type specified by the
+// `str_split()` adapts the returned collection to the type specified by the
 // caller.
 //
 // Example:
 //
 //   // Splits the given string on commas. Returns the results in a
 //   // vector of strings.
-//   std::vector<std::string> v = turbo::StrSplit("a,b,c", ',');
+//   std::vector<std::string> v = turbo::str_split("a,b,c", ',');
 //   // Can also use ","
 //   // v[0] == "a", v[1] == "b", v[2] == "c"
 //
-// See StrSplit() below for more information.
+// See str_split() below for more information.
+
+#pragma once
 
 #include <algorithm>
 #include <cstddef>
@@ -55,16 +57,16 @@ namespace turbo {
     // Delimiters
     //------------------------------------------------------------------------------
     //
-    // `StrSplit()` uses delimiters to define the boundaries between elements in the
+    // `str_split()` uses delimiters to define the boundaries between elements in the
     // provided input. Several `Delimiter` types are defined below. If a string
     // (`const char*`, `std::string`, or `turbo::string_view`) is passed in place of
-    // an explicit `Delimiter` object, `StrSplit()` treats it the same way as if it
+    // an explicit `Delimiter` object, `str_split()` treats it the same way as if it
     // were passed a `ByString` delimiter.
     //
     // A `Delimiter` is an object with a `Find()` function that knows how to find
     // the first occurrence of itself in a given `turbo::string_view`.
     //
-    // The following `Delimiter` types are available for use within `StrSplit()`:
+    // The following `Delimiter` types are available for use within `str_split()`:
     //
     //   - `ByString` (default for string arguments)
     //   - `ByChar` (default for a char argument)
@@ -105,7 +107,7 @@ namespace turbo {
 
     // ByString
     //
-    // A sub-string delimiter. If `StrSplit()` is passed a string in place of a
+    // A sub-string delimiter. If `str_split()` is passed a string in place of a
     // `Delimiter` object, the string will be implicitly converted into a
     // `ByString` delimiter.
     //
@@ -114,10 +116,10 @@ namespace turbo {
     //   // Because a string literal is converted to an `turbo::ByString`,
     //   // the following two splits are equivalent.
     //
-    //   std::vector<std::string> v1 = turbo::StrSplit("a, b, c", ", ");
+    //   std::vector<std::string> v1 = turbo::str_split("a, b, c", ", ");
     //
     //   using turbo::ByString;
-    //   std::vector<std::string> v2 = turbo::StrSplit("a, b, c",
+    //   std::vector<std::string> v2 = turbo::str_split("a, b, c",
     //                                                ByString(", "));
     //   // v[0] == "a", v[1] == "b", v[2] == "c"
     class ByString {
@@ -140,7 +142,7 @@ namespace turbo {
     //
     // Example:
     //
-    //   std::vector<std::string> v = turbo::StrSplit(
+    //   std::vector<std::string> v = turbo::str_split(
     //       "a b\tc\n  d  \n", turbo::ByAsciiWhitespace(), turbo::SkipEmpty());
     //   // v[0] == "a", v[1] == "b", v[2] == "c", v[3] == "d"
     class ByAsciiWhitespace {
@@ -157,19 +159,19 @@ namespace turbo {
     //
     //   // Because a char literal is converted to a turbo::ByChar,
     //   // the following two splits are equivalent.
-    //   std::vector<std::string> v1 = turbo::StrSplit("a,b,c", ',');
+    //   std::vector<std::string> v1 = turbo::str_split("a,b,c", ',');
     //   using turbo::ByChar;
-    //   std::vector<std::string> v2 = turbo::StrSplit("a,b,c", ByChar(','));
+    //   std::vector<std::string> v2 = turbo::str_split("a,b,c", ByChar(','));
     //   // v[0] == "a", v[1] == "b", v[2] == "c"
     //
     // `ByChar` is also the default delimiter if a single character is given
-    // as the delimiter to `StrSplit()`. For example, the following calls are
+    // as the delimiter to `str_split()`. For example, the following calls are
     // equivalent:
     //
-    //   std::vector<std::string> v = turbo::StrSplit("a-b", '-');
+    //   std::vector<std::string> v = turbo::str_split("a-b", '-');
     //
     //   using turbo::ByChar;
-    //   std::vector<std::string> v = turbo::StrSplit("a-b", ByChar('-'));
+    //   std::vector<std::string> v = turbo::str_split("a-b", ByChar('-'));
     //
     class ByChar {
     public:
@@ -192,7 +194,7 @@ namespace turbo {
     // Example:
     //
     //   using turbo::ByAnyChar;
-    //   std::vector<std::string> v = turbo::StrSplit("a,b=c", ByAnyChar(",="));
+    //   std::vector<std::string> v = turbo::str_split("a,b=c", ByAnyChar(",="));
     //   // v[0] == "a", v[1] == "b", v[2] == "c"
     //
     // If `ByAnyChar` is given the empty string, it behaves exactly like
@@ -219,7 +221,7 @@ namespace turbo {
     // Example:
     //
     //   using turbo::ByLength;
-    //   std::vector<std::string> v = turbo::StrSplit("123456789", ByLength(3));
+    //   std::vector<std::string> v = turbo::str_split("123456789", ByLength(3));
 
     //   // v[0] == "123", v[1] == "456", v[2] == "789"
     //
@@ -227,7 +229,7 @@ namespace turbo {
     // length. In such a case, the last substring will be shorter.
     //
     //   using turbo::ByLength;
-    //   std::vector<std::string> v = turbo::StrSplit("12345", ByLength(2));
+    //   std::vector<std::string> v = turbo::str_split("12345", ByLength(2));
     //
     //   // v[0] == "12", v[1] == "34", v[2] == "5"
     class ByLength {
@@ -246,7 +248,7 @@ namespace turbo {
         // for a particular Delimiter type. The base case simply exposes type Delimiter
         // itself as the delimiter's Type. However, there are specializations for
         // string-like objects that map them to the ByString delimiter object.
-        // This allows functions like turbo::StrSplit() and turbo::MaxSplits() to accept
+        // This allows functions like turbo::str_split() and turbo::MaxSplits() to accept
         // string-like objects (e.g., ',') as delimiter arguments but they will be
         // treated as if a ByString delimiter was given.
         template<typename Delimiter>
@@ -307,7 +309,7 @@ namespace turbo {
     // Example:
     //
     //   using turbo::MaxSplits;
-    //   std::vector<std::string> v = turbo::StrSplit("a,b,c", MaxSplits(',', 1));
+    //   std::vector<std::string> v = turbo::str_split("a,b,c", MaxSplits(',', 1));
     //
     //   // v[0] == "a", v[1] == "b,c"
     template<typename Delimiter>
@@ -324,28 +326,28 @@ namespace turbo {
     // Predicates
     //------------------------------------------------------------------------------
     //
-    // Predicates filter the results of a `StrSplit()` by determining whether or not
+    // Predicates filter the results of a `str_split()` by determining whether or not
     // a resultant element is included in the result set. A predicate may be passed
-    // as an optional third argument to the `StrSplit()` function.
+    // as an optional third argument to the `str_split()` function.
     //
     // Predicates are unary functions (or functors) that take a single
     // `turbo::string_view` argument and return a bool indicating whether the
     // argument should be included (`true`) or excluded (`false`).
     //
     // Predicates are useful when filtering out empty substrings. By default, empty
-    // substrings may be returned by `StrSplit()`, which is similar to the way split
+    // substrings may be returned by `str_split()`, which is similar to the way split
     // functions work in other programming languages.
 
     // AllowEmpty()
     //
     // Always returns `true`, indicating that all strings--including empty
     // strings--should be included in the split output. This predicate is not
-    // strictly needed because this is the default behavior of `StrSplit()`;
+    // strictly needed because this is the default behavior of `str_split()`;
     // however, it might be useful at some call sites to make the intent explicit.
     //
     // Example:
     //
-    //  std::vector<std::string> v = turbo::StrSplit(" a , ,,b,", ',', AllowEmpty());
+    //  std::vector<std::string> v = turbo::str_split(" a , ,,b,", ',', AllowEmpty());
     //
     //  // v[0] == " a ", v[1] == " ", v[2] == "", v[3] = "b", v[4] == ""
     struct AllowEmpty {
@@ -355,11 +357,11 @@ namespace turbo {
     // SkipEmpty()
     //
     // Returns `false` if the given `turbo::string_view` is empty, indicating that
-    // `StrSplit()` should omit the empty string.
+    // `str_split()` should omit the empty string.
     //
     // Example:
     //
-    //   std::vector<std::string> v = turbo::StrSplit(",a,,b,", ',', SkipEmpty());
+    //   std::vector<std::string> v = turbo::str_split(",a,,b,", ',', SkipEmpty());
     //
     //   // v[0] == "a", v[1] == "b"
     //
@@ -373,16 +375,16 @@ namespace turbo {
     // SkipWhitespace()
     //
     // Returns `false` if the given `turbo::string_view` is empty *or* contains only
-    // whitespace, indicating that `StrSplit()` should omit the string.
+    // whitespace, indicating that `str_split()` should omit the string.
     //
     // Example:
     //
-    //   std::vector<std::string> v = turbo::StrSplit(" a , ,,b,",
+    //   std::vector<std::string> v = turbo::str_split(" a , ,,b,",
     //                                               ',', SkipWhitespace());
     //   // v[0] == " a ", v[1] == "b"
     //
     //   // SkipEmpty() would return whitespace elements
-    //   std::vector<std::string> v = turbo::StrSplit(" a , ,,b,", ',', SkipEmpty());
+    //   std::vector<std::string> v = turbo::str_split(" a , ,,b,", ',', SkipEmpty());
     //   // v[0] == " a ", v[1] == " ", v[2] == "b"
     struct SkipWhitespace {
         bool operator()(turbo::string_view sp) const {
@@ -398,20 +400,20 @@ namespace turbo {
                     int>::type;
 
     //------------------------------------------------------------------------------
-    //                                  StrSplit()
+    //                                  str_split()
     //------------------------------------------------------------------------------
 
-    // StrSplit()
+    // str_split()
     //
     // Splits a given string based on the provided `Delimiter` object, returning the
     // elements within the type specified by the caller. Optionally, you may pass a
-    // `Predicate` to `StrSplit()` indicating whether to include or exclude the
+    // `Predicate` to `str_split()` indicating whether to include or exclude the
     // resulting element within the final result set. (See the overviews for
     // Delimiters and Predicates above.)
     //
     // Example:
     //
-    //   std::vector<std::string> v = turbo::StrSplit("a,b,c,d", ',');
+    //   std::vector<std::string> v = turbo::str_split("a,b,c,d", ',');
     //   // v[0] == "a", v[1] == "b", v[2] == "c", v[3] == "d"
     //
     // You can also provide an explicit `Delimiter` object:
@@ -419,7 +421,7 @@ namespace turbo {
     // Example:
     //
     //   using turbo::ByAnyChar;
-    //   std::vector<std::string> v = turbo::StrSplit("a,b=c", ByAnyChar(",="));
+    //   std::vector<std::string> v = turbo::str_split("a,b=c", ByAnyChar(",="));
     //   // v[0] == "a", v[1] == "b", v[2] == "c"
     //
     // See above for more information on delimiters.
@@ -430,17 +432,17 @@ namespace turbo {
     //
     // Example:
     //
-    //   std::vector<std::string> v = turbo::StrSplit(" a , ,,b,",
+    //   std::vector<std::string> v = turbo::str_split(" a , ,,b,",
     //                                               ',', SkipWhitespace());
     //   // v[0] == " a ", v[1] == "b"
     //
     // See above for more information on predicates.
     //
     //------------------------------------------------------------------------------
-    // StrSplit() Return Types
+    // str_split() Return Types
     //------------------------------------------------------------------------------
     //
-    // The `StrSplit()` function adapts the returned collection to the collection
+    // The `str_split()` function adapts the returned collection to the collection
     // specified by the caller (e.g. `std::vector` above). The returned collections
     // may contain `std::string`, `turbo::string_view` (in which case the original
     // string being split must ensure that it outlives the collection), or any
@@ -455,17 +457,17 @@ namespace turbo {
     //
     //   // The results are returned as `turbo::string_view` objects. Note that we
     //   // have to ensure that the input string outlives any results.
-    //   std::vector<turbo::string_view> v = turbo::StrSplit("a,b,c", ',');
+    //   std::vector<turbo::string_view> v = turbo::str_split("a,b,c", ',');
     //
     //   // Stores results in a std::set<std::string>, which also performs
     //   // de-duplication and orders the elements in ascending order.
-    //   std::set<std::string> a = turbo::StrSplit("b,a,c,a,b", ',');
+    //   std::set<std::string> a = turbo::str_split("b,a,c,a,b", ',');
     //   // a[0] == "a", a[1] == "b", a[2] == "c"
     //
-    //   // `StrSplit()` can be used within a range-based for loop, in which case
+    //   // `str_split()` can be used within a range-based for loop, in which case
     //   // each element will be of type `turbo::string_view`.
     //   std::vector<std::string> v;
-    //   for (const auto sv : turbo::StrSplit("a,b,c", ',')) {
+    //   for (const auto sv : turbo::str_split("a,b,c", ',')) {
     //     if (sv != "b") v.emplace_back(sv);
     //   }
     //   // v[0] == "a", v[1] == "c"
@@ -475,7 +477,7 @@ namespace turbo {
     //   // resulting from the split will be stored as a key to the 1st element. If
     //   // an odd number of elements are resolved, the last element is paired with
     //   // a default-constructed value (e.g., empty string).
-    //   std::map<std::string, std::string> m = turbo::StrSplit("a,b,c", ',');
+    //   std::map<std::string, std::string> m = turbo::str_split("a,b,c", ',');
     //   // m["a"] == "b", m["c"] == ""     // last component value equals ""
     //
     // Splitting to `std::pair` is an interesting case because it can hold only two
@@ -488,10 +490,10 @@ namespace turbo {
     // Example:
     //
     //   // Stores first two split strings as the members in a std::pair.
-    //   std::pair<std::string, std::string> p = turbo::StrSplit("a,b,c", ',');
+    //   std::pair<std::string, std::string> p = turbo::str_split("a,b,c", ',');
     //   // p.first == "a", p.second == "b"       // "c" is omitted.
     //
-    // The `StrSplit()` function can be used multiple times to perform more
+    // The `str_split()` function can be used multiple times to perform more
     // complicated splitting logic, such as intelligently parsing key-value pairs.
     //
     // Example:
@@ -499,8 +501,8 @@ namespace turbo {
     //   // The input string "a=b=c,d=e,f=,g" becomes
     //   // { "a" => "b=c", "d" => "e", "f" => "", "g" => "" }
     //   std::map<std::string, std::string> m;
-    //   for (turbo::string_view sp : turbo::StrSplit("a=b=c,d=e,f=,g", ',')) {
-    //     m.insert(turbo::StrSplit(sp, turbo::MaxSplits('=', 1)));
+    //   for (turbo::string_view sp : turbo::str_split("a=b=c,d=e,f=,g", ',')) {
+    //     m.insert(turbo::str_split(sp, turbo::MaxSplits('=', 1)));
     //   }
     //   EXPECT_EQ("b=c", m.find("a")->second);
     //   EXPECT_EQ("e", m.find("d")->second);
@@ -510,15 +512,15 @@ namespace turbo {
     // WARNING: Due to a legacy bug that is maintained for backward compatibility,
     // splitting the following empty string_views produces different results:
     //
-    //   turbo::StrSplit(turbo::string_view(""), '-');  // {""}
-    //   turbo::StrSplit(turbo::string_view(), '-');    // {}, but should be {""}
+    //   turbo::str_split(turbo::string_view(""), '-');  // {""}
+    //   turbo::str_split(turbo::string_view(), '-');    // {}, but should be {""}
     //
     // Try not to depend on this distinction because the bug may one day be fixed.
     template<typename Delimiter>
     strings_internal::Splitter<
             typename strings_internal::SelectDelimiter<Delimiter>::type, AllowEmpty,
             turbo::string_view>
-    StrSplit(strings_internal::ConvertibleToStringView text, Delimiter d) {
+    str_split(strings_internal::ConvertibleToStringView text, Delimiter d) {
         using DelimiterType =
                 typename strings_internal::SelectDelimiter<Delimiter>::type;
         return strings_internal::Splitter<DelimiterType, AllowEmpty,
@@ -531,7 +533,7 @@ namespace turbo {
     strings_internal::Splitter<
             typename strings_internal::SelectDelimiter<Delimiter>::type, AllowEmpty,
             std::string>
-    StrSplit(StringType &&text, Delimiter d) {
+    str_split(StringType &&text, Delimiter d) {
         using DelimiterType =
                 typename strings_internal::SelectDelimiter<Delimiter>::type;
         return strings_internal::Splitter<DelimiterType, AllowEmpty, std::string>(
@@ -542,7 +544,7 @@ namespace turbo {
     strings_internal::Splitter<
             typename strings_internal::SelectDelimiter<Delimiter>::type, Predicate,
             turbo::string_view>
-    StrSplit(strings_internal::ConvertibleToStringView text, Delimiter d,
+    str_split(strings_internal::ConvertibleToStringView text, Delimiter d,
              Predicate p) {
         using DelimiterType =
                 typename strings_internal::SelectDelimiter<Delimiter>::type;
@@ -556,7 +558,7 @@ namespace turbo {
     strings_internal::Splitter<
             typename strings_internal::SelectDelimiter<Delimiter>::type, Predicate,
             std::string>
-    StrSplit(StringType &&text, Delimiter d, Predicate p) {
+    str_split(StringType &&text, Delimiter d, Predicate p) {
         using DelimiterType =
                 typename strings_internal::SelectDelimiter<Delimiter>::type;
         return strings_internal::Splitter<DelimiterType, Predicate, std::string>(

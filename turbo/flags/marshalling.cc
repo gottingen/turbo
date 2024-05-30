@@ -187,7 +187,7 @@ bool turbo_parse_flag(turbo::string_view text, std::vector<std::string>* dst,
     dst->clear();
     return true;
   }
-  *dst = turbo::StrSplit(text, ',', turbo::AllowEmpty());
+  *dst = turbo::str_split(text, ',', turbo::AllowEmpty());
   return true;
 }
 

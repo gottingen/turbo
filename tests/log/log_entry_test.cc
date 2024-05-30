@@ -77,7 +77,7 @@ class LogEntryTestPeer {
         << "Failed to parse time " << timestamp << ": " << time_err;
     entry_.tid_ = tid;
     std::pair<turbo::string_view, std::string> timestamp_bits =
-        turbo::StrSplit(timestamp, turbo::ByChar('.'));
+        turbo::str_split(timestamp, turbo::ByChar('.'));
     EXPECT_THAT(turbo::ParseCivilTime(timestamp_bits.first, &ci_.cs), IsTrue())
         << "Failed to parse time " << timestamp_bits.first;
     timestamp_bits.second.resize(9, '0');

@@ -71,6 +71,8 @@
 //     e.g. "Hello $f".
 // In debug mode, i.e. #ifndef NDEBUG, such errors terminate the program.
 
+#pragma once
+
 #include <cstring>
 #include <string>
 #include <type_traits>

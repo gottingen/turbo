@@ -190,7 +190,7 @@ struct Cont {
 
 template <int index>
 turbo::string_view get(const Cont& c) {
-  auto splitter = turbo::StrSplit(c.data, ':');
+  auto splitter = turbo::str_split(c.data, ':');
   auto it = splitter.begin();
   for (int i = 0; i < index; ++i) ++it;
 
