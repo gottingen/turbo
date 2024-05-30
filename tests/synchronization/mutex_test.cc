@@ -1378,7 +1378,7 @@ static bool DelayIsWithinBounds(turbo::Duration expected_delay,
   // we do not expect context switches to occur during test execution.
   // Otherwise, thread scheduling delays may be substantial in rare cases, so
   // tolerate up to kTimeoutTestAllowedSchedulingDelay of error.
-  turbo::Duration tolerance = expected_delay <= turbo::ZeroDuration()
+  turbo::Duration tolerance = expected_delay <= turbo::Duration::zero()
                                  ? turbo::Milliseconds(10)
                                  : TimeoutTestAllowedSchedulingDelay();
   if (actual_delay > expected_delay + tolerance) {
@@ -1441,9 +1441,9 @@ std::ostream &operator<<(std::ostream &os, const TimeoutTestParam &param) {
 static void RunAfterDelay(turbo::Duration delay,
                           turbo::synchronization_internal::ThreadPool *pool,
                           const std::function<void()> &callback) {
-  if (delay <= turbo::ZeroDuration()) {
+  if (delay <= turbo::Duration::zero()) {
     callback();  // immediate
-  } else if (delay != turbo::InfiniteDuration()) {
+  } else if (delay != turbo::Duration::max_infinite()) {
     ScheduleAfter(pool, delay, callback);
   }
 }
@@ -1456,9 +1456,9 @@ std::vector<TimeoutTestParam> MakeTimeoutTestParamValues() {
   // than our allowed scheduling delay (slop factor) to avoid confusion when
   // diagnosing test failures.  The other constants here have clear meanings.
   const turbo::Duration finite = 3 * TimeoutTestAllowedSchedulingDelay();
-  const turbo::Duration never = turbo::InfiniteDuration();
-  const turbo::Duration negative = -turbo::InfiniteDuration();
-  const turbo::Duration immediate = turbo::ZeroDuration();
+  const turbo::Duration never = turbo::Duration::max_infinite();
+  const turbo::Duration negative = -turbo::Duration::max_infinite();
+  const turbo::Duration immediate = turbo::Duration::zero();
 
   // Every test case is run twice; once using the absolute deadline API and once
   // using the relative timeout API.

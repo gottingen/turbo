@@ -213,7 +213,7 @@ void BM_Duration_FDivDuration_Nanoseconds(benchmark::State& state) {
   int i = 0;
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(
-        d += turbo::FDivDuration(turbo::Milliseconds(i), turbo::Nanoseconds(1)));
+        d += turbo::Duration::fdiv(turbo::Milliseconds(i), turbo::Nanoseconds(1)));
     ++i;
   }
 }
@@ -225,7 +225,7 @@ void BM_Duration_IDivDuration_Nanoseconds(benchmark::State& state) {
   int i = 0;
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(a +=
-                             turbo::IDivDuration(turbo::Nanoseconds(i),
+                             turbo::Duration::idiv(turbo::Nanoseconds(i),
                                                 turbo::Nanoseconds(1), &ignore));
     ++i;
   }
@@ -237,7 +237,7 @@ void BM_Duration_IDivDuration_Microseconds(benchmark::State& state) {
   turbo::Duration ignore;
   int i = 0;
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(a += turbo::IDivDuration(turbo::Microseconds(i),
+    benchmark::DoNotOptimize(a += turbo::Duration::idiv(turbo::Microseconds(i),
                                                      turbo::Microseconds(1),
                                                      &ignore));
     ++i;
@@ -250,7 +250,7 @@ void BM_Duration_IDivDuration_Milliseconds(benchmark::State& state) {
   turbo::Duration ignore;
   int i = 0;
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(a += turbo::IDivDuration(turbo::Milliseconds(i),
+    benchmark::DoNotOptimize(a += turbo::Duration::idiv(turbo::Milliseconds(i),
                                                      turbo::Milliseconds(1),
                                                      &ignore));
     ++i;
@@ -264,7 +264,7 @@ void BM_Duration_IDivDuration_Seconds(benchmark::State& state) {
   int i = 0;
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(
-        a += turbo::IDivDuration(turbo::Seconds(i), turbo::Seconds(1), &ignore));
+        a += turbo::Duration::idiv(turbo::Seconds(i), turbo::Seconds(1), &ignore));
     ++i;
   }
 }
@@ -276,7 +276,7 @@ void BM_Duration_IDivDuration_Minutes(benchmark::State& state) {
   int i = 0;
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(
-        a += turbo::IDivDuration(turbo::Minutes(i), turbo::Minutes(1), &ignore));
+        a += turbo::Duration::idiv(turbo::Minutes(i), turbo::Minutes(1), &ignore));
     ++i;
   }
 }
@@ -288,7 +288,7 @@ void BM_Duration_IDivDuration_Hours(benchmark::State& state) {
   int i = 0;
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(
-        a += turbo::IDivDuration(turbo::Hours(i), turbo::Hours(1), &ignore));
+        a += turbo::Duration::idiv(turbo::Hours(i), turbo::Hours(1), &ignore));
     ++i;
   }
 }

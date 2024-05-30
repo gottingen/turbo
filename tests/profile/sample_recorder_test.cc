@@ -139,11 +139,11 @@ TEST(SampleRecorderTest, MultiThreaded) {
             break;
           }
           case 2: {
-            turbo::Duration oldest = turbo::ZeroDuration();
+            turbo::Duration oldest = turbo::Duration::zero();
             sampler.Iterate([&](const Info& info) {
               oldest = std::max(oldest, turbo::Time::current_time() - info.create_time);
             });
-            ASSERT_GE(oldest, turbo::ZeroDuration());
+            ASSERT_GE(oldest, turbo::Duration::zero());
             break;
           }
         }

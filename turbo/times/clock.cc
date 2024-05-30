@@ -605,7 +605,7 @@ extern "C" {
 
 TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalSleepFor)(
         turbo::Duration duration) {
-    while (duration > turbo::ZeroDuration()) {
+    while (duration > turbo::Duration::zero()) {
         turbo::Duration to_sleep = std::min(duration, turbo::MaxSleep());
         turbo::SleepOnce(to_sleep);
         duration -= to_sleep;

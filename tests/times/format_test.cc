@@ -159,7 +159,7 @@ namespace {
                             << err;
         const auto ci = turbo::TimeZone::fixed(-8 * 60 * 60).at(t);
         EXPECT_EQ(turbo::CivilSecond(2013, 6, 28, 19, 8, 9), ci.cs);
-        EXPECT_EQ(turbo::ZeroDuration(), ci.subsecond);
+        EXPECT_EQ(turbo::Duration::zero(), ci.subsecond);
     }
 
     TEST(parse_time, NullErrorString) {
@@ -182,7 +182,7 @@ namespace {
                             << e;
         auto ci = tz.at(t);
         EXPECT_EQ(turbo::CivilSecond(2013, 6, 28, 19, 8, 9), ci.cs);
-        EXPECT_EQ(turbo::ZeroDuration(), ci.subsecond);
+        EXPECT_EQ(turbo::Duration::zero(), ci.subsecond);
 
         // But the timezone is ignored when a UTC offset is present.
         EXPECT_TRUE(turbo::Time::parse("%Y-%m-%d %H:%M:%S %z",
@@ -190,7 +190,7 @@ namespace {
                             << e;
         ci = turbo::TimeZone::fixed(8 * 60 * 60).at(t);
         EXPECT_EQ(turbo::CivilSecond(2013, 6, 28, 19, 8, 9), ci.cs);
-        EXPECT_EQ(turbo::ZeroDuration(), ci.subsecond);
+        EXPECT_EQ(turbo::Duration::zero(), ci.subsecond);
     }
 
     TEST(ParseTime, ErrorCases) {

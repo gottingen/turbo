@@ -80,9 +80,9 @@ namespace turbo {
         }
 
         KernelTimeout::KernelTimeout(turbo::Duration d) {
-            // `turbo::InfiniteDuration()` is a common "no timeout" value and cheaper to
+            // `turbo::Duration::max_infinite()` is a common "no timeout" value and cheaper to
             // compare than convert.
-            if (d == turbo::InfiniteDuration()) {
+            if (d == turbo::Duration::max_infinite()) {
                 rep_ = kNoTimeout;
                 return;
             }
@@ -171,7 +171,7 @@ namespace turbo {
             TURBO_RAW_CHECK(clock_gettime(c, &now) == 0, "clock_gettime() failed");
             turbo::Duration from_clock_epoch =
                     turbo::DurationFromTimespec(now) + turbo::Nanoseconds(nanos);
-            if (from_clock_epoch <= turbo::ZeroDuration()) {
+            if (from_clock_epoch <= turbo::Duration::zero()) {
                 // Some callers have assumed that 0 means no timeout, so instead we return a
                 // time of 1 nanosecond after the epoch. For safety we also do not return
                 // negative values.

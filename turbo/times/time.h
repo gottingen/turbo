@@ -151,7 +151,7 @@ namespace turbo {
     // `Duration` should be passed by value rather than const reference.
     //
     // Factory functions `Nanoseconds()`, `Microseconds()`, `Milliseconds()`,
-    // `Seconds()`, `Minutes()`, `Hours()` and `InfiniteDuration()` allow for
+    // `Seconds()`, `Minutes()`, `Hours()` and `Duration::max_infinite()` allow for
     // creation of constexpr `Duration` values
     //
     // Examples:
@@ -174,7 +174,7 @@ namespace turbo {
     //   int64_t sec = dur / turbo::Seconds(1);    // sec == 1 (subseconds truncated)
     //   int64_t min = dur / turbo::Minutes(1);    // min == 0
     //
-    // See the `IDivDuration()` and `FDivDuration()` functions below for details on
+    // See the `Duration::idiv()` and `Duration::fdiv()` functions below for details on
     // how to access the fractional parts of the quotient.
     //
     // Alternatively, conversions can be performed using helpers such as
@@ -247,6 +247,129 @@ namespace turbo {
         friend H turbo_hash_value(H h, Duration d) {
             return H::combine(std::move(h), d.rep_hi_.Get(), d.rep_lo_);
         }
+    public:
+        // Duration::idiv()
+        //
+        // Divides a numerator `Duration` by a denominator `Duration`, returning the
+        // quotient and remainder. The remainder always has the same sign as the
+        // numerator. The returned quotient and remainder respect the identity:
+        //
+        //   numerator = denominator * quotient + remainder
+        //
+        // Returned quotients are capped to the range of `int64_t`, with the difference
+        // spilling into the remainder to uphold the above identity. This means that the
+        // remainder returned could differ from the remainder returned by
+        // `Duration::operator%` for huge quotients.
+        //
+        // See also the notes on `Duration::max_infinite()` below regarding the behavior of
+        // division involving zero and infinite durations.
+        //
+        // Example:
+        //
+        //   constexpr turbo::Duration a =
+        //       turbo::Seconds(std::numeric_limits<int64_t>::max());  // big
+        //   constexpr turbo::Duration b = turbo::Nanoseconds(1);       // small
+        //
+        //   turbo::Duration rem = a % b;
+        //   // rem == turbo::Duration::zero()
+        //
+        //   // Here, q would overflow int64_t, so rem accounts for the difference.
+        //   int64_t q = turbo::Duration::idiv(a, b, &rem);
+        //   // q == std::numeric_limits<int64_t>::max(), rem == a - b * q
+        static int64_t idiv(Duration num, Duration den, Duration *rem);
+
+        // Duration::fdiv()
+        //
+        // Divides a `Duration` numerator into a fractional number of units of a
+        // `Duration` denominator.
+        //
+        // See also the notes on `Duration::max_infinite()` below regarding the behavior of
+        // division involving zero and infinite durations.
+        //
+        // Example:
+        //
+        //   double d = turbo::Duration::fdiv(turbo::Milliseconds(1500), turbo::Seconds(1));
+        //   // d == 1.5
+        TURBO_ATTRIBUTE_CONST_FUNCTION static double fdiv(Duration num, Duration den);
+    public:
+        // Duration::zero()
+        //
+        // Returns a zero-length duration. This function behaves just like the default
+        // constructor, but the name helps make the semantics clear at call sites.
+        TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Duration zero();
+        // Duration::max_infinite()/Duration::min_infinite()
+        //
+        // Returns an infinite `Duration`.  To get a `Duration` representing negative
+        // infinity, use `Duration::min_infinite()`.
+        //
+        // Duration arithmetic overflows to +/- infinity and saturates. In general,
+        // arithmetic with `Duration` infinities is similar to IEEE 754 infinities
+        // except where IEEE 754 NaN would be involved, in which case +/-
+        // `Duration::max_infinite()` is used in place of a "nan" Duration.
+        //
+        // Examples:
+        //
+        //   constexpr turbo::Duration inf = turbo::Duration::max_infinite();
+        //   const turbo::Duration d = ... any finite duration ...
+        //
+        //   inf == inf + inf
+        //   inf == inf + d
+        //   inf == inf - inf
+        //   -inf == d - inf
+        //
+        //   inf == d * 1e100
+        //   inf == inf / 2
+        //   0 == d / inf
+        //   INT64_MAX == inf / d
+        //
+        //   d < inf
+        //   -inf < d
+        //
+        //   // Division by zero returns infinity, or INT64_MIN/MAX where appropriate.
+        //   inf == d / 0
+        //   INT64_MAX == d / turbo::Duration::zero()
+        //
+        // The examples involving the `/` operator above also apply to `Duration::idiv()`
+        // and `Duration::fdiv()`.
+        TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Duration max_infinite();
+        TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Duration min_infinite();
+        // Duration::abs()
+        //
+        // Returns the absolute value of a duration.
+        TURBO_ATTRIBUTE_CONST_FUNCTION static Duration abs(Duration d);
+
+        // Duration::trunc()
+        //
+        // Truncates a duration (toward zero) to a multiple of a non-zero unit.
+        //
+        // Example:
+        //
+        //   turbo::Duration d = turbo::Nanoseconds(123456789);
+        //   turbo::Duration a = turbo::Duration::trunc(d, turbo::Microseconds(1));  // 123456us
+        TURBO_ATTRIBUTE_CONST_FUNCTION static Duration trunc(Duration d, Duration unit);
+
+        // Duration::floor()
+        //
+        // Floors a duration using the passed duration unit to its largest value not
+        // greater than the duration.
+        //
+        // Example:
+        //
+        //   turbo::Duration d = turbo::Nanoseconds(123456789);
+        //   turbo::Duration b = turbo::Duration::floor(d, turbo::Microseconds(1));  // 123456us
+        TURBO_ATTRIBUTE_CONST_FUNCTION static Duration floor(Duration d, Duration unit);
+
+        // Duration::ceil()
+        //
+        // Returns the ceiling of a duration using the passed duration unit to its
+        // smallest value not less than the duration.
+        //
+        // Example:
+        //
+        //   turbo::Duration d = turbo::Nanoseconds(123456789);
+        //   turbo::Duration c = turbo::Duration::ceil(d, turbo::Microseconds(1));   // 123457us
+        TURBO_ATTRIBUTE_CONST_FUNCTION static Duration ceil(Duration d, Duration unit);
+
 
     private:
         friend constexpr int64_t time_internal::GetRepHi(Duration d);
@@ -375,50 +498,6 @@ namespace turbo {
         return lhs -= rhs;
     }
 
-    // IDivDuration()
-    //
-    // Divides a numerator `Duration` by a denominator `Duration`, returning the
-    // quotient and remainder. The remainder always has the same sign as the
-    // numerator. The returned quotient and remainder respect the identity:
-    //
-    //   numerator = denominator * quotient + remainder
-    //
-    // Returned quotients are capped to the range of `int64_t`, with the difference
-    // spilling into the remainder to uphold the above identity. This means that the
-    // remainder returned could differ from the remainder returned by
-    // `Duration::operator%` for huge quotients.
-    //
-    // See also the notes on `InfiniteDuration()` below regarding the behavior of
-    // division involving zero and infinite durations.
-    //
-    // Example:
-    //
-    //   constexpr turbo::Duration a =
-    //       turbo::Seconds(std::numeric_limits<int64_t>::max());  // big
-    //   constexpr turbo::Duration b = turbo::Nanoseconds(1);       // small
-    //
-    //   turbo::Duration rem = a % b;
-    //   // rem == turbo::ZeroDuration()
-    //
-    //   // Here, q would overflow int64_t, so rem accounts for the difference.
-    //   int64_t q = turbo::IDivDuration(a, b, &rem);
-    //   // q == std::numeric_limits<int64_t>::max(), rem == a - b * q
-    int64_t IDivDuration(Duration num, Duration den, Duration *rem);
-
-    // FDivDuration()
-    //
-    // Divides a `Duration` numerator into a fractional number of units of a
-    // `Duration` denominator.
-    //
-    // See also the notes on `InfiniteDuration()` below regarding the behavior of
-    // division involving zero and infinite durations.
-    //
-    // Example:
-    //
-    //   double d = turbo::FDivDuration(turbo::Milliseconds(1500), turbo::Seconds(1));
-    //   // d == 1.5
-    TURBO_ATTRIBUTE_CONST_FUNCTION double FDivDuration(Duration num, Duration den);
-
     // Multiplicative Operators
     // Integer operands must be representable as int64_t.
     template<typename T>
@@ -438,7 +517,7 @@ namespace turbo {
 
     TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t operator/(Duration lhs,
                                                             Duration rhs) {
-        return IDivDuration(lhs, rhs,
+        return Duration::idiv(lhs, rhs,
                             &lhs);  // trunc towards zero
     }
 
@@ -446,89 +525,6 @@ namespace turbo {
                                                              Duration rhs) {
         return lhs %= rhs;
     }
-
-    // ZeroDuration()
-    //
-    // Returns a zero-length duration. This function behaves just like the default
-    // constructor, but the name helps make the semantics clear at call sites.
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration ZeroDuration() {
-        return Duration();
-    }
-
-    // AbsDuration()
-    //
-    // Returns the absolute value of a duration.
-    TURBO_ATTRIBUTE_CONST_FUNCTION inline Duration AbsDuration(Duration d) {
-        return (d < ZeroDuration()) ? -d : d;
-    }
-
-    // Trunc()
-    //
-    // Truncates a duration (toward zero) to a multiple of a non-zero unit.
-    //
-    // Example:
-    //
-    //   turbo::Duration d = turbo::Nanoseconds(123456789);
-    //   turbo::Duration a = turbo::Trunc(d, turbo::Microseconds(1));  // 123456us
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration Trunc(Duration d, Duration unit);
-
-    // Floor()
-    //
-    // Floors a duration using the passed duration unit to its largest value not
-    // greater than the duration.
-    //
-    // Example:
-    //
-    //   turbo::Duration d = turbo::Nanoseconds(123456789);
-    //   turbo::Duration b = turbo::Floor(d, turbo::Microseconds(1));  // 123456us
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration Floor(Duration d, Duration unit);
-
-    // Ceil()
-    //
-    // Returns the ceiling of a duration using the passed duration unit to its
-    // smallest value not less than the duration.
-    //
-    // Example:
-    //
-    //   turbo::Duration d = turbo::Nanoseconds(123456789);
-    //   turbo::Duration c = turbo::Ceil(d, turbo::Microseconds(1));   // 123457us
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration Ceil(Duration d, Duration unit);
-
-    // InfiniteDuration()
-    //
-    // Returns an infinite `Duration`.  To get a `Duration` representing negative
-    // infinity, use `-InfiniteDuration()`.
-    //
-    // Duration arithmetic overflows to +/- infinity and saturates. In general,
-    // arithmetic with `Duration` infinities is similar to IEEE 754 infinities
-    // except where IEEE 754 NaN would be involved, in which case +/-
-    // `InfiniteDuration()` is used in place of a "nan" Duration.
-    //
-    // Examples:
-    //
-    //   constexpr turbo::Duration inf = turbo::InfiniteDuration();
-    //   const turbo::Duration d = ... any finite duration ...
-    //
-    //   inf == inf + inf
-    //   inf == inf + d
-    //   inf == inf - inf
-    //   -inf == d - inf
-    //
-    //   inf == d * 1e100
-    //   inf == inf / 2
-    //   0 == d / inf
-    //   INT64_MAX == inf / d
-    //
-    //   d < inf
-    //   -inf < d
-    //
-    //   // Division by zero returns infinity, or INT64_MIN/MAX where appropriate.
-    //   inf == d / 0
-    //   INT64_MAX == d / turbo::ZeroDuration()
-    //
-    // The examples involving the `/` operator above also apply to `IDivDuration()`
-    // and `FDivDuration()`.
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration InfiniteDuration();
 
     // Nanoseconds()
     // Microseconds()
@@ -609,13 +605,13 @@ namespace turbo {
     TURBO_ATTRIBUTE_CONST_FUNCTION Duration Seconds(T n) {
         if (n >= 0) {  // Note: `NaN >= 0` is false.
             if (n >= static_cast<T>((std::numeric_limits<int64_t>::max)())) {
-                return InfiniteDuration();
+                return Duration::max_infinite();
             }
             return time_internal::MakePosDoubleDuration(n);
         } else {
             if (std::isnan(n))
-                return std::signbit(n) ? -InfiniteDuration() : InfiniteDuration();
-            if (n <= (std::numeric_limits<int64_t>::min)()) return -InfiniteDuration();
+                return std::signbit(n) ? Duration::min_infinite() : Duration::max_infinite();
+            if (n <= (std::numeric_limits<int64_t>::min)()) return Duration::min_infinite();
             return -time_internal::MakePosDoubleDuration(-n);
         }
     }
@@ -638,9 +634,9 @@ namespace turbo {
     // ToInt64Hours()
     //
     // Helper functions that convert a Duration to an integral count of the
-    // indicated unit. These return the same results as the `IDivDuration()`
+    // indicated unit. These return the same results as the `Duration::idiv()`
     // function, though they usually do so more efficiently; see the
-    // documentation of `IDivDuration()` for details about overflow, etc.
+    // documentation of `Duration::idiv()` for details about overflow, etc.
     //
     // Example:
     //
@@ -666,7 +662,7 @@ namespace turbo {
     // ToDoubleHours()
     //
     // Helper functions that convert a Duration to a floating point count of the
-    // indicated unit. These functions are shorthand for the `FDivDuration()`
+    // indicated unit. These functions are shorthand for the `Duration::fdiv()`
     // function above; see its documentation for details about overflow, etc.
     //
     // Example:
@@ -727,7 +723,7 @@ namespace turbo {
     //   turbo::Duration d = turbo::Microseconds(123);
     //   auto x = turbo::ToChronoMicroseconds(d);
     //   auto y = turbo::ToChronoNanoseconds(d);  // x == y
-    //   auto z = turbo::ToChronoSeconds(turbo::InfiniteDuration());
+    //   auto z = turbo::ToChronoSeconds(turbo::Duration::max_infinite());
     //   // z == std::chrono::seconds::max()
     TURBO_ATTRIBUTE_CONST_FUNCTION std::chrono::nanoseconds ToChronoNanoseconds(
             Duration d);
@@ -747,7 +743,7 @@ namespace turbo {
     // FormatDuration()
     //
     // Returns a string representing the duration in the form "72h3m0.5s".
-    // Returns "inf" or "-inf" for +/- `InfiniteDuration()`.
+    // Returns "inf" or "-inf" for +/- `Duration::max_infinite()`.
     TURBO_ATTRIBUTE_CONST_FUNCTION std::string FormatDuration(Duration d);
 
     // Output stream operator.
@@ -767,7 +763,7 @@ namespace turbo {
     // decimal numbers, each with an optional fractional part and a unit
     // suffix.  The valid suffixes are "ns", "us" "ms", "s", "m", and "h".
     // Simple examples include "300ms", "-1.5h", and "2h45m".  Parses "0" as
-    // `ZeroDuration()`. Parses "inf" and "-inf" as +/- `InfiniteDuration()`.
+    // `Duration::zero()`. Parses "inf" and "-inf" as +/- `Duration::max_infinite()`.
     bool ParseDuration(turbo::string_view dur_string, Duration *d);
 
     // turbo_parse_flag()
@@ -1407,7 +1403,7 @@ namespace turbo {
         //
         //   const auto epoch = lax.at(turbo::Time::from_unix_epoch());
         //   // epoch.cs == 1969-12-31 16:00:00
-        //   // epoch.subsecond == turbo::ZeroDuration()
+        //   // epoch.subsecond == turbo::Duration::zero()
         //   // epoch.offset == -28800
         //   // epoch.is_dst == false
         //   // epoch.abbr == "PST"
@@ -1685,7 +1681,7 @@ namespace turbo {
             return (v <= (std::numeric_limits<int64_t>::max)() / 60 &&
                     v >= (std::numeric_limits<int64_t>::min)() / 60)
                    ? MakeDuration(v * 60)
-                   : v > 0 ? InfiniteDuration() : -InfiniteDuration();
+                   : v > 0 ? Duration::max_infinite() : Duration::min_infinite();
         }
 
         TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration FromInt64(int64_t v,
@@ -1693,7 +1689,7 @@ namespace turbo {
             return (v <= (std::numeric_limits<int64_t>::max)() / 3600 &&
                     v >= (std::numeric_limits<int64_t>::min)() / 3600)
                    ? MakeDuration(v * 3600)
-                   : v > 0 ? InfiniteDuration() : -InfiniteDuration();
+                   : v > 0 ? Duration::max_infinite() : Duration::min_infinite();
         }
 
         // IsValidRep64<T>(0) is true if the expression `int64_t{std::declval<T>()}` is
@@ -1757,7 +1753,7 @@ namespace turbo {
             using Period = typename T::period;
             static_assert(IsValidRep64<Rep>(0), "duration::rep is invalid");
             if (time_internal::IsInfiniteDuration(d))
-                return d < ZeroDuration() ? (T::min)() : (T::max)();
+                return d < Duration::zero() ? (T::min)() : (T::max)();
             const auto v = ToInt64(d, Period{});
             if (v > (std::numeric_limits<Rep>::max)()) return (T::max)();
             if (v < (std::numeric_limits<Rep>::min)()) return (T::min)();
@@ -1797,7 +1793,7 @@ namespace turbo {
         return time_internal::GetRepLo(d) == 0
                ? time_internal::GetRepHi(d) ==
                  (std::numeric_limits<int64_t>::min)()
-                 ? InfiniteDuration()
+                 ? Duration::max_infinite()
                  : time_internal::MakeDuration(-time_internal::GetRepHi(d))
                : time_internal::IsInfiniteDuration(d)
                  ? time_internal::OppositeInfinity(d)
@@ -1806,11 +1802,6 @@ namespace turbo {
                                         time_internal::GetRepHi(d)),
                                 time_internal::kTicksPerSecond -
                                 time_internal::GetRepLo(d));
-    }
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration InfiniteDuration() {
-        return time_internal::MakeDuration((std::numeric_limits<int64_t>::max)(),
-                                           ~uint32_t{0});
     }
 
     TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
@@ -1848,6 +1839,29 @@ namespace turbo {
 
 namespace turbo {
     /// Duration inlines and implementation details
+    // Duration::zero()
+    //
+    // Returns a zero-length duration. This function behaves just like the default
+    // constructor, but the name helps make the semantics clear at call sites.
+    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration Duration::zero() {
+        return Duration();
+    }
+
+    // Duration::abs()
+    //
+    // Returns the absolute value of a duration.
+    TURBO_ATTRIBUTE_CONST_FUNCTION inline Duration Duration::abs(Duration d) {
+        return (d < Duration::zero()) ? -d : d;
+    }
+
+    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration Duration::max_infinite() {
+        return time_internal::MakeDuration((std::numeric_limits<int64_t>::max)(),
+                                           ~uint32_t{0});
+    }
+
+    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration Duration::min_infinite() {
+        return -max_infinite();
+    }
 
 }  // namespace turbo
 

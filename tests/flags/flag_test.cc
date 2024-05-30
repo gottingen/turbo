@@ -1168,7 +1168,7 @@ TEST_F(FlagTest, TestOptionalDuration) {
   EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_duration).has_value());
   EXPECT_EQ(turbo::GetFlag(FLAGS_optional_duration), turbo::nullopt);
 
-  turbo::SetFlag(&FLAGS_optional_duration, turbo::ZeroDuration());
+  turbo::SetFlag(&FLAGS_optional_duration, turbo::Duration::zero());
   EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_duration).has_value());
   EXPECT_EQ(turbo::GetFlag(FLAGS_optional_duration), turbo::Seconds(0));
 

@@ -62,8 +62,8 @@ namespace turbo {
         // Floors d to the next unit boundary closer to negative infinity.
         inline int64_t FloorToUnit(turbo::Duration d, turbo::Duration unit) {
             turbo::Duration rem;
-            int64_t q = turbo::IDivDuration(d, unit, &rem);
-            return (q > 0 || rem >= ZeroDuration() ||
+            int64_t q = turbo::Duration::idiv(d, unit, &rem);
+            return (q > 0 || rem >= Duration::zero() ||
                     q == std::numeric_limits<int64_t>::min())
                    ? q
                    : q - 1;
@@ -72,7 +72,7 @@ namespace turbo {
         inline turbo::TimeZone::CivilInfo InfiniteFutureCivilInfo() {
             TimeZone::CivilInfo ci;
             ci.cs = CivilSecond::max();
-            ci.subsecond = InfiniteDuration();
+            ci.subsecond = Duration::max_infinite();
             ci.offset = 0;
             ci.is_dst = false;
             ci.zone_abbr = "-00";
@@ -82,7 +82,7 @@ namespace turbo {
         inline turbo::TimeZone::CivilInfo InfinitePastCivilInfo() {
             TimeZone::CivilInfo ci;
             ci.cs = CivilSecond::min();
-            ci.subsecond = -InfiniteDuration();
+            ci.subsecond = Duration::min_infinite();
             ci.offset = 0;
             ci.is_dst = false;
             ci.zone_abbr = "-00";
@@ -205,7 +205,7 @@ namespace turbo {
     time_t Time::to_time_t(Time t) { return turbo::Time::to_timespec(t).tv_sec; }
 
     double Time::to_udate(Time t) {
-        return turbo::FDivDuration(time_internal::ToUnixDuration(t),
+        return turbo::Duration::fdiv(time_internal::ToUnixDuration(t),
                                    turbo::Milliseconds(1));
     }
 
@@ -231,7 +231,7 @@ namespace turbo {
                 return ts;
             }
         }
-        if (d >= turbo::ZeroDuration()) {
+        if (d >= turbo::Duration::zero()) {
             ts.tv_sec = std::numeric_limits<time_t>::max();
             ts.tv_nsec = 1000 * 1000 * 1000 - 1;
         } else {
@@ -267,7 +267,7 @@ namespace turbo {
     std::chrono::system_clock::time_point Time::to_chrono(turbo::Time t) {
         using D = std::chrono::system_clock::duration;
         auto d = time_internal::ToUnixDuration(t);
-        if (d < ZeroDuration()) d = Floor(d, FromChrono(D{1}));
+        if (d < Duration::zero()) d = Duration::floor(d, FromChrono(D{1}));
         return std::chrono::system_clock::from_time_t(0) +
                time_internal::ToChronoDuration<D>(d);
     }

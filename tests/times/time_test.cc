@@ -119,7 +119,7 @@ namespace {
     TEST(Time, from_unix_epoch) {
         const auto ci = turbo::TimeZone::utc().at(turbo::Time::from_unix_epoch());
         EXPECT_EQ(turbo::CivilSecond(1970, 1, 1, 0, 0, 0), ci.cs);
-        EXPECT_EQ(turbo::ZeroDuration(), ci.subsecond);
+        EXPECT_EQ(turbo::Duration::zero(), ci.subsecond);
         EXPECT_EQ(turbo::Weekday::thursday, turbo::GetWeekday(ci.cs));
     }
 
@@ -130,7 +130,7 @@ namespace {
         // The Unix epoch as seen in NYC.
         auto ci = tz.at(t);
         EXPECT_CIVIL_INFO(ci, 1969, 12, 31, 19, 0, 0, -18000, false);
-        EXPECT_EQ(turbo::ZeroDuration(), ci.subsecond);
+        EXPECT_EQ(turbo::Duration::zero(), ci.subsecond);
         EXPECT_EQ(turbo::Weekday::wednesday, turbo::GetWeekday(ci.cs));
 
         // Just before the epoch.
@@ -227,17 +227,17 @@ namespace {
         EXPECT_EQ(ipast, ipast + turbo::Seconds(1));
         EXPECT_EQ(ipast, ipast - turbo::Seconds(1));
 
-        EXPECT_EQ(turbo::InfiniteDuration(), ifuture - ifuture);
-        EXPECT_EQ(turbo::InfiniteDuration(), ifuture - ipast);
-        EXPECT_EQ(-turbo::InfiniteDuration(), ipast - ifuture);
-        EXPECT_EQ(-turbo::InfiniteDuration(), ipast - ipast);
+        EXPECT_EQ(turbo::Duration::max_infinite(), ifuture - ifuture);
+        EXPECT_EQ(turbo::Duration::max_infinite(), ifuture - ipast);
+        EXPECT_EQ(-turbo::Duration::max_infinite(), ipast - ifuture);
+        EXPECT_EQ(-turbo::Duration::max_infinite(), ipast - ipast);
 
         constexpr turbo::Time t = turbo::Time::from_unix_epoch();  // Any finite time.
         static_assert(t < ifuture, "");
         static_assert(t > ipast, "");
 
-        EXPECT_EQ(ifuture, t + turbo::InfiniteDuration());
-        EXPECT_EQ(ipast, t - turbo::InfiniteDuration());
+        EXPECT_EQ(ifuture, t + turbo::Duration::max_infinite());
+        EXPECT_EQ(ipast, t - turbo::Duration::max_infinite());
     }
 
     TEST(Time, FloorConversion) {
@@ -263,7 +263,7 @@ namespace {
         EXPECT_EQ(1, turbo::Time::to_nanoseconds(turbo::Time::from_unix_epoch() + turbo::Nanoseconds(3) / 2));
         EXPECT_EQ(1, turbo::Time::to_nanoseconds(turbo::Time::from_unix_epoch() + turbo::Nanoseconds(1)));
         EXPECT_EQ(0, turbo::Time::to_nanoseconds(turbo::Time::from_unix_epoch() + turbo::Nanoseconds(1) / 2));
-        EXPECT_EQ(0, turbo::Time::to_nanoseconds(turbo::Time::from_unix_epoch() + turbo::ZeroDuration()));
+        EXPECT_EQ(0, turbo::Time::to_nanoseconds(turbo::Time::from_unix_epoch() + turbo::Duration::zero()));
         EXPECT_EQ(-1,
                   turbo::Time::to_nanoseconds(turbo::Time::from_unix_epoch() - turbo::Nanoseconds(1) / 2));
         EXPECT_EQ(-1, turbo::Time::to_nanoseconds(turbo::Time::from_unix_epoch() - turbo::Nanoseconds(1)));
@@ -280,7 +280,7 @@ namespace {
         EXPECT_EQ(0,
                   turbo::Time::to_universal(turbo::Time::from_universal_epoch() + turbo::Nanoseconds(1)));
         EXPECT_EQ(0,
-                  turbo::Time::to_universal(turbo::Time::from_universal_epoch() + turbo::ZeroDuration()));
+                  turbo::Time::to_universal(turbo::Time::from_universal_epoch() + turbo::Duration::zero()));
         EXPECT_EQ(-1,
                   turbo::Time::to_universal(turbo::Time::from_universal_epoch() + turbo::Nanoseconds(-1)));
         EXPECT_EQ(-1,
@@ -297,13 +297,13 @@ namespace {
         } to_ts[] = {
                 {turbo::Time::from_seconds(1) + turbo::Nanoseconds(1),      {1,  1}},
                 {turbo::Time::from_seconds(1) + turbo::Nanoseconds(1) / 2,  {1,  0}},
-                {turbo::Time::from_seconds(1) + turbo::ZeroDuration(),      {1,  0}},
-                {turbo::Time::from_seconds(0) + turbo::ZeroDuration(),      {0,  0}},
+                {turbo::Time::from_seconds(1) + turbo::Duration::zero(),      {1,  0}},
+                {turbo::Time::from_seconds(0) + turbo::Duration::zero(),      {0,  0}},
                 {turbo::Time::from_seconds(0) - turbo::Nanoseconds(1) / 2,  {-1, 999999999}},
                 {turbo::Time::from_seconds(0) - turbo::Nanoseconds(1),      {-1, 999999999}},
                 {turbo::Time::from_seconds(-1) + turbo::Nanoseconds(1),     {-1, 1}},
                 {turbo::Time::from_seconds(-1) + turbo::Nanoseconds(1) / 2, {-1, 0}},
-                {turbo::Time::from_seconds(-1) + turbo::ZeroDuration(),     {-1, 0}},
+                {turbo::Time::from_seconds(-1) + turbo::Duration::zero(),     {-1, 0}},
                 {turbo::Time::from_seconds(-1) - turbo::Nanoseconds(1) / 2, {-2, 999999999}},
         };
         for (const auto &test: to_ts) {
@@ -314,12 +314,12 @@ namespace {
             turbo::Time t;
         } from_ts[] = {
                 {{1,  1},         turbo::Time::from_seconds(1) + turbo::Nanoseconds(1)},
-                {{1,  0},         turbo::Time::from_seconds(1) + turbo::ZeroDuration()},
-                {{0,  0},         turbo::Time::from_seconds(0) + turbo::ZeroDuration()},
+                {{1,  0},         turbo::Time::from_seconds(1) + turbo::Duration::zero()},
+                {{0,  0},         turbo::Time::from_seconds(0) + turbo::Duration::zero()},
                 {{0,  -1},        turbo::Time::from_seconds(0) - turbo::Nanoseconds(1)},
                 {{-1, 999999999}, turbo::Time::from_seconds(0) - turbo::Nanoseconds(1)},
                 {{-1, 1},         turbo::Time::from_seconds(-1) + turbo::Nanoseconds(1)},
-                {{-1, 0},         turbo::Time::from_seconds(-1) + turbo::ZeroDuration()},
+                {{-1, 0},         turbo::Time::from_seconds(-1) + turbo::Duration::zero()},
                 {{-1, -1},        turbo::Time::from_seconds(-1) - turbo::Nanoseconds(1)},
                 {{-2, 999999999}, turbo::Time::from_seconds(-1) - turbo::Nanoseconds(1)},
         };
@@ -334,13 +334,13 @@ namespace {
         } to_tv[] = {
                 {turbo::Time::from_seconds(1) + turbo::Microseconds(1),      {1,  1}},
                 {turbo::Time::from_seconds(1) + turbo::Microseconds(1) / 2,  {1,  0}},
-                {turbo::Time::from_seconds(1) + turbo::ZeroDuration(),       {1,  0}},
-                {turbo::Time::from_seconds(0) + turbo::ZeroDuration(),       {0,  0}},
+                {turbo::Time::from_seconds(1) + turbo::Duration::zero(),       {1,  0}},
+                {turbo::Time::from_seconds(0) + turbo::Duration::zero(),       {0,  0}},
                 {turbo::Time::from_seconds(0) - turbo::Microseconds(1) / 2,  {-1, 999999}},
                 {turbo::Time::from_seconds(0) - turbo::Microseconds(1),      {-1, 999999}},
                 {turbo::Time::from_seconds(-1) + turbo::Microseconds(1),     {-1, 1}},
                 {turbo::Time::from_seconds(-1) + turbo::Microseconds(1) / 2, {-1, 0}},
-                {turbo::Time::from_seconds(-1) + turbo::ZeroDuration(),      {-1, 0}},
+                {turbo::Time::from_seconds(-1) + turbo::Duration::zero(),      {-1, 0}},
                 {turbo::Time::from_seconds(-1) - turbo::Microseconds(1) / 2, {-2, 999999}},
         };
         for (const auto &test: to_tv) {
@@ -351,12 +351,12 @@ namespace {
             turbo::Time t;
         } from_tv[] = {
                 {{1,  1},      turbo::Time::from_seconds(1) + turbo::Microseconds(1)},
-                {{1,  0},      turbo::Time::from_seconds(1) + turbo::ZeroDuration()},
-                {{0,  0},      turbo::Time::from_seconds(0) + turbo::ZeroDuration()},
+                {{1,  0},      turbo::Time::from_seconds(1) + turbo::Duration::zero()},
+                {{0,  0},      turbo::Time::from_seconds(0) + turbo::Duration::zero()},
                 {{0,  -1},     turbo::Time::from_seconds(0) - turbo::Microseconds(1)},
                 {{-1, 999999}, turbo::Time::from_seconds(0) - turbo::Microseconds(1)},
                 {{-1, 1},      turbo::Time::from_seconds(-1) + turbo::Microseconds(1)},
-                {{-1, 0},      turbo::Time::from_seconds(-1) + turbo::ZeroDuration()},
+                {{-1, 0},      turbo::Time::from_seconds(-1) + turbo::Duration::zero()},
                 {{-1, -1},     turbo::Time::from_seconds(-1) - turbo::Microseconds(1)},
                 {{-2, 999999}, turbo::Time::from_seconds(-1) - turbo::Microseconds(1)},
         };
@@ -930,7 +930,7 @@ namespace {
     }
 
     TEST(Time, Limits) {
-        // It is an implementation detail that Time().rep_ == ZeroDuration(),
+        // It is an implementation detail that Time().rep_ == Duration::zero(),
         // and that the resolution of a Duration is 1/4 of a nanosecond.
         const turbo::Time zero;
         const turbo::Time max =
@@ -948,8 +948,8 @@ namespace {
         EXPECT_LT(turbo::Time::from_unix_epoch(), max);
 
         // Check sign of Time differences.
-        EXPECT_LT(turbo::ZeroDuration(), max - zero);
-        EXPECT_LT(turbo::ZeroDuration(),
+        EXPECT_LT(turbo::Duration::zero(), max - zero);
+        EXPECT_LT(turbo::Duration::zero(),
                   zero - turbo::Nanoseconds(1) / 4 - min);  // avoid zero - min
 
         // Arithmetic works at max - 0.25ns and min + 0.25ns.
@@ -1059,14 +1059,14 @@ namespace {
         auto ci = utc.at(turbo::Time::future_infinite());
         EXPECT_CIVIL_INFO(ci, std::numeric_limits<int64_t>::max(), 12, 31, 23, 59, 59,
                           0, false);
-        EXPECT_EQ(turbo::InfiniteDuration(), ci.subsecond);
+        EXPECT_EQ(turbo::Duration::max_infinite(), ci.subsecond);
         EXPECT_EQ(turbo::Weekday::thursday, turbo::GetWeekday(ci.cs));
         EXPECT_EQ(365, turbo::GetYearDay(ci.cs));
         EXPECT_STREQ("-00", ci.zone_abbr);  // artifact of TimeZone::at()
         ci = utc.at(turbo::Time::past_infinite());
         EXPECT_CIVIL_INFO(ci, std::numeric_limits<int64_t>::min(), 1, 1, 0, 0, 0, 0,
                           false);
-        EXPECT_EQ(-turbo::InfiniteDuration(), ci.subsecond);
+        EXPECT_EQ(-turbo::Duration::max_infinite(), ci.subsecond);
         EXPECT_EQ(turbo::Weekday::sunday, turbo::GetWeekday(ci.cs));
         EXPECT_EQ(1, turbo::GetYearDay(ci.cs));
         EXPECT_STREQ("-00", ci.zone_abbr);  // artifact of TimeZone::at()

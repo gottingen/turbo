@@ -63,7 +63,7 @@ namespace {
 
     TEST(KernelTimeout, FiniteTimes) {
         constexpr turbo::Duration kDurationsToTest[] = {
-                turbo::ZeroDuration(),
+                turbo::Duration::zero(),
                 turbo::Nanoseconds(1),
                 turbo::Microseconds(1),
                 turbo::Milliseconds(1),
@@ -91,23 +91,23 @@ namespace {
             EXPECT_EQ(turbo::Time::from_timespec(t.MakeAbsTimespec()), when);
 #ifndef _WIN32
             EXPECT_LE(
-                    turbo::AbsDuration(turbo::Time::current_time() + duration -
+                    turbo::Duration::abs(turbo::Time::current_time() + duration -
                                        turbo::Time::from_timespec(
                                                t.MakeClockAbsoluteTimespec(CLOCK_REALTIME))),
                     turbo::Milliseconds(10));
 #endif
             EXPECT_LE(
-                    turbo::AbsDuration(turbo::DurationFromTimespec(t.MakeRelativeTimespec()) -
-                                       std::max(duration, turbo::ZeroDuration())),
+                    turbo::Duration::abs(turbo::DurationFromTimespec(t.MakeRelativeTimespec()) -
+                                       std::max(duration, turbo::Duration::zero())),
                     kTimingBound);
             EXPECT_EQ(turbo::Time::from_nanoseconds(t.MakeAbsNanos()), when);
-            EXPECT_LE(turbo::AbsDuration(turbo::Milliseconds(t.InMillisecondsFromNow()) -
-                                         std::max(duration, turbo::ZeroDuration())),
+            EXPECT_LE(turbo::Duration::abs(turbo::Milliseconds(t.InMillisecondsFromNow()) -
+                                         std::max(duration, turbo::Duration::zero())),
                       turbo::Milliseconds(5));
-            EXPECT_LE(turbo::AbsDuration(turbo::Time::from_chrono(t.ToChronoTimePoint()) - when),
+            EXPECT_LE(turbo::Duration::abs(turbo::Time::from_chrono(t.ToChronoTimePoint()) - when),
                       turbo::Microseconds(1));
-            EXPECT_LE(turbo::AbsDuration(turbo::FromChrono(t.ToChronoDuration()) -
-                                         std::max(duration, turbo::ZeroDuration())),
+            EXPECT_LE(turbo::Duration::abs(turbo::FromChrono(t.ToChronoDuration()) -
+                                         std::max(duration, turbo::Duration::zero())),
                       kTimingBound);
         }
     }
@@ -117,7 +117,7 @@ namespace {
         EXPECT_FALSE(t.has_timeout());
         // Callers are expected to check has_timeout() instead of using the methods
         // below, but we do try to do something reasonable if they don't. We may not
-        // be able to round-trip back to turbo::InfiniteDuration() or
+        // be able to round-trip back to turbo::Duration::max_infinite() or
         // turbo::Time::future_infinite(), but we should return a very large value.
         EXPECT_GT(turbo::Time::from_timespec(t.MakeAbsTimespec()),
                   turbo::Time::current_time() + turbo::Hours(100000));
@@ -142,7 +142,7 @@ namespace {
         EXPECT_FALSE(t.has_timeout());
         // Callers are expected to check has_timeout() instead of using the methods
         // below, but we do try to do something reasonable if they don't. We may not
-        // be able to round-trip back to turbo::InfiniteDuration() or
+        // be able to round-trip back to turbo::Duration::max_infinite() or
         // turbo::Time::future_infinite(), but we should return a very large value.
         EXPECT_GT(turbo::Time::from_timespec(t.MakeAbsTimespec()),
                   turbo::Time::current_time() + turbo::Hours(100000));
@@ -167,7 +167,7 @@ namespace {
         EXPECT_FALSE(t.has_timeout());
         // Callers are expected to check has_timeout() instead of using the methods
         // below, but we do try to do something reasonable if they don't. We may not
-        // be able to round-trip back to turbo::InfiniteDuration() or
+        // be able to round-trip back to turbo::Duration::max_infinite() or
         // turbo::Time::future_infinite(), but we should return a very large value.
         EXPECT_GT(turbo::Time::from_timespec(t.MakeAbsTimespec()),
                   turbo::Time::current_time() + turbo::Hours(100000));
@@ -192,7 +192,7 @@ namespace {
         EXPECT_FALSE(t.has_timeout());
         // Callers are expected to check has_timeout() instead of using the methods
         // below, but we do try to do something reasonable if they don't. We may not
-        // be able to round-trip back to turbo::InfiniteDuration() or
+        // be able to round-trip back to turbo::Duration::max_infinite() or
         // turbo::Time::future_infinite(), but we should return a very large value.
         EXPECT_GT(turbo::Time::from_timespec(t.MakeAbsTimespec()),
                   turbo::Time::current_time() + turbo::Hours(100000));
@@ -223,7 +223,7 @@ namespace {
                   turbo::Time::from_seconds(1));
 #endif
         EXPECT_EQ(turbo::DurationFromTimespec(t.MakeRelativeTimespec()),
-                  turbo::ZeroDuration());
+                  turbo::Duration::zero());
         EXPECT_LE(turbo::Time::from_nanoseconds(t.MakeAbsNanos()), turbo::Time::from_nanoseconds(1));
         EXPECT_EQ(t.InMillisecondsFromNow(), KernelTimeout::DWord{0});
         EXPECT_LT(t.ToChronoTimePoint(), std::chrono::system_clock::from_time_t(0) +
@@ -233,7 +233,7 @@ namespace {
 
     TEST(KernelTimeout, FiniteDurations) {
         constexpr turbo::Duration kDurationsToTest[] = {
-                turbo::ZeroDuration(),
+                turbo::Duration::zero(),
                 turbo::Nanoseconds(1),
                 turbo::Microseconds(1),
                 turbo::Milliseconds(1),
@@ -249,37 +249,37 @@ namespace {
             EXPECT_TRUE(t.has_timeout());
             EXPECT_FALSE(t.is_absolute_timeout());
             EXPECT_TRUE(t.is_relative_timeout());
-            EXPECT_LE(turbo::AbsDuration(turbo::Time::current_time() + duration -
+            EXPECT_LE(turbo::Duration::abs(turbo::Time::current_time() + duration -
                                          turbo::Time::from_timespec(t.MakeAbsTimespec())),
                       turbo::Milliseconds(5));
 #ifndef _WIN32
             EXPECT_LE(
-                    turbo::AbsDuration(turbo::Time::current_time() + duration -
+                    turbo::Duration::abs(turbo::Time::current_time() + duration -
                                        turbo::Time::from_timespec(
                                                t.MakeClockAbsoluteTimespec(CLOCK_REALTIME))),
                     turbo::Milliseconds(5));
 #endif
             EXPECT_LE(
-                    turbo::AbsDuration(turbo::DurationFromTimespec(t.MakeRelativeTimespec()) -
+                    turbo::Duration::abs(turbo::DurationFromTimespec(t.MakeRelativeTimespec()) -
                                        duration),
                     kTimingBound);
-            EXPECT_LE(turbo::AbsDuration(turbo::Time::current_time() + duration -
+            EXPECT_LE(turbo::Duration::abs(turbo::Time::current_time() + duration -
                                          turbo::Time::from_nanoseconds(t.MakeAbsNanos())),
                       turbo::Milliseconds(5));
             EXPECT_LE(turbo::Milliseconds(t.InMillisecondsFromNow()) - duration,
                       turbo::Milliseconds(5));
-            EXPECT_LE(turbo::AbsDuration(turbo::Time::current_time() + duration -
+            EXPECT_LE(turbo::Duration::abs(turbo::Time::current_time() + duration -
                                          turbo::Time::from_chrono(t.ToChronoTimePoint())),
                       kTimingBound);
             EXPECT_LE(
-                    turbo::AbsDuration(turbo::FromChrono(t.ToChronoDuration()) - duration),
+                    turbo::Duration::abs(turbo::FromChrono(t.ToChronoDuration()) - duration),
                     kTimingBound);
         }
     }
 
     TEST(KernelTimeout, NegativeDurations) {
         constexpr turbo::Duration kDurationsToTest[] = {
-                -turbo::ZeroDuration(),
+                -turbo::Duration::zero(),
                 -turbo::Nanoseconds(1),
                 -turbo::Microseconds(1),
                 -turbo::Milliseconds(1),
@@ -287,7 +287,7 @@ namespace {
                 -turbo::Minutes(1),
                 -turbo::Hours(1),
                 -turbo::Hours(1000),
-                -turbo::InfiniteDuration(),
+                -turbo::Duration::max_infinite(),
         };
 
         for (auto duration: kDurationsToTest) {
@@ -297,34 +297,34 @@ namespace {
             EXPECT_TRUE(t.has_timeout());
             EXPECT_FALSE(t.is_absolute_timeout());
             EXPECT_TRUE(t.is_relative_timeout());
-            EXPECT_LE(turbo::AbsDuration(turbo::Time::current_time() -
+            EXPECT_LE(turbo::Duration::abs(turbo::Time::current_time() -
                                          turbo::Time::from_timespec(t.MakeAbsTimespec())),
                       turbo::Milliseconds(5));
 #ifndef _WIN32
-            EXPECT_LE(turbo::AbsDuration(turbo::Time::current_time() - turbo::Time::from_timespec(
+            EXPECT_LE(turbo::Duration::abs(turbo::Time::current_time() - turbo::Time::from_timespec(
                     t.MakeClockAbsoluteTimespec(
                             CLOCK_REALTIME))),
                       turbo::Milliseconds(5));
 #endif
             EXPECT_EQ(turbo::DurationFromTimespec(t.MakeRelativeTimespec()),
-                      turbo::ZeroDuration());
+                      turbo::Duration::zero());
             EXPECT_LE(
-                    turbo::AbsDuration(turbo::Time::current_time() - turbo::Time::from_nanoseconds(t.MakeAbsNanos())),
+                    turbo::Duration::abs(turbo::Time::current_time() - turbo::Time::from_nanoseconds(t.MakeAbsNanos())),
                     turbo::Milliseconds(5));
             EXPECT_EQ(t.InMillisecondsFromNow(), KernelTimeout::DWord{0});
-            EXPECT_LE(turbo::AbsDuration(turbo::Time::current_time() -
+            EXPECT_LE(turbo::Duration::abs(turbo::Time::current_time() -
                                          turbo::Time::from_chrono(t.ToChronoTimePoint())),
                       turbo::Milliseconds(5));
             EXPECT_EQ(t.ToChronoDuration(), std::chrono::nanoseconds(0));
         }
     }
 
-    TEST(KernelTimeout, InfiniteDuration) {
-        KernelTimeout t(turbo::InfiniteDuration());
+    TEST(KernelTimeout, Infinite) {
+        KernelTimeout t(turbo::Duration::max_infinite());
         EXPECT_FALSE(t.has_timeout());
         // Callers are expected to check has_timeout() instead of using the methods
         // below, but we do try to do something reasonable if they don't. We may not
-        // be able to round-trip back to turbo::InfiniteDuration() or
+        // be able to round-trip back to turbo::Duration::max_infinite() or
         // turbo::Time::future_infinite(), but we should return a very large value.
         EXPECT_GT(turbo::Time::from_timespec(t.MakeAbsTimespec()),
                   turbo::Time::current_time() + turbo::Hours(100000));
@@ -349,7 +349,7 @@ namespace {
         EXPECT_FALSE(t.has_timeout());
         // Callers are expected to check has_timeout() instead of using the methods
         // below, but we do try to do something reasonable if they don't. We may not
-        // be able to round-trip back to turbo::InfiniteDuration() or
+        // be able to round-trip back to turbo::Duration::max_infinite() or
         // turbo::Time::future_infinite(), but we should return a very large value.
         EXPECT_GT(turbo::Time::from_timespec(t.MakeAbsTimespec()),
                   turbo::Time::current_time() + turbo::Hours(100000));
