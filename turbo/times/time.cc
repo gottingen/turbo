@@ -89,28 +89,8 @@ namespace turbo {
             return ci;
         }
 
-        TURBO_INTERNAL_DISABLE_DEPRECATED_DECLARATION_WARNING
-
-        inline turbo::TimeConversion InfiniteFutureTimeConversion() {
-            turbo::TimeConversion tc;
-            tc.pre = tc.trans = tc.post = turbo::Time::future_infinite();
-            tc.kind = turbo::TimeConversion::UNIQUE;
-            tc.normalized = true;
-            return tc;
-        }
-
-        inline TimeConversion InfinitePastTimeConversion() {
-            turbo::TimeConversion tc;
-            tc.pre = tc.trans = tc.post = turbo::Time::past_infinite();
-            tc.kind = turbo::TimeConversion::UNIQUE;
-            tc.normalized = true;
-            return tc;
-        }
-
-        TURBO_INTERNAL_RESTORE_DEPRECATED_DECLARATION_WARNING
-
-// Makes a Time from sec, overflowing to InfiniteFuture/Time::past_infinite as
-// necessary. If sec is min/max, then consult cs+tz to check for overflow.
+        // Makes a Time from sec, overflowing to InfiniteFuture/Time::past_infinite as
+        // necessary. If sec is min/max, then consult cs+tz to check for overflow.
         Time MakeTimeWithOverflow(const cctz::time_point <cctz::seconds> &sec,
                                   const cctz::civil_second &cs,
                                   const cctz::time_zone &tz,
@@ -343,44 +323,6 @@ namespace turbo {
         return FindTransition(cz_, &cctz::time_zone::prev_transition, t, trans);
     }
 
-//
-// Conversions involving time zones.
-//
-    TURBO_INTERNAL_DISABLE_DEPRECATED_DECLARATION_WARNING
-
-    turbo::TimeConversion ConvertDateTime(int64_t year, int mon, int day, int hour,
-                                          int min, int sec, TimeZone tz) {
-        // Avoids years that are too extreme for CivilSecond to normalize.
-        if (year > 300000000000) return InfiniteFutureTimeConversion();
-        if (year < -300000000000) return InfinitePastTimeConversion();
-
-        const CivilSecond cs(year, mon, day, hour, min, sec);
-        const auto ti = tz.At(cs);
-
-        TimeConversion tc;
-        tc.pre = ti.pre;
-        tc.trans = ti.trans;
-        tc.post = ti.post;
-        switch (ti.kind) {
-            case TimeZone::TimeInfo::UNIQUE:
-                tc.kind = TimeConversion::UNIQUE;
-                break;
-            case TimeZone::TimeInfo::SKIPPED:
-                tc.kind = TimeConversion::SKIPPED;
-                break;
-            case TimeZone::TimeInfo::REPEATED:
-                tc.kind = TimeConversion::REPEATED;
-                break;
-        }
-        tc.normalized = false;
-        if (year != cs.year() || mon != cs.month() || day != cs.day() ||
-            hour != cs.hour() || min != cs.minute() || sec != cs.second()) {
-            tc.normalized = true;
-        }
-        return tc;
-    }
-
-    TURBO_INTERNAL_RESTORE_DEPRECATED_DECLARATION_WARNING
 
     turbo::Time Time::from_tm(const struct tm &tm, turbo::TimeZone tz) {
         civil_year_t tm_year = tm.tm_year;

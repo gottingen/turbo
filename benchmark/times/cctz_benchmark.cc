@@ -782,7 +782,7 @@ void BM_Time_ToCivilUTC_Libc(benchmark::State& state) {
 }
 BENCHMARK(BM_Time_ToCivilUTC_Libc);
 
-// In each "FromCivil" benchmark we switch between two YMDhms values
+// In each "Time::from_civil" benchmark we switch between two YMDhms values
 // separated by at least one transition in order to defeat any internal
 // caching of previous results (e.g., see time_local_hint_).
 //

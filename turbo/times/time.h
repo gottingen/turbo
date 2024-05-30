@@ -49,7 +49,7 @@
 //
 //   // My flight leaves NYC on Jan 2, 2017 at 03:04:05
 //   turbo::CivilSecond cs(2017, 1, 2, 3, 4, 5);
-//   turbo::Time takeoff = turbo::FromCivil(cs, nyc);
+//   turbo::Time takeoff = turbo::Time::from_civil(cs, nyc);
 //
 //   turbo::Duration flight_duration = turbo::Hours(21) + turbo::Minutes(35);
 //   turbo::Time landing = takeoff + flight_duration;
@@ -58,7 +58,7 @@
 //   if (!turbo::LoadTimeZone("Australia/Sydney", &syd)) {
 //      // handle error case
 //   }
-//   std::string s = turbo::FormatTime(
+//   std::string s = turbo::Time::format(
 //       "My flight will land in Sydney on %Y-%m-%d at %H:%M:%S",
 //       landing, syd);
 
@@ -930,6 +930,9 @@ namespace turbo {
         // happened.
         TURBO_ATTRIBUTE_PURE_FUNCTION static Time from_tm(const struct tm &tm, TimeZone tz);
 
+        TURBO_ATTRIBUTE_PURE_FUNCTION static Time from_civil(CivilSecond ct,
+                                                            TimeZone tz);
+
         // Time::from_unix_epoch()
         //
         // Returns the `turbo::Time` representing "1970-01-01 00:00:00.0 +0000".
@@ -951,6 +954,115 @@ namespace turbo {
         //
         // Returns an `turbo::Time` that is infinitely far in the past.
         TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Time past_infinite();
+    public:
+        // Time::parse()
+        //
+        // Parses an input string according to the provided format string and
+        // returns the corresponding `turbo::Time`. Uses strftime()-like formatting
+        // options, with the same extensions as Time::format(), but with the
+        // exceptions that %E#S is interpreted as %E*S, and %E#f as %E*f.  %Ez
+        // and %E*z also accept the same inputs, which (along with %z) includes
+        // 'z' and 'Z' as synonyms for +00:00.  %ET accepts either 'T' or 't'.
+        //
+        // %Y consumes as many numeric characters as it can, so the matching data
+        // should always be terminated with a non-numeric.  %E4Y always consumes
+        // exactly four characters, including any sign.
+        //
+        // Unspecified fields are taken from the default date and time of ...
+        //
+        //   "1970-01-01 00:00:00.0 +0000"
+        //
+        // For example, parsing a string of "15:45" (%H:%M) will return an turbo::Time
+        // that represents "1970-01-01 15:45:00.0 +0000".
+        //
+        // Note that since Time::parse() returns time instants, it makes the most sense
+        // to parse fully-specified date/time strings that include a UTC offset (%z,
+        // %Ez, or %E*z).
+        //
+        // Note also that `turbo::Time::parse()` only heeds the fields year, month, day,
+        // hour, minute, (fractional) second, and UTC offset.  Other fields, like
+        // weekday (%a or %A), while parsed for syntactic validity, are ignored
+        // in the conversion.
+        //
+        // Date and time fields that are out-of-range will be treated as errors
+        // rather than normalizing them like `turbo::CivilSecond` does.  For example,
+        // it is an error to parse the date "Oct 32, 2013" because 32 is out of range.
+        //
+        // A leap second of ":60" is normalized to ":00" of the following minute
+        // with fractional seconds discarded.  The following table shows how the
+        // given seconds and subseconds will be parsed:
+        //
+        //   "59.x" -> 59.x  // exact
+        //   "60.x" -> 00.0  // normalized
+        //   "00.x" -> 00.x  // exact
+        //
+        // Errors are indicated by returning false and assigning an error message
+        // to the "err" out param if it is non-null.
+        //
+        // Note: If the input string is exactly "infinite-future", the returned
+        // `turbo::Time` will be `turbo::Time::future_infinite()` and `true` will be returned.
+        // If the input string is "infinite-past", the returned `turbo::Time` will be
+        // `turbo::Time::past_infinite()` and `true` will be returned.
+        //
+        static bool parse(turbo::string_view format, turbo::string_view input, Time *time,
+                       std::string *err);
+
+        // Like Time::parse() above, but if the format string does not contain a UTC
+        // offset specification (%z/%Ez/%E*z) then the input is interpreted in the
+        // given TimeZone.  This means that the input, by itself, does not identify a
+        // unique instant.  Being time-zone dependent, it also admits the possibility
+        // of ambiguity or non-existence, in which case the "pre" time (as defined
+        // by TimeZone::TimeInfo) is returned.  For these reasons we recommend that
+        // all date/time strings include a UTC offset so they're context independent.
+        static bool parse(turbo::string_view format, turbo::string_view input, TimeZone tz,
+                       Time *time, std::string *err);
+
+        // Time::format()
+        //
+        // Formats the given `turbo::Time` in the `turbo::TimeZone` according to the
+        // provided format string. Uses strftime()-like formatting options, with
+        // the following extensions:
+        //
+        //   - %Ez  - RFC3339-compatible numeric UTC offset (+hh:mm or -hh:mm)
+        //   - %E*z - Full-resolution numeric UTC offset (+hh:mm:ss or -hh:mm:ss)
+        //   - %E#S - Seconds with # digits of fractional precision
+        //   - %E*S - Seconds with full fractional precision (a literal '*')
+        //   - %E#f - Fractional seconds with # digits of precision
+        //   - %E*f - Fractional seconds with full precision (a literal '*')
+        //   - %E4Y - Four-character years (-999 ... -001, 0000, 0001 ... 9999)
+        //   - %ET  - The RFC3339 "date-time" separator "T"
+        //
+        // Note that %E0S behaves like %S, and %E0f produces no characters.  In
+        // contrast %E*f always produces at least one digit, which may be '0'.
+        //
+        // Note that %Y produces as many characters as it takes to fully render the
+        // year.  A year outside of [-999:9999] when formatted with %E4Y will produce
+        // more than four characters, just like %Y.
+        //
+        // We recommend that format strings include the UTC offset (%z, %Ez, or %E*z)
+        // so that the result uniquely identifies a time instant.
+        //
+        // Example:
+        //
+        //   turbo::CivilSecond cs(2013, 1, 2, 3, 4, 5);
+        //   turbo::Time t = turbo::Time::from_civil(cs, lax);
+        //   std::string f = turbo::Time::format("%H:%M:%S", t, lax);  // "03:04:05"
+        //   f = turbo::Time::format("%H:%M:%E3S", t, lax);  // "03:04:05.000"
+        //
+        // Note: If the given `turbo::Time` is `turbo::Time::future_infinite()`, the returned
+        // string will be exactly "infinite-future". If the given `turbo::Time` is
+        // `turbo::Time::past_infinite()`, the returned string will be exactly "infinite-past".
+        // In both cases the given format string and `turbo::TimeZone` are ignored.
+        //
+        TURBO_ATTRIBUTE_PURE_FUNCTION static std::string format(turbo::string_view format,
+                                                             Time t, TimeZone tz);
+
+        // Convenience functions that format the given time using the RFC3339_full
+        // format.  The first overload uses the provided TimeZone, while the second
+        // uses LocalTimeZone().
+        TURBO_ATTRIBUTE_PURE_FUNCTION static std::string format(Time t, TimeZone tz);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static std::string format(Time t);
     public:
         template<typename H>
         friend H turbo_hash_value(H h, Time t) {
@@ -1102,7 +1214,7 @@ namespace turbo {
     // turbo_unparse_flag()
     //
     // Unparses a Time value into a command-line string representation using
-    // the format specified by `turbo::ParseTime()`.
+    // the format specified by `turbo::Time::parse()`.
     std::string turbo_unparse_flag(Time t);
 
     TURBO_DEPRECATED("Use turbo_parse_flag() instead.")
@@ -1169,7 +1281,7 @@ namespace turbo {
             // Note: The following fields exist for backward compatibility
             // with older APIs.  Accessing these fields directly is a sign of
             // imprudent logic in the calling code.  Modern time-related code
-            // should only access this data indirectly by way of FormatTime().
+            // should only access this data indirectly by way of Time::format().
             // These fields are undefined for InfiniteFuture() and Time::past_infinite().
             int offset;             // seconds east of UTC
             bool is_dst;            // is offset non-standard?
@@ -1389,7 +1501,7 @@ namespace turbo {
         return CivilYear(tz.At(t).cs);
     }
 
-    // FromCivil()
+    // Time::from_civil()
     //
     // Helper for TimeZone::At(CivilSecond) that provides "order-preserving
     // semantics." If the civil time maps to a unique time, that time is
@@ -1397,89 +1509,15 @@ namespace turbo {
     // time using the pre-transition offset is returned. Otherwise, the
     // civil time is skipped in the given time zone, and the transition time
     // is returned. This means that for any two civil times, ct1 and ct2,
-    // (ct1 < ct2) => (FromCivil(ct1) <= FromCivil(ct2)), the equal case
+    // (ct1 < ct2) => (Time::from_civil(ct1) <= Time::from_civil(ct2)), the equal case
     // being when two non-existent civil times map to the same transition time.
     //
     // Note: Accepts civil times of any alignment.
-    TURBO_ATTRIBUTE_PURE_FUNCTION inline Time FromCivil(CivilSecond ct,
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline Time Time::from_civil(CivilSecond ct,
                                                         TimeZone tz) {
         const auto ti = tz.At(ct);
         if (ti.kind == TimeZone::TimeInfo::SKIPPED) return ti.trans;
         return ti.pre;
-    }
-
-    // TimeConversion
-    //
-    // An `turbo::TimeConversion` represents the conversion of year, month, day,
-    // hour, minute, and second values (i.e., a civil time), in a particular
-    // `turbo::TimeZone`, to a time instant (an absolute time), as returned by
-    // `turbo::ConvertDateTime()`. Legacy version of `turbo::TimeZone::TimeInfo`.
-    //
-    // Deprecated. Use `turbo::TimeZone::TimeInfo`.
-    struct TURBO_DEPRECATED("Use `turbo::TimeZone::TimeInfo`.") TimeConversion {
-        Time pre;    // time calculated using the pre-transition offset
-        Time trans;  // when the civil-time discontinuity occurred
-        Time post;   // time calculated using the post-transition offset
-
-        enum Kind {
-            UNIQUE,    // the civil time was singular (pre == trans == post)
-            SKIPPED,   // the civil time did not exist
-            REPEATED,  // the civil time was ambiguous
-        };
-        Kind kind;
-
-        bool normalized;  // input values were outside their valid ranges
-    };
-
-    // ConvertDateTime()
-    //
-    // Legacy version of `turbo::TimeZone::At(turbo::CivilSecond)` that takes
-    // the civil time as six, separate values (YMDHMS).
-    //
-    // The input month, day, hour, minute, and second values can be outside
-    // of their valid ranges, in which case they will be "normalized" during
-    // the conversion.
-    //
-    // Example:
-    //
-    //   // "October 32" normalizes to "November 1".
-    //   turbo::TimeConversion tc =
-    //       turbo::ConvertDateTime(2013, 10, 32, 8, 30, 0, lax);
-    //   // tc.kind == TimeConversion::UNIQUE && tc.normalized == true
-    //   // turbo::ToCivilDay(tc.pre, tz).month() == 11
-    //   // turbo::ToCivilDay(tc.pre, tz).day() == 1
-    //
-    // Deprecated. Use `turbo::TimeZone::At(CivilSecond)`.
-    TURBO_INTERNAL_DISABLE_DEPRECATED_DECLARATION_WARNING
-    TURBO_DEPRECATED("Use `turbo::TimeZone::At(CivilSecond)`.")
-
-    TimeConversion ConvertDateTime(int64_t year, int mon, int day, int hour,
-                                   int min, int sec, TimeZone tz);
-
-    TURBO_INTERNAL_RESTORE_DEPRECATED_DECLARATION_WARNING
-
-    // FromDateTime()
-    //
-    // A convenience wrapper for `turbo::ConvertDateTime()` that simply returns
-    // the "pre" `turbo::Time`.  That is, the unique result, or the instant that
-    // is correct using the pre-transition offset (as if the transition never
-    // happened).
-    //
-    // Example:
-    //
-    //   turbo::Time t = turbo::FromDateTime(2017, 9, 26, 9, 30, 0, lax);
-    //   // t = 2017-09-26 09:30:00 -0700
-    //
-    // Deprecated. Use `turbo::FromCivil(CivilSecond, TimeZone)`. Note that the
-    // behavior of `FromCivil()` differs from `FromDateTime()` for skipped civil
-    // times. If you care about that see `turbo::TimeZone::At(turbo::CivilSecond)`.
-    TURBO_DEPRECATED("Use `turbo::FromCivil(CivilSecond, TimeZone)`.")
-
-    inline Time FromDateTime(int64_t year, int mon, int day, int hour, int min,
-                             int sec, TimeZone tz) {
-        TURBO_INTERNAL_DISABLE_DEPRECATED_DECLARATION_WARNING
-        return ConvertDateTime(year, mon, day, hour, min, sec, tz).pre;
-        TURBO_INTERNAL_RESTORE_DEPRECATED_DECLARATION_WARNING
     }
 
     // ToTM()
@@ -1491,7 +1529,7 @@ namespace turbo {
     // RFC3339_full
     // RFC3339_sec
     //
-    // FormatTime()/ParseTime() format specifiers for RFC3339 date/time strings,
+    // Time::format()/Time::parse() format specifiers for RFC3339 date/time strings,
     // with trailing zeros trimmed or with fractional seconds omitted altogether.
     //
     // Note that RFC3339_sec[] matches an ISO 8601 extended format for date and
@@ -1504,129 +1542,20 @@ namespace turbo {
     // RFC1123_full
     // RFC1123_no_wday
     //
-    // FormatTime()/ParseTime() format specifiers for RFC1123 date/time strings.
+    // Time::format()/Time::parse() format specifiers for RFC1123 date/time strings.
     TURBO_DLL extern const char RFC1123_full[];     // %a, %d %b %E4Y %H:%M:%S %z
     TURBO_DLL extern const char RFC1123_no_wday[];  // %d %b %E4Y %H:%M:%S %z
 
-    // FormatTime()
-    //
-    // Formats the given `turbo::Time` in the `turbo::TimeZone` according to the
-    // provided format string. Uses strftime()-like formatting options, with
-    // the following extensions:
-    //
-    //   - %Ez  - RFC3339-compatible numeric UTC offset (+hh:mm or -hh:mm)
-    //   - %E*z - Full-resolution numeric UTC offset (+hh:mm:ss or -hh:mm:ss)
-    //   - %E#S - Seconds with # digits of fractional precision
-    //   - %E*S - Seconds with full fractional precision (a literal '*')
-    //   - %E#f - Fractional seconds with # digits of precision
-    //   - %E*f - Fractional seconds with full precision (a literal '*')
-    //   - %E4Y - Four-character years (-999 ... -001, 0000, 0001 ... 9999)
-    //   - %ET  - The RFC3339 "date-time" separator "T"
-    //
-    // Note that %E0S behaves like %S, and %E0f produces no characters.  In
-    // contrast %E*f always produces at least one digit, which may be '0'.
-    //
-    // Note that %Y produces as many characters as it takes to fully render the
-    // year.  A year outside of [-999:9999] when formatted with %E4Y will produce
-    // more than four characters, just like %Y.
-    //
-    // We recommend that format strings include the UTC offset (%z, %Ez, or %E*z)
-    // so that the result uniquely identifies a time instant.
-    //
-    // Example:
-    //
-    //   turbo::CivilSecond cs(2013, 1, 2, 3, 4, 5);
-    //   turbo::Time t = turbo::FromCivil(cs, lax);
-    //   std::string f = turbo::FormatTime("%H:%M:%S", t, lax);  // "03:04:05"
-    //   f = turbo::FormatTime("%H:%M:%E3S", t, lax);  // "03:04:05.000"
-    //
-    // Note: If the given `turbo::Time` is `turbo::Time::future_infinite()`, the returned
-    // string will be exactly "infinite-future". If the given `turbo::Time` is
-    // `turbo::Time::past_infinite()`, the returned string will be exactly "infinite-past".
-    // In both cases the given format string and `turbo::TimeZone` are ignored.
-    //
-    TURBO_ATTRIBUTE_PURE_FUNCTION std::string FormatTime(turbo::string_view format,
-                                                         Time t, TimeZone tz);
-
-    // Convenience functions that format the given time using the RFC3339_full
-    // format.  The first overload uses the provided TimeZone, while the second
-    // uses LocalTimeZone().
-    TURBO_ATTRIBUTE_PURE_FUNCTION std::string FormatTime(Time t, TimeZone tz);
-
-    TURBO_ATTRIBUTE_PURE_FUNCTION std::string FormatTime(Time t);
-
     // Output stream operator.
     inline std::ostream &operator<<(std::ostream &os, Time t) {
-        return os << FormatTime(t);
+        return os << Time::format(t);
     }
 
     // Support for StrFormat(), StrCat() etc.
     template<typename Sink>
     void turbo_stringify(Sink &sink, Time t) {
-        sink.Append(FormatTime(t));
+        sink.Append(Time::format(t));
     }
-
-    // ParseTime()
-    //
-    // Parses an input string according to the provided format string and
-    // returns the corresponding `turbo::Time`. Uses strftime()-like formatting
-    // options, with the same extensions as FormatTime(), but with the
-    // exceptions that %E#S is interpreted as %E*S, and %E#f as %E*f.  %Ez
-    // and %E*z also accept the same inputs, which (along with %z) includes
-    // 'z' and 'Z' as synonyms for +00:00.  %ET accepts either 'T' or 't'.
-    //
-    // %Y consumes as many numeric characters as it can, so the matching data
-    // should always be terminated with a non-numeric.  %E4Y always consumes
-    // exactly four characters, including any sign.
-    //
-    // Unspecified fields are taken from the default date and time of ...
-    //
-    //   "1970-01-01 00:00:00.0 +0000"
-    //
-    // For example, parsing a string of "15:45" (%H:%M) will return an turbo::Time
-    // that represents "1970-01-01 15:45:00.0 +0000".
-    //
-    // Note that since ParseTime() returns time instants, it makes the most sense
-    // to parse fully-specified date/time strings that include a UTC offset (%z,
-    // %Ez, or %E*z).
-    //
-    // Note also that `turbo::ParseTime()` only heeds the fields year, month, day,
-    // hour, minute, (fractional) second, and UTC offset.  Other fields, like
-    // weekday (%a or %A), while parsed for syntactic validity, are ignored
-    // in the conversion.
-    //
-    // Date and time fields that are out-of-range will be treated as errors
-    // rather than normalizing them like `turbo::CivilSecond` does.  For example,
-    // it is an error to parse the date "Oct 32, 2013" because 32 is out of range.
-    //
-    // A leap second of ":60" is normalized to ":00" of the following minute
-    // with fractional seconds discarded.  The following table shows how the
-    // given seconds and subseconds will be parsed:
-    //
-    //   "59.x" -> 59.x  // exact
-    //   "60.x" -> 00.0  // normalized
-    //   "00.x" -> 00.x  // exact
-    //
-    // Errors are indicated by returning false and assigning an error message
-    // to the "err" out param if it is non-null.
-    //
-    // Note: If the input string is exactly "infinite-future", the returned
-    // `turbo::Time` will be `turbo::Time::future_infinite()` and `true` will be returned.
-    // If the input string is "infinite-past", the returned `turbo::Time` will be
-    // `turbo::Time::past_infinite()` and `true` will be returned.
-    //
-    bool ParseTime(turbo::string_view format, turbo::string_view input, Time *time,
-                   std::string *err);
-
-    // Like ParseTime() above, but if the format string does not contain a UTC
-    // offset specification (%z/%Ez/%E*z) then the input is interpreted in the
-    // given TimeZone.  This means that the input, by itself, does not identify a
-    // unique instant.  Being time-zone dependent, it also admits the possibility
-    // of ambiguity or non-existence, in which case the "pre" time (as defined
-    // by TimeZone::TimeInfo) is returned.  For these reasons we recommend that
-    // all date/time strings include a UTC offset so they're context independent.
-    bool ParseTime(turbo::string_view format, turbo::string_view input, TimeZone tz,
-                   Time *time, std::string *err);
 
     // ============================================================================
     // Implementation Details Follow

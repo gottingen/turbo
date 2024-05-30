@@ -111,7 +111,7 @@ namespace {
     TEST(Time, FlagSupport) {
         EXPECT_EQ(turbo::Time::past_infinite(), turbo::GetFlag(FLAGS_test_time_flag));
 
-        const turbo::Time t = turbo::FromCivil(turbo::CivilSecond(2016, 1, 2, 3, 4, 5),
+        const turbo::Time t = turbo::Time::from_civil(turbo::CivilSecond(2016, 1, 2, 3, 4, 5),
                                                turbo::UTCTimeZone());
         turbo::SetFlag(&FLAGS_test_time_flag, t);
         EXPECT_EQ(t, turbo::GetFlag(FLAGS_test_time_flag));

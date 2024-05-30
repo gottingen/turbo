@@ -767,7 +767,7 @@
 //
 // Example:
 //
-//  TURBO_ATTRIBUTE_PURE_FUNCTION std::string FormatTime(Time t);
+//  TURBO_ATTRIBUTE_PURE_FUNCTION std::string Time::format(Time t);
 #if TURBO_HAVE_CPP_ATTRIBUTE(gnu::pure)
 #define TURBO_ATTRIBUTE_PURE_FUNCTION [[gnu::pure]]
 #elif TURBO_HAVE_ATTRIBUTE(pure)

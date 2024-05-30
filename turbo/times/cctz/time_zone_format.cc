@@ -753,7 +753,7 @@ bool parse(const std::string& format, const std::string& input,
     }
     switch (*fmt++) {
       case 'Y':
-        // Symmetrically with FormatTime(), directly handing %Y avoids the
+        // Symmetrically with Time::format(), directly handing %Y avoids the
         // tm.tm_year overflow problem.  However, tm.tm_year will still be
         // used by other specifiers like %D.
         data = ParseInt(data, 0, kyearmin, kyearmax, &year);

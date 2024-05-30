@@ -75,7 +75,7 @@ namespace turbo {
 
     }  // namespace
 
-    std::string FormatTime(turbo::string_view format, turbo::Time t,
+    std::string Time::format(turbo::string_view format, turbo::Time t,
                            turbo::TimeZone tz) {
         if (t == turbo::Time::future_infinite()) return std::string(kInfiniteFutureStr);
         if (t == turbo::Time::past_infinite()) return std::string(kInfinitePastStr);
@@ -84,22 +84,22 @@ namespace turbo {
                                     cctz::time_zone(tz));
     }
 
-    std::string FormatTime(turbo::Time t, turbo::TimeZone tz) {
-        return FormatTime(RFC3339_full, t, tz);
+    std::string Time::format(turbo::Time t, turbo::TimeZone tz) {
+        return Time::format(RFC3339_full, t, tz);
     }
 
-    std::string FormatTime(turbo::Time t) {
-        return turbo::FormatTime(RFC3339_full, t, turbo::LocalTimeZone());
+    std::string Time::format(turbo::Time t) {
+        return turbo::Time::format(RFC3339_full, t, turbo::LocalTimeZone());
     }
 
-    bool ParseTime(turbo::string_view format, turbo::string_view input,
+    bool Time::parse(turbo::string_view format, turbo::string_view input,
                    turbo::Time *time, std::string *err) {
-        return turbo::ParseTime(format, input, turbo::UTCTimeZone(), time, err);
+        return turbo::Time::parse(format, input, turbo::UTCTimeZone(), time, err);
     }
 
-// If the input string does not contain an explicit UTC offset, interpret
-// the fields with respect to the given TimeZone.
-    bool ParseTime(turbo::string_view format, turbo::string_view input,
+    // If the input string does not contain an explicit UTC offset, interpret
+    // the fields with respect to the given TimeZone.
+    bool Time::parse(turbo::string_view format, turbo::string_view input,
                    turbo::TimeZone tz, turbo::Time *time, std::string *err) {
         auto strip_leading_space = [](turbo::string_view *sv) {
             while (!sv->empty()) {
@@ -144,21 +144,21 @@ namespace turbo {
         return b;
     }
 
-// Functions required to support turbo::Time flags.
+    // Functions required to support turbo::Time flags.
     bool turbo_parse_flag(turbo::string_view text, turbo::Time *t, std::string *error) {
-        return turbo::ParseTime(RFC3339_full, text, turbo::UTCTimeZone(), t, error);
+        return turbo::Time::parse(RFC3339_full, text, turbo::UTCTimeZone(), t, error);
     }
 
     std::string turbo_unparse_flag(turbo::Time t) {
-        return turbo::FormatTime(RFC3339_full, t, turbo::UTCTimeZone());
+        return turbo::Time::format(RFC3339_full, t, turbo::UTCTimeZone());
     }
 
     bool ParseFlag(const std::string &text, turbo::Time *t, std::string *error) {
-        return turbo::ParseTime(RFC3339_full, text, turbo::UTCTimeZone(), t, error);
+        return turbo::Time::parse(RFC3339_full, text, turbo::UTCTimeZone(), t, error);
     }
 
     std::string UnparseFlag(turbo::Time t) {
-        return turbo::FormatTime(RFC3339_full, t, turbo::UTCTimeZone());
+        return turbo::Time::format(RFC3339_full, t, turbo::UTCTimeZone());
     }
 
     TURBO_NAMESPACE_END
