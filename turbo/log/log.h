@@ -197,8 +197,7 @@
 //   LOG(INFO) << std::hex << 0xdeadbeef;  // logs "0xdeadbeef"
 //   LOG(INFO) << 0xdeadbeef;              // logs "3735928559"
 
-#ifndef TURBO_LOG_LOG_H_
-#define TURBO_LOG_LOG_H_
+#pragma once
 
 #include <turbo/log/internal/log_impl.h>
 
@@ -364,5 +363,3 @@
   TURBO_LOG_INTERNAL_DLOG_IF_EVERY_POW_2_IMPL(_##severity, condition)
 #define DLOG_IF_EVERY_N_SEC(severity, condition, n_seconds) \
   TURBO_LOG_INTERNAL_DLOG_IF_EVERY_N_SEC_IMPL(_##severity, condition, n_seconds)
-
-#endif  // TURBO_LOG_LOG_H_

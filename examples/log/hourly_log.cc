@@ -1,3 +1,4 @@
+//
 // Copyright (C) 2024 EA group inc.
 // Author: Jeff.li lijippy@163.com
 // All rights reserved.
@@ -15,13 +16,48 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/log/log_sink.h>
+#include <turbo/log/logging.h>
 
-#include <turbo/base/config.h>
+void call0() {
+    int x = 3, y = 5;
+    CHECK_EQ(2 * x, y) << "oops!";
+}
 
-namespace turbo {
-    TURBO_NAMESPACE_BEGIN
-    void LogSink::KeyFunction() const {}
+void call1() {
+    call0();
+}
 
-    TURBO_NAMESPACE_END
-}  // namespace turbo
+void call2() {
+    call1();
+}
+
+void call3() {
+    LOG(INFO) << "hello world" << "sd";
+    call2();
+}
+
+void call4() {
+    call3();
+}
+
+void call5() {
+    call4();
+    LOG(INFO) << "hello world";
+}
+
+void call6() {
+    LOG(INFO) << "hello world";
+    call5();
+}
+
+int main() {
+
+    //turbo::initialize_log();
+    turbo::setup_hourly_file_sink("logs/daily_log.txt");
+    turbo::set_stderr_threshold(turbo::LogSeverityAtLeast::kInfinity);
+    for (int i = 0; i < 100; i++) {
+        LOG(INFO) << "hello world";
+        LOG(ERROR) << "error hello world";
+    }
+    call6();
+}

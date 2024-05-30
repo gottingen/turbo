@@ -42,7 +42,7 @@ TURBO_NAMESPACE_BEGIN
 // Example:
 //
 //   // Effectively disables all logging:
-//   SetMinLogLevel(static_cast<turbo::LogSeverity>(100));
+//   set_min_log_level(static_cast<turbo::LogSeverity>(100));
 //
 // Turbo flags may be defined with type `LogSeverity`. Dependency layering
 // constraints require that the `turbo_parse_flag()` overload be declared and
@@ -132,7 +132,7 @@ constexpr turbo::LogSeverity NormalizeLogSeverity(int s) {
 std::ostream& operator<<(std::ostream& os, turbo::LogSeverity s);
 
 // Enums representing a lower bound for LogSeverity. APIs that only operate on
-// messages of at least a certain level (for example, `SetMinLogLevel()`) use
+// messages of at least a certain level (for example, `set_min_log_level()`) use
 // this type to specify that level. turbo::LogSeverityAtLeast::kInfinity is
 // a level above all threshold levels and therefore no log message will
 // ever meet this threshold.

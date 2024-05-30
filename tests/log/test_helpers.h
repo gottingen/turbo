@@ -42,7 +42,7 @@ constexpr auto kTurboMinLogLevel =
 #endif
 
 // Returns false if the specified severity level is disabled by
-// `TURBO_MIN_LOG_LEVEL` or `turbo::MinLogLevel()`.
+// `TURBO_MIN_LOG_LEVEL` or `turbo::min_log_level()`.
 bool LoggingEnabledAt(turbo::LogSeverity severity);
 
 // -----------------------------------------------------------------------------

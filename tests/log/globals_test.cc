@@ -41,81 +41,81 @@ constexpr static turbo::LogSeverityAtLeast DefaultStderrThreshold() {
   return turbo::LogSeverityAtLeast::kError;
 }
 
-TEST(TestGlobals, MinLogLevel) {
-  EXPECT_EQ(turbo::MinLogLevel(), DefaultMinLogLevel());
-  turbo::SetMinLogLevel(turbo::LogSeverityAtLeast::kError);
-  EXPECT_EQ(turbo::MinLogLevel(), turbo::LogSeverityAtLeast::kError);
-  turbo::SetMinLogLevel(DefaultMinLogLevel());
+TEST(TestGlobals, min_log_level) {
+  EXPECT_EQ(turbo::min_log_level(), DefaultMinLogLevel());
+  turbo::set_min_log_level(turbo::LogSeverityAtLeast::kError);
+  EXPECT_EQ(turbo::min_log_level(), turbo::LogSeverityAtLeast::kError);
+  turbo::set_min_log_level(DefaultMinLogLevel());
 }
 
 TEST(TestGlobals, ScopedMinLogLevel) {
-  EXPECT_EQ(turbo::MinLogLevel(), DefaultMinLogLevel());
+  EXPECT_EQ(turbo::min_log_level(), DefaultMinLogLevel());
   {
     turbo::log_internal::ScopedMinLogLevel scoped_stderr_threshold(
         turbo::LogSeverityAtLeast::kError);
-    EXPECT_EQ(turbo::MinLogLevel(), turbo::LogSeverityAtLeast::kError);
+    EXPECT_EQ(turbo::min_log_level(), turbo::LogSeverityAtLeast::kError);
   }
-  EXPECT_EQ(turbo::MinLogLevel(), DefaultMinLogLevel());
+  EXPECT_EQ(turbo::min_log_level(), DefaultMinLogLevel());
 }
 
-TEST(TestGlobals, StderrThreshold) {
-  EXPECT_EQ(turbo::StderrThreshold(), DefaultStderrThreshold());
-  turbo::SetStderrThreshold(turbo::LogSeverityAtLeast::kError);
-  EXPECT_EQ(turbo::StderrThreshold(), turbo::LogSeverityAtLeast::kError);
-  turbo::SetStderrThreshold(DefaultStderrThreshold());
+TEST(TestGlobals, stderr_threshold) {
+  EXPECT_EQ(turbo::stderr_threshold(), DefaultStderrThreshold());
+  turbo::set_stderr_threshold(turbo::LogSeverityAtLeast::kError);
+  EXPECT_EQ(turbo::stderr_threshold(), turbo::LogSeverityAtLeast::kError);
+  turbo::set_stderr_threshold(DefaultStderrThreshold());
 }
 
 TEST(TestGlobals, ScopedStderrThreshold) {
-  EXPECT_EQ(turbo::StderrThreshold(), DefaultStderrThreshold());
+  EXPECT_EQ(turbo::stderr_threshold(), DefaultStderrThreshold());
   {
     turbo::ScopedStderrThreshold scoped_stderr_threshold(
         turbo::LogSeverityAtLeast::kError);
-    EXPECT_EQ(turbo::StderrThreshold(), turbo::LogSeverityAtLeast::kError);
+    EXPECT_EQ(turbo::stderr_threshold(), turbo::LogSeverityAtLeast::kError);
   }
-  EXPECT_EQ(turbo::StderrThreshold(), DefaultStderrThreshold());
+  EXPECT_EQ(turbo::stderr_threshold(), DefaultStderrThreshold());
 }
 
 TEST(TestGlobals, LogBacktraceAt) {
   EXPECT_FALSE(turbo::log_internal::ShouldLogBacktraceAt("some_file.cc", 111));
-  turbo::SetLogBacktraceLocation("some_file.cc", 111);
+  turbo::set_log_backtrace_location("some_file.cc", 111);
   EXPECT_TRUE(turbo::log_internal::ShouldLogBacktraceAt("some_file.cc", 111));
   EXPECT_FALSE(
       turbo::log_internal::ShouldLogBacktraceAt("another_file.cc", 222));
 }
 
 TEST(TestGlobals, LogPrefix) {
-  EXPECT_TRUE(turbo::ShouldPrependLogPrefix());
-  turbo::EnableLogPrefix(false);
-  EXPECT_FALSE(turbo::ShouldPrependLogPrefix());
-  turbo::EnableLogPrefix(true);
-  EXPECT_TRUE(turbo::ShouldPrependLogPrefix());
+  EXPECT_TRUE(turbo::should_prepend_log_prefix());
+  turbo::enable_log_prefix(false);
+  EXPECT_FALSE(turbo::should_prepend_log_prefix());
+  turbo::enable_log_prefix(true);
+  EXPECT_TRUE(turbo::should_prepend_log_prefix());
 }
 
-TEST(TestGlobals, SetGlobalVLogLevel) {
-  EXPECT_EQ(turbo::SetGlobalVLogLevel(42), 0);
-  EXPECT_EQ(turbo::SetGlobalVLogLevel(1337), 42);
+TEST(TestGlobals, set_global_vlog_level) {
+  EXPECT_EQ(turbo::set_global_vlog_level(42), 0);
+  EXPECT_EQ(turbo::set_global_vlog_level(1337), 42);
   // Restore the value since it affects the default unset module value for
-  // `SetVLogLevel()`.
-  EXPECT_EQ(turbo::SetGlobalVLogLevel(0), 1337);
+  // `set_vlog_level()`.
+  EXPECT_EQ(turbo::set_global_vlog_level(0), 1337);
 }
 
-TEST(TestGlobals, SetVLogLevel) {
-  EXPECT_EQ(turbo::SetVLogLevel("setvloglevel", 42), 0);
-  EXPECT_EQ(turbo::SetVLogLevel("setvloglevel", 1337), 42);
-  EXPECT_EQ(turbo::SetVLogLevel("othersetvloglevel", 50), 0);
+TEST(TestGlobals, set_vlog_level) {
+  EXPECT_EQ(turbo::set_vlog_level("setvloglevel", 42), 0);
+  EXPECT_EQ(turbo::set_vlog_level("setvloglevel", 1337), 42);
+  EXPECT_EQ(turbo::set_vlog_level("othersetvloglevel", 50), 0);
 }
 
 TEST(TestGlobals, AndroidLogTag) {
   // Verify invalid tags result in a check failure.
-  EXPECT_DEATH_IF_SUPPORTED(turbo::SetAndroidNativeTag(nullptr), ".*");
+  EXPECT_DEATH_IF_SUPPORTED(turbo::set_android_native_tag(nullptr), ".*");
 
   // Verify valid tags applied.
   EXPECT_THAT(turbo::log_internal::GetAndroidNativeTag(), StrEq("native"));
-  turbo::SetAndroidNativeTag("test_tag");
+  turbo::set_android_native_tag("test_tag");
   EXPECT_THAT(turbo::log_internal::GetAndroidNativeTag(), StrEq("test_tag"));
 
   // Verify that additional calls (more than 1) result in a check failure.
-  EXPECT_DEATH_IF_SUPPORTED(turbo::SetAndroidNativeTag("test_tag_fail"), ".*");
+  EXPECT_DEATH_IF_SUPPORTED(turbo::set_android_native_tag("test_tag_fail"), ".*");
 }
 
 TEST(TestExitOnDFatal, OffTest) {

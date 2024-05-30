@@ -306,7 +306,7 @@ TEST_F(FlagTest, TestFlagDefinition) {
 #if TURBO_FLAGS_STRIP_NAMES
   GTEST_SKIP() << "This test requires flag names to be present";
 #endif
-  turbo::string_view expected_file_name = "turbo/flags/flag_test.cc";
+  turbo::string_view expected_file_name = "tests/flags/flag_test.cc";
 
   EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_01).Name(),
             "test_flag_01");

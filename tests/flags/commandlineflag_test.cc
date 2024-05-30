@@ -85,7 +85,7 @@ TEST_F(CommandLineFlagTest, TestAttributesAccessMethods) {
   EXPECT_TRUE(!flag_01->IsOfType<bool>());
   EXPECT_TRUE(!flag_01->IsOfType<std::string>());
   EXPECT_TRUE(turbo::EndsWith(flag_01->Filename(),
-                             "turbo/flags/commandlineflag_test.cc"))
+                             "tests/flags/commandlineflag_test.cc"))
       << flag_01->Filename();
 
   auto* flag_02 = turbo::FindCommandLineFlag("string_flag");
@@ -98,7 +98,7 @@ TEST_F(CommandLineFlagTest, TestAttributesAccessMethods) {
   EXPECT_TRUE(!flag_02->IsOfType<bool>());
   EXPECT_TRUE(!flag_02->IsOfType<int>());
   EXPECT_TRUE(turbo::EndsWith(flag_02->Filename(),
-                             "turbo/flags/commandlineflag_test.cc"))
+                             "tests/flags/commandlineflag_test.cc"))
       << flag_02->Filename();
 }
 

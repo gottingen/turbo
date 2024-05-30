@@ -33,149 +33,148 @@
 #include <turbo/strings/string_view.h>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace {
+    namespace {
 
-// These atomics represent logging library configuration.
-// Integer types are used instead of turbo::LogSeverity to ensure that a
-// lock-free std::atomic is used when possible.
-TURBO_CONST_INIT std::atomic<int> min_log_level{
-    static_cast<int>(turbo::LogSeverityAtLeast::kInfo)};
-TURBO_CONST_INIT std::atomic<int> stderrthreshold{
-    static_cast<int>(turbo::LogSeverityAtLeast::kError)};
-// We evaluate this value as a hash comparison to avoid having to
-// hold a mutex or make a copy (to access the value of a string-typed flag) in
-// very hot codepath.
-TURBO_CONST_INIT std::atomic<size_t> log_backtrace_at_hash{0};
-TURBO_CONST_INIT std::atomic<bool> prepend_log_prefix{true};
+        // These atomics represent logging library configuration.
+        // Integer types are used instead of turbo::LogSeverity to ensure that a
+        // lock-free std::atomic is used when possible.
+        TURBO_CONST_INIT std::atomic<int> g_min_log_level{
+                static_cast<int>(turbo::LogSeverityAtLeast::kInfo)};
+        TURBO_CONST_INIT std::atomic<int> stderrthreshold{
+                static_cast<int>(turbo::LogSeverityAtLeast::kError)};
+        // We evaluate this value as a hash comparison to avoid having to
+        // hold a mutex or make a copy (to access the value of a string-typed flag) in
+        // very hot codepath.
+        TURBO_CONST_INIT std::atomic<size_t> log_backtrace_at_hash{0};
+        TURBO_CONST_INIT std::atomic<bool> prepend_log_prefix{true};
 
-constexpr char kDefaultAndroidTag[] = "native";
-TURBO_CONST_INIT std::atomic<const char*> android_log_tag{kDefaultAndroidTag};
+        constexpr char kDefaultAndroidTag[] = "native";
+        TURBO_CONST_INIT std::atomic<const char *> android_log_tag{kDefaultAndroidTag};
 
-TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
-turbo::base_internal::AtomicHook<log_internal::LoggingGlobalsListener>
-    logging_globals_listener;
+        TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
+        turbo::base_internal::AtomicHook<log_internal::LoggingGlobalsListener>
+                logging_globals_listener;
 
-size_t HashSiteForLogBacktraceAt(turbo::string_view file, int line) {
-  return turbo::HashOf(file, line);
-}
+        size_t HashSiteForLogBacktraceAt(turbo::string_view file, int line) {
+            return turbo::HashOf(file, line);
+        }
 
-void TriggerLoggingGlobalsListener() {
-  auto* listener = logging_globals_listener.Load();
-  if (listener != nullptr) listener();
-}
+        void TriggerLoggingGlobalsListener() {
+            auto *listener = logging_globals_listener.Load();
+            if (listener != nullptr) listener();
+        }
 
-}  // namespace
+    }  // namespace
 
-namespace log_internal {
+    namespace log_internal {
 
-void RawSetMinLogLevel(turbo::LogSeverityAtLeast severity) {
-  min_log_level.store(static_cast<int>(severity), std::memory_order_release);
-}
+        void RawSetMinLogLevel(turbo::LogSeverityAtLeast severity) {
+            g_min_log_level.store(static_cast<int>(severity), std::memory_order_release);
+        }
 
-void RawSetStderrThreshold(turbo::LogSeverityAtLeast severity) {
-  stderrthreshold.store(static_cast<int>(severity), std::memory_order_release);
-}
+        void RawSetStderrThreshold(turbo::LogSeverityAtLeast severity) {
+            stderrthreshold.store(static_cast<int>(severity), std::memory_order_release);
+        }
 
-void RawEnableLogPrefix(bool on_off) {
-  prepend_log_prefix.store(on_off, std::memory_order_release);
-}
+        void RawEnableLogPrefix(bool on_off) {
+            prepend_log_prefix.store(on_off, std::memory_order_release);
+        }
 
-void SetLoggingGlobalsListener(LoggingGlobalsListener l) {
-  logging_globals_listener.Store(l);
-}
+        void SetLoggingGlobalsListener(LoggingGlobalsListener l) {
+            logging_globals_listener.Store(l);
+        }
 
-}  // namespace log_internal
+    }  // namespace log_internal
 
-turbo::LogSeverityAtLeast MinLogLevel() {
-  return static_cast<turbo::LogSeverityAtLeast>(
-      min_log_level.load(std::memory_order_acquire));
-}
+    turbo::LogSeverityAtLeast min_log_level() {
+        return static_cast<turbo::LogSeverityAtLeast>(
+                g_min_log_level.load(std::memory_order_acquire));
+    }
 
-void SetMinLogLevel(turbo::LogSeverityAtLeast severity) {
-  log_internal::RawSetMinLogLevel(severity);
-  TriggerLoggingGlobalsListener();
-}
+    void set_min_log_level(turbo::LogSeverityAtLeast severity) {
+        log_internal::RawSetMinLogLevel(severity);
+        TriggerLoggingGlobalsListener();
+    }
 
-namespace log_internal {
+    namespace log_internal {
 
-ScopedMinLogLevel::ScopedMinLogLevel(turbo::LogSeverityAtLeast severity)
-    : saved_severity_(turbo::MinLogLevel()) {
-  turbo::SetMinLogLevel(severity);
-}
-ScopedMinLogLevel::~ScopedMinLogLevel() {
-  turbo::SetMinLogLevel(saved_severity_);
-}
+        ScopedMinLogLevel::ScopedMinLogLevel(turbo::LogSeverityAtLeast severity)
+                : saved_severity_(turbo::min_log_level()) {
+            turbo::set_min_log_level(severity);
+        }
 
-}  // namespace log_internal
+        ScopedMinLogLevel::~ScopedMinLogLevel() {
+            turbo::set_min_log_level(saved_severity_);
+        }
 
-turbo::LogSeverityAtLeast StderrThreshold() {
-  return static_cast<turbo::LogSeverityAtLeast>(
-      stderrthreshold.load(std::memory_order_acquire));
-}
+    }  // namespace log_internal
 
-void SetStderrThreshold(turbo::LogSeverityAtLeast severity) {
-  log_internal::RawSetStderrThreshold(severity);
-  TriggerLoggingGlobalsListener();
-}
+    turbo::LogSeverityAtLeast stderr_threshold() {
+        return static_cast<turbo::LogSeverityAtLeast>(
+                stderrthreshold.load(std::memory_order_acquire));
+    }
 
-ScopedStderrThreshold::ScopedStderrThreshold(turbo::LogSeverityAtLeast severity)
-    : saved_severity_(turbo::StderrThreshold()) {
-  turbo::SetStderrThreshold(severity);
-}
+    void set_stderr_threshold(turbo::LogSeverityAtLeast severity) {
+        log_internal::RawSetStderrThreshold(severity);
+        TriggerLoggingGlobalsListener();
+    }
 
-ScopedStderrThreshold::~ScopedStderrThreshold() {
-  turbo::SetStderrThreshold(saved_severity_);
-}
+    ScopedStderrThreshold::ScopedStderrThreshold(turbo::LogSeverityAtLeast severity)
+            : saved_severity_(turbo::stderr_threshold()) {
+        turbo::set_stderr_threshold(severity);
+    }
 
-namespace log_internal {
+    ScopedStderrThreshold::~ScopedStderrThreshold() {
+        turbo::set_stderr_threshold(saved_severity_);
+    }
 
-const char* GetAndroidNativeTag() {
-  return android_log_tag.load(std::memory_order_acquire);
-}
+    namespace log_internal {
 
-}  // namespace log_internal
+        const char *GetAndroidNativeTag() {
+            return android_log_tag.load(std::memory_order_acquire);
+        }
 
-void SetAndroidNativeTag(const char* tag) {
-  TURBO_CONST_INIT static std::atomic<const std::string*> user_log_tag(nullptr);
-  TURBO_INTERNAL_CHECK(tag, "tag must be non-null.");
+    }  // namespace log_internal
 
-  const std::string* tag_str = new std::string(tag);
-  TURBO_INTERNAL_CHECK(
-      android_log_tag.exchange(tag_str->c_str(), std::memory_order_acq_rel) ==
-          kDefaultAndroidTag,
-      "SetAndroidNativeTag() must only be called once per process!");
-  user_log_tag.store(tag_str, std::memory_order_relaxed);
-}
+    void set_android_native_tag(const char *tag) {
+        TURBO_CONST_INIT static std::atomic<const std::string *> user_log_tag(nullptr);
+        TURBO_INTERNAL_CHECK(tag, "tag must be non-null.");
 
-namespace log_internal {
+        const std::string *tag_str = new std::string(tag);
+        TURBO_INTERNAL_CHECK(
+                android_log_tag.exchange(tag_str->c_str(), std::memory_order_acq_rel) ==
+                kDefaultAndroidTag,
+                "set_android_native_tag() must only be called once per process!");
+        user_log_tag.store(tag_str, std::memory_order_relaxed);
+    }
 
-bool ShouldLogBacktraceAt(turbo::string_view file, int line) {
-  const size_t flag_hash =
-      log_backtrace_at_hash.load(std::memory_order_relaxed);
+    namespace log_internal {
 
-  return flag_hash != 0 && flag_hash == HashSiteForLogBacktraceAt(file, line);
-}
+        bool ShouldLogBacktraceAt(turbo::string_view file, int line) {
+            const size_t flag_hash =
+                    log_backtrace_at_hash.load(std::memory_order_relaxed);
 
-}  // namespace log_internal
+            return flag_hash != 0 && flag_hash == HashSiteForLogBacktraceAt(file, line);
+        }
 
-void SetLogBacktraceLocation(turbo::string_view file, int line) {
-  log_backtrace_at_hash.store(HashSiteForLogBacktraceAt(file, line),
-                              std::memory_order_relaxed);
-}
+    }  // namespace log_internal
 
-void ClearLogBacktraceLocation() {
-  log_backtrace_at_hash.store(0, std::memory_order_relaxed);
-}
+    void set_log_backtrace_location(turbo::string_view file, int line) {
+        log_backtrace_at_hash.store(HashSiteForLogBacktraceAt(file, line),
+                                    std::memory_order_relaxed);
+    }
 
-bool ShouldPrependLogPrefix() {
-  return prepend_log_prefix.load(std::memory_order_acquire);
-}
+    void clear_log_backtrace_location() {
+        log_backtrace_at_hash.store(0, std::memory_order_relaxed);
+    }
 
-void EnableLogPrefix(bool on_off) {
-  log_internal::RawEnableLogPrefix(on_off);
-  TriggerLoggingGlobalsListener();
-}
+    bool should_prepend_log_prefix() {
+        return prepend_log_prefix.load(std::memory_order_acquire);
+    }
 
-TURBO_NAMESPACE_END
+    void enable_log_prefix(bool on_off) {
+        log_internal::RawEnableLogPrefix(on_off);
+        TriggerLoggingGlobalsListener();
+    }
+
 }  // namespace turbo

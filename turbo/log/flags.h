@@ -20,8 +20,7 @@
 // -----------------------------------------------------------------------------
 //
 
-#ifndef TURBO_LOG_FLAGS_H_
-#define TURBO_LOG_FLAGS_H_
+#pragma once
 
 // The Turbo Logging library supports the following command line flags to
 // configure logging behavior at runtime:
@@ -38,9 +37,7 @@
 //
 // To use these commandline flags, the //turbo/log:flags library must be
 // explicitly linked, and turbo::ParseCommandLine() must be called before the
-// call to turbo::InitializeLog().
+// call to turbo::initialize_log().
 //
 // To configure the Log library programmatically, use the interfaces defined in
 // turbo/log/globals.h.
-
-#endif  // TURBO_LOG_FLAGS_H_

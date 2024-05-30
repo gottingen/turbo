@@ -55,26 +55,26 @@ class LogFlagsTest : public ::testing::Test {
 // This order dependency is currently not fixable due to the way the
 // stderrthreshold global value is out of sync with the stderrthreshold flag.
 TEST_F(LogFlagsTest, DISABLED_StderrKnobsDefault) {
-  EXPECT_EQ(turbo::StderrThreshold(), DefaultStderrThreshold());
+  EXPECT_EQ(turbo::stderr_threshold(), DefaultStderrThreshold());
 }
 
-TEST_F(LogFlagsTest, SetStderrThreshold) {
+TEST_F(LogFlagsTest, set_stderr_threshold) {
   turbo::SetFlag(&FLAGS_stderrthreshold,
                 static_cast<int>(turbo::LogSeverityAtLeast::kInfo));
 
-  EXPECT_EQ(turbo::StderrThreshold(), turbo::LogSeverityAtLeast::kInfo);
+  EXPECT_EQ(turbo::stderr_threshold(), turbo::LogSeverityAtLeast::kInfo);
 
   turbo::SetFlag(&FLAGS_stderrthreshold,
                 static_cast<int>(turbo::LogSeverityAtLeast::kError));
 
-  EXPECT_EQ(turbo::StderrThreshold(), turbo::LogSeverityAtLeast::kError);
+  EXPECT_EQ(turbo::stderr_threshold(), turbo::LogSeverityAtLeast::kError);
 }
 
-TEST_F(LogFlagsTest, SetMinLogLevel) {
+TEST_F(LogFlagsTest, set_min_log_level) {
   turbo::SetFlag(&FLAGS_minloglevel,
                 static_cast<int>(turbo::LogSeverityAtLeast::kError));
 
-  EXPECT_EQ(turbo::MinLogLevel(), turbo::LogSeverityAtLeast::kError);
+  EXPECT_EQ(turbo::min_log_level(), turbo::LogSeverityAtLeast::kError);
 
   turbo::log_internal::ScopedMinLogLevel scoped_min_log_level(
       turbo::LogSeverityAtLeast::kWarning);
@@ -86,15 +86,15 @@ TEST_F(LogFlagsTest, SetMinLogLevel) {
 TEST_F(LogFlagsTest, PrependLogPrefix) {
   turbo::SetFlag(&FLAGS_log_prefix, false);
 
-  EXPECT_EQ(turbo::ShouldPrependLogPrefix(), false);
+  EXPECT_EQ(turbo::should_prepend_log_prefix(), false);
 
-  turbo::EnableLogPrefix(true);
+  turbo::enable_log_prefix(true);
 
   EXPECT_EQ(turbo::GetFlag(FLAGS_log_prefix), true);
 }
 
 TEST_F(LogFlagsTest, EmptyBacktraceAtFlag) {
-  turbo::SetMinLogLevel(turbo::LogSeverityAtLeast::kInfo);
+  turbo::set_min_log_level(turbo::LogSeverityAtLeast::kInfo);
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
   EXPECT_CALL(test_sink, Send(TextMessage(Not(HasSubstr("(stacktrace:")))));
@@ -105,7 +105,7 @@ TEST_F(LogFlagsTest, EmptyBacktraceAtFlag) {
 }
 
 TEST_F(LogFlagsTest, BacktraceAtNonsense) {
-  turbo::SetMinLogLevel(turbo::LogSeverityAtLeast::kInfo);
+  turbo::set_min_log_level(turbo::LogSeverityAtLeast::kInfo);
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
   EXPECT_CALL(test_sink, Send(TextMessage(Not(HasSubstr("(stacktrace:")))));
@@ -116,7 +116,7 @@ TEST_F(LogFlagsTest, BacktraceAtNonsense) {
 }
 
 TEST_F(LogFlagsTest, BacktraceAtWrongFile) {
-  turbo::SetMinLogLevel(turbo::LogSeverityAtLeast::kInfo);
+  turbo::set_min_log_level(turbo::LogSeverityAtLeast::kInfo);
   const int log_line = __LINE__ + 1;
   auto do_log = [] { LOG(INFO) << "hello world"; };
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
@@ -130,7 +130,7 @@ TEST_F(LogFlagsTest, BacktraceAtWrongFile) {
 }
 
 TEST_F(LogFlagsTest, BacktraceAtWrongLine) {
-  turbo::SetMinLogLevel(turbo::LogSeverityAtLeast::kInfo);
+  turbo::set_min_log_level(turbo::LogSeverityAtLeast::kInfo);
   const int log_line = __LINE__ + 1;
   auto do_log = [] { LOG(INFO) << "hello world"; };
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
@@ -144,7 +144,7 @@ TEST_F(LogFlagsTest, BacktraceAtWrongLine) {
 }
 
 TEST_F(LogFlagsTest, BacktraceAtWholeFilename) {
-  turbo::SetMinLogLevel(turbo::LogSeverityAtLeast::kInfo);
+  turbo::set_min_log_level(turbo::LogSeverityAtLeast::kInfo);
   const int log_line = __LINE__ + 1;
   auto do_log = [] { LOG(INFO) << "hello world"; };
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
@@ -157,7 +157,7 @@ TEST_F(LogFlagsTest, BacktraceAtWholeFilename) {
 }
 
 TEST_F(LogFlagsTest, BacktraceAtNonmatchingSuffix) {
-  turbo::SetMinLogLevel(turbo::LogSeverityAtLeast::kInfo);
+  turbo::set_min_log_level(turbo::LogSeverityAtLeast::kInfo);
   const int log_line = __LINE__ + 1;
   auto do_log = [] { LOG(INFO) << "hello world"; };
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
@@ -171,7 +171,7 @@ TEST_F(LogFlagsTest, BacktraceAtNonmatchingSuffix) {
 }
 
 TEST_F(LogFlagsTest, LogsBacktrace) {
-  turbo::SetMinLogLevel(turbo::LogSeverityAtLeast::kInfo);
+  turbo::set_min_log_level(turbo::LogSeverityAtLeast::kInfo);
   const int log_line = __LINE__ + 1;
   auto do_log = [] { LOG(INFO) << "hello world"; };
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);

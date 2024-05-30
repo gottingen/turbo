@@ -46,7 +46,7 @@ auto* test_env TURBO_ATTRIBUTE_UNUSED = ::testing::AddGlobalTestEnvironment(
 // Tests for global log sink registration.
 // ---------------------------------------
 
-TEST(LogSinkRegistryTest, AddLogSink) {
+TEST(LogSinkRegistryTest, add_log_sink) {
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
   InSequence s;
@@ -102,7 +102,7 @@ TEST(LogSinkRegistrationDeathTest, DuplicateSinkRegistration) {
       {
         turbo::ScopedMockLog sink;
         sink.StartCapturingLogs();
-        turbo::AddLogSink(&sink.UseAsLocalSink());
+        turbo::add_log_sink(&sink.UseAsLocalSink());
       },
       HasSubstr("Duplicate log sinks"));
 }
@@ -111,7 +111,7 @@ TEST(LogSinkRegistrationDeathTest, MismatchSinkRemoval) {
   ASSERT_DEATH_IF_SUPPORTED(
       {
         turbo::ScopedMockLog sink;
-        turbo::RemoveLogSink(&sink.UseAsLocalSink());
+        turbo::remove_log_sink(&sink.UseAsLocalSink());
       },
       HasSubstr("Mismatched log sink"));
 }
@@ -126,8 +126,8 @@ TEST(LogSinkTest, FlushSinks) {
 
   test_sink.StartCapturingLogs();
 
-  turbo::FlushLogSinks();
-  turbo::FlushLogSinks();
+  turbo::flush_log_sinks();
+  turbo::flush_log_sinks();
 }
 
 TEST(LogSinkDeathTest, DeathInSend) {
@@ -245,9 +245,9 @@ TEST_F(ReentrancyTest, RegisteredLogSinkThatLogsInSend) {
   EXPECT_CALL(test_sink, Log(_, _, "hello world"));
 
   test_sink.StartCapturingLogs();
-  turbo::AddLogSink(&renentrant_sink);
+  turbo::add_log_sink(&renentrant_sink);
   LOG(INFO) << "hello world";
-  turbo::RemoveLogSink(&renentrant_sink);
+  turbo::remove_log_sink(&renentrant_sink);
 }
 
 TEST_F(ReentrancyTest, AlsoLogSinkThatLogsInSend) {
@@ -272,9 +272,9 @@ TEST_F(ReentrancyTest, RegisteredAlsoLogSinkThatLogsInSend) {
               Log(_, _, "The log is coming from *inside the sink*."));
 
   test_sink.StartCapturingLogs();
-  turbo::AddLogSink(&reentrant_sink);
+  turbo::add_log_sink(&reentrant_sink);
   LOG(INFO).ToSinkAlso(&reentrant_sink) << "hello world";
-  turbo::RemoveLogSink(&reentrant_sink);
+  turbo::remove_log_sink(&reentrant_sink);
 }
 
 TEST_F(ReentrancyTest, OnlyLogSinkThatLogsInSend) {
@@ -294,9 +294,9 @@ TEST_F(ReentrancyTest, RegisteredOnlyLogSinkThatLogsInSend) {
               Log(_, _, "The log is coming from *inside the sink*."));
 
   test_sink.StartCapturingLogs();
-  turbo::AddLogSink(&reentrant_sink);
+  turbo::add_log_sink(&reentrant_sink);
   LOG(INFO).ToSinkOnly(&reentrant_sink) << "hello world";
-  turbo::RemoveLogSink(&reentrant_sink);
+  turbo::remove_log_sink(&reentrant_sink);
 }
 
 using ReentrancyDeathTest = ReentrancyTest;
@@ -330,9 +330,9 @@ TEST_F(ReentrancyDeathTest, RegisteredLogSinkThatLogsFatalInSend) {
             .WillOnce(DeathTestExpectedLogging());
 
         test_sink.StartCapturingLogs();
-        turbo::AddLogSink(&reentrant_sink);
+        turbo::add_log_sink(&reentrant_sink);
         LOG(INFO) << "hello world";
-        // No need to call RemoveLogSink - process is dead at this point.
+        // No need to call remove_log_sink - process is dead at this point.
       },
       DiedOfFatal, DeathTestValidateExpectations());
 }
@@ -373,9 +373,9 @@ TEST_F(ReentrancyDeathTest, RegisteredAlsoLogSinkThatLogsFatalInSend) {
             .WillOnce(DeathTestExpectedLogging());
 
         test_sink.StartCapturingLogs();
-        turbo::AddLogSink(&reentrant_sink);
+        turbo::add_log_sink(&reentrant_sink);
         LOG(INFO).ToSinkAlso(&reentrant_sink) << "hello world";
-        // No need to call RemoveLogSink - process is dead at this point.
+        // No need to call remove_log_sink - process is dead at this point.
       },
       DiedOfFatal, DeathTestValidateExpectations());
 }
@@ -411,9 +411,9 @@ TEST_F(ReentrancyDeathTest, RegisteredOnlyLogSinkThatLogsFatalInSend) {
             .WillOnce(DeathTestExpectedLogging());
 
         test_sink.StartCapturingLogs();
-        turbo::AddLogSink(&reentrant_sink);
+        turbo::add_log_sink(&reentrant_sink);
         LOG(INFO).ToSinkOnly(&reentrant_sink) << "hello world";
-        // No need to call RemoveLogSink - process is dead at this point.
+        // No need to call remove_log_sink - process is dead at this point.
       },
       DiedOfFatal, DeathTestValidateExpectations());
 }

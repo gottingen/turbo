@@ -21,8 +21,7 @@
 //
 // This header declares macro `TURBO_DIE_IF_NULL`.
 
-#ifndef TURBO_LOG_DIE_IF_NULL_H_
-#define TURBO_LOG_DIE_IF_NULL_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -50,30 +49,24 @@
 #define TURBO_DIE_IF_NULL(val) \
   ::turbo::log_internal::DieIfNull(__FILE__, __LINE__, #val, (val))
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace log_internal {
+namespace turbo::log_internal {
 
-// Crashes the process after logging `exprtext` annotated at the `file` and
-// `line` location. Called when `TURBO_DIE_IF_NULL` fails. Calling this function
-// generates less code than its implementation would if inlined, for a slight
-// code size reduction each time `TURBO_DIE_IF_NULL` is called.
-TURBO_ATTRIBUTE_NORETURN TURBO_ATTRIBUTE_NOINLINE void DieBecauseNull(
-    const char* file, int line, const char* exprtext);
+    // Crashes the process after logging `exprtext` annotated at the `file` and
+    // `line` location. Called when `TURBO_DIE_IF_NULL` fails. Calling this function
+    // generates less code than its implementation would if inlined, for a slight
+    // code size reduction each time `TURBO_DIE_IF_NULL` is called.
+    TURBO_ATTRIBUTE_NORETURN TURBO_ATTRIBUTE_NOINLINE void DieBecauseNull(
+            const char *file, int line, const char *exprtext);
 
-// Helper for `TURBO_DIE_IF_NULL`.
-template <typename T>
-TURBO_MUST_USE_RESULT T DieIfNull(const char* file, int line,
-                                 const char* exprtext, T&& t) {
-  if (TURBO_PREDICT_FALSE(t == nullptr)) {
-    // Call a non-inline helper function for a small code size improvement.
-    DieBecauseNull(file, line, exprtext);
-  }
-  return std::forward<T>(t);
-}
+    // Helper for `TURBO_DIE_IF_NULL`.
+    template<typename T>
+    TURBO_MUST_USE_RESULT T DieIfNull(const char *file, int line,
+                                      const char *exprtext, T &&t) {
+        if (TURBO_PREDICT_FALSE(t == nullptr)) {
+            // Call a non-inline helper function for a small code size improvement.
+            DieBecauseNull(file, line, exprtext);
+        }
+        return std::forward<T>(t);
+    }
 
-}  // namespace log_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
-
-#endif  // TURBO_LOG_DIE_IF_NULL_H_
+}  // namespace turbo::log_internal

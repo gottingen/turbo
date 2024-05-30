@@ -173,7 +173,7 @@ LogMessage::LogMessageData::LogMessageData(const char* file, int line,
   entry.full_filename_ = file;
   entry.base_filename_ = Basename(file);
   entry.line_ = line;
-  entry.prefix_ = turbo::ShouldPrependLogPrefix();
+  entry.prefix_ = turbo::should_prepend_log_prefix();
   entry.severity_ = turbo::NormalizeLogSeverity(severity);
   entry.verbose_level_ = turbo::LogEntry::kNoVerbosityLevel;
   entry.timestamp_ = timestamp;
@@ -199,7 +199,7 @@ void LogMessage::LogMessageData::FinalizeEncodingAndFormat() {
       entry.prefix() ? log_internal::FormatLogPrefix(
                            entry.log_severity(), entry.timestamp(), entry.tid(),
                            entry.source_basename(), entry.source_line(),
-                           log_internal::ThreadIsLoggingToLogSink()
+                           log_internal::thread_is_logging_to_log_sink()
                                ? PrefixFormat::kRaw
                                : PrefixFormat::kNotRaw,
                            string_remaining)
@@ -393,7 +393,7 @@ template LogMessage& LogMessage::operator<<(const double& v);
 template LogMessage& LogMessage::operator<<(const bool& v);
 
 void LogMessage::Flush() {
-  if (data_->entry.log_severity() < turbo::MinLogLevel()) return;
+  if (data_->entry.log_severity() < turbo::min_log_level()) return;
 
   if (data_->is_perror) {
     InternalStream() << ": " << turbo::base_internal::StrError(errno_saver_())
@@ -478,7 +478,7 @@ void LogMessage::PrepareToDie() {
 
   if (!data_->fail_quietly) {
     // Log the message first before we start collecting stack trace.
-    log_internal::LogToSinks(data_->entry, turbo::MakeSpan(data_->extra_sinks),
+    log_internal::log_to_sinks(data_->entry, turbo::MakeSpan(data_->extra_sinks),
                              data_->extra_sinks_only);
 
     // `DumpStackTrace` generates an empty string under MSVC.
@@ -492,7 +492,7 @@ void LogMessage::PrepareToDie() {
 }
 
 void LogMessage::Die() {
-  turbo::FlushLogSinks();
+  turbo::flush_log_sinks();
 
   if (data_->fail_quietly) {
     FailQuietly();
@@ -504,7 +504,7 @@ void LogMessage::Die() {
 void LogMessage::SendToLog() {
   if (IsFatal()) PrepareToDie();
   // Also log to all registered sinks, even if OnlyLogToStderr() is set.
-  log_internal::LogToSinks(data_->entry, turbo::MakeSpan(data_->extra_sinks),
+  log_internal::log_to_sinks(data_->entry, turbo::MakeSpan(data_->extra_sinks),
                            data_->extra_sinks_only);
   if (IsFatal()) Die();
 }

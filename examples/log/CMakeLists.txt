@@ -16,20 +16,29 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-#[[
 carbin_cc_binary(
-        NAME hashes_example
-        SOURCES hashes_example.cc
-        DEPS tedis::tedis ${CARBIN_DEPS_LINK}
-        COPTS ${USER_CXX_FLAGS}
+        NAME daily_log
+        SOURCES daily_log.cc
+        LINKS turbo::turbo
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
 )
-]]
-#[[
+
 carbin_cc_binary(
-        NAME foo_ex
-        SOURCES foo_ex.cc
-        DEPS changeme::foo ${CARBIN_DEPS_LINK}
-        COPTS ${USER_CXX_FLAGS}
+        NAME color_log
+        SOURCES color_log.cc
+        LINKS turbo::turbo
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
 )
-]]
-add_subdirectory(log)
+
+carbin_cc_binary(
+        NAME hourly_log
+        SOURCES hourly_log.cc
+        LINKS turbo::turbo
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+carbin_cc_binary(
+        NAME rotating_log
+        SOURCES rotating_log.cc
+        LINKS turbo::turbo
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)

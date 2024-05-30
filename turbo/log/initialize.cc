@@ -35,7 +35,7 @@ void InitializeLogImpl(turbo::TimeZone time_zone) {
 }
 }  // namespace
 
-void InitializeLog() { InitializeLogImpl(turbo::LocalTimeZone()); }
+void initialize_log() { InitializeLogImpl(turbo::LocalTimeZone()); }
 
 TURBO_NAMESPACE_END
 }  // namespace turbo

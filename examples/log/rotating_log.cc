@@ -1,3 +1,4 @@
+//
 // Copyright (C) 2024 EA group inc.
 // Author: Jeff.li lijippy@163.com
 // All rights reserved.
@@ -15,13 +16,47 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/log/log_sink.h>
+#include <turbo/log/logging.h>
 
-#include <turbo/base/config.h>
+void call0() {
+    int x = 3, y = 5;
+    CHECK_EQ(2 * x, y) << "oops!";
+}
 
-namespace turbo {
-    TURBO_NAMESPACE_BEGIN
-    void LogSink::KeyFunction() const {}
+void call1() {
+    call0();
+}
 
-    TURBO_NAMESPACE_END
-}  // namespace turbo
+void call2() {
+    call1();
+}
+
+void call3() {
+    call2();
+}
+
+void call4() {
+    call3();
+}
+
+void call5() {
+    call4();
+}
+
+void call6() {
+    call5();
+}
+
+int main() {
+
+    //turbo::initialize_log();
+    // default rotation size 100MB
+    turbo::setup_rotating_file_sink("logs/rotating.txt");
+    turbo::set_stderr_threshold(turbo::LogSeverityAtLeast::kInfinity);
+    auto limit = 10 * 1024 * 1024;
+    std::string msg = "hello world";
+    for (int i = 0; i < limit; i++) {
+        LOG(INFO) << "hello world";
+        LOG(ERROR) << "error hello world";
+    }
+}
