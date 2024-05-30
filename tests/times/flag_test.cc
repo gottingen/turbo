@@ -35,7 +35,7 @@ TURBO_FLAG(turbo::CivilMonth, test_flag_civil_month, turbo::CivilMonth(2015, 1),
            "");
 TURBO_FLAG(turbo::CivilYear, test_flag_civil_year, turbo::CivilYear(2015), "");
 
-TURBO_FLAG(turbo::Duration, test_duration_flag, turbo::Seconds(5),
+TURBO_FLAG(turbo::Duration, test_duration_flag, turbo::Duration::seconds(5),
            "For testing support for Duration flags");
 TURBO_FLAG(turbo::Time, test_time_flag, turbo::Time::past_infinite(),
            "For testing support for Time flags");
@@ -95,13 +95,13 @@ namespace {
     }
 
     TEST(Duration, FlagSupport) {
-        EXPECT_EQ(turbo::Seconds(5), turbo::GetFlag(FLAGS_test_duration_flag));
+        EXPECT_EQ(turbo::Duration::seconds(5), turbo::GetFlag(FLAGS_test_duration_flag));
 
-        turbo::SetFlag(&FLAGS_test_duration_flag, turbo::Seconds(10));
-        EXPECT_EQ(turbo::Seconds(10), turbo::GetFlag(FLAGS_test_duration_flag));
+        turbo::SetFlag(&FLAGS_test_duration_flag, turbo::Duration::seconds(10));
+        EXPECT_EQ(turbo::Duration::seconds(10), turbo::GetFlag(FLAGS_test_duration_flag));
 
         EXPECT_TRUE(SetFlagValue("test_duration_flag", "20s"));
-        EXPECT_EQ(turbo::Seconds(20), turbo::GetFlag(FLAGS_test_duration_flag));
+        EXPECT_EQ(turbo::Duration::seconds(20), turbo::GetFlag(FLAGS_test_duration_flag));
 
         std::string current_flag_value;
         EXPECT_TRUE(GetFlagValue("test_duration_flag", current_flag_value));
@@ -118,17 +118,17 @@ namespace {
 
         // Successful parse
         EXPECT_TRUE(SetFlagValue("test_time_flag", "2016-01-02T03:04:06Z"));
-        EXPECT_EQ(t + turbo::Seconds(1), turbo::GetFlag(FLAGS_test_time_flag));
+        EXPECT_EQ(t + turbo::Duration::seconds(1), turbo::GetFlag(FLAGS_test_time_flag));
         EXPECT_TRUE(SetFlagValue("test_time_flag", "2016-01-02T03:04:07.0Z"));
-        EXPECT_EQ(t + turbo::Seconds(2), turbo::GetFlag(FLAGS_test_time_flag));
+        EXPECT_EQ(t + turbo::Duration::seconds(2), turbo::GetFlag(FLAGS_test_time_flag));
         EXPECT_TRUE(SetFlagValue("test_time_flag", "2016-01-02T03:04:08.000Z"));
-        EXPECT_EQ(t + turbo::Seconds(3), turbo::GetFlag(FLAGS_test_time_flag));
+        EXPECT_EQ(t + turbo::Duration::seconds(3), turbo::GetFlag(FLAGS_test_time_flag));
         EXPECT_TRUE(SetFlagValue("test_time_flag", "2016-01-02T03:04:09+00:00"));
-        EXPECT_EQ(t + turbo::Seconds(4), turbo::GetFlag(FLAGS_test_time_flag));
+        EXPECT_EQ(t + turbo::Duration::seconds(4), turbo::GetFlag(FLAGS_test_time_flag));
         EXPECT_TRUE(SetFlagValue("test_time_flag", "2016-01-02T03:04:05.123+00:00"));
-        EXPECT_EQ(t + turbo::Milliseconds(123), turbo::GetFlag(FLAGS_test_time_flag));
+        EXPECT_EQ(t + turbo::Duration::milliseconds(123), turbo::GetFlag(FLAGS_test_time_flag));
         EXPECT_TRUE(SetFlagValue("test_time_flag", "2016-01-02T03:04:05.123+08:00"));
-        EXPECT_EQ(t + turbo::Milliseconds(123) - turbo::Hours(8),
+        EXPECT_EQ(t + turbo::Duration::milliseconds(123) - turbo::Duration::hours(8),
                   turbo::GetFlag(FLAGS_test_time_flag));
         EXPECT_TRUE(SetFlagValue("test_time_flag", "infinite-future"));
         EXPECT_EQ(turbo::Time::future_infinite(), turbo::GetFlag(FLAGS_test_time_flag));

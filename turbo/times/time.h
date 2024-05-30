@@ -51,7 +51,7 @@
 //   turbo::CivilSecond cs(2017, 1, 2, 3, 4, 5);
 //   turbo::Time takeoff = turbo::Time::from_civil(cs, nyc);
 //
-//   turbo::Duration flight_duration = turbo::Hours(21) + turbo::Minutes(35);
+//   turbo::Duration flight_duration = turbo::Duration::hours(21) + turbo::Duration::minutes(35);
 //   turbo::Time landing = takeoff + flight_duration;
 //
 //   turbo::TimeZone syd;
@@ -150,29 +150,29 @@ namespace turbo {
     // arithmetic operations. Arithmetic overflows and saturates at +/- infinity.
     // `Duration` should be passed by value rather than const reference.
     //
-    // Factory functions `Nanoseconds()`, `Microseconds()`, `Milliseconds()`,
-    // `Seconds()`, `Minutes()`, `Hours()` and `Duration::max_infinite()` allow for
+    // Factory functions `Duration::nanoseconds()`, `Duration::microseconds()`, `Duration::milliseconds()`,
+    // `Duration::seconds()`, `Duration::minutes()`, `Duration::hours()` and `Duration::max_infinite()` allow for
     // creation of constexpr `Duration` values
     //
     // Examples:
     //
-    //   constexpr turbo::Duration ten_ns = turbo::Nanoseconds(10);
-    //   constexpr turbo::Duration min = turbo::Minutes(1);
-    //   constexpr turbo::Duration hour = turbo::Hours(1);
+    //   constexpr turbo::Duration ten_ns = turbo::Duration::nanoseconds(10);
+    //   constexpr turbo::Duration min = turbo::Duration::minutes(1);
+    //   constexpr turbo::Duration hour = turbo::Duration::hours(1);
     //   turbo::Duration dur = 60 * min;  // dur == hour
-    //   turbo::Duration half_sec = turbo::Milliseconds(500);
-    //   turbo::Duration quarter_sec = 0.25 * turbo::Seconds(1);
+    //   turbo::Duration half_sec = turbo::Duration::milliseconds(500);
+    //   turbo::Duration quarter_sec = 0.25 * turbo::Duration::seconds(1);
     //
     // `Duration` values can be easily converted to an integral number of units
     // using the division operator.
     //
     // Example:
     //
-    //   constexpr turbo::Duration dur = turbo::Milliseconds(1500);
-    //   int64_t ns = dur / turbo::Nanoseconds(1);   // ns == 1500000000
-    //   int64_t ms = dur / turbo::Milliseconds(1);  // ms == 1500
-    //   int64_t sec = dur / turbo::Seconds(1);    // sec == 1 (subseconds truncated)
-    //   int64_t min = dur / turbo::Minutes(1);    // min == 0
+    //   constexpr turbo::Duration dur = turbo::Duration::milliseconds(1500);
+    //   int64_t ns = dur / turbo::Duration::nanoseconds(1);   // ns == 1500000000
+    //   int64_t ms = dur / turbo::Duration::milliseconds(1);  // ms == 1500
+    //   int64_t sec = dur / turbo::Duration::seconds(1);    // sec == 1 (subseconds truncated)
+    //   int64_t min = dur / turbo::Duration::minutes(1);    // min == 0
     //
     // See the `Duration::idiv()` and `Duration::fdiv()` functions below for details on
     // how to access the fractional parts of the quotient.
@@ -268,8 +268,8 @@ namespace turbo {
         // Example:
         //
         //   constexpr turbo::Duration a =
-        //       turbo::Seconds(std::numeric_limits<int64_t>::max());  // big
-        //   constexpr turbo::Duration b = turbo::Nanoseconds(1);       // small
+        //       turbo::Duration::seconds(std::numeric_limits<int64_t>::max());  // big
+        //   constexpr turbo::Duration b = turbo::Duration::nanoseconds(1);       // small
         //
         //   turbo::Duration rem = a % b;
         //   // rem == turbo::Duration::zero()
@@ -289,7 +289,7 @@ namespace turbo {
         //
         // Example:
         //
-        //   double d = turbo::Duration::fdiv(turbo::Milliseconds(1500), turbo::Seconds(1));
+        //   double d = turbo::Duration::fdiv(turbo::Duration::milliseconds(1500), turbo::Duration::seconds(1));
         //   // d == 1.5
         TURBO_ATTRIBUTE_CONST_FUNCTION static double fdiv(Duration num, Duration den);
 
@@ -347,8 +347,8 @@ namespace turbo {
         //
         // Example:
         //
-        //   turbo::Duration d = turbo::Nanoseconds(123456789);
-        //   turbo::Duration a = turbo::Duration::trunc(d, turbo::Microseconds(1));  // 123456us
+        //   turbo::Duration d = turbo::Duration::nanoseconds(123456789);
+        //   turbo::Duration a = turbo::Duration::trunc(d, turbo::Duration::microseconds(1));  // 123456us
         TURBO_ATTRIBUTE_CONST_FUNCTION static Duration trunc(Duration d, Duration unit);
 
         // Duration::floor()
@@ -358,8 +358,8 @@ namespace turbo {
         //
         // Example:
         //
-        //   turbo::Duration d = turbo::Nanoseconds(123456789);
-        //   turbo::Duration b = turbo::Duration::floor(d, turbo::Microseconds(1));  // 123456us
+        //   turbo::Duration d = turbo::Duration::nanoseconds(123456789);
+        //   turbo::Duration b = turbo::Duration::floor(d, turbo::Duration::microseconds(1));  // 123456us
         TURBO_ATTRIBUTE_CONST_FUNCTION static Duration floor(Duration d, Duration unit);
 
         // Duration::ceil()
@@ -369,9 +369,101 @@ namespace turbo {
         //
         // Example:
         //
-        //   turbo::Duration d = turbo::Nanoseconds(123456789);
-        //   turbo::Duration c = turbo::Duration::ceil(d, turbo::Microseconds(1));   // 123457us
+        //   turbo::Duration d = turbo::Duration::nanoseconds(123456789);
+        //   turbo::Duration c = turbo::Duration::ceil(d, turbo::Duration::microseconds(1));   // 123457us
         TURBO_ATTRIBUTE_CONST_FUNCTION static Duration ceil(Duration d, Duration unit);
+    public:
+        // Factory functions for constructing `Duration` values from an integral number
+        // of the unit indicated by the factory function's name. The number must be
+        // representable as int64_t.
+        //
+        // NOTE: no "Days()" factory function exists because "a day" is ambiguous.
+        // Civil days are not always 24 hours long, and a 24-hour duration often does
+        // not correspond with a civil day. If a 24-hour duration is needed, use
+        // `turbo::Duration::hours(24)`. If you actually want a civil day, use turbo::CivilDay
+        // from civil_time.h.
+        //
+        // Example:
+        //
+        //   turbo::Duration a = turbo::Duration::seconds(60);
+        //   turbo::Duration b = turbo::Duration::minutes(1);  // b == a
+        template<typename T, time_internal::EnableIfIntegral<T> = 0>
+        TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Duration nanoseconds(T n) {
+            return time_internal::FromInt64(n, std::nano{});
+        }
+
+        template<typename T, time_internal::EnableIfIntegral<T> = 0>
+        TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Duration microseconds(T n) {
+            return time_internal::FromInt64(n, std::micro{});
+        }
+
+        template<typename T, time_internal::EnableIfIntegral<T> = 0>
+        TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Duration milliseconds(T n) {
+            return time_internal::FromInt64(n, std::milli{});
+        }
+
+        template<typename T, time_internal::EnableIfIntegral<T> = 0>
+        TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Duration seconds(T n) {
+            return time_internal::FromInt64(n, std::ratio<1>{});
+        }
+
+        template<typename T, time_internal::EnableIfIntegral<T> = 0>
+        TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Duration minutes(T n) {
+            return time_internal::FromInt64(n, std::ratio<60>{});
+        }
+
+        template<typename T, time_internal::EnableIfIntegral<T> = 0>
+        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr static Duration hours(T n) {
+            return time_internal::FromInt64(n, std::ratio<3600>{});
+        }
+        // Factory overloads for constructing `Duration` values from a floating-point
+        // number of the unit indicated by the factory function's name. These functions
+        // exist for convenience, but they are not as efficient as the integral
+        // factories, which should be preferred.
+        //
+        // Example:
+        //
+        //   auto a = turbo::Duration::seconds(1.5);        // OK
+        //   auto b = turbo::Duration::milliseconds(1500);  // BETTER
+        template<typename T, time_internal::EnableIfFloat<T> = 0>
+        TURBO_ATTRIBUTE_CONST_FUNCTION static Duration nanoseconds(T n) {
+            return n * nanoseconds(1);
+        }
+        template<typename T, time_internal::EnableIfFloat<T> = 0>
+        TURBO_ATTRIBUTE_CONST_FUNCTION static Duration microseconds(T n) {
+            return n * microseconds(1);
+        }
+
+        template<typename T, time_internal::EnableIfFloat<T> = 0>
+        TURBO_ATTRIBUTE_CONST_FUNCTION static Duration milliseconds(T n) {
+            return n * milliseconds(1);
+        }
+
+        template<typename T, time_internal::EnableIfFloat<T> = 0>
+        TURBO_ATTRIBUTE_CONST_FUNCTION static Duration seconds(T n) {
+            if (n >= 0) {  // Note: `NaN >= 0` is false.
+                if (n >= static_cast<T>((std::numeric_limits<int64_t>::max)())) {
+                    return Duration::max_infinite();
+                }
+                return time_internal::MakePosDoubleDuration(n);
+            } else {
+                if (std::isnan(n))
+                    return std::signbit(n) ? Duration::min_infinite() : Duration::max_infinite();
+                if (n <= (std::numeric_limits<int64_t>::min)()) return Duration::min_infinite();
+                return -time_internal::MakePosDoubleDuration(-n);
+            }
+        }
+
+        template<typename T, time_internal::EnableIfFloat<T> = 0>
+        TURBO_ATTRIBUTE_CONST_FUNCTION static Duration minutes(T n) {
+            return n * minutes(1);
+        }
+
+        template<typename T, time_internal::EnableIfFloat<T> = 0>
+        TURBO_ATTRIBUTE_CONST_FUNCTION static Duration hours(T n) {
+            return n * hours(1);
+        }
+
 
     public:
         // Helper functions that convert a Duration to an integral count of the
@@ -381,7 +473,7 @@ namespace turbo {
         //
         // Example:
         //
-        //   turbo::Duration d = turbo::Milliseconds(1500);
+        //   turbo::Duration d = turbo::Duration::milliseconds(1500);
         //   int64_t isec = turbo::Duration::to_seconds(d);  // isec == 1
         TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t to_nanoseconds(Duration d);
 
@@ -400,7 +492,7 @@ namespace turbo {
         //
         // Example:
         //
-        //   turbo::Duration d = turbo::Milliseconds(1500);
+        //   turbo::Duration d = turbo::Duration::milliseconds(1500);
         //   double dsec = turbo::Duration::to_double_seconds(d);  // dsec == 1.5
         TURBO_ATTRIBUTE_CONST_FUNCTION static double to_double_nanoseconds(Duration d);
 
@@ -420,7 +512,7 @@ namespace turbo {
         //
         // Example:
         //
-        //   turbo::Duration d = turbo::Microseconds(123);
+        //   turbo::Duration d = turbo::Duration::microseconds(123);
         //   auto x = turbo::Duration::to_chrono_microseconds(d);
         //   auto y = turbo::Duration::to_chrono_nanoseconds(d);  // x == y
         //   auto z = turbo::Duration::to_chrono_seconds(turbo::Duration::max_infinite());
@@ -633,106 +725,6 @@ namespace turbo {
         return lhs %= rhs;
     }
 
-    // Nanoseconds()
-    // Microseconds()
-    // Milliseconds()
-    // Seconds()
-    // Minutes()
-    // Hours()
-    //
-    // Factory functions for constructing `Duration` values from an integral number
-    // of the unit indicated by the factory function's name. The number must be
-    // representable as int64_t.
-    //
-    // NOTE: no "Days()" factory function exists because "a day" is ambiguous.
-    // Civil days are not always 24 hours long, and a 24-hour duration often does
-    // not correspond with a civil day. If a 24-hour duration is needed, use
-    // `turbo::Hours(24)`. If you actually want a civil day, use turbo::CivilDay
-    // from civil_time.h.
-    //
-    // Example:
-    //
-    //   turbo::Duration a = turbo::Seconds(60);
-    //   turbo::Duration b = turbo::Minutes(1);  // b == a
-    template<typename T, time_internal::EnableIfIntegral<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration Nanoseconds(T n) {
-        return time_internal::FromInt64(n, std::nano{});
-    }
-
-    template<typename T, time_internal::EnableIfIntegral<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration Microseconds(T n) {
-        return time_internal::FromInt64(n, std::micro{});
-    }
-
-    template<typename T, time_internal::EnableIfIntegral<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration Milliseconds(T n) {
-        return time_internal::FromInt64(n, std::milli{});
-    }
-
-    template<typename T, time_internal::EnableIfIntegral<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration Seconds(T n) {
-        return time_internal::FromInt64(n, std::ratio<1>{});
-    }
-
-    template<typename T, time_internal::EnableIfIntegral<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration Minutes(T n) {
-        return time_internal::FromInt64(n, std::ratio<60>{});
-    }
-
-    template<typename T, time_internal::EnableIfIntegral<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration Hours(T n) {
-        return time_internal::FromInt64(n, std::ratio<3600>{});
-    }
-
-    // Factory overloads for constructing `Duration` values from a floating-point
-    // number of the unit indicated by the factory function's name. These functions
-    // exist for convenience, but they are not as efficient as the integral
-    // factories, which should be preferred.
-    //
-    // Example:
-    //
-    //   auto a = turbo::Seconds(1.5);        // OK
-    //   auto b = turbo::Milliseconds(1500);  // BETTER
-    template<typename T, time_internal::EnableIfFloat<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration Nanoseconds(T n) {
-        return n * Nanoseconds(1);
-    }
-
-    template<typename T, time_internal::EnableIfFloat<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration Microseconds(T n) {
-        return n * Microseconds(1);
-    }
-
-    template<typename T, time_internal::EnableIfFloat<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration Milliseconds(T n) {
-        return n * Milliseconds(1);
-    }
-
-    template<typename T, time_internal::EnableIfFloat<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration Seconds(T n) {
-        if (n >= 0) {  // Note: `NaN >= 0` is false.
-            if (n >= static_cast<T>((std::numeric_limits<int64_t>::max)())) {
-                return Duration::max_infinite();
-            }
-            return time_internal::MakePosDoubleDuration(n);
-        } else {
-            if (std::isnan(n))
-                return std::signbit(n) ? Duration::min_infinite() : Duration::max_infinite();
-            if (n <= (std::numeric_limits<int64_t>::min)()) return Duration::min_infinite();
-            return -time_internal::MakePosDoubleDuration(-n);
-        }
-    }
-
-    template<typename T, time_internal::EnableIfFloat<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration Minutes(T n) {
-        return n * Minutes(1);
-    }
-
-    template<typename T, time_internal::EnableIfFloat<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration Hours(T n) {
-        return n * Hours(1);
-    }
-
     // Output stream operator.
     inline std::ostream &operator<<(std::ostream &os, Duration d) {
         return os << Duration::format(d);
@@ -798,8 +790,8 @@ namespace turbo {
     // Examples:
     //
     //   turbo::Time t1 = ...;
-    //   turbo::Time t2 = t1 + turbo::Minutes(2);
-    //   turbo::Duration d = t2 - t1;  // == turbo::Minutes(2)
+    //   turbo::Time t2 = t1 + turbo::Duration::minutes(2);
+    //   turbo::Duration d = t2 - t1;  // == turbo::Duration::minutes(2)
     //
     class Time {
     public:
@@ -1852,23 +1844,23 @@ namespace turbo {
     }
 
     TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time Time::from_nanoseconds(int64_t ns) {
-        return time_internal::FromUnixDuration(Nanoseconds(ns));
+        return time_internal::FromUnixDuration(Duration::nanoseconds(ns));
     }
 
     TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time Time::from_microseconds(int64_t us) {
-        return time_internal::FromUnixDuration(Microseconds(us));
+        return time_internal::FromUnixDuration(Duration::microseconds(us));
     }
 
     TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time Time::from_milliseconds(int64_t ms) {
-        return time_internal::FromUnixDuration(Milliseconds(ms));
+        return time_internal::FromUnixDuration(Duration::milliseconds(ms));
     }
 
     TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time Time::from_seconds(int64_t s) {
-        return time_internal::FromUnixDuration(Seconds(s));
+        return time_internal::FromUnixDuration(Duration::seconds(s));
     }
 
     TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time Time::from_time_t(time_t t) {
-        return time_internal::FromUnixDuration(Seconds(t));
+        return time_internal::FromUnixDuration(Duration::seconds(t));
     }
 
     TURBO_ATTRIBUTE_PURE_FUNCTION inline Time Time::from_civil(CivilSecond ct,

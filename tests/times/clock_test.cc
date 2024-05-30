@@ -110,9 +110,9 @@ testing::AssertionResult AssertSleepForBounded(turbo::Duration d,
 
 // Tests that SleepFor() returns neither too early nor too late.
 TEST(SleepFor, Bounded) {
-  const turbo::Duration d = turbo::Milliseconds(2500);
-  const turbo::Duration early = turbo::Milliseconds(100);
-  const turbo::Duration late = turbo::Milliseconds(300);
+  const turbo::Duration d = turbo::Duration::milliseconds(2500);
+  const turbo::Duration early = turbo::Duration::milliseconds(100);
+  const turbo::Duration late = turbo::Duration::milliseconds(300);
   const turbo::Duration timeout = 48 * d;
   EXPECT_TRUE(AssertSleepForBounded(d, early, late, timeout,
                                     AlarmPolicy::kWithoutAlarm));

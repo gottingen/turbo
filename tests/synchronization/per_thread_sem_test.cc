@@ -97,7 +97,7 @@ class PerThreadSemTest : public testing::Test {
     ThreadData t;
     t.num_iterations = kNumIterations;
     t.timeout = timeout ?
-        KernelTimeout(turbo::Time::current_time() + turbo::Seconds(10000))  // far in the future
+        KernelTimeout(turbo::Time::current_time() + turbo::Duration::seconds(10000))  // far in the future
         : KernelTimeout::Never();
     t.identity1 = GetOrCreateCurrentThreadIdentity();
 
@@ -111,7 +111,7 @@ class PerThreadSemTest : public testing::Test {
     int64_t min_cycles = std::numeric_limits<int64_t>::max();
     int64_t total_cycles = 0;
     for (int i = 0; i < kNumIterations; ++i) {
-      turbo::SleepFor(turbo::Milliseconds(20));
+      turbo::SleepFor(turbo::Duration::milliseconds(20));
       int64_t cycles = base_internal::CycleClock::Now();
       Post(t.identity2);
       Wait(t.timeout);
@@ -156,22 +156,22 @@ TEST_F(PerThreadSemTest, WithTimeout) {
 }
 
 TEST_F(PerThreadSemTest, Timeouts) {
-  const turbo::Duration delay = turbo::Milliseconds(50);
+  const turbo::Duration delay = turbo::Duration::milliseconds(50);
   const turbo::Time start = turbo::Time::current_time();
   EXPECT_FALSE(Wait(start + delay));
   const turbo::Duration elapsed = turbo::Time::current_time() - start;
   // Allow for a slight early return, to account for quality of implementation
   // issues on various platforms.
-  turbo::Duration slop = turbo::Milliseconds(1);
+  turbo::Duration slop = turbo::Duration::milliseconds(1);
 #ifdef _MSC_VER
   // Use higher slop on MSVC due to flaky test failures.
-  slop = turbo::Milliseconds(8);
+  slop = turbo::Duration::milliseconds(8);
 #endif
   EXPECT_LE(delay - slop, elapsed)
       << "Wait returned " << delay - elapsed
       << " early (with " << slop << " slop), start time was " << start;
 
-  turbo::Time negative_timeout = turbo::Time::from_unix_epoch() - turbo::Milliseconds(100);
+  turbo::Time negative_timeout = turbo::Time::from_unix_epoch() - turbo::Duration::milliseconds(100);
   EXPECT_FALSE(Wait(negative_timeout));
   EXPECT_LE(negative_timeout, turbo::Time::current_time() + slop);  // trivially true :)
 

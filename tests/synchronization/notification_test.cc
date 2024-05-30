@@ -72,17 +72,17 @@ static void RunWorker(int i, ThreadSafeCounter* ready_counter,
 static void BasicTests(bool notify_before_waiting, Notification* notification) {
   EXPECT_FALSE(notification->HasBeenNotified());
   EXPECT_FALSE(
-      notification->WaitForNotificationWithTimeout(turbo::Milliseconds(0)));
+      notification->WaitForNotificationWithTimeout(turbo::Duration::milliseconds(0)));
   EXPECT_FALSE(notification->WaitForNotificationWithDeadline(turbo::Time::current_time()));
 
-  const turbo::Duration delay = turbo::Milliseconds(50);
+  const turbo::Duration delay = turbo::Duration::milliseconds(50);
   const turbo::Time start = turbo::Time::current_time();
   EXPECT_FALSE(notification->WaitForNotificationWithTimeout(delay));
   const turbo::Duration elapsed = turbo::Time::current_time() - start;
 
   // Allow for a slight early return, to account for quality of implementation
   // issues on various platforms.
-  const turbo::Duration slop = turbo::Milliseconds(5);
+  const turbo::Duration slop = turbo::Duration::milliseconds(5);
   EXPECT_LE(delay - slop, elapsed)
       << "WaitForNotificationWithTimeout returned " << delay - elapsed
       << " early (with " << slop << " slop), start time was " << start;
@@ -117,7 +117,7 @@ static void BasicTests(bool notify_before_waiting, Notification* notification) {
   // fully incremented.
   notification->WaitForNotification();  // should exit immediately
   EXPECT_TRUE(notification->HasBeenNotified());
-  EXPECT_TRUE(notification->WaitForNotificationWithTimeout(turbo::Seconds(0)));
+  EXPECT_TRUE(notification->WaitForNotificationWithTimeout(turbo::Duration::seconds(0)));
   EXPECT_TRUE(notification->WaitForNotificationWithDeadline(turbo::Time::current_time()));
   for (std::thread& worker : workers) {
     worker.join();

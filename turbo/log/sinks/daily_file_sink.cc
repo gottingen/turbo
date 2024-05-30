@@ -57,7 +57,7 @@ namespace turbo {
               _truncate(truncate),
               _max_files(max_files),
               _check_interval_s(check_interval_s),
-              _next_check_time(turbo::Time::current_time() + turbo::Seconds(check_interval_s)) {
+              _next_check_time(turbo::Time::current_time() + turbo::Duration::seconds(check_interval_s)) {
         _next_rotation_time = next_rotation_time(turbo::Time::current_time());
         if (_max_files > 0) {
             init_file_queue();
@@ -105,7 +105,7 @@ namespace turbo {
                 break;
             }
             filenames.emplace_back(filename);
-            now -= turbo::Hours(24);
+            now -= turbo::Duration::hours(24);
         }
         for (auto iter = filenames.rbegin(); iter != filenames.rend(); ++iter) {
             _files.push_back(std::move(*iter));
@@ -114,7 +114,7 @@ namespace turbo {
 
     void DailyFileSink::rotate_file( turbo::Time stamp) {
         if (stamp >= _next_check_time) {
-            _next_check_time = stamp + turbo::Seconds(_check_interval_s);
+            _next_check_time = stamp + turbo::Duration::seconds(_check_interval_s);
             if(_file_writer != nullptr)
                 _file_writer->reopen();
         }
@@ -153,7 +153,7 @@ namespace turbo {
         if (rotation_time > stamp) {
             return rotation_time;
         }
-        return rotation_time + turbo::Hours(24);
+        return rotation_time + turbo::Duration::hours(24);
     }
 
     void DailyFileSink::Flush() {

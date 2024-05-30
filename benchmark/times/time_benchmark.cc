@@ -42,8 +42,8 @@ namespace {
 //
 
     void BM_Time_Arithmetic(benchmark::State &state) {
-        const turbo::Duration nano = turbo::Nanoseconds(1);
-        const turbo::Duration sec = turbo::Seconds(1);
+        const turbo::Duration nano = turbo::Duration::nanoseconds(1);
+        const turbo::Duration sec = turbo::Duration::seconds(1);
         turbo::Time t = turbo::Time::from_unix_epoch();
         while (state.KeepRunning()) {
             benchmark::DoNotOptimize(t += nano);
@@ -59,7 +59,7 @@ namespace {
 
     void BM_Time_Difference(benchmark::State &state) {
         turbo::Time start = turbo::Time::current_time();
-        turbo::Time end = start + turbo::Nanoseconds(1);
+        turbo::Time end = start + turbo::Duration::nanoseconds(1);
         turbo::Duration diff;
         while (state.KeepRunning()) {
             benchmark::DoNotOptimize(diff += end - start);
@@ -85,7 +85,7 @@ namespace {
         turbo::Time t2 = turbo::Time::from_seconds(1418962578);
         while (state.KeepRunning()) {
             std::swap(t, t2);
-            t += turbo::Seconds(1);
+            t += turbo::Duration::seconds(1);
             benchmark::DoNotOptimize(tz.at(t));
         }
     }
@@ -114,7 +114,7 @@ namespace {
         const turbo::TimeZone tz = turbo::TimeZone::utc();
         turbo::Time t = turbo::Time::from_seconds(1384569027);
         while (state.KeepRunning()) {
-            t += turbo::Seconds(1);
+            t += turbo::Duration::seconds(1);
             benchmark::DoNotOptimize(tz.at(t));
         }
     }
@@ -151,7 +151,7 @@ namespace {
     BENCHMARK(BM_Time_FromUnixMicros);
 
     void BM_Time_ToUnixNanos(benchmark::State &state) {
-        const turbo::Time t = turbo::Time::from_unix_epoch() + turbo::Seconds(123);
+        const turbo::Time t = turbo::Time::from_unix_epoch() + turbo::Duration::seconds(123);
         while (state.KeepRunning()) {
             benchmark::DoNotOptimize(turbo::Time::to_nanoseconds(t));
         }
@@ -160,7 +160,7 @@ namespace {
     BENCHMARK(BM_Time_ToUnixNanos);
 
     void BM_Time_ToUnixMicros(benchmark::State &state) {
-        const turbo::Time t = turbo::Time::from_unix_epoch() + turbo::Seconds(123);
+        const turbo::Time t = turbo::Time::from_unix_epoch() + turbo::Duration::seconds(123);
         while (state.KeepRunning()) {
             benchmark::DoNotOptimize(turbo::Time::to_microseconds(t));
         }
@@ -169,7 +169,7 @@ namespace {
     BENCHMARK(BM_Time_ToUnixMicros);
 
     void BM_Time_ToUnixMillis(benchmark::State &state) {
-        const turbo::Time t = turbo::Time::from_unix_epoch() + turbo::Seconds(123);
+        const turbo::Time t = turbo::Time::from_unix_epoch() + turbo::Duration::seconds(123);
         while (state.KeepRunning()) {
             benchmark::DoNotOptimize(turbo::Time::to_milliseconds(t));
         }
@@ -178,7 +178,7 @@ namespace {
     BENCHMARK(BM_Time_ToUnixMillis);
 
     void BM_Time_ToUnixSeconds(benchmark::State &state) {
-        const turbo::Time t = turbo::Time::from_unix_epoch() + turbo::Seconds(123);
+        const turbo::Time t = turbo::Time::from_unix_epoch() + turbo::Duration::seconds(123);
         while (state.KeepRunning()) {
             benchmark::DoNotOptimize(turbo::Time::to_seconds(t));
         }

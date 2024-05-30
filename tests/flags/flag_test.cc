@@ -295,7 +295,7 @@ TURBO_FLAG(uint64_t, test_flag_08, 9876543, "test flag 08");
 TURBO_FLAG(double, test_flag_09, -9.876e-50, "test flag 09");
 TURBO_FLAG(float, test_flag_10, 1.234e12f, "test flag 10");
 TURBO_FLAG(std::string, test_flag_11, "", "test flag 11");
-TURBO_FLAG(turbo::Duration, test_flag_12, turbo::Minutes(10), "test flag 12");
+TURBO_FLAG(turbo::Duration, test_flag_12, turbo::Duration::minutes(10), "test flag 12");
 TURBO_FLAG(turbo::int128, test_flag_13, turbo::MakeInt128(-1, 0), "test flag 13");
 TURBO_FLAG(turbo::uint128, test_flag_14, turbo::MakeUint128(0, 0xFFFAAABBBCCCDDD),
           "test flag 14");
@@ -507,7 +507,7 @@ TEST_F(FlagTest, TestDefault) {
   EXPECT_NEAR(turbo::GetFlag(FLAGS_test_flag_09), -9.876e-50, 1e-55);
   EXPECT_NEAR(turbo::GetFlag(FLAGS_test_flag_10), 1.234e12f, 1e5f);
   EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_11), "");
-  EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_12), turbo::Minutes(10));
+  EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_12), turbo::Duration::minutes(10));
   EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_13), turbo::MakeInt128(-1, 0));
   EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_14),
             turbo::MakeUint128(0, 0xFFFAAABBBCCCDDD));
@@ -610,8 +610,8 @@ TEST_F(FlagTest, TestGetSet) {
   turbo::SetFlag(&FLAGS_test_flag_11, "asdf");
   EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_11), "asdf");
 
-  turbo::SetFlag(&FLAGS_test_flag_12, turbo::Seconds(110));
-  EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_12), turbo::Seconds(110));
+  turbo::SetFlag(&FLAGS_test_flag_12, turbo::Duration::seconds(110));
+  EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_12), turbo::Duration::seconds(110));
 
   turbo::SetFlag(&FLAGS_test_flag_13, turbo::MakeInt128(-1, 0));
   EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_13), turbo::MakeInt128(-1, 0));
@@ -650,7 +650,7 @@ TEST_F(FlagTest, TestGetViaReflection) {
   handle = turbo::FindCommandLineFlag("test_flag_11");
   EXPECT_EQ(*handle->TryGet<std::string>(), "");
   handle = turbo::FindCommandLineFlag("test_flag_12");
-  EXPECT_EQ(*handle->TryGet<turbo::Duration>(), turbo::Minutes(10));
+  EXPECT_EQ(*handle->TryGet<turbo::Duration>(), turbo::Duration::minutes(10));
   handle = turbo::FindCommandLineFlag("test_flag_13");
   EXPECT_EQ(*handle->TryGet<turbo::int128>(), turbo::MakeInt128(-1, 0));
   handle = turbo::FindCommandLineFlag("test_flag_14");
@@ -669,8 +669,8 @@ TEST_F(FlagTest, ConcurrentSetAndGet) {
   // between these two values, while the other threads read it and verify
   // that no other value is seen.
   static const turbo::Duration kValidDurations[] = {
-      turbo::Seconds(int64_t{0x6cebf47a9b68c802}) + turbo::Nanoseconds(229702057),
-      turbo::Seconds(int64_t{0x23fec0307e4e9d3}) + turbo::Nanoseconds(44555374)};
+      turbo::Duration::seconds(int64_t{0x6cebf47a9b68c802}) + turbo::Duration::nanoseconds(229702057),
+      turbo::Duration::seconds(int64_t{0x23fec0307e4e9d3}) + turbo::Duration::nanoseconds(44555374)};
   turbo::SetFlag(&FLAGS_test_flag_12, kValidDurations[0]);
 
   std::atomic<bool> stop{false};
@@ -688,7 +688,7 @@ TEST_F(FlagTest, ConcurrentSetAndGet) {
       }
     });
   }
-  turbo::Time end_time = turbo::Time::current_time() + turbo::Seconds(1);
+  turbo::Time end_time = turbo::Time::current_time() + turbo::Duration::seconds(1);
   int i = 0;
   while (turbo::Time::current_time() < end_time) {
     turbo::SetFlag(&FLAGS_test_flag_12,
@@ -1170,11 +1170,11 @@ TEST_F(FlagTest, TestOptionalDuration) {
 
   turbo::SetFlag(&FLAGS_optional_duration, turbo::Duration::zero());
   EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_duration).has_value());
-  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_duration), turbo::Seconds(0));
+  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_duration), turbo::Duration::seconds(0));
 
-  turbo::SetFlag(&FLAGS_optional_duration, turbo::Hours(3));
+  turbo::SetFlag(&FLAGS_optional_duration, turbo::Duration::hours(3));
   EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_duration).has_value());
-  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_duration), turbo::Hours(3));
+  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_duration), turbo::Duration::hours(3));
 
   turbo::SetFlag(&FLAGS_optional_duration, turbo::nullopt);
   EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_duration).has_value());

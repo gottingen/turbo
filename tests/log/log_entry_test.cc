@@ -84,7 +84,7 @@ class LogEntryTestPeer {
     int64_t nanos = 0;
     EXPECT_THAT(turbo::SimpleAtoi(timestamp_bits.second, &nanos), IsTrue())
         << "Failed to parse time " << timestamp_bits.first;
-    ci_.subsecond = turbo::Nanoseconds(nanos);
+    ci_.subsecond = turbo::Duration::nanoseconds(nanos);
 
     turbo::Span<char> view = turbo::MakeSpan(buf_);
     view.remove_suffix(2);

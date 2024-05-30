@@ -43,7 +43,7 @@ namespace {
                 turbo::time_internal::LoadTimeZone("America/Los_Angeles");
         const turbo::Time t =
                 turbo::Time::from_civil(turbo::CivilSecond(1977, 6, 28, 9, 8, 7), lax) +
-                turbo::Nanoseconds(1);
+                turbo::Duration::nanoseconds(1);
         while (state.KeepRunning()) {
             benchmark::DoNotOptimize(turbo::Time::format(fmt, t, lax).length());
         }
@@ -57,7 +57,7 @@ namespace {
         const turbo::TimeZone lax =
                 turbo::time_internal::LoadTimeZone("America/Los_Angeles");
         turbo::Time t = turbo::Time::from_civil(turbo::CivilSecond(1977, 6, 28, 9, 8, 7), lax) +
-                        turbo::Nanoseconds(1);
+                        turbo::Duration::nanoseconds(1);
         const std::string when = turbo::Time::format(fmt, t, lax);
         std::string err;
         while (state.KeepRunning()) {

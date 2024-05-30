@@ -29,7 +29,7 @@ TURBO_NAMESPACE_BEGIN
 namespace {
 
 void PauseAndDecreaseCounter(BlockingCounter* counter, int* done) {
-  turbo::SleepFor(turbo::Seconds(1));
+  turbo::SleepFor(turbo::Duration::seconds(1));
   *done = 1;
   counter->DecrementCount();
 }

@@ -38,9 +38,9 @@
 // Test go/btm support by randomizing the value of clock_gettime() for
 // CLOCK_MONOTONIC. This works by overriding a weak symbol in glibc.
 // We should be resistant to this randomization when !SupportsSteadyClock().
-#if defined(__GOOGLE_GRTE_VERSION__) &&      \
+#if defined(__GOOGLE_GRTE_VERSION__) && \
     !defined(TURBO_HAVE_ADDRESS_SANITIZER) && \
-    !defined(TURBO_HAVE_MEMORY_SANITIZER) &&  \
+    !defined(TURBO_HAVE_MEMORY_SANITIZER) && \
     !defined(TURBO_HAVE_THREAD_SANITIZER)
 extern "C" int __clock_gettime(clockid_t c, struct timespec* ts);
 
@@ -58,126 +58,126 @@ extern "C" int clock_gettime(clockid_t c, struct timespec* ts) {
 
 namespace {
 
-TEST(Waiter, PrintPlatformImplementation) {
-  // Allows us to verify that the platform is using the expected implementation.
-  std::cout << turbo::synchronization_internal::Waiter::kName << std::endl;
-}
+    TEST(Waiter, PrintPlatformImplementation) {
+        // Allows us to verify that the platform is using the expected implementation.
+        std::cout << turbo::synchronization_internal::Waiter::kName << std::endl;
+    }
 
-template <typename T>
-class WaiterTest : public ::testing::Test {
- public:
-  // Waiter implementations assume that a ThreadIdentity has already been
-  // created.
-  WaiterTest() {
-    turbo::synchronization_internal::GetOrCreateCurrentThreadIdentity();
-  }
-};
+    template<typename T>
+    class WaiterTest : public ::testing::Test {
+    public:
+        // Waiter implementations assume that a ThreadIdentity has already been
+        // created.
+        WaiterTest() {
+            turbo::synchronization_internal::GetOrCreateCurrentThreadIdentity();
+        }
+    };
 
-TYPED_TEST_SUITE_P(WaiterTest);
+    TYPED_TEST_SUITE_P(WaiterTest);
 
-turbo::Duration WithTolerance(turbo::Duration d) { return d * 0.95; }
+    turbo::Duration WithTolerance(turbo::Duration d) { return d * 0.95; }
 
-TYPED_TEST_P(WaiterTest, WaitNoTimeout) {
-  turbo::synchronization_internal::ThreadPool tp(1);
-  TypeParam waiter;
-  tp.Schedule([&]() {
-    // Include some `Poke()` calls to ensure they don't cause `waiter` to return
-    // from `Wait()`.
-    waiter.Poke();
-    turbo::SleepFor(turbo::Seconds(1));
-    waiter.Poke();
-    turbo::SleepFor(turbo::Seconds(1));
-    waiter.Post();
-  });
-  turbo::Time start = turbo::Time::current_time();
-  EXPECT_TRUE(
-      waiter.Wait(turbo::synchronization_internal::KernelTimeout::Never()));
-  turbo::Duration waited = turbo::Time::current_time() - start;
-  EXPECT_GE(waited, WithTolerance(turbo::Seconds(2)));
-}
+    TYPED_TEST_P(WaiterTest, WaitNoTimeout) {
+        turbo::synchronization_internal::ThreadPool tp(1);
+        TypeParam waiter;
+        tp.Schedule([&]() {
+            // Include some `Poke()` calls to ensure they don't cause `waiter` to return
+            // from `Wait()`.
+            waiter.Poke();
+            turbo::SleepFor(turbo::Duration::seconds(1));
+            waiter.Poke();
+            turbo::SleepFor(turbo::Duration::seconds(1));
+            waiter.Post();
+        });
+        turbo::Time start = turbo::Time::current_time();
+        EXPECT_TRUE(
+                waiter.Wait(turbo::synchronization_internal::KernelTimeout::Never()));
+        turbo::Duration waited = turbo::Time::current_time() - start;
+        EXPECT_GE(waited, WithTolerance(turbo::Duration::seconds(2)));
+    }
 
-TYPED_TEST_P(WaiterTest, WaitDurationWoken) {
-  turbo::synchronization_internal::ThreadPool tp(1);
-  TypeParam waiter;
-  tp.Schedule([&]() {
-    // Include some `Poke()` calls to ensure they don't cause `waiter` to return
-    // from `Wait()`.
-    waiter.Poke();
-    turbo::SleepFor(turbo::Milliseconds(500));
-    waiter.Post();
-  });
-  turbo::Time start = turbo::Time::current_time();
-  EXPECT_TRUE(waiter.Wait(
-      turbo::synchronization_internal::KernelTimeout(turbo::Seconds(10))));
-  turbo::Duration waited = turbo::Time::current_time() - start;
-  EXPECT_GE(waited, WithTolerance(turbo::Milliseconds(500)));
-  EXPECT_LT(waited, turbo::Seconds(2));
-}
+    TYPED_TEST_P(WaiterTest, WaitDurationWoken) {
+        turbo::synchronization_internal::ThreadPool tp(1);
+        TypeParam waiter;
+        tp.Schedule([&]() {
+            // Include some `Poke()` calls to ensure they don't cause `waiter` to return
+            // from `Wait()`.
+            waiter.Poke();
+            turbo::SleepFor(turbo::Duration::milliseconds(500));
+            waiter.Post();
+        });
+        turbo::Time start = turbo::Time::current_time();
+        EXPECT_TRUE(waiter.Wait(
+                turbo::synchronization_internal::KernelTimeout(turbo::Duration::seconds(10))));
+        turbo::Duration waited = turbo::Time::current_time() - start;
+        EXPECT_GE(waited, WithTolerance(turbo::Duration::milliseconds(500)));
+        EXPECT_LT(waited, turbo::Duration::seconds(2));
+    }
 
-TYPED_TEST_P(WaiterTest, WaitTimeWoken) {
-  turbo::synchronization_internal::ThreadPool tp(1);
-  TypeParam waiter;
-  tp.Schedule([&]() {
-    // Include some `Poke()` calls to ensure they don't cause `waiter` to return
-    // from `Wait()`.
-    waiter.Poke();
-    turbo::SleepFor(turbo::Milliseconds(500));
-    waiter.Post();
-  });
-  turbo::Time start = turbo::Time::current_time();
-  EXPECT_TRUE(waiter.Wait(turbo::synchronization_internal::KernelTimeout(
-      start + turbo::Seconds(10))));
-  turbo::Duration waited = turbo::Time::current_time() - start;
-  EXPECT_GE(waited, WithTolerance(turbo::Milliseconds(500)));
-  EXPECT_LT(waited, turbo::Seconds(2));
-}
+    TYPED_TEST_P(WaiterTest, WaitTimeWoken) {
+        turbo::synchronization_internal::ThreadPool tp(1);
+        TypeParam waiter;
+        tp.Schedule([&]() {
+            // Include some `Poke()` calls to ensure they don't cause `waiter` to return
+            // from `Wait()`.
+            waiter.Poke();
+            turbo::SleepFor(turbo::Duration::milliseconds(500));
+            waiter.Post();
+        });
+        turbo::Time start = turbo::Time::current_time();
+        EXPECT_TRUE(waiter.Wait(turbo::synchronization_internal::KernelTimeout(
+                start + turbo::Duration::seconds(10))));
+        turbo::Duration waited = turbo::Time::current_time() - start;
+        EXPECT_GE(waited, WithTolerance(turbo::Duration::milliseconds(500)));
+        EXPECT_LT(waited, turbo::Duration::seconds(2));
+    }
 
-TYPED_TEST_P(WaiterTest, WaitDurationReached) {
-  TypeParam waiter;
-  turbo::Time start = turbo::Time::current_time();
-  EXPECT_FALSE(waiter.Wait(
-      turbo::synchronization_internal::KernelTimeout(turbo::Milliseconds(500))));
-  turbo::Duration waited = turbo::Time::current_time() - start;
-  EXPECT_GE(waited, WithTolerance(turbo::Milliseconds(500)));
-  EXPECT_LT(waited, turbo::Seconds(1));
-}
+    TYPED_TEST_P(WaiterTest, WaitDurationReached) {
+        TypeParam waiter;
+        turbo::Time start = turbo::Time::current_time();
+        EXPECT_FALSE(waiter.Wait(
+                turbo::synchronization_internal::KernelTimeout(turbo::Duration::milliseconds(500))));
+        turbo::Duration waited = turbo::Time::current_time() - start;
+        EXPECT_GE(waited, WithTolerance(turbo::Duration::milliseconds(500)));
+        EXPECT_LT(waited, turbo::Duration::seconds(1));
+    }
 
-TYPED_TEST_P(WaiterTest, WaitTimeReached) {
-  TypeParam waiter;
-  turbo::Time start = turbo::Time::current_time();
-  EXPECT_FALSE(waiter.Wait(turbo::synchronization_internal::KernelTimeout(
-      start + turbo::Milliseconds(500))));
-  turbo::Duration waited = turbo::Time::current_time() - start;
-  EXPECT_GE(waited, WithTolerance(turbo::Milliseconds(500)));
-  EXPECT_LT(waited, turbo::Seconds(1));
-}
+    TYPED_TEST_P(WaiterTest, WaitTimeReached) {
+        TypeParam waiter;
+        turbo::Time start = turbo::Time::current_time();
+        EXPECT_FALSE(waiter.Wait(turbo::synchronization_internal::KernelTimeout(
+                start + turbo::Duration::milliseconds(500))));
+        turbo::Duration waited = turbo::Time::current_time() - start;
+        EXPECT_GE(waited, WithTolerance(turbo::Duration::milliseconds(500)));
+        EXPECT_LT(waited, turbo::Duration::seconds(1));
+    }
 
-REGISTER_TYPED_TEST_SUITE_P(WaiterTest,
-                            WaitNoTimeout,
-                            WaitDurationWoken,
-                            WaitTimeWoken,
-                            WaitDurationReached,
-                            WaitTimeReached);
+    REGISTER_TYPED_TEST_SUITE_P(WaiterTest,
+                                WaitNoTimeout,
+                                WaitDurationWoken,
+                                WaitTimeWoken,
+                                WaitDurationReached,
+                                WaitTimeReached);
 
 #ifdef TURBO_INTERNAL_HAVE_FUTEX_WAITER
-INSTANTIATE_TYPED_TEST_SUITE_P(Futex, WaiterTest,
-                               turbo::synchronization_internal::FutexWaiter);
+    INSTANTIATE_TYPED_TEST_SUITE_P(Futex, WaiterTest,
+                                   turbo::synchronization_internal::FutexWaiter);
 #endif
 #ifdef TURBO_INTERNAL_HAVE_PTHREAD_WAITER
-INSTANTIATE_TYPED_TEST_SUITE_P(Pthread, WaiterTest,
-                               turbo::synchronization_internal::PthreadWaiter);
+    INSTANTIATE_TYPED_TEST_SUITE_P(Pthread, WaiterTest,
+                                   turbo::synchronization_internal::PthreadWaiter);
 #endif
 #ifdef TURBO_INTERNAL_HAVE_SEM_WAITER
-INSTANTIATE_TYPED_TEST_SUITE_P(Sem, WaiterTest,
-                               turbo::synchronization_internal::SemWaiter);
+    INSTANTIATE_TYPED_TEST_SUITE_P(Sem, WaiterTest,
+                                   turbo::synchronization_internal::SemWaiter);
 #endif
 #ifdef TURBO_INTERNAL_HAVE_WIN32_WAITER
-INSTANTIATE_TYPED_TEST_SUITE_P(Win32, WaiterTest,
-                               turbo::synchronization_internal::Win32Waiter);
+    INSTANTIATE_TYPED_TEST_SUITE_P(Win32, WaiterTest,
+                                   turbo::synchronization_internal::Win32Waiter);
 #endif
 #ifdef TURBO_INTERNAL_HAVE_STDCPP_WAITER
-INSTANTIATE_TYPED_TEST_SUITE_P(Stdcpp, WaiterTest,
-                               turbo::synchronization_internal::StdcppWaiter);
+    INSTANTIATE_TYPED_TEST_SUITE_P(Stdcpp, WaiterTest,
+                                   turbo::synchronization_internal::StdcppWaiter);
 #endif
 
 }  // namespace

@@ -84,19 +84,19 @@ TEST_P(ConcurrentSequenceLockTest, ReadAndWrite) {
     });
   }
   while (unsuccessful_reads.load(std::memory_order_relaxed) < num_threads_) {
-    turbo::SleepFor(turbo::Milliseconds(1));
+    turbo::SleepFor(turbo::Duration::milliseconds(1));
   }
   seq_lock.MarkInitialized();
 
   // Run a maximum of 5 seconds. On Windows, the scheduler behavior seems
   // somewhat unfair and without an explicit timeout for this loop, the tests
   // can run a long time.
-  turbo::Time deadline = turbo::Time::current_time() + turbo::Seconds(5);
+  turbo::Time deadline = turbo::Time::current_time() + turbo::Duration::seconds(5);
   for (int i = 0; i < 100 && turbo::Time::current_time() < deadline; i++) {
     turbo::FixedArray<char> writer_buf(buf_bytes_);
     for (auto& v : writer_buf) v = i;
     seq_lock.Write(protected_buf.data(), writer_buf.data(), buf_bytes_);
-    turbo::SleepFor(turbo::Microseconds(10));
+    turbo::SleepFor(turbo::Duration::microseconds(10));
   }
   stop.store(true, std::memory_order_relaxed);
   for (auto& t : threads) t.join();

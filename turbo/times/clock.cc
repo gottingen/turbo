@@ -46,7 +46,7 @@ namespace turbo {
             return time_internal::FromUnixDuration(
                     time_internal::MakeDuration(n / 1000000000, n % 1000000000 * 4));
         }
-        return time_internal::FromUnixDuration(turbo::Nanoseconds(n));
+        return time_internal::FromUnixDuration(turbo::Duration::nanoseconds(n));
     }
 
     TURBO_NAMESPACE_END
@@ -577,10 +577,10 @@ namespace turbo {
         constexpr turbo::Duration MaxSleep() {
 #ifdef _WIN32
             // Windows Sleep() takes unsigned long argument in milliseconds.
-            return turbo::Milliseconds(
+            return turbo::Duration::milliseconds(
                 std::numeric_limits<unsigned long>::max());  // NOLINT(runtime/int)
 #else
-            return turbo::Seconds(std::numeric_limits<time_t>::max());
+            return turbo::Duration::seconds(std::numeric_limits<time_t>::max());
 #endif
         }
 
@@ -588,7 +588,7 @@ namespace turbo {
 // REQUIRES: to_sleep <= MaxSleep().
         void SleepOnce(turbo::Duration to_sleep) {
 #ifdef _WIN32
-            Sleep(static_cast<DWORD>(to_sleep / turbo::Milliseconds(1)));
+            Sleep(static_cast<DWORD>(to_sleep / turbo::Duration::milliseconds(1)));
 #else
             struct timespec sleep_time = turbo::ToTimespec(to_sleep);
             while (nanosleep(&sleep_time, &sleep_time) != 0 && errno == EINTR) {

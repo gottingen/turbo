@@ -539,7 +539,7 @@ namespace turbo {
             int64_t ticks = ts.tv_nsec * kTicksPerNanosecond;
             return time_internal::MakeDuration(ts.tv_sec, ticks);
         }
-        return Seconds(ts.tv_sec) + Nanoseconds(ts.tv_nsec);
+        return Duration::seconds(ts.tv_sec) + Duration::nanoseconds(ts.tv_nsec);
     }
 
     Duration DurationFromTimeval(timeval tv) {
@@ -547,7 +547,7 @@ namespace turbo {
             int64_t ticks = tv.tv_usec * 1000 * kTicksPerNanosecond;
             return time_internal::MakeDuration(tv.tv_sec, ticks);
         }
-        return Seconds(tv.tv_sec) + Microseconds(tv.tv_usec);
+        return Duration::seconds(tv.tv_sec) + Duration::microseconds(tv.tv_usec);
     }
 
     //
@@ -560,7 +560,7 @@ namespace turbo {
             return (time_internal::GetRepHi(d) * 1000 * 1000 * 1000) +
                    (time_internal::GetRepLo(d) / kTicksPerNanosecond);
         }
-        return d / Nanoseconds(1);
+        return d / Duration::nanoseconds(1);
     }
 
     int64_t Duration::to_microseconds(Duration d) {
@@ -569,7 +569,7 @@ namespace turbo {
             return (time_internal::GetRepHi(d) * 1000 * 1000) +
                    (time_internal::GetRepLo(d) / (kTicksPerNanosecond * 1000));
         }
-        return d / Microseconds(1);
+        return d / Duration::microseconds(1);
     }
 
     int64_t Duration::to_milliseconds(Duration d) {
@@ -578,7 +578,7 @@ namespace turbo {
             return (time_internal::GetRepHi(d) * 1000) +
                    (time_internal::GetRepLo(d) / (kTicksPerNanosecond * 1000 * 1000));
         }
-        return d / Milliseconds(1);
+        return d / Duration::milliseconds(1);
     }
 
     int64_t Duration::to_seconds(Duration d) {
@@ -603,22 +603,22 @@ namespace turbo {
     }
 
     double Duration::to_double_nanoseconds(Duration d) {
-        return Duration::fdiv(d, Nanoseconds(1));
+        return Duration::fdiv(d, Duration::nanoseconds(1));
     }
 
     double Duration::to_double_microseconds(Duration d) {
-        return Duration::fdiv(d, Microseconds(1));
+        return Duration::fdiv(d, Duration::microseconds(1));
     }
 
     double Duration::to_double_milliseconds(Duration d) {
-        return Duration::fdiv(d, Milliseconds(1));
+        return Duration::fdiv(d, Duration::milliseconds(1));
     }
 
-    double Duration::to_double_seconds(Duration d) { return Duration::fdiv(d, Seconds(1)); }
+    double Duration::to_double_seconds(Duration d) { return Duration::fdiv(d, Duration::seconds(1)); }
 
-    double Duration::to_double_minutes(Duration d) { return Duration::fdiv(d, Minutes(1)); }
+    double Duration::to_double_minutes(Duration d) { return Duration::fdiv(d, Duration::minutes(1)); }
 
-    double Duration::to_double_hours(Duration d) { return Duration::fdiv(d, Hours(1)); }
+    double Duration::to_double_hours(Duration d) { return Duration::fdiv(d, Duration::hours(1)); }
 
     timespec ToTimespec(Duration d) {
         timespec ts;
@@ -788,7 +788,7 @@ namespace turbo {
     //   is non-zero.
     // Unlike Go, we format the zero duration as 0, with no unit.
     std::string Duration::format(Duration d) {
-        constexpr Duration kMinDuration = Seconds(kint64min);
+        constexpr Duration kMinDuration = Duration::seconds(kint64min);
         std::string s;
         if (d == kMinDuration) {
             // Avoid needing to negate kint64min by directly returning what the
@@ -802,20 +802,20 @@ namespace turbo {
         }
         if (d == Duration::max_infinite()) {
             s.append("inf");
-        } else if (d < Seconds(1)) {
+        } else if (d < Duration::seconds(1)) {
             // Special case for durations with a magnitude < 1 second.  The duration
             // is printed as a fraction of a single unit, e.g., "1.2ms".
-            if (d < Microseconds(1)) {
-                AppendNumberUnit(&s, Duration::fdiv(d, Nanoseconds(1)), kDisplayNano);
-            } else if (d < Milliseconds(1)) {
-                AppendNumberUnit(&s, Duration::fdiv(d, Microseconds(1)), kDisplayMicro);
+            if (d < Duration::microseconds(1)) {
+                AppendNumberUnit(&s, Duration::fdiv(d, Duration::nanoseconds(1)), kDisplayNano);
+            } else if (d < Duration::milliseconds(1)) {
+                AppendNumberUnit(&s, Duration::fdiv(d, Duration::microseconds(1)), kDisplayMicro);
             } else {
-                AppendNumberUnit(&s, Duration::fdiv(d, Milliseconds(1)), kDisplayMilli);
+                AppendNumberUnit(&s, Duration::fdiv(d, Duration::milliseconds(1)), kDisplayMilli);
             }
         } else {
-            AppendNumberUnit(&s, Duration::idiv(d, Hours(1), &d), kDisplayHour);
-            AppendNumberUnit(&s, Duration::idiv(d, Minutes(1), &d), kDisplayMin);
-            AppendNumberUnit(&s, Duration::fdiv(d, Seconds(1)), kDisplaySec);
+            AppendNumberUnit(&s, Duration::idiv(d, Duration::hours(1), &d), kDisplayHour);
+            AppendNumberUnit(&s, Duration::idiv(d, Duration::minutes(1), &d), kDisplayMin);
+            AppendNumberUnit(&s, Duration::fdiv(d, Duration::seconds(1)), kDisplaySec);
         }
         if (s.empty() || s == "-") {
             s = "0";
@@ -872,21 +872,21 @@ namespace turbo {
                         case 'n':
                             if (*(*start + 1) == 's') {
                                 *start += 2;
-                                *unit = Nanoseconds(1);
+                                *unit = Duration::nanoseconds(1);
                                 return true;
                             }
                             break;
                         case 'u':
                             if (*(*start + 1) == 's') {
                                 *start += 2;
-                                *unit = Microseconds(1);
+                                *unit = Duration::microseconds(1);
                                 return true;
                             }
                             break;
                         case 'm':
                             if (*(*start + 1) == 's') {
                                 *start += 2;
-                                *unit = Milliseconds(1);
+                                *unit = Duration::milliseconds(1);
                                 return true;
                             }
                             break;
@@ -897,15 +897,15 @@ namespace turbo {
                 case 1:
                     switch (**start) {
                         case 's':
-                            *unit = Seconds(1);
+                            *unit = Duration::seconds(1);
                             *start += 1;
                             return true;
                         case 'm':
-                            *unit = Minutes(1);
+                            *unit = Duration::minutes(1);
                             *start += 1;
                             return true;
                         case 'h':
-                            *unit = Hours(1);
+                            *unit = Duration::hours(1);
                             *start += 1;
                             return true;
                         default:

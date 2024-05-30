@@ -40,13 +40,13 @@ namespace {
     constexpr int64_t kint64max = std::numeric_limits<int64_t>::max();
     constexpr int64_t kint64min = std::numeric_limits<int64_t>::min();
 
-// Approximates the given number of years. This is only used to make some test
-// code more readable.
-    turbo::Duration ApproxYears(int64_t n) { return turbo::Hours(n) * 365 * 24; }
+    // Approximates the given number of years. This is only used to make some test
+    // code more readable.
+    turbo::Duration ApproxYears(int64_t n) { return turbo::Duration::hours(n) * 365 * 24; }
 
-// A gMock matcher to match timespec values. Use this matcher like:
-// timespec ts1, ts2;
-// EXPECT_THAT(ts1, TimespecMatcher(ts2));
+    // A gMock matcher to match timespec values. Use this matcher like:
+    // timespec ts1, ts2;
+    // EXPECT_THAT(ts1, TimespecMatcher(ts2));
     MATCHER_P(TimespecMatcher, ts, "") {
         if (ts.tv_sec == arg.tv_sec && ts.tv_nsec == arg.tv_nsec)
             return true;
@@ -55,9 +55,9 @@ namespace {
         return false;
     }
 
-// A gMock matcher to match timeval values. Use this matcher like:
-// timeval tv1, tv2;
-// EXPECT_THAT(tv1, TimevalMatcher(tv2));
+    // A gMock matcher to match timeval values. Use this matcher like:
+    // timeval tv1, tv2;
+    // EXPECT_THAT(tv1, TimevalMatcher(tv2));
     MATCHER_P(TimevalMatcher, tv, "") {
         if (tv.tv_sec == arg.tv_sec && tv.tv_usec == arg.tv_usec)
             return true;
@@ -69,9 +69,9 @@ namespace {
     TEST(Duration, ConstExpr) {
         constexpr turbo::Duration d0 = turbo::Duration::zero();
         static_assert(d0 == turbo::Duration::zero(), "Duration::zero()");
-        constexpr turbo::Duration d1 = turbo::Seconds(1);
-        static_assert(d1 == turbo::Seconds(1), "Seconds(1)");
-        static_assert(d1 != turbo::Duration::zero(), "Seconds(1)");
+        constexpr turbo::Duration d1 = turbo::Duration::seconds(1);
+        static_assert(d1 == turbo::Duration::seconds(1), "Duration::seconds(1)");
+        static_assert(d1 != turbo::Duration::zero(), "Duration::seconds(1)");
         constexpr turbo::Duration d2 = turbo::Duration::max_infinite();
         static_assert(d2 == turbo::Duration::max_infinite(), "Duration::max_infinite()");
         static_assert(d2 != turbo::Duration::zero(), "Duration::max_infinite()");
@@ -89,42 +89,42 @@ namespace {
 
     TEST(Duration, Factories) {
         constexpr turbo::Duration zero = turbo::Duration::zero();
-        constexpr turbo::Duration nano = turbo::Nanoseconds(1);
-        constexpr turbo::Duration micro = turbo::Microseconds(1);
-        constexpr turbo::Duration milli = turbo::Milliseconds(1);
-        constexpr turbo::Duration sec = turbo::Seconds(1);
-        constexpr turbo::Duration min = turbo::Minutes(1);
-        constexpr turbo::Duration hour = turbo::Hours(1);
+        constexpr turbo::Duration nano = turbo::Duration::nanoseconds(1);
+        constexpr turbo::Duration micro = turbo::Duration::microseconds(1);
+        constexpr turbo::Duration milli = turbo::Duration::milliseconds(1);
+        constexpr turbo::Duration sec = turbo::Duration::seconds(1);
+        constexpr turbo::Duration min = turbo::Duration::minutes(1);
+        constexpr turbo::Duration hour = turbo::Duration::hours(1);
 
         EXPECT_EQ(zero, turbo::Duration());
-        EXPECT_EQ(zero, turbo::Seconds(0));
-        EXPECT_EQ(nano, turbo::Nanoseconds(1));
-        EXPECT_EQ(micro, turbo::Nanoseconds(1000));
-        EXPECT_EQ(milli, turbo::Microseconds(1000));
-        EXPECT_EQ(sec, turbo::Milliseconds(1000));
-        EXPECT_EQ(min, turbo::Seconds(60));
-        EXPECT_EQ(hour, turbo::Minutes(60));
+        EXPECT_EQ(zero, turbo::Duration::seconds(0));
+        EXPECT_EQ(nano, turbo::Duration::nanoseconds(1));
+        EXPECT_EQ(micro, turbo::Duration::nanoseconds(1000));
+        EXPECT_EQ(milli, turbo::Duration::microseconds(1000));
+        EXPECT_EQ(sec, turbo::Duration::milliseconds(1000));
+        EXPECT_EQ(min, turbo::Duration::seconds(60));
+        EXPECT_EQ(hour, turbo::Duration::minutes(60));
 
         // Tests factory limits
         const turbo::Duration inf = turbo::Duration::max_infinite();
 
-        EXPECT_GT(inf, turbo::Seconds(kint64max));
-        EXPECT_LT(-inf, turbo::Seconds(kint64min));
-        EXPECT_LT(-inf, turbo::Seconds(-kint64max));
+        EXPECT_GT(inf, turbo::Duration::seconds(kint64max));
+        EXPECT_LT(-inf, turbo::Duration::seconds(kint64min));
+        EXPECT_LT(-inf, turbo::Duration::seconds(-kint64max));
 
-        EXPECT_EQ(inf, turbo::Minutes(kint64max));
-        EXPECT_EQ(-inf, turbo::Minutes(kint64min));
-        EXPECT_EQ(-inf, turbo::Minutes(-kint64max));
-        EXPECT_GT(inf, turbo::Minutes(kint64max / 60));
-        EXPECT_LT(-inf, turbo::Minutes(kint64min / 60));
-        EXPECT_LT(-inf, turbo::Minutes(-kint64max / 60));
+        EXPECT_EQ(inf, turbo::Duration::minutes(kint64max));
+        EXPECT_EQ(-inf, turbo::Duration::minutes(kint64min));
+        EXPECT_EQ(-inf, turbo::Duration::minutes(-kint64max));
+        EXPECT_GT(inf, turbo::Duration::minutes(kint64max / 60));
+        EXPECT_LT(-inf, turbo::Duration::minutes(kint64min / 60));
+        EXPECT_LT(-inf, turbo::Duration::minutes(-kint64max / 60));
 
-        EXPECT_EQ(inf, turbo::Hours(kint64max));
-        EXPECT_EQ(-inf, turbo::Hours(kint64min));
-        EXPECT_EQ(-inf, turbo::Hours(-kint64max));
-        EXPECT_GT(inf, turbo::Hours(kint64max / 3600));
-        EXPECT_LT(-inf, turbo::Hours(kint64min / 3600));
-        EXPECT_LT(-inf, turbo::Hours(-kint64max / 3600));
+        EXPECT_EQ(inf, turbo::Duration::hours(kint64max));
+        EXPECT_EQ(-inf, turbo::Duration::hours(kint64min));
+        EXPECT_EQ(-inf, turbo::Duration::hours(-kint64max));
+        EXPECT_GT(inf, turbo::Duration::hours(kint64max / 3600));
+        EXPECT_LT(-inf, turbo::Duration::hours(kint64min / 3600));
+        EXPECT_LT(-inf, turbo::Duration::hours(-kint64max / 3600));
     }
 
     TEST(Duration, ToConversion) {
@@ -146,54 +146,54 @@ namespace {
     EXPECT_EQ(dbl_inf, turbo::Duration::to_double_##UNIT(inf));                      \
   } while (0)
 
-        TEST_DURATION_CONVERSION(nanoseconds, Nanoseconds);
-        TEST_DURATION_CONVERSION(microseconds,Microseconds);
-        TEST_DURATION_CONVERSION(milliseconds, Milliseconds);
-        TEST_DURATION_CONVERSION(seconds,Seconds);
-        TEST_DURATION_CONVERSION(minutes, Minutes);
-        TEST_DURATION_CONVERSION(hours, Hours);
+        TEST_DURATION_CONVERSION(nanoseconds, Duration::nanoseconds);
+        TEST_DURATION_CONVERSION(microseconds,Duration::microseconds);
+        TEST_DURATION_CONVERSION(milliseconds, Duration::milliseconds);
+        TEST_DURATION_CONVERSION(seconds,Duration::seconds);
+        TEST_DURATION_CONVERSION(minutes, Duration::minutes);
+        TEST_DURATION_CONVERSION(hours, Duration::hours);
 
 #undef TEST_DURATION_CONVERSION
     }
 
     template<int64_t N>
     void TestToConversion() {
-        constexpr turbo::Duration nano = turbo::Nanoseconds(N);
+        constexpr turbo::Duration nano = turbo::Duration::nanoseconds(N);
         EXPECT_EQ(N, turbo::Duration::to_nanoseconds(nano));
         EXPECT_EQ(0, turbo::Duration::to_microseconds(nano));
         EXPECT_EQ(0, turbo::Duration::to_milliseconds(nano));
         EXPECT_EQ(0, turbo::Duration::to_seconds(nano));
         EXPECT_EQ(0, turbo::Duration::to_minutes(nano));
         EXPECT_EQ(0, turbo::Duration::to_hours(nano));
-        const turbo::Duration micro = turbo::Microseconds(N);
+        const turbo::Duration micro = turbo::Duration::microseconds(N);
         EXPECT_EQ(N * 1000, turbo::Duration::to_nanoseconds(micro));
         EXPECT_EQ(N, turbo::Duration::to_microseconds(micro));
         EXPECT_EQ(0, turbo::Duration::to_milliseconds(micro));
         EXPECT_EQ(0, turbo::Duration::to_seconds(micro));
         EXPECT_EQ(0, turbo::Duration::to_minutes(micro));
         EXPECT_EQ(0, turbo::Duration::to_hours(micro));
-        const turbo::Duration milli = turbo::Milliseconds(N);
+        const turbo::Duration milli = turbo::Duration::milliseconds(N);
         EXPECT_EQ(N * 1000 * 1000, turbo::Duration::to_nanoseconds(milli));
         EXPECT_EQ(N * 1000, turbo::Duration::to_microseconds(milli));
         EXPECT_EQ(N, turbo::Duration::to_milliseconds(milli));
         EXPECT_EQ(0, turbo::Duration::to_seconds(milli));
         EXPECT_EQ(0, turbo::Duration::to_minutes(milli));
         EXPECT_EQ(0, turbo::Duration::to_hours(milli));
-        const turbo::Duration sec = turbo::Seconds(N);
+        const turbo::Duration sec = turbo::Duration::seconds(N);
         EXPECT_EQ(N * 1000 * 1000 * 1000, turbo::Duration::to_nanoseconds(sec));
         EXPECT_EQ(N * 1000 * 1000, turbo::Duration::to_microseconds(sec));
         EXPECT_EQ(N * 1000, turbo::Duration::to_milliseconds(sec));
         EXPECT_EQ(N, turbo::Duration::to_seconds(sec));
         EXPECT_EQ(0, turbo::Duration::to_minutes(sec));
         EXPECT_EQ(0, turbo::Duration::to_hours(sec));
-        const turbo::Duration min = turbo::Minutes(N);
+        const turbo::Duration min = turbo::Duration::minutes(N);
         EXPECT_EQ(N * 60 * 1000 * 1000 * 1000, turbo::Duration::to_nanoseconds(min));
         EXPECT_EQ(N * 60 * 1000 * 1000, turbo::Duration::to_microseconds(min));
         EXPECT_EQ(N * 60 * 1000, turbo::Duration::to_milliseconds(min));
         EXPECT_EQ(N * 60, turbo::Duration::to_seconds(min));
         EXPECT_EQ(N, turbo::Duration::to_minutes(min));
         EXPECT_EQ(0, turbo::Duration::to_hours(min));
-        const turbo::Duration hour = turbo::Hours(N);
+        const turbo::Duration hour = turbo::Duration::hours(N);
         EXPECT_EQ(N * 60 * 60 * 1000 * 1000 * 1000, turbo::Duration::to_nanoseconds(hour));
         EXPECT_EQ(N * 60 * 60 * 1000 * 1000, turbo::Duration::to_microseconds(hour));
         EXPECT_EQ(N * 60 * 60 * 1000, turbo::Duration::to_milliseconds(hour));
@@ -219,12 +219,12 @@ namespace {
         using std::chrono::minutes;
         using std::chrono::hours;
 
-        static_assert(turbo::Nanoseconds(N) == turbo::Duration::from_chrono(nanoseconds(N)), "");
-        static_assert(turbo::Microseconds(N) == turbo::Duration::from_chrono(microseconds(N)), "");
-        static_assert(turbo::Milliseconds(N) == turbo::Duration::from_chrono(milliseconds(N)), "");
-        static_assert(turbo::Seconds(N) == turbo::Duration::from_chrono(seconds(N)), "");
-        static_assert(turbo::Minutes(N) == turbo::Duration::from_chrono(minutes(N)), "");
-        static_assert(turbo::Hours(N) == turbo::Duration::from_chrono(hours(N)), "");
+        static_assert(turbo::Duration::nanoseconds(N) == turbo::Duration::from_chrono(nanoseconds(N)), "");
+        static_assert(turbo::Duration::microseconds(N) == turbo::Duration::from_chrono(microseconds(N)), "");
+        static_assert(turbo::Duration::milliseconds(N) == turbo::Duration::from_chrono(milliseconds(N)), "");
+        static_assert(turbo::Duration::seconds(N) == turbo::Duration::from_chrono(seconds(N)), "");
+        static_assert(turbo::Duration::minutes(N) == turbo::Duration::from_chrono(minutes(N)), "");
+        static_assert(turbo::Duration::hours(N) == turbo::Duration::from_chrono(hours(N)), "");
     }
 
     TEST(Duration, FromChrono) {
@@ -241,7 +241,7 @@ namespace {
         if (minutes_max_count > kint64max / 60) {
             EXPECT_EQ(turbo::Duration::max_infinite(), minutes_max);
         } else {
-            EXPECT_EQ(turbo::Minutes(minutes_max_count), minutes_max);
+            EXPECT_EQ(turbo::Duration::minutes(minutes_max_count), minutes_max);
         }
 
         // Minutes (might, depending on the platform) saturate at -inf.
@@ -251,7 +251,7 @@ namespace {
         if (minutes_min_count < kint64min / 60) {
             EXPECT_EQ(-turbo::Duration::max_infinite(), minutes_min);
         } else {
-            EXPECT_EQ(turbo::Minutes(minutes_min_count), minutes_min);
+            EXPECT_EQ(turbo::Duration::minutes(minutes_min_count), minutes_min);
         }
 
         // Hours (might, depending on the platform) saturate at +inf.
@@ -261,7 +261,7 @@ namespace {
         if (hours_max_count > kint64max / 3600) {
             EXPECT_EQ(turbo::Duration::max_infinite(), hours_max);
         } else {
-            EXPECT_EQ(turbo::Hours(hours_max_count), hours_max);
+            EXPECT_EQ(turbo::Duration::hours(hours_max_count), hours_max);
         }
 
         // Hours (might, depending on the platform) saturate at -inf.
@@ -271,7 +271,7 @@ namespace {
         if (hours_min_count < kint64min / 3600) {
             EXPECT_EQ(-turbo::Duration::max_infinite(), hours_min);
         } else {
-            EXPECT_EQ(turbo::Hours(hours_min_count), hours_min);
+            EXPECT_EQ(turbo::Duration::hours(hours_min_count), hours_min);
         }
     }
 
@@ -284,12 +284,12 @@ namespace {
         using std::chrono::minutes;
         using std::chrono::hours;
 
-        EXPECT_EQ(nanoseconds(N), turbo::Duration::to_chrono_nanoseconds(turbo::Nanoseconds(N)));
-        EXPECT_EQ(microseconds(N), turbo::Duration::to_chrono_microseconds(turbo::Microseconds(N)));
-        EXPECT_EQ(milliseconds(N), turbo::Duration::to_chrono_milliseconds(turbo::Milliseconds(N)));
-        EXPECT_EQ(seconds(N), turbo::Duration::to_chrono_seconds(turbo::Seconds(N)));
+        EXPECT_EQ(nanoseconds(N), turbo::Duration::to_chrono_nanoseconds(turbo::Duration::nanoseconds(N)));
+        EXPECT_EQ(microseconds(N), turbo::Duration::to_chrono_microseconds(turbo::Duration::microseconds(N)));
+        EXPECT_EQ(milliseconds(N), turbo::Duration::to_chrono_milliseconds(turbo::Duration::milliseconds(N)));
+        EXPECT_EQ(seconds(N), turbo::Duration::to_chrono_seconds(turbo::Duration::seconds(N)));
 
-        constexpr auto turbo_minutes = turbo::Minutes(N);
+        constexpr auto turbo_minutes = turbo::Duration::minutes(N);
         auto chrono_minutes = minutes(N);
         if (turbo_minutes == -turbo::Duration::max_infinite()) {
             chrono_minutes = minutes::min();
@@ -298,7 +298,7 @@ namespace {
         }
         EXPECT_EQ(chrono_minutes, turbo::Duration::to_chrono_minutes(turbo_minutes));
 
-        constexpr auto turbo_hours = turbo::Hours(N);
+        constexpr auto turbo_hours = turbo::Duration::hours(N);
         auto chrono_hours = hours(N);
         if (turbo_hours == -turbo::Duration::max_infinite()) {
             chrono_hours = hours::min();
@@ -323,7 +323,7 @@ namespace {
         TestToChrono<kint64max>();
 
         // Verify truncation toward zero.
-        const auto tick = turbo::Nanoseconds(1) / 4;
+        const auto tick = turbo::Duration::nanoseconds(1) / 4;
         EXPECT_EQ(nanoseconds(0), turbo::Duration::to_chrono_nanoseconds(tick));
         EXPECT_EQ(nanoseconds(0), turbo::Duration::to_chrono_nanoseconds(-tick));
         EXPECT_EQ(microseconds(0), turbo::Duration::to_chrono_microseconds(tick));
@@ -372,32 +372,32 @@ namespace {
   EXPECT_EQ(1.5, turbo::Duration::fdiv(NAME(static_cast<float>(1.5)), NAME(1))); \
   EXPECT_EQ(1.5, turbo::Duration::fdiv(NAME(static_cast<double>(1.5)), NAME(1)));
 
-        TEST_FACTORY_OVERLOADS(turbo::Nanoseconds);
-        TEST_FACTORY_OVERLOADS(turbo::Microseconds);
-        TEST_FACTORY_OVERLOADS(turbo::Milliseconds);
-        TEST_FACTORY_OVERLOADS(turbo::Seconds);
-        TEST_FACTORY_OVERLOADS(turbo::Minutes);
-        TEST_FACTORY_OVERLOADS(turbo::Hours);
+        TEST_FACTORY_OVERLOADS(turbo::Duration::nanoseconds);
+        TEST_FACTORY_OVERLOADS(turbo::Duration::microseconds);
+        TEST_FACTORY_OVERLOADS(turbo::Duration::milliseconds);
+        TEST_FACTORY_OVERLOADS(turbo::Duration::seconds);
+        TEST_FACTORY_OVERLOADS(turbo::Duration::minutes);
+        TEST_FACTORY_OVERLOADS(turbo::Duration::hours);
 
 #undef TEST_FACTORY_OVERLOADS
 
-        EXPECT_EQ(turbo::Milliseconds(1500), turbo::Seconds(1.5));
-        EXPECT_LT(turbo::Nanoseconds(1), turbo::Nanoseconds(1.5));
-        EXPECT_GT(turbo::Nanoseconds(2), turbo::Nanoseconds(1.5));
+        EXPECT_EQ(turbo::Duration::milliseconds(1500), turbo::Duration::seconds(1.5));
+        EXPECT_LT(turbo::Duration::nanoseconds(1), turbo::Duration::nanoseconds(1.5));
+        EXPECT_GT(turbo::Duration::nanoseconds(2), turbo::Duration::nanoseconds(1.5));
 
         const double dbl_inf = std::numeric_limits<double>::infinity();
-        EXPECT_EQ(turbo::Duration::max_infinite(), turbo::Nanoseconds(dbl_inf));
-        EXPECT_EQ(turbo::Duration::max_infinite(), turbo::Microseconds(dbl_inf));
-        EXPECT_EQ(turbo::Duration::max_infinite(), turbo::Milliseconds(dbl_inf));
-        EXPECT_EQ(turbo::Duration::max_infinite(), turbo::Seconds(dbl_inf));
-        EXPECT_EQ(turbo::Duration::max_infinite(), turbo::Minutes(dbl_inf));
-        EXPECT_EQ(turbo::Duration::max_infinite(), turbo::Hours(dbl_inf));
-        EXPECT_EQ(-turbo::Duration::max_infinite(), turbo::Nanoseconds(-dbl_inf));
-        EXPECT_EQ(-turbo::Duration::max_infinite(), turbo::Microseconds(-dbl_inf));
-        EXPECT_EQ(-turbo::Duration::max_infinite(), turbo::Milliseconds(-dbl_inf));
-        EXPECT_EQ(-turbo::Duration::max_infinite(), turbo::Seconds(-dbl_inf));
-        EXPECT_EQ(-turbo::Duration::max_infinite(), turbo::Minutes(-dbl_inf));
-        EXPECT_EQ(-turbo::Duration::max_infinite(), turbo::Hours(-dbl_inf));
+        EXPECT_EQ(turbo::Duration::max_infinite(), turbo::Duration::nanoseconds(dbl_inf));
+        EXPECT_EQ(turbo::Duration::max_infinite(), turbo::Duration::microseconds(dbl_inf));
+        EXPECT_EQ(turbo::Duration::max_infinite(), turbo::Duration::milliseconds(dbl_inf));
+        EXPECT_EQ(turbo::Duration::max_infinite(), turbo::Duration::seconds(dbl_inf));
+        EXPECT_EQ(turbo::Duration::max_infinite(), turbo::Duration::minutes(dbl_inf));
+        EXPECT_EQ(turbo::Duration::max_infinite(), turbo::Duration::hours(dbl_inf));
+        EXPECT_EQ(-turbo::Duration::max_infinite(), turbo::Duration::nanoseconds(-dbl_inf));
+        EXPECT_EQ(-turbo::Duration::max_infinite(), turbo::Duration::microseconds(-dbl_inf));
+        EXPECT_EQ(-turbo::Duration::max_infinite(), turbo::Duration::milliseconds(-dbl_inf));
+        EXPECT_EQ(-turbo::Duration::max_infinite(), turbo::Duration::seconds(-dbl_inf));
+        EXPECT_EQ(-turbo::Duration::max_infinite(), turbo::Duration::minutes(-dbl_inf));
+        EXPECT_EQ(-turbo::Duration::max_infinite(), turbo::Duration::hours(-dbl_inf));
     }
 
     TEST(Duration, InfinityExamples) {
@@ -405,7 +405,7 @@ namespace {
         // written so that they can be copy-n-pasted easily.
 
         constexpr turbo::Duration inf = turbo::Duration::max_infinite();
-        constexpr turbo::Duration d = turbo::Seconds(1);  // Any finite duration
+        constexpr turbo::Duration d = turbo::Duration::seconds(1);  // Any finite duration
 
         EXPECT_TRUE(inf == inf + inf);
         EXPECT_TRUE(inf == inf + d);
@@ -422,7 +422,7 @@ namespace {
 
     TEST(Duration, InfinityComparison) {
         const turbo::Duration inf = turbo::Duration::max_infinite();
-        const turbo::Duration any_dur = turbo::Seconds(1);
+        const turbo::Duration any_dur = turbo::Duration::seconds(1);
 
         // Equality
         EXPECT_EQ(inf, inf);
@@ -439,9 +439,9 @@ namespace {
     }
 
     TEST(Duration, InfinityAddition) {
-        const turbo::Duration sec_max = turbo::Seconds(kint64max);
-        const turbo::Duration sec_min = turbo::Seconds(kint64min);
-        const turbo::Duration any_dur = turbo::Seconds(1);
+        const turbo::Duration sec_max = turbo::Duration::seconds(kint64max);
+        const turbo::Duration sec_min = turbo::Duration::seconds(kint64min);
+        const turbo::Duration any_dur = turbo::Duration::seconds(1);
         const turbo::Duration inf = turbo::Duration::max_infinite();
 
         // Addition
@@ -456,15 +456,15 @@ namespace {
         EXPECT_EQ(-inf, any_dur + -inf);
 
         // Interesting case
-        turbo::Duration almost_inf = sec_max + turbo::Nanoseconds(999999999);
+        turbo::Duration almost_inf = sec_max + turbo::Duration::nanoseconds(999999999);
         EXPECT_GT(inf, almost_inf);
-        almost_inf += -turbo::Nanoseconds(999999999);
+        almost_inf += -turbo::Duration::nanoseconds(999999999);
         EXPECT_GT(inf, almost_inf);
 
         // Addition overflow/underflow
-        EXPECT_EQ(inf, sec_max + turbo::Seconds(1));
+        EXPECT_EQ(inf, sec_max + turbo::Duration::seconds(1));
         EXPECT_EQ(inf, sec_max + sec_max);
-        EXPECT_EQ(-inf, sec_min + -turbo::Seconds(1));
+        EXPECT_EQ(-inf, sec_min + -turbo::Duration::seconds(1));
         EXPECT_EQ(-inf, sec_min + -sec_max);
 
         // For reference: IEEE 754 behavior
@@ -476,9 +476,9 @@ namespace {
     }
 
     TEST(Duration, InfinitySubtraction) {
-        const turbo::Duration sec_max = turbo::Seconds(kint64max);
-        const turbo::Duration sec_min = turbo::Seconds(kint64min);
-        const turbo::Duration any_dur = turbo::Seconds(1);
+        const turbo::Duration sec_max = turbo::Duration::seconds(kint64max);
+        const turbo::Duration sec_min = turbo::Duration::seconds(kint64min);
+        const turbo::Duration any_dur = turbo::Duration::seconds(1);
         const turbo::Duration inf = turbo::Duration::max_infinite();
 
         // Subtraction
@@ -493,15 +493,15 @@ namespace {
         EXPECT_EQ(inf, any_dur - -inf);
 
         // Subtraction overflow/underflow
-        EXPECT_EQ(inf, sec_max - -turbo::Seconds(1));
+        EXPECT_EQ(inf, sec_max - -turbo::Duration::seconds(1));
         EXPECT_EQ(inf, sec_max - -sec_max);
-        EXPECT_EQ(-inf, sec_min - turbo::Seconds(1));
+        EXPECT_EQ(-inf, sec_min - turbo::Duration::seconds(1));
         EXPECT_EQ(-inf, sec_min - sec_max);
 
         // Interesting case
         turbo::Duration almost_neg_inf = sec_min;
         EXPECT_LT(-inf, almost_neg_inf);
-        almost_neg_inf -= -turbo::Nanoseconds(1);
+        almost_neg_inf -= -turbo::Duration::nanoseconds(1);
         EXPECT_LT(-inf, almost_neg_inf);
 
         // For reference: IEEE 754 behavior
@@ -513,8 +513,8 @@ namespace {
     }
 
     TEST(Duration, InfinityMultiplication) {
-        const turbo::Duration sec_max = turbo::Seconds(kint64max);
-        const turbo::Duration sec_min = turbo::Seconds(kint64min);
+        const turbo::Duration sec_max = turbo::Duration::seconds(kint64max);
+        const turbo::Duration sec_min = turbo::Duration::seconds(kint64min);
         const turbo::Duration inf = turbo::Duration::max_infinite();
 
 #define TEST_INF_MUL_WITH_TYPE(T)                                     \
@@ -542,7 +542,7 @@ namespace {
         EXPECT_EQ(-inf, inf * -dbl_inf);
         EXPECT_EQ(inf, -inf * -dbl_inf);
 
-        const turbo::Duration any_dur = turbo::Seconds(1);
+        const turbo::Duration any_dur = turbo::Duration::seconds(1);
         EXPECT_EQ(inf, any_dur * dbl_inf);
         EXPECT_EQ(-inf, -any_dur * dbl_inf);
         EXPECT_EQ(-inf, any_dur * -dbl_inf);
@@ -550,10 +550,10 @@ namespace {
 
         // Fixed-point multiplication will produce a finite value, whereas floating
         // point fuzziness will overflow to inf.
-        EXPECT_NE(turbo::Duration::max_infinite(), turbo::Seconds(1) * kint64max);
-        EXPECT_EQ(inf, turbo::Seconds(1) * static_cast<double>(kint64max));
-        EXPECT_NE(-turbo::Duration::max_infinite(), turbo::Seconds(1) * kint64min);
-        EXPECT_EQ(-inf, turbo::Seconds(1) * static_cast<double>(kint64min));
+        EXPECT_NE(turbo::Duration::max_infinite(), turbo::Duration::seconds(1) * kint64max);
+        EXPECT_EQ(inf, turbo::Duration::seconds(1) * static_cast<double>(kint64max));
+        EXPECT_NE(-turbo::Duration::max_infinite(), turbo::Duration::seconds(1) * kint64min);
+        EXPECT_EQ(-inf, turbo::Duration::seconds(1) * static_cast<double>(kint64min));
 
         // Note that sec_max * or / by 1.0 overflows to inf due to the 53-bit
         // limitations of double.
@@ -565,8 +565,8 @@ namespace {
     }
 
     TEST(Duration, InfinityDivision) {
-        const turbo::Duration sec_max = turbo::Seconds(kint64max);
-        const turbo::Duration sec_min = turbo::Seconds(kint64min);
+        const turbo::Duration sec_max = turbo::Duration::seconds(kint64max);
+        const turbo::Duration sec_min = turbo::Duration::seconds(kint64min);
         const turbo::Duration inf = turbo::Duration::max_infinite();
 
         // Division of Duration by a double
@@ -584,10 +584,10 @@ namespace {
         // Division of Duration by a double overflow/underflow
         EXPECT_EQ(inf, sec_max / 0.5);
         EXPECT_EQ(inf, sec_min / -0.5);
-        EXPECT_EQ(inf, ((sec_max / 0.5) + turbo::Seconds(1)) / 0.5);
+        EXPECT_EQ(inf, ((sec_max / 0.5) + turbo::Duration::seconds(1)) / 0.5);
         EXPECT_EQ(-inf, sec_max / -0.5);
         EXPECT_EQ(-inf, sec_min / 0.5);
-        EXPECT_EQ(-inf, ((sec_min / 0.5) - turbo::Seconds(1)) / 0.5);
+        EXPECT_EQ(-inf, ((sec_min / 0.5) - turbo::Duration::seconds(1)) / 0.5);
 
         const double dbl_inf = std::numeric_limits<double>::infinity();
         EXPECT_EQ(inf, inf / dbl_inf);
@@ -595,7 +595,7 @@ namespace {
         EXPECT_EQ(-inf, -inf / dbl_inf);
         EXPECT_EQ(inf, -inf / -dbl_inf);
 
-        const turbo::Duration any_dur = turbo::Seconds(1);
+        const turbo::Duration any_dur = turbo::Duration::seconds(1);
         EXPECT_EQ(turbo::Duration::zero(), any_dur / dbl_inf);
         EXPECT_EQ(turbo::Duration::zero(), any_dur / -dbl_inf);
         EXPECT_EQ(turbo::Duration::zero(), -any_dur / dbl_inf);
@@ -603,8 +603,8 @@ namespace {
     }
 
     TEST(Duration, InfinityModulus) {
-        const turbo::Duration sec_max = turbo::Seconds(kint64max);
-        const turbo::Duration any_dur = turbo::Seconds(1);
+        const turbo::Duration sec_max = turbo::Duration::seconds(kint64max);
+        const turbo::Duration any_dur = turbo::Duration::seconds(1);
         const turbo::Duration inf = turbo::Duration::max_infinite();
 
         EXPECT_EQ(inf, inf % inf);
@@ -623,16 +623,16 @@ namespace {
         EXPECT_EQ(-inf, -inf % any_dur);
 
         // Remainder isn't affected by overflow.
-        EXPECT_EQ(turbo::Duration::zero(), sec_max % turbo::Seconds(1));
-        EXPECT_EQ(turbo::Duration::zero(), sec_max % turbo::Milliseconds(1));
-        EXPECT_EQ(turbo::Duration::zero(), sec_max % turbo::Microseconds(1));
-        EXPECT_EQ(turbo::Duration::zero(), sec_max % turbo::Nanoseconds(1));
-        EXPECT_EQ(turbo::Duration::zero(), sec_max % turbo::Nanoseconds(1) / 4);
+        EXPECT_EQ(turbo::Duration::zero(), sec_max % turbo::Duration::seconds(1));
+        EXPECT_EQ(turbo::Duration::zero(), sec_max % turbo::Duration::milliseconds(1));
+        EXPECT_EQ(turbo::Duration::zero(), sec_max % turbo::Duration::microseconds(1));
+        EXPECT_EQ(turbo::Duration::zero(), sec_max % turbo::Duration::nanoseconds(1));
+        EXPECT_EQ(turbo::Duration::zero(), sec_max % turbo::Duration::nanoseconds(1) / 4);
     }
 
     TEST(Duration, InfinityIDiv) {
-        const turbo::Duration sec_max = turbo::Seconds(kint64max);
-        const turbo::Duration any_dur = turbo::Seconds(1);
+        const turbo::Duration sec_max = turbo::Duration::seconds(kint64max);
+        const turbo::Duration any_dur = turbo::Duration::seconds(1);
         const turbo::Duration inf = turbo::Duration::max_infinite();
         const double dbl_inf = std::numeric_limits<double>::infinity();
 
@@ -688,28 +688,28 @@ namespace {
         // Duration::idiv overflow/underflow
         rem = any_dur;
         EXPECT_EQ(kint64max,
-                  turbo::Duration::idiv(sec_max, turbo::Nanoseconds(1) / 4, &rem));
-        EXPECT_EQ(sec_max - turbo::Nanoseconds(kint64max) / 4, rem);
+                  turbo::Duration::idiv(sec_max, turbo::Duration::nanoseconds(1) / 4, &rem));
+        EXPECT_EQ(sec_max - turbo::Duration::nanoseconds(kint64max) / 4, rem);
 
         rem = any_dur;
         EXPECT_EQ(kint64max,
-                  turbo::Duration::idiv(sec_max, turbo::Milliseconds(1), &rem));
-        EXPECT_EQ(sec_max - turbo::Milliseconds(kint64max), rem);
+                  turbo::Duration::idiv(sec_max, turbo::Duration::milliseconds(1), &rem));
+        EXPECT_EQ(sec_max - turbo::Duration::milliseconds(kint64max), rem);
 
         rem = any_dur;
         EXPECT_EQ(kint64max,
-                  turbo::Duration::idiv(-sec_max, -turbo::Milliseconds(1), &rem));
-        EXPECT_EQ(-sec_max + turbo::Milliseconds(kint64max), rem);
+                  turbo::Duration::idiv(-sec_max, -turbo::Duration::milliseconds(1), &rem));
+        EXPECT_EQ(-sec_max + turbo::Duration::milliseconds(kint64max), rem);
 
         rem = any_dur;
         EXPECT_EQ(kint64min,
-                  turbo::Duration::idiv(-sec_max, turbo::Milliseconds(1), &rem));
-        EXPECT_EQ(-sec_max - turbo::Milliseconds(kint64min), rem);
+                  turbo::Duration::idiv(-sec_max, turbo::Duration::milliseconds(1), &rem));
+        EXPECT_EQ(-sec_max - turbo::Duration::milliseconds(kint64min), rem);
 
         rem = any_dur;
         EXPECT_EQ(kint64min,
-                  turbo::Duration::idiv(sec_max, -turbo::Milliseconds(1), &rem));
-        EXPECT_EQ(sec_max + turbo::Milliseconds(kint64min), rem);
+                  turbo::Duration::idiv(sec_max, -turbo::Duration::milliseconds(1), &rem));
+        EXPECT_EQ(sec_max + turbo::Duration::milliseconds(kint64min), rem);
 
         //
         // operator/(Duration, Duration) is a wrapper for Duration::idiv().
@@ -737,14 +737,14 @@ namespace {
         EXPECT_EQ(0, turbo::Duration::zero() / inf);
 
         // Division of Duration by a Duration overflow/underflow
-        EXPECT_EQ(kint64max, sec_max / turbo::Milliseconds(1));
-        EXPECT_EQ(kint64max, -sec_max / -turbo::Milliseconds(1));
-        EXPECT_EQ(kint64min, -sec_max / turbo::Milliseconds(1));
-        EXPECT_EQ(kint64min, sec_max / -turbo::Milliseconds(1));
+        EXPECT_EQ(kint64max, sec_max / turbo::Duration::milliseconds(1));
+        EXPECT_EQ(kint64max, -sec_max / -turbo::Duration::milliseconds(1));
+        EXPECT_EQ(kint64min, -sec_max / turbo::Duration::milliseconds(1));
+        EXPECT_EQ(kint64min, sec_max / -turbo::Duration::milliseconds(1));
     }
 
     TEST(Duration, InfinityFDiv) {
-        const turbo::Duration any_dur = turbo::Seconds(1);
+        const turbo::Duration any_dur = turbo::Duration::seconds(1);
         const turbo::Duration inf = turbo::Duration::max_infinite();
         const double dbl_inf = std::numeric_limits<double>::infinity();
 
@@ -766,7 +766,7 @@ namespace {
     TEST(Duration, DivisionByZero) {
         const turbo::Duration zero = turbo::Duration::zero();
         const turbo::Duration inf = turbo::Duration::max_infinite();
-        const turbo::Duration any_dur = turbo::Seconds(1);
+        const turbo::Duration any_dur = turbo::Duration::seconds(1);
         const double dbl_inf = std::numeric_limits<double>::infinity();
         const double dbl_denorm = std::numeric_limits<double>::denorm_min();
 
@@ -827,19 +827,19 @@ namespace {
   } while (0)
 
         const double nan = std::numeric_limits<double>::quiet_NaN();
-        TEST_NAN_HANDLING(turbo::Nanoseconds, nan);
-        TEST_NAN_HANDLING(turbo::Microseconds, nan);
-        TEST_NAN_HANDLING(turbo::Milliseconds, nan);
-        TEST_NAN_HANDLING(turbo::Seconds, nan);
-        TEST_NAN_HANDLING(turbo::Minutes, nan);
-        TEST_NAN_HANDLING(turbo::Hours, nan);
+        TEST_NAN_HANDLING(turbo::Duration::nanoseconds, nan);
+        TEST_NAN_HANDLING(turbo::Duration::microseconds, nan);
+        TEST_NAN_HANDLING(turbo::Duration::milliseconds, nan);
+        TEST_NAN_HANDLING(turbo::Duration::seconds, nan);
+        TEST_NAN_HANDLING(turbo::Duration::minutes, nan);
+        TEST_NAN_HANDLING(turbo::Duration::hours, nan);
 
-        TEST_NAN_HANDLING(turbo::Nanoseconds, -nan);
-        TEST_NAN_HANDLING(turbo::Microseconds, -nan);
-        TEST_NAN_HANDLING(turbo::Milliseconds, -nan);
-        TEST_NAN_HANDLING(turbo::Seconds, -nan);
-        TEST_NAN_HANDLING(turbo::Minutes, -nan);
-        TEST_NAN_HANDLING(turbo::Hours, -nan);
+        TEST_NAN_HANDLING(turbo::Duration::nanoseconds, -nan);
+        TEST_NAN_HANDLING(turbo::Duration::microseconds, -nan);
+        TEST_NAN_HANDLING(turbo::Duration::milliseconds, -nan);
+        TEST_NAN_HANDLING(turbo::Duration::seconds, -nan);
+        TEST_NAN_HANDLING(turbo::Duration::minutes, -nan);
+        TEST_NAN_HANDLING(turbo::Duration::hours, -nan);
 
 #undef TEST_NAN_HANDLING
     }
@@ -875,12 +875,12 @@ namespace {
   static_assert(UNIT(3) >= UNIT(2), ""); \
   static_assert(UNIT(2) >= UNIT(2), "");
 
-        TEST_REL_OPS(turbo::Nanoseconds);
-        TEST_REL_OPS(turbo::Microseconds);
-        TEST_REL_OPS(turbo::Milliseconds);
-        TEST_REL_OPS(turbo::Seconds);
-        TEST_REL_OPS(turbo::Minutes);
-        TEST_REL_OPS(turbo::Hours);
+        TEST_REL_OPS(turbo::Duration::nanoseconds);
+        TEST_REL_OPS(turbo::Duration::microseconds);
+        TEST_REL_OPS(turbo::Duration::milliseconds);
+        TEST_REL_OPS(turbo::Duration::seconds);
+        TEST_REL_OPS(turbo::Duration::minutes);
+        TEST_REL_OPS(turbo::Duration::hours);
 
 #undef TEST_REL_OPS
     }
@@ -901,42 +901,42 @@ namespace {
     EXPECT_EQ(UNIT(1), a);                  \
   } while (0)
 
-        TEST_ADD_OPS(turbo::Nanoseconds);
-        TEST_ADD_OPS(turbo::Microseconds);
-        TEST_ADD_OPS(turbo::Milliseconds);
-        TEST_ADD_OPS(turbo::Seconds);
-        TEST_ADD_OPS(turbo::Minutes);
-        TEST_ADD_OPS(turbo::Hours);
+        TEST_ADD_OPS(turbo::Duration::nanoseconds);
+        TEST_ADD_OPS(turbo::Duration::microseconds);
+        TEST_ADD_OPS(turbo::Duration::milliseconds);
+        TEST_ADD_OPS(turbo::Duration::seconds);
+        TEST_ADD_OPS(turbo::Duration::minutes);
+        TEST_ADD_OPS(turbo::Duration::hours);
 
 #undef TEST_ADD_OPS
 
-        EXPECT_EQ(turbo::Seconds(2), turbo::Seconds(3) - 2 * turbo::Milliseconds(500));
-        EXPECT_EQ(turbo::Seconds(2) + turbo::Milliseconds(500),
-                  turbo::Seconds(3) - turbo::Milliseconds(500));
+        EXPECT_EQ(turbo::Duration::seconds(2), turbo::Duration::seconds(3) - 2 * turbo::Duration::milliseconds(500));
+        EXPECT_EQ(turbo::Duration::seconds(2) + turbo::Duration::milliseconds(500),
+                  turbo::Duration::seconds(3) - turbo::Duration::milliseconds(500));
 
-        EXPECT_EQ(turbo::Seconds(1) + turbo::Milliseconds(998),
-                  turbo::Milliseconds(999) + turbo::Milliseconds(999));
+        EXPECT_EQ(turbo::Duration::seconds(1) + turbo::Duration::milliseconds(998),
+                  turbo::Duration::milliseconds(999) + turbo::Duration::milliseconds(999));
 
-        EXPECT_EQ(turbo::Milliseconds(-1),
-                  turbo::Milliseconds(998) - turbo::Milliseconds(999));
+        EXPECT_EQ(turbo::Duration::milliseconds(-1),
+                  turbo::Duration::milliseconds(998) - turbo::Duration::milliseconds(999));
 
         // Tests fractions of a nanoseconds. These are implementation details only.
-        EXPECT_GT(turbo::Nanoseconds(1), turbo::Nanoseconds(1) / 2);
-        EXPECT_EQ(turbo::Nanoseconds(1),
-                  turbo::Nanoseconds(1) / 2 + turbo::Nanoseconds(1) / 2);
-        EXPECT_GT(turbo::Nanoseconds(1) / 4, turbo::Nanoseconds(0));
-        EXPECT_EQ(turbo::Nanoseconds(1) / 8, turbo::Nanoseconds(0));
+        EXPECT_GT(turbo::Duration::nanoseconds(1), turbo::Duration::nanoseconds(1) / 2);
+        EXPECT_EQ(turbo::Duration::nanoseconds(1),
+                  turbo::Duration::nanoseconds(1) / 2 + turbo::Duration::nanoseconds(1) / 2);
+        EXPECT_GT(turbo::Duration::nanoseconds(1) / 4, turbo::Duration::nanoseconds(0));
+        EXPECT_EQ(turbo::Duration::nanoseconds(1) / 8, turbo::Duration::nanoseconds(0));
 
         // Tests subtraction that will cause wrap around of the rep_lo_ bits.
-        turbo::Duration d_7_5 = turbo::Seconds(7) + turbo::Milliseconds(500);
-        turbo::Duration d_3_7 = turbo::Seconds(3) + turbo::Milliseconds(700);
-        turbo::Duration ans_3_8 = turbo::Seconds(3) + turbo::Milliseconds(800);
+        turbo::Duration d_7_5 = turbo::Duration::seconds(7) + turbo::Duration::milliseconds(500);
+        turbo::Duration d_3_7 = turbo::Duration::seconds(3) + turbo::Duration::milliseconds(700);
+        turbo::Duration ans_3_8 = turbo::Duration::seconds(3) + turbo::Duration::milliseconds(800);
         EXPECT_EQ(ans_3_8, d_7_5 - d_3_7);
 
         // Subtracting min_duration
-        turbo::Duration min_dur = turbo::Seconds(kint64min);
-        EXPECT_EQ(turbo::Seconds(0), min_dur - min_dur);
-        EXPECT_EQ(turbo::Seconds(kint64max), turbo::Seconds(-1) - min_dur);
+        turbo::Duration min_dur = turbo::Duration::seconds(kint64min);
+        EXPECT_EQ(turbo::Duration::seconds(0), min_dur - min_dur);
+        EXPECT_EQ(turbo::Duration::seconds(kint64max), turbo::Duration::seconds(-1) - min_dur);
     }
 
     TEST(Duration, Negation) {
@@ -980,19 +980,19 @@ namespace {
 
     TEST(Duration, AbsoluteValue) {
         EXPECT_EQ(turbo::Duration::zero(), turbo::Duration::abs(turbo::Duration::zero()));
-        EXPECT_EQ(turbo::Seconds(1),  turbo::Duration::abs(turbo::Seconds(1)));
-        EXPECT_EQ(turbo::Seconds(1),  turbo::Duration::abs(turbo::Seconds(-1)));
+        EXPECT_EQ(turbo::Duration::seconds(1),  turbo::Duration::abs(turbo::Duration::seconds(1)));
+        EXPECT_EQ(turbo::Duration::seconds(1),  turbo::Duration::abs(turbo::Duration::seconds(-1)));
 
         EXPECT_EQ(turbo::Duration::max_infinite(),  turbo::Duration::abs(turbo::Duration::max_infinite()));
         EXPECT_EQ(turbo::Duration::max_infinite(),  turbo::Duration::abs(-turbo::Duration::max_infinite()));
 
         turbo::Duration max_dur =
-                turbo::Seconds(kint64max) + (turbo::Seconds(1) - turbo::Nanoseconds(1) / 4);
+                turbo::Duration::seconds(kint64max) + (turbo::Duration::seconds(1) - turbo::Duration::nanoseconds(1) / 4);
         EXPECT_EQ(max_dur,  turbo::Duration::abs(max_dur));
 
-        turbo::Duration min_dur = turbo::Seconds(kint64min);
+        turbo::Duration min_dur = turbo::Duration::seconds(kint64min);
         EXPECT_EQ(turbo::Duration::max_infinite(),  turbo::Duration::abs(min_dur));
-        EXPECT_EQ(max_dur,  turbo::Duration::abs(min_dur + turbo::Nanoseconds(1) / 4));
+        EXPECT_EQ(max_dur,  turbo::Duration::abs(min_dur + turbo::Duration::nanoseconds(1) / 4));
     }
 
     TEST(Duration, Multiplication) {
@@ -1028,20 +1028,20 @@ namespace {
     EXPECT_EQ(2.0, turbo::Duration::fdiv(UNIT(2), UNIT(1)));     \
   } while (0)
 
-        TEST_MUL_OPS(turbo::Nanoseconds);
-        TEST_MUL_OPS(turbo::Microseconds);
-        TEST_MUL_OPS(turbo::Milliseconds);
-        TEST_MUL_OPS(turbo::Seconds);
-        TEST_MUL_OPS(turbo::Minutes);
-        TEST_MUL_OPS(turbo::Hours);
+        TEST_MUL_OPS(turbo::Duration::nanoseconds);
+        TEST_MUL_OPS(turbo::Duration::microseconds);
+        TEST_MUL_OPS(turbo::Duration::milliseconds);
+        TEST_MUL_OPS(turbo::Duration::seconds);
+        TEST_MUL_OPS(turbo::Duration::minutes);
+        TEST_MUL_OPS(turbo::Duration::hours);
 
 #undef TEST_MUL_OPS
 
         // Ensures that multiplication and division by 1 with a maxed-out durations
         // doesn't lose precision.
         turbo::Duration max_dur =
-                turbo::Seconds(kint64max) + (turbo::Seconds(1) - turbo::Nanoseconds(1) / 4);
-        turbo::Duration min_dur = turbo::Seconds(kint64min);
+                turbo::Duration::seconds(kint64max) + (turbo::Duration::seconds(1) - turbo::Duration::nanoseconds(1) / 4);
+        turbo::Duration min_dur = turbo::Duration::seconds(kint64min);
         EXPECT_EQ(max_dur, max_dur * 1);
         EXPECT_EQ(max_dur, max_dur / 1);
         EXPECT_EQ(min_dur, min_dur * 1);
@@ -1049,78 +1049,78 @@ namespace {
 
         // Tests division on a Duration with a large number of significant digits.
         // Tests when the digits span hi and lo as well as only in hi.
-        turbo::Duration sigfigs = turbo::Seconds(2000000000) + turbo::Nanoseconds(3);
-        EXPECT_EQ(turbo::Seconds(666666666) + turbo::Nanoseconds(666666667) +
-                  turbo::Nanoseconds(1) / 2,
+        turbo::Duration sigfigs = turbo::Duration::seconds(2000000000) + turbo::Duration::nanoseconds(3);
+        EXPECT_EQ(turbo::Duration::seconds(666666666) + turbo::Duration::nanoseconds(666666667) +
+                  turbo::Duration::nanoseconds(1) / 2,
                   sigfigs / 3);
-        sigfigs = turbo::Seconds(int64_t{7000000000});
-        EXPECT_EQ(turbo::Seconds(2333333333) + turbo::Nanoseconds(333333333) +
-                  turbo::Nanoseconds(1) / 4,
+        sigfigs = turbo::Duration::seconds(int64_t{7000000000});
+        EXPECT_EQ(turbo::Duration::seconds(2333333333) + turbo::Duration::nanoseconds(333333333) +
+                  turbo::Duration::nanoseconds(1) / 4,
                   sigfigs / 3);
 
-        EXPECT_EQ(turbo::Seconds(7) + turbo::Milliseconds(500), turbo::Seconds(3) * 2.5);
-        EXPECT_EQ(turbo::Seconds(8) * -1 + turbo::Milliseconds(300),
-                  (turbo::Seconds(2) + turbo::Milliseconds(200)) * -3.5);
-        EXPECT_EQ(-turbo::Seconds(8) + turbo::Milliseconds(300),
-                  (turbo::Seconds(2) + turbo::Milliseconds(200)) * -3.5);
-        EXPECT_EQ(turbo::Seconds(1) + turbo::Milliseconds(875),
-                  (turbo::Seconds(7) + turbo::Milliseconds(500)) / 4);
-        EXPECT_EQ(turbo::Seconds(30),
-                  (turbo::Seconds(7) + turbo::Milliseconds(500)) / 0.25);
-        EXPECT_EQ(turbo::Seconds(3),
-                  (turbo::Seconds(7) + turbo::Milliseconds(500)) / 2.5);
+        EXPECT_EQ(turbo::Duration::seconds(7) + turbo::Duration::milliseconds(500), turbo::Duration::seconds(3) * 2.5);
+        EXPECT_EQ(turbo::Duration::seconds(8) * -1 + turbo::Duration::milliseconds(300),
+                  (turbo::Duration::seconds(2) + turbo::Duration::milliseconds(200)) * -3.5);
+        EXPECT_EQ(-turbo::Duration::seconds(8) + turbo::Duration::milliseconds(300),
+                  (turbo::Duration::seconds(2) + turbo::Duration::milliseconds(200)) * -3.5);
+        EXPECT_EQ(turbo::Duration::seconds(1) + turbo::Duration::milliseconds(875),
+                  (turbo::Duration::seconds(7) + turbo::Duration::milliseconds(500)) / 4);
+        EXPECT_EQ(turbo::Duration::seconds(30),
+                  (turbo::Duration::seconds(7) + turbo::Duration::milliseconds(500)) / 0.25);
+        EXPECT_EQ(turbo::Duration::seconds(3),
+                  (turbo::Duration::seconds(7) + turbo::Duration::milliseconds(500)) / 2.5);
 
         // Tests division remainder.
-        EXPECT_EQ(turbo::Nanoseconds(0), turbo::Nanoseconds(7) % turbo::Nanoseconds(1));
-        EXPECT_EQ(turbo::Nanoseconds(0), turbo::Nanoseconds(0) % turbo::Nanoseconds(10));
-        EXPECT_EQ(turbo::Nanoseconds(2), turbo::Nanoseconds(7) % turbo::Nanoseconds(5));
-        EXPECT_EQ(turbo::Nanoseconds(2), turbo::Nanoseconds(2) % turbo::Nanoseconds(5));
+        EXPECT_EQ(turbo::Duration::nanoseconds(0), turbo::Duration::nanoseconds(7) % turbo::Duration::nanoseconds(1));
+        EXPECT_EQ(turbo::Duration::nanoseconds(0), turbo::Duration::nanoseconds(0) % turbo::Duration::nanoseconds(10));
+        EXPECT_EQ(turbo::Duration::nanoseconds(2), turbo::Duration::nanoseconds(7) % turbo::Duration::nanoseconds(5));
+        EXPECT_EQ(turbo::Duration::nanoseconds(2), turbo::Duration::nanoseconds(2) % turbo::Duration::nanoseconds(5));
 
-        EXPECT_EQ(turbo::Nanoseconds(1), turbo::Nanoseconds(10) % turbo::Nanoseconds(3));
-        EXPECT_EQ(turbo::Nanoseconds(1),
-                  turbo::Nanoseconds(10) % turbo::Nanoseconds(-3));
-        EXPECT_EQ(turbo::Nanoseconds(-1),
-                  turbo::Nanoseconds(-10) % turbo::Nanoseconds(3));
-        EXPECT_EQ(turbo::Nanoseconds(-1),
-                  turbo::Nanoseconds(-10) % turbo::Nanoseconds(-3));
+        EXPECT_EQ(turbo::Duration::nanoseconds(1), turbo::Duration::nanoseconds(10) % turbo::Duration::nanoseconds(3));
+        EXPECT_EQ(turbo::Duration::nanoseconds(1),
+                  turbo::Duration::nanoseconds(10) % turbo::Duration::nanoseconds(-3));
+        EXPECT_EQ(turbo::Duration::nanoseconds(-1),
+                  turbo::Duration::nanoseconds(-10) % turbo::Duration::nanoseconds(3));
+        EXPECT_EQ(turbo::Duration::nanoseconds(-1),
+                  turbo::Duration::nanoseconds(-10) % turbo::Duration::nanoseconds(-3));
 
-        EXPECT_EQ(turbo::Milliseconds(100),
-                  turbo::Seconds(1) % turbo::Milliseconds(300));
+        EXPECT_EQ(turbo::Duration::milliseconds(100),
+                  turbo::Duration::seconds(1) % turbo::Duration::milliseconds(300));
         EXPECT_EQ(
-                turbo::Milliseconds(300),
-                (turbo::Seconds(3) + turbo::Milliseconds(800)) % turbo::Milliseconds(500));
+                turbo::Duration::milliseconds(300),
+                (turbo::Duration::seconds(3) + turbo::Duration::milliseconds(800)) % turbo::Duration::milliseconds(500));
 
-        EXPECT_EQ(turbo::Nanoseconds(1), turbo::Nanoseconds(1) % turbo::Seconds(1));
-        EXPECT_EQ(turbo::Nanoseconds(-1), turbo::Nanoseconds(-1) % turbo::Seconds(1));
-        EXPECT_EQ(0, turbo::Nanoseconds(-1) / turbo::Seconds(1));  // Actual -1e-9
+        EXPECT_EQ(turbo::Duration::nanoseconds(1), turbo::Duration::nanoseconds(1) % turbo::Duration::seconds(1));
+        EXPECT_EQ(turbo::Duration::nanoseconds(-1), turbo::Duration::nanoseconds(-1) % turbo::Duration::seconds(1));
+        EXPECT_EQ(0, turbo::Duration::nanoseconds(-1) / turbo::Duration::seconds(1));  // Actual -1e-9
 
         // Tests identity a = (a/b)*b + a%b
 #define TEST_MOD_IDENTITY(a, b) \
   EXPECT_EQ((a), ((a) / (b))*(b) + ((a)%(b)))
 
-        TEST_MOD_IDENTITY(turbo::Seconds(0), turbo::Seconds(2));
-        TEST_MOD_IDENTITY(turbo::Seconds(1), turbo::Seconds(1));
-        TEST_MOD_IDENTITY(turbo::Seconds(1), turbo::Seconds(2));
-        TEST_MOD_IDENTITY(turbo::Seconds(2), turbo::Seconds(1));
+        TEST_MOD_IDENTITY(turbo::Duration::seconds(0), turbo::Duration::seconds(2));
+        TEST_MOD_IDENTITY(turbo::Duration::seconds(1), turbo::Duration::seconds(1));
+        TEST_MOD_IDENTITY(turbo::Duration::seconds(1), turbo::Duration::seconds(2));
+        TEST_MOD_IDENTITY(turbo::Duration::seconds(2), turbo::Duration::seconds(1));
 
-        TEST_MOD_IDENTITY(turbo::Seconds(-2), turbo::Seconds(1));
-        TEST_MOD_IDENTITY(turbo::Seconds(2), turbo::Seconds(-1));
-        TEST_MOD_IDENTITY(turbo::Seconds(-2), turbo::Seconds(-1));
+        TEST_MOD_IDENTITY(turbo::Duration::seconds(-2), turbo::Duration::seconds(1));
+        TEST_MOD_IDENTITY(turbo::Duration::seconds(2), turbo::Duration::seconds(-1));
+        TEST_MOD_IDENTITY(turbo::Duration::seconds(-2), turbo::Duration::seconds(-1));
 
-        TEST_MOD_IDENTITY(turbo::Nanoseconds(0), turbo::Nanoseconds(2));
-        TEST_MOD_IDENTITY(turbo::Nanoseconds(1), turbo::Nanoseconds(1));
-        TEST_MOD_IDENTITY(turbo::Nanoseconds(1), turbo::Nanoseconds(2));
-        TEST_MOD_IDENTITY(turbo::Nanoseconds(2), turbo::Nanoseconds(1));
+        TEST_MOD_IDENTITY(turbo::Duration::nanoseconds(0), turbo::Duration::nanoseconds(2));
+        TEST_MOD_IDENTITY(turbo::Duration::nanoseconds(1), turbo::Duration::nanoseconds(1));
+        TEST_MOD_IDENTITY(turbo::Duration::nanoseconds(1), turbo::Duration::nanoseconds(2));
+        TEST_MOD_IDENTITY(turbo::Duration::nanoseconds(2), turbo::Duration::nanoseconds(1));
 
-        TEST_MOD_IDENTITY(turbo::Nanoseconds(-2), turbo::Nanoseconds(1));
-        TEST_MOD_IDENTITY(turbo::Nanoseconds(2), turbo::Nanoseconds(-1));
-        TEST_MOD_IDENTITY(turbo::Nanoseconds(-2), turbo::Nanoseconds(-1));
+        TEST_MOD_IDENTITY(turbo::Duration::nanoseconds(-2), turbo::Duration::nanoseconds(1));
+        TEST_MOD_IDENTITY(turbo::Duration::nanoseconds(2), turbo::Duration::nanoseconds(-1));
+        TEST_MOD_IDENTITY(turbo::Duration::nanoseconds(-2), turbo::Duration::nanoseconds(-1));
 
         // Mixed seconds + subseconds
-        turbo::Duration mixed_a = turbo::Seconds(1) + turbo::Nanoseconds(2);
-        turbo::Duration mixed_b = turbo::Seconds(1) + turbo::Nanoseconds(3);
+        turbo::Duration mixed_a = turbo::Duration::seconds(1) + turbo::Duration::nanoseconds(2);
+        turbo::Duration mixed_b = turbo::Duration::seconds(1) + turbo::Duration::nanoseconds(3);
 
-        TEST_MOD_IDENTITY(turbo::Seconds(0), mixed_a);
+        TEST_MOD_IDENTITY(turbo::Duration::seconds(0), mixed_a);
         TEST_MOD_IDENTITY(mixed_a, mixed_a);
         TEST_MOD_IDENTITY(mixed_a, mixed_b);
         TEST_MOD_IDENTITY(mixed_b, mixed_a);
@@ -1133,74 +1133,74 @@ namespace {
     }
 
     TEST(Duration, Truncation) {
-        const turbo::Duration d = turbo::Nanoseconds(1234567890);
+        const turbo::Duration d = turbo::Duration::nanoseconds(1234567890);
         const turbo::Duration inf = turbo::Duration::max_infinite();
         for (int unit_sign: {1, -1}) {  // sign shouldn't matter
-            EXPECT_EQ(turbo::Nanoseconds(1234567890),
-                      turbo::Duration::trunc(d, unit_sign * turbo::Nanoseconds(1)));
-            EXPECT_EQ(turbo::Microseconds(1234567),
-                      turbo::Duration::trunc(d, unit_sign * turbo::Microseconds(1)));
-            EXPECT_EQ(turbo::Milliseconds(1234),
-                      turbo::Duration::trunc(d, unit_sign * turbo::Milliseconds(1)));
-            EXPECT_EQ(turbo::Seconds(1), turbo::Duration::trunc(d, unit_sign * turbo::Seconds(1)));
-            EXPECT_EQ(inf, turbo::Duration::trunc(inf, unit_sign * turbo::Seconds(1)));
+            EXPECT_EQ(turbo::Duration::nanoseconds(1234567890),
+                      turbo::Duration::trunc(d, unit_sign * turbo::Duration::nanoseconds(1)));
+            EXPECT_EQ(turbo::Duration::microseconds(1234567),
+                      turbo::Duration::trunc(d, unit_sign * turbo::Duration::microseconds(1)));
+            EXPECT_EQ(turbo::Duration::milliseconds(1234),
+                      turbo::Duration::trunc(d, unit_sign * turbo::Duration::milliseconds(1)));
+            EXPECT_EQ(turbo::Duration::seconds(1), turbo::Duration::trunc(d, unit_sign * turbo::Duration::seconds(1)));
+            EXPECT_EQ(inf, turbo::Duration::trunc(inf, unit_sign * turbo::Duration::seconds(1)));
 
-            EXPECT_EQ(turbo::Nanoseconds(-1234567890),
-                      turbo::Duration::trunc(-d, unit_sign * turbo::Nanoseconds(1)));
-            EXPECT_EQ(turbo::Microseconds(-1234567),
-                      turbo::Duration::trunc(-d, unit_sign * turbo::Microseconds(1)));
-            EXPECT_EQ(turbo::Milliseconds(-1234),
-                      turbo::Duration::trunc(-d, unit_sign * turbo::Milliseconds(1)));
-            EXPECT_EQ(turbo::Seconds(-1), turbo::Duration::trunc(-d, unit_sign * turbo::Seconds(1)));
-            EXPECT_EQ(-inf, turbo::Duration::trunc(-inf, unit_sign * turbo::Seconds(1)));
+            EXPECT_EQ(turbo::Duration::nanoseconds(-1234567890),
+                      turbo::Duration::trunc(-d, unit_sign * turbo::Duration::nanoseconds(1)));
+            EXPECT_EQ(turbo::Duration::microseconds(-1234567),
+                      turbo::Duration::trunc(-d, unit_sign * turbo::Duration::microseconds(1)));
+            EXPECT_EQ(turbo::Duration::milliseconds(-1234),
+                      turbo::Duration::trunc(-d, unit_sign * turbo::Duration::milliseconds(1)));
+            EXPECT_EQ(turbo::Duration::seconds(-1), turbo::Duration::trunc(-d, unit_sign * turbo::Duration::seconds(1)));
+            EXPECT_EQ(-inf, turbo::Duration::trunc(-inf, unit_sign * turbo::Duration::seconds(1)));
         }
     }
 
     TEST(Duration, Flooring) {
-        const turbo::Duration d = turbo::Nanoseconds(1234567890);
+        const turbo::Duration d = turbo::Duration::nanoseconds(1234567890);
         const turbo::Duration inf = turbo::Duration::max_infinite();
         for (int unit_sign: {1, -1}) {  // sign shouldn't matter
-            EXPECT_EQ(turbo::Nanoseconds(1234567890),
-                      turbo::Duration::floor(d, unit_sign * turbo::Nanoseconds(1)));
-            EXPECT_EQ(turbo::Microseconds(1234567),
-                      turbo::Duration::floor(d, unit_sign * turbo::Microseconds(1)));
-            EXPECT_EQ(turbo::Milliseconds(1234),
-                      turbo::Duration::floor(d, unit_sign * turbo::Milliseconds(1)));
-            EXPECT_EQ(turbo::Seconds(1), turbo::Duration::floor(d, unit_sign * turbo::Seconds(1)));
-            EXPECT_EQ(inf, turbo::Duration::floor(inf, unit_sign * turbo::Seconds(1)));
+            EXPECT_EQ(turbo::Duration::nanoseconds(1234567890),
+                      turbo::Duration::floor(d, unit_sign * turbo::Duration::nanoseconds(1)));
+            EXPECT_EQ(turbo::Duration::microseconds(1234567),
+                      turbo::Duration::floor(d, unit_sign * turbo::Duration::microseconds(1)));
+            EXPECT_EQ(turbo::Duration::milliseconds(1234),
+                      turbo::Duration::floor(d, unit_sign * turbo::Duration::milliseconds(1)));
+            EXPECT_EQ(turbo::Duration::seconds(1), turbo::Duration::floor(d, unit_sign * turbo::Duration::seconds(1)));
+            EXPECT_EQ(inf, turbo::Duration::floor(inf, unit_sign * turbo::Duration::seconds(1)));
 
-            EXPECT_EQ(turbo::Nanoseconds(-1234567890),
-                      turbo::Duration::floor(-d, unit_sign * turbo::Nanoseconds(1)));
-            EXPECT_EQ(turbo::Microseconds(-1234568),
-                      turbo::Duration::floor(-d, unit_sign * turbo::Microseconds(1)));
-            EXPECT_EQ(turbo::Milliseconds(-1235),
-                      turbo::Duration::floor(-d, unit_sign * turbo::Milliseconds(1)));
-            EXPECT_EQ(turbo::Seconds(-2), turbo::Duration::floor(-d, unit_sign * turbo::Seconds(1)));
-            EXPECT_EQ(-inf, turbo::Duration::floor(-inf, unit_sign * turbo::Seconds(1)));
+            EXPECT_EQ(turbo::Duration::nanoseconds(-1234567890),
+                      turbo::Duration::floor(-d, unit_sign * turbo::Duration::nanoseconds(1)));
+            EXPECT_EQ(turbo::Duration::microseconds(-1234568),
+                      turbo::Duration::floor(-d, unit_sign * turbo::Duration::microseconds(1)));
+            EXPECT_EQ(turbo::Duration::milliseconds(-1235),
+                      turbo::Duration::floor(-d, unit_sign * turbo::Duration::milliseconds(1)));
+            EXPECT_EQ(turbo::Duration::seconds(-2), turbo::Duration::floor(-d, unit_sign * turbo::Duration::seconds(1)));
+            EXPECT_EQ(-inf, turbo::Duration::floor(-inf, unit_sign * turbo::Duration::seconds(1)));
         }
     }
 
     TEST(Duration, Ceiling) {
-        const turbo::Duration d = turbo::Nanoseconds(1234567890);
+        const turbo::Duration d = turbo::Duration::nanoseconds(1234567890);
         const turbo::Duration inf = turbo::Duration::max_infinite();
         for (int unit_sign: {1, -1}) {  // // sign shouldn't matter
-            EXPECT_EQ(turbo::Nanoseconds(1234567890),
-                      turbo::Duration::ceil(d, unit_sign * turbo::Nanoseconds(1)));
-            EXPECT_EQ(turbo::Microseconds(1234568),
-                      turbo::Duration::ceil(d, unit_sign * turbo::Microseconds(1)));
-            EXPECT_EQ(turbo::Milliseconds(1235),
-                      turbo::Duration::ceil(d, unit_sign * turbo::Milliseconds(1)));
-            EXPECT_EQ(turbo::Seconds(2), turbo::Duration::ceil(d, unit_sign * turbo::Seconds(1)));
-            EXPECT_EQ(inf, turbo::Duration::ceil(inf, unit_sign * turbo::Seconds(1)));
+            EXPECT_EQ(turbo::Duration::nanoseconds(1234567890),
+                      turbo::Duration::ceil(d, unit_sign * turbo::Duration::nanoseconds(1)));
+            EXPECT_EQ(turbo::Duration::microseconds(1234568),
+                      turbo::Duration::ceil(d, unit_sign * turbo::Duration::microseconds(1)));
+            EXPECT_EQ(turbo::Duration::milliseconds(1235),
+                      turbo::Duration::ceil(d, unit_sign * turbo::Duration::milliseconds(1)));
+            EXPECT_EQ(turbo::Duration::seconds(2), turbo::Duration::ceil(d, unit_sign * turbo::Duration::seconds(1)));
+            EXPECT_EQ(inf, turbo::Duration::ceil(inf, unit_sign * turbo::Duration::seconds(1)));
 
-            EXPECT_EQ(turbo::Nanoseconds(-1234567890),
-                      turbo::Duration::ceil(-d, unit_sign * turbo::Nanoseconds(1)));
-            EXPECT_EQ(turbo::Microseconds(-1234567),
-                      turbo::Duration::ceil(-d, unit_sign * turbo::Microseconds(1)));
-            EXPECT_EQ(turbo::Milliseconds(-1234),
-                      turbo::Duration::ceil(-d, unit_sign * turbo::Milliseconds(1)));
-            EXPECT_EQ(turbo::Seconds(-1), turbo::Duration::ceil(-d, unit_sign * turbo::Seconds(1)));
-            EXPECT_EQ(-inf, turbo::Duration::ceil(-inf, unit_sign * turbo::Seconds(1)));
+            EXPECT_EQ(turbo::Duration::nanoseconds(-1234567890),
+                      turbo::Duration::ceil(-d, unit_sign * turbo::Duration::nanoseconds(1)));
+            EXPECT_EQ(turbo::Duration::microseconds(-1234567),
+                      turbo::Duration::ceil(-d, unit_sign * turbo::Duration::microseconds(1)));
+            EXPECT_EQ(turbo::Duration::milliseconds(-1234),
+                      turbo::Duration::ceil(-d, unit_sign * turbo::Duration::milliseconds(1)));
+            EXPECT_EQ(turbo::Duration::seconds(-1), turbo::Duration::ceil(-d, unit_sign * turbo::Duration::seconds(1)));
+            EXPECT_EQ(-inf, turbo::Duration::ceil(-inf, unit_sign * turbo::Duration::seconds(1)));
         }
     }
 
@@ -1220,29 +1220,29 @@ namespace {
     }                                          \
   } while (0)
 
-        ROUND_TRIP_UNIT(Nanoseconds, kint64min, kint64min + kRange);
-        ROUND_TRIP_UNIT(Nanoseconds, -kRange, kRange);
-        ROUND_TRIP_UNIT(Nanoseconds, kint64max - kRange, kint64max);
+        ROUND_TRIP_UNIT(Duration::nanoseconds, kint64min, kint64min + kRange);
+        ROUND_TRIP_UNIT(Duration::nanoseconds, -kRange, kRange);
+        ROUND_TRIP_UNIT(Duration::nanoseconds, kint64max - kRange, kint64max);
 
-        ROUND_TRIP_UNIT(Microseconds, kint64min, kint64min + kRange);
-        ROUND_TRIP_UNIT(Microseconds, -kRange, kRange);
-        ROUND_TRIP_UNIT(Microseconds, kint64max - kRange, kint64max);
+        ROUND_TRIP_UNIT(Duration::microseconds, kint64min, kint64min + kRange);
+        ROUND_TRIP_UNIT(Duration::microseconds, -kRange, kRange);
+        ROUND_TRIP_UNIT(Duration::microseconds, kint64max - kRange, kint64max);
 
-        ROUND_TRIP_UNIT(Milliseconds, kint64min, kint64min + kRange);
-        ROUND_TRIP_UNIT(Milliseconds, -kRange, kRange);
-        ROUND_TRIP_UNIT(Milliseconds, kint64max - kRange, kint64max);
+        ROUND_TRIP_UNIT(Duration::milliseconds, kint64min, kint64min + kRange);
+        ROUND_TRIP_UNIT(Duration::milliseconds, -kRange, kRange);
+        ROUND_TRIP_UNIT(Duration::milliseconds, kint64max - kRange, kint64max);
 
-        ROUND_TRIP_UNIT(Seconds, kint64min, kint64min + kRange);
-        ROUND_TRIP_UNIT(Seconds, -kRange, kRange);
-        ROUND_TRIP_UNIT(Seconds, kint64max - kRange, kint64max);
+        ROUND_TRIP_UNIT(Duration::seconds, kint64min, kint64min + kRange);
+        ROUND_TRIP_UNIT(Duration::seconds, -kRange, kRange);
+        ROUND_TRIP_UNIT(Duration::seconds, kint64max - kRange, kint64max);
 
-        ROUND_TRIP_UNIT(Minutes, kint64min / 60, kint64min / 60 + kRange);
-        ROUND_TRIP_UNIT(Minutes, -kRange, kRange);
-        ROUND_TRIP_UNIT(Minutes, kint64max / 60 - kRange, kint64max / 60);
+        ROUND_TRIP_UNIT(Duration::minutes, kint64min / 60, kint64min / 60 + kRange);
+        ROUND_TRIP_UNIT(Duration::minutes, -kRange, kRange);
+        ROUND_TRIP_UNIT(Duration::minutes, kint64max / 60 - kRange, kint64max / 60);
 
-        ROUND_TRIP_UNIT(Hours, kint64min / 3600, kint64min / 3600 + kRange);
-        ROUND_TRIP_UNIT(Hours, -kRange, kRange);
-        ROUND_TRIP_UNIT(Hours, kint64max / 3600 - kRange, kint64max / 3600);
+        ROUND_TRIP_UNIT(Duration::hours, kint64min / 3600, kint64min / 3600 + kRange);
+        ROUND_TRIP_UNIT(Duration::hours, -kRange, kRange);
+        ROUND_TRIP_UNIT(Duration::hours, kint64max / 3600 - kRange, kint64max / 3600);
 
 #undef ROUND_TRIP_UNIT
     }
@@ -1253,16 +1253,16 @@ namespace {
             turbo::Duration d;
             timespec ts;
         } to_ts[] = {
-                {turbo::Seconds(1) + turbo::Nanoseconds(1),      {1,  1}},
-                {turbo::Seconds(1) + turbo::Nanoseconds(1) / 2,  {1,  0}},
-                {turbo::Seconds(1) + turbo::Nanoseconds(0),      {1,  0}},
-                {turbo::Seconds(0) + turbo::Nanoseconds(0),      {0,  0}},
-                {turbo::Seconds(0) - turbo::Nanoseconds(1) / 2,  {0,  0}},
-                {turbo::Seconds(0) - turbo::Nanoseconds(1),      {-1, 999999999}},
-                {turbo::Seconds(-1) + turbo::Nanoseconds(1),     {-1, 1}},
-                {turbo::Seconds(-1) + turbo::Nanoseconds(1) / 2, {-1, 1}},
-                {turbo::Seconds(-1) + turbo::Nanoseconds(0),     {-1, 0}},
-                {turbo::Seconds(-1) - turbo::Nanoseconds(1) / 2, {-1, 0}},
+                {turbo::Duration::seconds(1) + turbo::Duration::nanoseconds(1),      {1,  1}},
+                {turbo::Duration::seconds(1) + turbo::Duration::nanoseconds(1) / 2,  {1,  0}},
+                {turbo::Duration::seconds(1) + turbo::Duration::nanoseconds(0),      {1,  0}},
+                {turbo::Duration::seconds(0) + turbo::Duration::nanoseconds(0),      {0,  0}},
+                {turbo::Duration::seconds(0) - turbo::Duration::nanoseconds(1) / 2,  {0,  0}},
+                {turbo::Duration::seconds(0) - turbo::Duration::nanoseconds(1),      {-1, 999999999}},
+                {turbo::Duration::seconds(-1) + turbo::Duration::nanoseconds(1),     {-1, 1}},
+                {turbo::Duration::seconds(-1) + turbo::Duration::nanoseconds(1) / 2, {-1, 1}},
+                {turbo::Duration::seconds(-1) + turbo::Duration::nanoseconds(0),     {-1, 0}},
+                {turbo::Duration::seconds(-1) - turbo::Duration::nanoseconds(1) / 2, {-1, 0}},
         };
         for (const auto &test: to_ts) {
             EXPECT_THAT(turbo::ToTimespec(test.d), TimespecMatcher(test.ts));
@@ -1271,15 +1271,15 @@ namespace {
             timespec ts;
             turbo::Duration d;
         } from_ts[] = {
-                {{1,  1},         turbo::Seconds(1) + turbo::Nanoseconds(1)},
-                {{1,  0},         turbo::Seconds(1) + turbo::Nanoseconds(0)},
-                {{0,  0},         turbo::Seconds(0) + turbo::Nanoseconds(0)},
-                {{0,  -1},        turbo::Seconds(0) - turbo::Nanoseconds(1)},
-                {{-1, 999999999}, turbo::Seconds(0) - turbo::Nanoseconds(1)},
-                {{-1, 1},         turbo::Seconds(-1) + turbo::Nanoseconds(1)},
-                {{-1, 0},         turbo::Seconds(-1) + turbo::Nanoseconds(0)},
-                {{-1, -1},        turbo::Seconds(-1) - turbo::Nanoseconds(1)},
-                {{-2, 999999999}, turbo::Seconds(-1) - turbo::Nanoseconds(1)},
+                {{1,  1},         turbo::Duration::seconds(1) + turbo::Duration::nanoseconds(1)},
+                {{1,  0},         turbo::Duration::seconds(1) + turbo::Duration::nanoseconds(0)},
+                {{0,  0},         turbo::Duration::seconds(0) + turbo::Duration::nanoseconds(0)},
+                {{0,  -1},        turbo::Duration::seconds(0) - turbo::Duration::nanoseconds(1)},
+                {{-1, 999999999}, turbo::Duration::seconds(0) - turbo::Duration::nanoseconds(1)},
+                {{-1, 1},         turbo::Duration::seconds(-1) + turbo::Duration::nanoseconds(1)},
+                {{-1, 0},         turbo::Duration::seconds(-1) + turbo::Duration::nanoseconds(0)},
+                {{-1, -1},        turbo::Duration::seconds(-1) - turbo::Duration::nanoseconds(1)},
+                {{-2, 999999999}, turbo::Duration::seconds(-1) - turbo::Duration::nanoseconds(1)},
         };
         for (const auto &test: from_ts) {
             EXPECT_EQ(test.d, turbo::DurationFromTimespec(test.ts));
@@ -1290,16 +1290,16 @@ namespace {
             turbo::Duration d;
             timeval tv;
         } to_tv[] = {
-                {turbo::Seconds(1) + turbo::Microseconds(1),      {1,  1}},
-                {turbo::Seconds(1) + turbo::Microseconds(1) / 2,  {1,  0}},
-                {turbo::Seconds(1) + turbo::Microseconds(0),      {1,  0}},
-                {turbo::Seconds(0) + turbo::Microseconds(0),      {0,  0}},
-                {turbo::Seconds(0) - turbo::Microseconds(1) / 2,  {0,  0}},
-                {turbo::Seconds(0) - turbo::Microseconds(1),      {-1, 999999}},
-                {turbo::Seconds(-1) + turbo::Microseconds(1),     {-1, 1}},
-                {turbo::Seconds(-1) + turbo::Microseconds(1) / 2, {-1, 1}},
-                {turbo::Seconds(-1) + turbo::Microseconds(0),     {-1, 0}},
-                {turbo::Seconds(-1) - turbo::Microseconds(1) / 2, {-1, 0}},
+                {turbo::Duration::seconds(1) + turbo::Duration::microseconds(1),      {1,  1}},
+                {turbo::Duration::seconds(1) + turbo::Duration::microseconds(1) / 2,  {1,  0}},
+                {turbo::Duration::seconds(1) + turbo::Duration::microseconds(0),      {1,  0}},
+                {turbo::Duration::seconds(0) + turbo::Duration::microseconds(0),      {0,  0}},
+                {turbo::Duration::seconds(0) - turbo::Duration::microseconds(1) / 2,  {0,  0}},
+                {turbo::Duration::seconds(0) - turbo::Duration::microseconds(1),      {-1, 999999}},
+                {turbo::Duration::seconds(-1) + turbo::Duration::microseconds(1),     {-1, 1}},
+                {turbo::Duration::seconds(-1) + turbo::Duration::microseconds(1) / 2, {-1, 1}},
+                {turbo::Duration::seconds(-1) + turbo::Duration::microseconds(0),     {-1, 0}},
+                {turbo::Duration::seconds(-1) - turbo::Duration::microseconds(1) / 2, {-1, 0}},
         };
         for (const auto &test: to_tv) {
             EXPECT_THAT(turbo::ToTimeval(test.d), TimevalMatcher(test.tv));
@@ -1308,15 +1308,15 @@ namespace {
             timeval tv;
             turbo::Duration d;
         } from_tv[] = {
-                {{1,  1},      turbo::Seconds(1) + turbo::Microseconds(1)},
-                {{1,  0},      turbo::Seconds(1) + turbo::Microseconds(0)},
-                {{0,  0},      turbo::Seconds(0) + turbo::Microseconds(0)},
-                {{0,  -1},     turbo::Seconds(0) - turbo::Microseconds(1)},
-                {{-1, 999999}, turbo::Seconds(0) - turbo::Microseconds(1)},
-                {{-1, 1},      turbo::Seconds(-1) + turbo::Microseconds(1)},
-                {{-1, 0},      turbo::Seconds(-1) + turbo::Microseconds(0)},
-                {{-1, -1},     turbo::Seconds(-1) - turbo::Microseconds(1)},
-                {{-2, 999999}, turbo::Seconds(-1) - turbo::Microseconds(1)},
+                {{1,  1},      turbo::Duration::seconds(1) + turbo::Duration::microseconds(1)},
+                {{1,  0},      turbo::Duration::seconds(1) + turbo::Duration::microseconds(0)},
+                {{0,  0},      turbo::Duration::seconds(0) + turbo::Duration::microseconds(0)},
+                {{0,  -1},     turbo::Duration::seconds(0) - turbo::Duration::microseconds(1)},
+                {{-1, 999999}, turbo::Duration::seconds(0) - turbo::Duration::microseconds(1)},
+                {{-1, 1},      turbo::Duration::seconds(-1) + turbo::Duration::microseconds(1)},
+                {{-1, 0},      turbo::Duration::seconds(-1) + turbo::Duration::microseconds(0)},
+                {{-1, -1},     turbo::Duration::seconds(-1) - turbo::Duration::microseconds(1)},
+                {{-2, 999999}, turbo::Duration::seconds(-1) - turbo::Duration::microseconds(1)},
         };
         for (const auto &test: from_tv) {
             EXPECT_EQ(test.d, turbo::DurationFromTimeval(test.tv));
@@ -1326,60 +1326,60 @@ namespace {
     TEST(Duration, SmallConversions) {
         // Special tests for conversions of small durations.
 
-        EXPECT_EQ(turbo::Duration::zero(), turbo::Seconds(0));
+        EXPECT_EQ(turbo::Duration::zero(), turbo::Duration::seconds(0));
         // TODO(bww): Is the next one OK?
-        EXPECT_EQ(turbo::Duration::zero(), turbo::Seconds(std::nextafter(0.125e-9, 0)));
-        EXPECT_EQ(turbo::Nanoseconds(1) / 4, turbo::Seconds(0.125e-9));
-        EXPECT_EQ(turbo::Nanoseconds(1) / 4, turbo::Seconds(0.250e-9));
-        EXPECT_EQ(turbo::Nanoseconds(1) / 2, turbo::Seconds(0.375e-9));
-        EXPECT_EQ(turbo::Nanoseconds(1) / 2, turbo::Seconds(0.500e-9));
-        EXPECT_EQ(turbo::Nanoseconds(3) / 4, turbo::Seconds(0.625e-9));
-        EXPECT_EQ(turbo::Nanoseconds(3) / 4, turbo::Seconds(0.750e-9));
-        EXPECT_EQ(turbo::Nanoseconds(1), turbo::Seconds(0.875e-9));
-        EXPECT_EQ(turbo::Nanoseconds(1), turbo::Seconds(1.000e-9));
+        EXPECT_EQ(turbo::Duration::zero(), turbo::Duration::seconds(std::nextafter(0.125e-9, 0)));
+        EXPECT_EQ(turbo::Duration::nanoseconds(1) / 4, turbo::Duration::seconds(0.125e-9));
+        EXPECT_EQ(turbo::Duration::nanoseconds(1) / 4, turbo::Duration::seconds(0.250e-9));
+        EXPECT_EQ(turbo::Duration::nanoseconds(1) / 2, turbo::Duration::seconds(0.375e-9));
+        EXPECT_EQ(turbo::Duration::nanoseconds(1) / 2, turbo::Duration::seconds(0.500e-9));
+        EXPECT_EQ(turbo::Duration::nanoseconds(3) / 4, turbo::Duration::seconds(0.625e-9));
+        EXPECT_EQ(turbo::Duration::nanoseconds(3) / 4, turbo::Duration::seconds(0.750e-9));
+        EXPECT_EQ(turbo::Duration::nanoseconds(1), turbo::Duration::seconds(0.875e-9));
+        EXPECT_EQ(turbo::Duration::nanoseconds(1), turbo::Duration::seconds(1.000e-9));
 
-        EXPECT_EQ(turbo::Duration::zero(), turbo::Seconds(std::nextafter(-0.125e-9, 0)));
-        EXPECT_EQ(-turbo::Nanoseconds(1) / 4, turbo::Seconds(-0.125e-9));
-        EXPECT_EQ(-turbo::Nanoseconds(1) / 4, turbo::Seconds(-0.250e-9));
-        EXPECT_EQ(-turbo::Nanoseconds(1) / 2, turbo::Seconds(-0.375e-9));
-        EXPECT_EQ(-turbo::Nanoseconds(1) / 2, turbo::Seconds(-0.500e-9));
-        EXPECT_EQ(-turbo::Nanoseconds(3) / 4, turbo::Seconds(-0.625e-9));
-        EXPECT_EQ(-turbo::Nanoseconds(3) / 4, turbo::Seconds(-0.750e-9));
-        EXPECT_EQ(-turbo::Nanoseconds(1), turbo::Seconds(-0.875e-9));
-        EXPECT_EQ(-turbo::Nanoseconds(1), turbo::Seconds(-1.000e-9));
+        EXPECT_EQ(turbo::Duration::zero(), turbo::Duration::seconds(std::nextafter(-0.125e-9, 0)));
+        EXPECT_EQ(-turbo::Duration::nanoseconds(1) / 4, turbo::Duration::seconds(-0.125e-9));
+        EXPECT_EQ(-turbo::Duration::nanoseconds(1) / 4, turbo::Duration::seconds(-0.250e-9));
+        EXPECT_EQ(-turbo::Duration::nanoseconds(1) / 2, turbo::Duration::seconds(-0.375e-9));
+        EXPECT_EQ(-turbo::Duration::nanoseconds(1) / 2, turbo::Duration::seconds(-0.500e-9));
+        EXPECT_EQ(-turbo::Duration::nanoseconds(3) / 4, turbo::Duration::seconds(-0.625e-9));
+        EXPECT_EQ(-turbo::Duration::nanoseconds(3) / 4, turbo::Duration::seconds(-0.750e-9));
+        EXPECT_EQ(-turbo::Duration::nanoseconds(1), turbo::Duration::seconds(-0.875e-9));
+        EXPECT_EQ(-turbo::Duration::nanoseconds(1), turbo::Duration::seconds(-1.000e-9));
 
         timespec ts;
         ts.tv_sec = 0;
         ts.tv_nsec = 0;
-        EXPECT_THAT(ToTimespec(turbo::Nanoseconds(0)), TimespecMatcher(ts));
+        EXPECT_THAT(ToTimespec(turbo::Duration::nanoseconds(0)), TimespecMatcher(ts));
         // TODO(bww): Are the next three OK?
-        EXPECT_THAT(ToTimespec(turbo::Nanoseconds(1) / 4), TimespecMatcher(ts));
-        EXPECT_THAT(ToTimespec(turbo::Nanoseconds(2) / 4), TimespecMatcher(ts));
-        EXPECT_THAT(ToTimespec(turbo::Nanoseconds(3) / 4), TimespecMatcher(ts));
+        EXPECT_THAT(ToTimespec(turbo::Duration::nanoseconds(1) / 4), TimespecMatcher(ts));
+        EXPECT_THAT(ToTimespec(turbo::Duration::nanoseconds(2) / 4), TimespecMatcher(ts));
+        EXPECT_THAT(ToTimespec(turbo::Duration::nanoseconds(3) / 4), TimespecMatcher(ts));
         ts.tv_nsec = 1;
-        EXPECT_THAT(ToTimespec(turbo::Nanoseconds(4) / 4), TimespecMatcher(ts));
-        EXPECT_THAT(ToTimespec(turbo::Nanoseconds(5) / 4), TimespecMatcher(ts));
-        EXPECT_THAT(ToTimespec(turbo::Nanoseconds(6) / 4), TimespecMatcher(ts));
-        EXPECT_THAT(ToTimespec(turbo::Nanoseconds(7) / 4), TimespecMatcher(ts));
+        EXPECT_THAT(ToTimespec(turbo::Duration::nanoseconds(4) / 4), TimespecMatcher(ts));
+        EXPECT_THAT(ToTimespec(turbo::Duration::nanoseconds(5) / 4), TimespecMatcher(ts));
+        EXPECT_THAT(ToTimespec(turbo::Duration::nanoseconds(6) / 4), TimespecMatcher(ts));
+        EXPECT_THAT(ToTimespec(turbo::Duration::nanoseconds(7) / 4), TimespecMatcher(ts));
         ts.tv_nsec = 2;
-        EXPECT_THAT(ToTimespec(turbo::Nanoseconds(8) / 4), TimespecMatcher(ts));
+        EXPECT_THAT(ToTimespec(turbo::Duration::nanoseconds(8) / 4), TimespecMatcher(ts));
 
         timeval tv;
         tv.tv_sec = 0;
         tv.tv_usec = 0;
-        EXPECT_THAT(ToTimeval(turbo::Nanoseconds(0)), TimevalMatcher(tv));
+        EXPECT_THAT(ToTimeval(turbo::Duration::nanoseconds(0)), TimevalMatcher(tv));
         // TODO(bww): Is the next one OK?
-        EXPECT_THAT(ToTimeval(turbo::Nanoseconds(999)), TimevalMatcher(tv));
+        EXPECT_THAT(ToTimeval(turbo::Duration::nanoseconds(999)), TimevalMatcher(tv));
         tv.tv_usec = 1;
-        EXPECT_THAT(ToTimeval(turbo::Nanoseconds(1000)), TimevalMatcher(tv));
-        EXPECT_THAT(ToTimeval(turbo::Nanoseconds(1999)), TimevalMatcher(tv));
+        EXPECT_THAT(ToTimeval(turbo::Duration::nanoseconds(1000)), TimevalMatcher(tv));
+        EXPECT_THAT(ToTimeval(turbo::Duration::nanoseconds(1999)), TimevalMatcher(tv));
         tv.tv_usec = 2;
-        EXPECT_THAT(ToTimeval(turbo::Nanoseconds(2000)), TimevalMatcher(tv));
+        EXPECT_THAT(ToTimeval(turbo::Duration::nanoseconds(2000)), TimevalMatcher(tv));
     }
 
     void VerifyApproxSameAsMul(double time_as_seconds, int *const misses) {
-        auto direct_seconds = turbo::Seconds(time_as_seconds);
-        auto mul_by_one_second = time_as_seconds * turbo::Seconds(1);
+        auto direct_seconds = turbo::Duration::seconds(time_as_seconds);
+        auto mul_by_one_second = time_as_seconds * turbo::Duration::seconds(1);
         // These are expected to differ by up to one tick due to fused multiply/add
         // contraction.
         if (turbo::Duration::abs(direct_seconds - mul_by_one_second) >
@@ -1395,7 +1395,7 @@ namespace {
 // For a variety of interesting durations, we find the exact point
 // where one double converts to that duration, and the very next double
 // converts to the next duration.  For both of those points, verify that
-// Seconds(point) returns a duration near point * Seconds(1.0). (They may
+// Duration::seconds(point) returns a duration near point * Duration::seconds(1.0). (They may
 // not be exactly equal due to fused multiply/add contraction.)
     TEST(Duration, ToDoubleSecondsCheckEdgeCases) {
 #if (defined(__i386__) || defined(_M_IX86)) && FLT_EVAL_METHOD != 0
@@ -1418,22 +1418,22 @@ namespace {
                                     4, 1004, 1000004, 1000000004, kTicksPerSecond + 4,
                                     5, 6, 7, 8, 9};
             for (uint32_t ticks: tick_vals) {
-                turbo::Duration s_plus_t = turbo::Seconds(seconds) + ticks * duration_tick;
+                turbo::Duration s_plus_t = turbo::Duration::seconds(seconds) + ticks * duration_tick;
                 for (turbo::Duration d: {s_plus_t, -s_plus_t}) {
                     turbo::Duration after_d = d + duration_tick;
                     EXPECT_NE(d, after_d);
                     EXPECT_EQ(after_d - d, duration_tick);
 
                     double low_edge = turbo::Duration::to_double_seconds(d);
-                    EXPECT_EQ(d, turbo::Seconds(low_edge));
+                    EXPECT_EQ(d, turbo::Duration::seconds(low_edge));
 
                     double high_edge = turbo::Duration::to_double_seconds(after_d);
-                    EXPECT_EQ(after_d, turbo::Seconds(high_edge));
+                    EXPECT_EQ(after_d, turbo::Duration::seconds(high_edge));
 
                     for (;;) {
                         double midpoint = low_edge + (high_edge - low_edge) / 2;
                         if (midpoint == low_edge || midpoint == high_edge) break;
-                        turbo::Duration mid_duration = turbo::Seconds(midpoint);
+                        turbo::Duration mid_duration = turbo::Duration::seconds(midpoint);
                         if (mid_duration == d) {
                             low_edge = midpoint;
                         } else {
@@ -1483,11 +1483,11 @@ namespace {
         tv = ToTimeval(d);
         EXPECT_EQ(max_timeval_sec, tv.tv_sec);
         EXPECT_EQ(999998, tv.tv_usec);
-        d += turbo::Microseconds(1);
+        d += turbo::Duration::microseconds(1);
         tv = ToTimeval(d);
         EXPECT_EQ(max_timeval_sec, tv.tv_sec);
         EXPECT_EQ(999999, tv.tv_usec);
-        d += turbo::Microseconds(1);  // no effect
+        d += turbo::Duration::microseconds(1);  // no effect
         tv = ToTimeval(d);
         EXPECT_EQ(max_timeval_sec, tv.tv_sec);
         EXPECT_EQ(999999, tv.tv_usec);
@@ -1498,11 +1498,11 @@ namespace {
         tv = ToTimeval(d);
         EXPECT_EQ(min_timeval_sec, tv.tv_sec);
         EXPECT_EQ(1, tv.tv_usec);
-        d -= turbo::Microseconds(1);
+        d -= turbo::Duration::microseconds(1);
         tv = ToTimeval(d);
         EXPECT_EQ(min_timeval_sec, tv.tv_sec);
         EXPECT_EQ(0, tv.tv_usec);
-        d -= turbo::Microseconds(1);  // no effect
+        d -= turbo::Duration::microseconds(1);  // no effect
         tv = ToTimeval(d);
         EXPECT_EQ(min_timeval_sec, tv.tv_sec);
         EXPECT_EQ(0, tv.tv_usec);
@@ -1518,11 +1518,11 @@ namespace {
         ts = turbo::ToTimespec(d);
         EXPECT_EQ(max_timespec_sec, ts.tv_sec);
         EXPECT_EQ(999999998, ts.tv_nsec);
-        d += turbo::Nanoseconds(1);
+        d += turbo::Duration::nanoseconds(1);
         ts = turbo::ToTimespec(d);
         EXPECT_EQ(max_timespec_sec, ts.tv_sec);
         EXPECT_EQ(999999999, ts.tv_nsec);
-        d += turbo::Nanoseconds(1);  // no effect
+        d += turbo::Duration::nanoseconds(1);  // no effect
         ts = turbo::ToTimespec(d);
         EXPECT_EQ(max_timespec_sec, ts.tv_sec);
         EXPECT_EQ(999999999, ts.tv_nsec);
@@ -1533,11 +1533,11 @@ namespace {
         ts = turbo::ToTimespec(d);
         EXPECT_EQ(min_timespec_sec, ts.tv_sec);
         EXPECT_EQ(1, ts.tv_nsec);
-        d -= turbo::Nanoseconds(1);
+        d -= turbo::Duration::nanoseconds(1);
         ts = turbo::ToTimespec(d);
         EXPECT_EQ(min_timespec_sec, ts.tv_sec);
         EXPECT_EQ(0, ts.tv_nsec);
-        d -= turbo::Nanoseconds(1);  // no effect
+        d -= turbo::Duration::nanoseconds(1);  // no effect
         ts = turbo::ToTimespec(d);
         EXPECT_EQ(min_timespec_sec, ts.tv_sec);
         EXPECT_EQ(0, ts.tv_nsec);
@@ -1546,93 +1546,93 @@ namespace {
     TEST(Duration, Duration_format) {
         // Example from Go's docs.
         EXPECT_EQ("72h3m0.5s",
-                  turbo::Duration::format(turbo::Hours(72) + turbo::Minutes(3) +
-                                        turbo::Milliseconds(500)));
+                  turbo::Duration::format(turbo::Duration::hours(72) + turbo::Duration::minutes(3) +
+                                        turbo::Duration::milliseconds(500)));
         // Go's largest time: 2540400h10m10.000000000s
         EXPECT_EQ("2540400h10m10s",
-                  turbo::Duration::format(turbo::Hours(2540400) + turbo::Minutes(10) +
-                                        turbo::Seconds(10)));
+                  turbo::Duration::format(turbo::Duration::hours(2540400) + turbo::Duration::minutes(10) +
+                                        turbo::Duration::seconds(10)));
 
         EXPECT_EQ("0", turbo::Duration::format(turbo::Duration::zero()));
-        EXPECT_EQ("0", turbo::Duration::format(turbo::Seconds(0)));
-        EXPECT_EQ("0", turbo::Duration::format(turbo::Nanoseconds(0)));
+        EXPECT_EQ("0", turbo::Duration::format(turbo::Duration::seconds(0)));
+        EXPECT_EQ("0", turbo::Duration::format(turbo::Duration::nanoseconds(0)));
 
-        EXPECT_EQ("1ns", turbo::Duration::format(turbo::Nanoseconds(1)));
-        EXPECT_EQ("1us", turbo::Duration::format(turbo::Microseconds(1)));
-        EXPECT_EQ("1ms", turbo::Duration::format(turbo::Milliseconds(1)));
-        EXPECT_EQ("1s", turbo::Duration::format(turbo::Seconds(1)));
-        EXPECT_EQ("1m", turbo::Duration::format(turbo::Minutes(1)));
-        EXPECT_EQ("1h", turbo::Duration::format(turbo::Hours(1)));
+        EXPECT_EQ("1ns", turbo::Duration::format(turbo::Duration::nanoseconds(1)));
+        EXPECT_EQ("1us", turbo::Duration::format(turbo::Duration::microseconds(1)));
+        EXPECT_EQ("1ms", turbo::Duration::format(turbo::Duration::milliseconds(1)));
+        EXPECT_EQ("1s", turbo::Duration::format(turbo::Duration::seconds(1)));
+        EXPECT_EQ("1m", turbo::Duration::format(turbo::Duration::minutes(1)));
+        EXPECT_EQ("1h", turbo::Duration::format(turbo::Duration::hours(1)));
 
-        EXPECT_EQ("1h1m", turbo::Duration::format(turbo::Hours(1) + turbo::Minutes(1)));
-        EXPECT_EQ("1h1s", turbo::Duration::format(turbo::Hours(1) + turbo::Seconds(1)));
-        EXPECT_EQ("1m1s", turbo::Duration::format(turbo::Minutes(1) + turbo::Seconds(1)));
+        EXPECT_EQ("1h1m", turbo::Duration::format(turbo::Duration::hours(1) + turbo::Duration::minutes(1)));
+        EXPECT_EQ("1h1s", turbo::Duration::format(turbo::Duration::hours(1) + turbo::Duration::seconds(1)));
+        EXPECT_EQ("1m1s", turbo::Duration::format(turbo::Duration::minutes(1) + turbo::Duration::seconds(1)));
 
         EXPECT_EQ("1h0.25s",
-                  turbo::Duration::format(turbo::Hours(1) + turbo::Milliseconds(250)));
+                  turbo::Duration::format(turbo::Duration::hours(1) + turbo::Duration::milliseconds(250)));
         EXPECT_EQ("1m0.25s",
-                  turbo::Duration::format(turbo::Minutes(1) + turbo::Milliseconds(250)));
+                  turbo::Duration::format(turbo::Duration::minutes(1) + turbo::Duration::milliseconds(250)));
         EXPECT_EQ("1h1m0.25s",
-                  turbo::Duration::format(turbo::Hours(1) + turbo::Minutes(1) +
-                                        turbo::Milliseconds(250)));
+                  turbo::Duration::format(turbo::Duration::hours(1) + turbo::Duration::minutes(1) +
+                                        turbo::Duration::milliseconds(250)));
         EXPECT_EQ("1h0.0005s",
-                  turbo::Duration::format(turbo::Hours(1) + turbo::Microseconds(500)));
+                  turbo::Duration::format(turbo::Duration::hours(1) + turbo::Duration::microseconds(500)));
         EXPECT_EQ("1h0.0000005s",
-                  turbo::Duration::format(turbo::Hours(1) + turbo::Nanoseconds(500)));
+                  turbo::Duration::format(turbo::Duration::hours(1) + turbo::Duration::nanoseconds(500)));
 
         // Subsecond special case.
-        EXPECT_EQ("1.5ns", turbo::Duration::format(turbo::Nanoseconds(1) +
-                                                 turbo::Nanoseconds(1) / 2));
-        EXPECT_EQ("1.25ns", turbo::Duration::format(turbo::Nanoseconds(1) +
-                                                  turbo::Nanoseconds(1) / 4));
-        EXPECT_EQ("1ns", turbo::Duration::format(turbo::Nanoseconds(1) +
-                                               turbo::Nanoseconds(1) / 9));
-        EXPECT_EQ("1.2us", turbo::Duration::format(turbo::Microseconds(1) +
-                                                 turbo::Nanoseconds(200)));
-        EXPECT_EQ("1.2ms", turbo::Duration::format(turbo::Milliseconds(1) +
-                                                 turbo::Microseconds(200)));
-        EXPECT_EQ("1.0002ms", turbo::Duration::format(turbo::Milliseconds(1) +
-                                                    turbo::Nanoseconds(200)));
-        EXPECT_EQ("1.00001ms", turbo::Duration::format(turbo::Milliseconds(1) +
-                                                     turbo::Nanoseconds(10)));
+        EXPECT_EQ("1.5ns", turbo::Duration::format(turbo::Duration::nanoseconds(1) +
+                                                 turbo::Duration::nanoseconds(1) / 2));
+        EXPECT_EQ("1.25ns", turbo::Duration::format(turbo::Duration::nanoseconds(1) +
+                                                  turbo::Duration::nanoseconds(1) / 4));
+        EXPECT_EQ("1ns", turbo::Duration::format(turbo::Duration::nanoseconds(1) +
+                                               turbo::Duration::nanoseconds(1) / 9));
+        EXPECT_EQ("1.2us", turbo::Duration::format(turbo::Duration::microseconds(1) +
+                                                 turbo::Duration::nanoseconds(200)));
+        EXPECT_EQ("1.2ms", turbo::Duration::format(turbo::Duration::milliseconds(1) +
+                                                 turbo::Duration::microseconds(200)));
+        EXPECT_EQ("1.0002ms", turbo::Duration::format(turbo::Duration::milliseconds(1) +
+                                                    turbo::Duration::nanoseconds(200)));
+        EXPECT_EQ("1.00001ms", turbo::Duration::format(turbo::Duration::milliseconds(1) +
+                                                     turbo::Duration::nanoseconds(10)));
         EXPECT_EQ("1.000001ms",
-                  turbo::Duration::format(turbo::Milliseconds(1) + turbo::Nanoseconds(1)));
+                  turbo::Duration::format(turbo::Duration::milliseconds(1) + turbo::Duration::nanoseconds(1)));
 
         // Negative durations.
-        EXPECT_EQ("-1ns", turbo::Duration::format(turbo::Nanoseconds(-1)));
-        EXPECT_EQ("-1us", turbo::Duration::format(turbo::Microseconds(-1)));
-        EXPECT_EQ("-1ms", turbo::Duration::format(turbo::Milliseconds(-1)));
-        EXPECT_EQ("-1s", turbo::Duration::format(turbo::Seconds(-1)));
-        EXPECT_EQ("-1m", turbo::Duration::format(turbo::Minutes(-1)));
-        EXPECT_EQ("-1h", turbo::Duration::format(turbo::Hours(-1)));
+        EXPECT_EQ("-1ns", turbo::Duration::format(turbo::Duration::nanoseconds(-1)));
+        EXPECT_EQ("-1us", turbo::Duration::format(turbo::Duration::microseconds(-1)));
+        EXPECT_EQ("-1ms", turbo::Duration::format(turbo::Duration::milliseconds(-1)));
+        EXPECT_EQ("-1s", turbo::Duration::format(turbo::Duration::seconds(-1)));
+        EXPECT_EQ("-1m", turbo::Duration::format(turbo::Duration::minutes(-1)));
+        EXPECT_EQ("-1h", turbo::Duration::format(turbo::Duration::hours(-1)));
 
         EXPECT_EQ("-1h1m",
-                  turbo::Duration::format(-(turbo::Hours(1) + turbo::Minutes(1))));
+                  turbo::Duration::format(-(turbo::Duration::hours(1) + turbo::Duration::minutes(1))));
         EXPECT_EQ("-1h1s",
-                  turbo::Duration::format(-(turbo::Hours(1) + turbo::Seconds(1))));
+                  turbo::Duration::format(-(turbo::Duration::hours(1) + turbo::Duration::seconds(1))));
         EXPECT_EQ("-1m1s",
-                  turbo::Duration::format(-(turbo::Minutes(1) + turbo::Seconds(1))));
+                  turbo::Duration::format(-(turbo::Duration::minutes(1) + turbo::Duration::seconds(1))));
 
-        EXPECT_EQ("-1ns", turbo::Duration::format(turbo::Nanoseconds(-1)));
+        EXPECT_EQ("-1ns", turbo::Duration::format(turbo::Duration::nanoseconds(-1)));
         EXPECT_EQ("-1.2us", turbo::Duration::format(
-                -(turbo::Microseconds(1) + turbo::Nanoseconds(200))));
+                -(turbo::Duration::microseconds(1) + turbo::Duration::nanoseconds(200))));
         EXPECT_EQ("-1.2ms", turbo::Duration::format(
-                -(turbo::Milliseconds(1) + turbo::Microseconds(200))));
-        EXPECT_EQ("-1.0002ms", turbo::Duration::format(-(turbo::Milliseconds(1) +
-                                                       turbo::Nanoseconds(200))));
-        EXPECT_EQ("-1.00001ms", turbo::Duration::format(-(turbo::Milliseconds(1) +
-                                                        turbo::Nanoseconds(10))));
-        EXPECT_EQ("-1.000001ms", turbo::Duration::format(-(turbo::Milliseconds(1) +
-                                                         turbo::Nanoseconds(1))));
+                -(turbo::Duration::milliseconds(1) + turbo::Duration::microseconds(200))));
+        EXPECT_EQ("-1.0002ms", turbo::Duration::format(-(turbo::Duration::milliseconds(1) +
+                                                       turbo::Duration::nanoseconds(200))));
+        EXPECT_EQ("-1.00001ms", turbo::Duration::format(-(turbo::Duration::milliseconds(1) +
+                                                        turbo::Duration::nanoseconds(10))));
+        EXPECT_EQ("-1.000001ms", turbo::Duration::format(-(turbo::Duration::milliseconds(1) +
+                                                         turbo::Duration::nanoseconds(1))));
 
         //
         // Interesting corner cases.
         //
 
-        const turbo::Duration qns = turbo::Nanoseconds(1) / 4;
+        const turbo::Duration qns = turbo::Duration::nanoseconds(1) / 4;
         const turbo::Duration max_dur =
-                turbo::Seconds(kint64max) + (turbo::Seconds(1) - qns);
-        const turbo::Duration min_dur = turbo::Seconds(kint64min);
+                turbo::Duration::seconds(kint64max) + (turbo::Duration::seconds(1) - qns);
+        const turbo::Duration min_dur = turbo::Duration::seconds(kint64min);
 
         EXPECT_EQ("0.25ns", turbo::Duration::format(qns));
         EXPECT_EQ("-0.25ns", turbo::Duration::format(-qns));
@@ -1641,11 +1641,11 @@ namespace {
         EXPECT_EQ("-2562047788015215h30m8s", turbo::Duration::format(min_dur));
 
         // Tests printing full precision from units that print using Duration::fdiv
-        EXPECT_EQ("55.00000000025s", turbo::Duration::format(turbo::Seconds(55) + qns));
+        EXPECT_EQ("55.00000000025s", turbo::Duration::format(turbo::Duration::seconds(55) + qns));
         EXPECT_EQ("55.00000025ms",
-                  turbo::Duration::format(turbo::Milliseconds(55) + qns));
-        EXPECT_EQ("55.00025us", turbo::Duration::format(turbo::Microseconds(55) + qns));
-        EXPECT_EQ("55.25ns", turbo::Duration::format(turbo::Nanoseconds(55) + qns));
+                  turbo::Duration::format(turbo::Duration::milliseconds(55) + qns));
+        EXPECT_EQ("55.00025us", turbo::Duration::format(turbo::Duration::microseconds(55) + qns));
+        EXPECT_EQ("55.25ns", turbo::Duration::format(turbo::Duration::nanoseconds(55) + qns));
 
         // Formatting infinity
         EXPECT_EQ("inf", turbo::Duration::format(turbo::Duration::max_infinite()));
@@ -1658,23 +1658,23 @@ namespace {
 
         EXPECT_EQ("876000000000000h0.999999999s",
                   turbo::Duration::format(huge_range +
-                                        (turbo::Seconds(1) - turbo::Nanoseconds(1))));
+                                        (turbo::Duration::seconds(1) - turbo::Duration::nanoseconds(1))));
         EXPECT_EQ("876000000000000h0.9999999995s",
                   turbo::Duration::format(
-                          huge_range + (turbo::Seconds(1) - turbo::Nanoseconds(1) / 2)));
+                          huge_range + (turbo::Duration::seconds(1) - turbo::Duration::nanoseconds(1) / 2)));
         EXPECT_EQ("876000000000000h0.99999999975s",
                   turbo::Duration::format(
-                          huge_range + (turbo::Seconds(1) - turbo::Nanoseconds(1) / 4)));
+                          huge_range + (turbo::Duration::seconds(1) - turbo::Duration::nanoseconds(1) / 4)));
 
         EXPECT_EQ("-876000000000000h0.999999999s",
                   turbo::Duration::format(-huge_range -
-                                        (turbo::Seconds(1) - turbo::Nanoseconds(1))));
+                                        (turbo::Duration::seconds(1) - turbo::Duration::nanoseconds(1))));
         EXPECT_EQ("-876000000000000h0.9999999995s",
                   turbo::Duration::format(
-                          -huge_range - (turbo::Seconds(1) - turbo::Nanoseconds(1) / 2)));
+                          -huge_range - (turbo::Duration::seconds(1) - turbo::Duration::nanoseconds(1) / 2)));
         EXPECT_EQ("-876000000000000h0.99999999975s",
                   turbo::Duration::format(
-                          -huge_range - (turbo::Seconds(1) - turbo::Nanoseconds(1) / 4)));
+                          -huge_range - (turbo::Duration::seconds(1) - turbo::Duration::nanoseconds(1) / 4)));
     }
 
     TEST(Duration, Duration_parse) {
@@ -1717,71 +1717,71 @@ namespace {
 
         // One unit type.
         EXPECT_TRUE(turbo::Duration::parse("1ns", &d));
-        EXPECT_EQ(turbo::Nanoseconds(1), d);
+        EXPECT_EQ(turbo::Duration::nanoseconds(1), d);
         EXPECT_TRUE(turbo::Duration::parse("1us", &d));
-        EXPECT_EQ(turbo::Microseconds(1), d);
+        EXPECT_EQ(turbo::Duration::microseconds(1), d);
         EXPECT_TRUE(turbo::Duration::parse("1ms", &d));
-        EXPECT_EQ(turbo::Milliseconds(1), d);
+        EXPECT_EQ(turbo::Duration::milliseconds(1), d);
         EXPECT_TRUE(turbo::Duration::parse("1s", &d));
-        EXPECT_EQ(turbo::Seconds(1), d);
+        EXPECT_EQ(turbo::Duration::seconds(1), d);
         EXPECT_TRUE(turbo::Duration::parse("2m", &d));
-        EXPECT_EQ(turbo::Minutes(2), d);
+        EXPECT_EQ(turbo::Duration::minutes(2), d);
         EXPECT_TRUE(turbo::Duration::parse("2h", &d));
-        EXPECT_EQ(turbo::Hours(2), d);
+        EXPECT_EQ(turbo::Duration::hours(2), d);
 
         // Huge counts of a unit.
         EXPECT_TRUE(turbo::Duration::parse("9223372036854775807us", &d));
-        EXPECT_EQ(turbo::Microseconds(9223372036854775807), d);
+        EXPECT_EQ(turbo::Duration::microseconds(9223372036854775807), d);
         EXPECT_TRUE(turbo::Duration::parse("-9223372036854775807us", &d));
-        EXPECT_EQ(turbo::Microseconds(-9223372036854775807), d);
+        EXPECT_EQ(turbo::Duration::microseconds(-9223372036854775807), d);
 
         // Multiple units.
         EXPECT_TRUE(turbo::Duration::parse("2h3m4s", &d));
-        EXPECT_EQ(turbo::Hours(2) + turbo::Minutes(3) + turbo::Seconds(4), d);
+        EXPECT_EQ(turbo::Duration::hours(2) + turbo::Duration::minutes(3) + turbo::Duration::seconds(4), d);
         EXPECT_TRUE(turbo::Duration::parse("3m4s5us", &d));
-        EXPECT_EQ(turbo::Minutes(3) + turbo::Seconds(4) + turbo::Microseconds(5), d);
+        EXPECT_EQ(turbo::Duration::minutes(3) + turbo::Duration::seconds(4) + turbo::Duration::microseconds(5), d);
         EXPECT_TRUE(turbo::Duration::parse("2h3m4s5ms6us7ns", &d));
-        EXPECT_EQ(turbo::Hours(2) + turbo::Minutes(3) + turbo::Seconds(4) +
-                  turbo::Milliseconds(5) + turbo::Microseconds(6) +
-                  turbo::Nanoseconds(7),
+        EXPECT_EQ(turbo::Duration::hours(2) + turbo::Duration::minutes(3) + turbo::Duration::seconds(4) +
+                  turbo::Duration::milliseconds(5) + turbo::Duration::microseconds(6) +
+                  turbo::Duration::nanoseconds(7),
                   d);
 
         // Multiple units out of order.
         EXPECT_TRUE(turbo::Duration::parse("2us3m4s5h", &d));
-        EXPECT_EQ(turbo::Hours(5) + turbo::Minutes(3) + turbo::Seconds(4) +
-                  turbo::Microseconds(2),
+        EXPECT_EQ(turbo::Duration::hours(5) + turbo::Duration::minutes(3) + turbo::Duration::seconds(4) +
+                  turbo::Duration::microseconds(2),
                   d);
 
         // Fractional values of units.
         EXPECT_TRUE(turbo::Duration::parse("1.5ns", &d));
-        EXPECT_EQ(1.5 * turbo::Nanoseconds(1), d);
+        EXPECT_EQ(1.5 * turbo::Duration::nanoseconds(1), d);
         EXPECT_TRUE(turbo::Duration::parse("1.5us", &d));
-        EXPECT_EQ(1.5 * turbo::Microseconds(1), d);
+        EXPECT_EQ(1.5 * turbo::Duration::microseconds(1), d);
         EXPECT_TRUE(turbo::Duration::parse("1.5ms", &d));
-        EXPECT_EQ(1.5 * turbo::Milliseconds(1), d);
+        EXPECT_EQ(1.5 * turbo::Duration::milliseconds(1), d);
         EXPECT_TRUE(turbo::Duration::parse("1.5s", &d));
-        EXPECT_EQ(1.5 * turbo::Seconds(1), d);
+        EXPECT_EQ(1.5 * turbo::Duration::seconds(1), d);
         EXPECT_TRUE(turbo::Duration::parse("1.5m", &d));
-        EXPECT_EQ(1.5 * turbo::Minutes(1), d);
+        EXPECT_EQ(1.5 * turbo::Duration::minutes(1), d);
         EXPECT_TRUE(turbo::Duration::parse("1.5h", &d));
-        EXPECT_EQ(1.5 * turbo::Hours(1), d);
+        EXPECT_EQ(1.5 * turbo::Duration::hours(1), d);
 
         // Huge fractional counts of a unit.
         EXPECT_TRUE(turbo::Duration::parse("0.4294967295s", &d));
-        EXPECT_EQ(turbo::Nanoseconds(429496729) + turbo::Nanoseconds(1) / 2, d);
+        EXPECT_EQ(turbo::Duration::nanoseconds(429496729) + turbo::Duration::nanoseconds(1) / 2, d);
         EXPECT_TRUE(turbo::Duration::parse("0.429496729501234567890123456789s", &d));
-        EXPECT_EQ(turbo::Nanoseconds(429496729) + turbo::Nanoseconds(1) / 2, d);
+        EXPECT_EQ(turbo::Duration::nanoseconds(429496729) + turbo::Duration::nanoseconds(1) / 2, d);
 
         // Negative durations.
         EXPECT_TRUE(turbo::Duration::parse("-1s", &d));
-        EXPECT_EQ(turbo::Seconds(-1), d);
+        EXPECT_EQ(turbo::Duration::seconds(-1), d);
         EXPECT_TRUE(turbo::Duration::parse("-1m", &d));
-        EXPECT_EQ(turbo::Minutes(-1), d);
+        EXPECT_EQ(turbo::Duration::minutes(-1), d);
         EXPECT_TRUE(turbo::Duration::parse("-1h", &d));
-        EXPECT_EQ(turbo::Hours(-1), d);
+        EXPECT_EQ(turbo::Duration::hours(-1), d);
 
         EXPECT_TRUE(turbo::Duration::parse("-1h2s", &d));
-        EXPECT_EQ(-(turbo::Hours(1) + turbo::Seconds(2)), d);
+        EXPECT_EQ(-(turbo::Duration::hours(1) + turbo::Duration::seconds(2)), d);
         EXPECT_FALSE(turbo::Duration::parse("1h-2s", &d));
         EXPECT_FALSE(turbo::Duration::parse("-1h-2s", &d));
         EXPECT_FALSE(turbo::Duration::parse("-1h -2s", &d));
@@ -1796,31 +1796,31 @@ namespace {
     EXPECT_EQ(d, dur);                         \
   } while (0)
 
-        TEST_PARSE_ROUNDTRIP(turbo::Nanoseconds(1));
-        TEST_PARSE_ROUNDTRIP(turbo::Microseconds(1));
-        TEST_PARSE_ROUNDTRIP(turbo::Milliseconds(1));
-        TEST_PARSE_ROUNDTRIP(turbo::Seconds(1));
-        TEST_PARSE_ROUNDTRIP(turbo::Minutes(1));
-        TEST_PARSE_ROUNDTRIP(turbo::Hours(1));
-        TEST_PARSE_ROUNDTRIP(turbo::Hours(1) + turbo::Nanoseconds(2));
+        TEST_PARSE_ROUNDTRIP(turbo::Duration::nanoseconds(1));
+        TEST_PARSE_ROUNDTRIP(turbo::Duration::microseconds(1));
+        TEST_PARSE_ROUNDTRIP(turbo::Duration::milliseconds(1));
+        TEST_PARSE_ROUNDTRIP(turbo::Duration::seconds(1));
+        TEST_PARSE_ROUNDTRIP(turbo::Duration::minutes(1));
+        TEST_PARSE_ROUNDTRIP(turbo::Duration::hours(1));
+        TEST_PARSE_ROUNDTRIP(turbo::Duration::hours(1) + turbo::Duration::nanoseconds(2));
 
-        TEST_PARSE_ROUNDTRIP(turbo::Nanoseconds(-1));
-        TEST_PARSE_ROUNDTRIP(turbo::Microseconds(-1));
-        TEST_PARSE_ROUNDTRIP(turbo::Milliseconds(-1));
-        TEST_PARSE_ROUNDTRIP(turbo::Seconds(-1));
-        TEST_PARSE_ROUNDTRIP(turbo::Minutes(-1));
-        TEST_PARSE_ROUNDTRIP(turbo::Hours(-1));
+        TEST_PARSE_ROUNDTRIP(turbo::Duration::nanoseconds(-1));
+        TEST_PARSE_ROUNDTRIP(turbo::Duration::microseconds(-1));
+        TEST_PARSE_ROUNDTRIP(turbo::Duration::milliseconds(-1));
+        TEST_PARSE_ROUNDTRIP(turbo::Duration::seconds(-1));
+        TEST_PARSE_ROUNDTRIP(turbo::Duration::minutes(-1));
+        TEST_PARSE_ROUNDTRIP(turbo::Duration::hours(-1));
 
-        TEST_PARSE_ROUNDTRIP(turbo::Hours(-1) + turbo::Nanoseconds(2));
-        TEST_PARSE_ROUNDTRIP(turbo::Hours(1) + turbo::Nanoseconds(-2));
-        TEST_PARSE_ROUNDTRIP(turbo::Hours(-1) + turbo::Nanoseconds(-2));
+        TEST_PARSE_ROUNDTRIP(turbo::Duration::hours(-1) + turbo::Duration::nanoseconds(2));
+        TEST_PARSE_ROUNDTRIP(turbo::Duration::hours(1) + turbo::Duration::nanoseconds(-2));
+        TEST_PARSE_ROUNDTRIP(turbo::Duration::hours(-1) + turbo::Duration::nanoseconds(-2));
 
-        TEST_PARSE_ROUNDTRIP(turbo::Nanoseconds(1) +
-                             turbo::Nanoseconds(1) / 4);  // 1.25ns
+        TEST_PARSE_ROUNDTRIP(turbo::Duration::nanoseconds(1) +
+                             turbo::Duration::nanoseconds(1) / 4);  // 1.25ns
 
         const turbo::Duration huge_range = ApproxYears(100000000000);
         TEST_PARSE_ROUNDTRIP(huge_range);
-        TEST_PARSE_ROUNDTRIP(huge_range + (turbo::Seconds(1) - turbo::Nanoseconds(1)));
+        TEST_PARSE_ROUNDTRIP(huge_range + (turbo::Duration::seconds(1) - turbo::Duration::nanoseconds(1)));
 
 #undef TEST_PARSE_ROUNDTRIP
     }
@@ -1828,7 +1828,7 @@ namespace {
     TEST(Duration, turbo_stringify) {
         // Duration::format is already well tested, so just use one test case here to
         // verify that StrFormat("%v", d) works as expected.
-        turbo::Duration d = turbo::Seconds(1);
+        turbo::Duration d = turbo::Duration::seconds(1);
         EXPECT_EQ(turbo::StrFormat("%v", d), turbo::Duration::format(d));
     }
 

@@ -157,7 +157,7 @@ const MutexGlobals& GetMutexGlobals() {
       // without undue delay.
       globals.mutex_sleep_spins[AGGRESSIVE] = 5000;
       globals.mutex_sleep_spins[GENTLE] = 250;
-      globals.mutex_sleep_time = turbo::Microseconds(10);
+      globals.mutex_sleep_time = turbo::Duration::microseconds(10);
     } else {
       // If this a uniprocessor, only yield/sleep. Real-time threads are often
       // unable to yield, so the sleep time needs to be long enough to keep
@@ -166,9 +166,9 @@ const MutexGlobals& GetMutexGlobals() {
       globals.mutex_sleep_spins[GENTLE] = 0;
       globals.mutex_sleep_time = MeasureTimeToYield() * 5;
       globals.mutex_sleep_time =
-          std::min(globals.mutex_sleep_time, turbo::Milliseconds(1));
+          std::min(globals.mutex_sleep_time, turbo::Duration::milliseconds(1));
       globals.mutex_sleep_time =
-          std::max(globals.mutex_sleep_time, turbo::Microseconds(10));
+          std::max(globals.mutex_sleep_time, turbo::Duration::microseconds(10));
     }
   });
   return globals;

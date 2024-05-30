@@ -152,7 +152,7 @@ TEST(SampleRecorderTest, MultiThreaded) {
   }
   // The threads will hammer away.  Give it a little bit of time for tsan to
   // spot errors.
-  turbo::SleepFor(turbo::Seconds(3));
+  turbo::SleepFor(turbo::Duration::seconds(3));
   stop.Notify();
 }
 
