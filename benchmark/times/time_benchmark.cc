@@ -86,7 +86,7 @@ namespace {
         while (state.KeepRunning()) {
             std::swap(t, t2);
             t += turbo::Seconds(1);
-            benchmark::DoNotOptimize(tz.At(t));
+            benchmark::DoNotOptimize(tz.at(t));
         }
     }
 
@@ -115,7 +115,7 @@ namespace {
         turbo::Time t = turbo::Time::from_seconds(1384569027);
         while (state.KeepRunning()) {
             t += turbo::Seconds(1);
-            benchmark::DoNotOptimize(tz.At(t));
+            benchmark::DoNotOptimize(tz.at(t));
         }
     }
 

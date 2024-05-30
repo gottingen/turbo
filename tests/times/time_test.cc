@@ -117,7 +117,7 @@ namespace {
     }
 
     TEST(Time, from_unix_epoch) {
-        const auto ci = turbo::TimeZone::utc().At(turbo::Time::from_unix_epoch());
+        const auto ci = turbo::TimeZone::utc().at(turbo::Time::from_unix_epoch());
         EXPECT_EQ(turbo::CivilSecond(1970, 1, 1, 0, 0, 0), ci.cs);
         EXPECT_EQ(turbo::ZeroDuration(), ci.subsecond);
         EXPECT_EQ(turbo::Weekday::thursday, turbo::GetWeekday(ci.cs));
@@ -128,14 +128,14 @@ namespace {
         turbo::Time t = turbo::Time::from_unix_epoch();
 
         // The Unix epoch as seen in NYC.
-        auto ci = tz.At(t);
+        auto ci = tz.at(t);
         EXPECT_CIVIL_INFO(ci, 1969, 12, 31, 19, 0, 0, -18000, false);
         EXPECT_EQ(turbo::ZeroDuration(), ci.subsecond);
         EXPECT_EQ(turbo::Weekday::wednesday, turbo::GetWeekday(ci.cs));
 
         // Just before the epoch.
         t -= turbo::Nanoseconds(1);
-        ci = tz.At(t);
+        ci = tz.at(t);
         EXPECT_CIVIL_INFO(ci, 1969, 12, 31, 18, 59, 59, -18000, false);
         EXPECT_EQ(turbo::Nanoseconds(999999999), ci.subsecond);
         EXPECT_EQ(turbo::Weekday::wednesday, turbo::GetWeekday(ci.cs));
@@ -144,7 +144,7 @@ namespace {
         t += turbo::Hours(24) * 2735;
         t += turbo::Hours(18) + turbo::Minutes(30) + turbo::Seconds(15) +
              turbo::Nanoseconds(9);
-        ci = tz.At(t);
+        ci = tz.at(t);
         EXPECT_CIVIL_INFO(ci, 1977, 6, 28, 14, 30, 15, -14400, true);
         EXPECT_EQ(8, ci.subsecond / turbo::Nanoseconds(1));
         EXPECT_EQ(turbo::Weekday::tuesday, turbo::GetWeekday(ci.cs));
@@ -639,7 +639,7 @@ namespace {
 
         // A non-transition where the civil time is unique.
         turbo::CivilSecond nov01(2013, 11, 1, 8, 30, 0);
-        const auto nov01_ci = nyc.At(nov01);
+        const auto nov01_ci = nyc.at(nov01);
         EXPECT_EQ(turbo::TimeZone::TimeInfo::UNIQUE, nov01_ci.kind);
         EXPECT_EQ("Fri,  1 Nov 2013 08:30:00 -0400 (EDT)",
                   turbo::Time::format(fmt, nov01_ci.pre, nyc));
@@ -651,7 +651,7 @@ namespace {
         // and we prefer the later of the possible interpretations of a
         // non-existent time.
         turbo::CivilSecond mar13(2011, 3, 13, 2, 15, 0);
-        const auto mar_ci = nyc.At(mar13);
+        const auto mar_ci = nyc.at(mar13);
         EXPECT_EQ(turbo::TimeZone::TimeInfo::SKIPPED, mar_ci.kind);
         EXPECT_EQ("Sun, 13 Mar 2011 03:15:00 -0400 (EDT)",
                   turbo::Time::format(fmt, mar_ci.pre, nyc));
@@ -665,7 +665,7 @@ namespace {
         // we prefer the earlier of the possible interpretations of an
         // ambiguous time.
         turbo::CivilSecond nov06(2011, 11, 6, 1, 15, 0);
-        const auto nov06_ci = nyc.At(nov06);
+        const auto nov06_ci = nyc.at(nov06);
         EXPECT_EQ(turbo::TimeZone::TimeInfo::REPEATED, nov06_ci.kind);
         EXPECT_EQ("Sun,  6 Nov 2011 01:15:00 -0400 (EDT)",
                   turbo::Time::format(fmt, nov06_ci.pre, nyc));
@@ -677,7 +677,7 @@ namespace {
 
         // Check that (time_t) -1 is handled correctly.
         turbo::CivilSecond minus1(1969, 12, 31, 18, 59, 59);
-        const auto minus1_cl = nyc.At(minus1);
+        const auto minus1_cl = nyc.at(minus1);
         EXPECT_EQ(turbo::TimeZone::TimeInfo::UNIQUE, minus1_cl.kind);
         EXPECT_EQ(-1, turbo::Time::to_time_t(minus1_cl.pre));
         EXPECT_EQ("Wed, 31 Dec 1969 18:59:59 -0500 (EST)",
@@ -1055,21 +1055,21 @@ namespace {
         EXPECT_EQ(min_timespec_sec, ts.tv_sec);
         EXPECT_EQ(0, ts.tv_nsec);
 
-        // Checks how TimeZone::At() saturates on infinities.
-        auto ci = utc.At(turbo::Time::future_infinite());
+        // Checks how TimeZone::at() saturates on infinities.
+        auto ci = utc.at(turbo::Time::future_infinite());
         EXPECT_CIVIL_INFO(ci, std::numeric_limits<int64_t>::max(), 12, 31, 23, 59, 59,
                           0, false);
         EXPECT_EQ(turbo::InfiniteDuration(), ci.subsecond);
         EXPECT_EQ(turbo::Weekday::thursday, turbo::GetWeekday(ci.cs));
         EXPECT_EQ(365, turbo::GetYearDay(ci.cs));
-        EXPECT_STREQ("-00", ci.zone_abbr);  // artifact of TimeZone::At()
-        ci = utc.At(turbo::Time::past_infinite());
+        EXPECT_STREQ("-00", ci.zone_abbr);  // artifact of TimeZone::at()
+        ci = utc.at(turbo::Time::past_infinite());
         EXPECT_CIVIL_INFO(ci, std::numeric_limits<int64_t>::min(), 1, 1, 0, 0, 0, 0,
                           false);
         EXPECT_EQ(-turbo::InfiniteDuration(), ci.subsecond);
         EXPECT_EQ(turbo::Weekday::sunday, turbo::GetWeekday(ci.cs));
         EXPECT_EQ(1, turbo::GetYearDay(ci.cs));
-        EXPECT_STREQ("-00", ci.zone_abbr);  // artifact of TimeZone::At()
+        EXPECT_STREQ("-00", ci.zone_abbr);  // artifact of TimeZone::at()
 
         // Approach the maximal Time value from below.
         t = turbo::Time::from_civil(turbo::CivilSecond(292277026596, 12, 4, 15, 30, 6), utc);
@@ -1135,11 +1135,11 @@ namespace {
         turbo::Time t;
 
         // The maximal time converted in each zone.
-        ci = syd.At(max);
+        ci = syd.at(max);
         EXPECT_CIVIL_INFO(ci, 292277026596, 12, 5, 2, 30, 7, 39600, true);
         t = turbo::Time::from_civil(turbo::CivilSecond(292277026596, 12, 5, 2, 30, 7), syd);
         EXPECT_EQ(max, t);
-        ci = nyc.At(max);
+        ci = nyc.at(max);
         EXPECT_CIVIL_INFO(ci, 292277026596, 12, 4, 10, 30, 7, -18000, false);
         t = turbo::Time::from_civil(turbo::CivilSecond(292277026596, 12, 4, 10, 30, 7), nyc);
         EXPECT_EQ(max, t);

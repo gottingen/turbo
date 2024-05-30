@@ -157,7 +157,7 @@ namespace {
         EXPECT_TRUE(turbo::Time::parse("%Y-%m-%d %H:%M:%S %z",
                                      "2013-06-28 19:08:09 -0800", &t, &err))
                             << err;
-        const auto ci = turbo::TimeZone::fixed(-8 * 60 * 60).At(t);
+        const auto ci = turbo::TimeZone::fixed(-8 * 60 * 60).at(t);
         EXPECT_EQ(turbo::CivilSecond(2013, 6, 28, 19, 8, 9), ci.cs);
         EXPECT_EQ(turbo::ZeroDuration(), ci.subsecond);
     }
@@ -180,7 +180,7 @@ namespace {
         EXPECT_TRUE(
                 turbo::Time::parse("%Y-%m-%d %H:%M:%S", "2013-06-28 19:08:09", tz, &t, &e))
                             << e;
-        auto ci = tz.At(t);
+        auto ci = tz.at(t);
         EXPECT_EQ(turbo::CivilSecond(2013, 6, 28, 19, 8, 9), ci.cs);
         EXPECT_EQ(turbo::ZeroDuration(), ci.subsecond);
 
@@ -188,7 +188,7 @@ namespace {
         EXPECT_TRUE(turbo::Time::parse("%Y-%m-%d %H:%M:%S %z",
                                      "2013-06-28 19:08:09 +0800", tz, &t, &e))
                             << e;
-        ci = turbo::TimeZone::fixed(8 * 60 * 60).At(t);
+        ci = turbo::TimeZone::fixed(8 * 60 * 60).at(t);
         EXPECT_EQ(turbo::CivilSecond(2013, 6, 28, 19, 8, 9), ci.cs);
         EXPECT_EQ(turbo::ZeroDuration(), ci.subsecond);
     }
@@ -335,15 +335,15 @@ namespace {
         EXPECT_TRUE(turbo::Time::parse("infinite-future %H:%M", "infinite-future 03:04",
                                      &t, &err));
         EXPECT_NE(turbo::Time::future_infinite(), t);
-        EXPECT_EQ(3, tz.At(t).cs.hour());
-        EXPECT_EQ(4, tz.At(t).cs.minute());
+        EXPECT_EQ(3, tz.at(t).cs.hour());
+        EXPECT_EQ(4, tz.at(t).cs.minute());
 
         // "infinite-past" as literal string
         EXPECT_TRUE(
                 turbo::Time::parse("infinite-past %H:%M", "infinite-past 03:04", &t, &err));
         EXPECT_NE(turbo::Time::past_infinite(), t);
-        EXPECT_EQ(3, tz.At(t).cs.hour());
-        EXPECT_EQ(4, tz.At(t).cs.minute());
+        EXPECT_EQ(3, tz.at(t).cs.hour());
+        EXPECT_EQ(4, tz.at(t).cs.minute());
 
         // The input doesn't match the format.
         EXPECT_FALSE(turbo::Time::parse("infinite-future %H:%M", "03:04", &t, &err));

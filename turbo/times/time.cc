@@ -276,7 +276,7 @@ namespace turbo {
     // TimeZone
     //
 
-    turbo::TimeZone::CivilInfo TimeZone::At(Time t) const {
+    turbo::TimeZone::CivilInfo TimeZone::at(Time t) const {
         if (t == turbo::Time::future_infinite()) return InfiniteFutureCivilInfo();
         if (t == turbo::Time::past_infinite()) return InfinitePastCivilInfo();
 
@@ -293,7 +293,7 @@ namespace turbo {
         return ci;
     }
 
-    turbo::TimeZone::TimeInfo TimeZone::At(CivilSecond ct) const {
+    turbo::TimeZone::TimeInfo TimeZone::at(CivilSecond ct) const {
         const cctz::civil_second cs(ct);
         const auto cl = cz_.lookup(cs);
 
@@ -334,7 +334,7 @@ namespace turbo {
             tm_mon -= 12;
             tm_year += 1;
         }
-        const auto ti = tz.At(CivilSecond(tm_year + 1900, tm_mon + 1, tm.tm_mday,
+        const auto ti = tz.at(CivilSecond(tm_year + 1900, tm_mon + 1, tm.tm_mday,
                                           tm.tm_hour, tm.tm_min, tm.tm_sec));
         return tm.tm_isdst == 0 ? ti.post : ti.pre;
     }
@@ -342,7 +342,7 @@ namespace turbo {
     struct tm Time::to_tm(turbo::Time t, turbo::TimeZone tz) {
         struct tm tm = {};
 
-        const auto ci = tz.At(t);
+        const auto ci = tz.at(t);
         const auto &cs = ci.cs;
         tm.tm_sec = cs.second();
         tm.tm_min = cs.minute();

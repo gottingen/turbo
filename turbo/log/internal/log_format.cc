@@ -115,7 +115,7 @@ size_t FormatBoundedFields(turbo::LogSeverity severity, turbo::Time timestamp,
 
   char* p = buf.data();
   *p++ = turbo::LogSeverityName(severity)[0];
-  const turbo::TimeZone::CivilInfo ci = tz->At(timestamp);
+  const turbo::TimeZone::CivilInfo ci = tz->at(timestamp);
   turbo::numbers_internal::PutTwoDigits(static_cast<uint32_t>(ci.cs.month()), p);
   p += 2;
   turbo::numbers_internal::PutTwoDigits(static_cast<uint32_t>(ci.cs.day()), p);

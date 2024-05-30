@@ -921,7 +921,7 @@ namespace turbo {
         // Converts the `tm_year`, `tm_mon`, `tm_mday`, `tm_hour`, `tm_min`, and
         // `tm_sec` fields to an `turbo::Time` using the given time zone. See ctime(3)
         // for a description of the expected values of the tm fields. If the civil time
-        // is unique (see `turbo::TimeZone::At(turbo::CivilSecond)` above), the matching
+        // is unique (see `turbo::TimeZone::at(turbo::CivilSecond)` above), the matching
         // time instant is returned.  Otherwise, the `tm_isdst` field is consulted to
         // choose between the possible results.  For a repeated civil time, `tm_isdst !=
         // 0` returns the matching DST instant, while `tm_isdst == 0` returns the
@@ -933,7 +933,7 @@ namespace turbo {
 
         // Time::from_civil()
         //
-        // Helper for TimeZone::At(CivilSecond) that provides "order-preserving
+        // Helper for TimeZone::at(CivilSecond) that provides "order-preserving
         // semantics." If the civil time maps to a unique time, that time is
         // returned. If the civil time is repeated in the given time zone, the
         // time using the pre-transition offset is returned. Otherwise, the
@@ -963,11 +963,31 @@ namespace turbo {
         // Returns an `turbo::Time` that is infinitely far in the future.
         TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Time future_infinite();
 
+        TURBO_ATTRIBUTE_CONST_FUNCTION static Time future_time(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t future_nanoseconds(int64_t ns);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t future_microseconds(int64_t us);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t future_milliseconds(int64_t ms);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t future_seconds(int64_t s);
+
     public:
         // past_infinite()
         //
         // Returns an `turbo::Time` that is infinitely far in the past.
         TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Time past_infinite();
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static Time past_time(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t past_nanoseconds(int64_t ns);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t past_microseconds(int64_t us);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t past_milliseconds(int64_t ms);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static int64_t past_seconds(int64_t s);
 
     public:
         // Converts an `turbo::Time` to a variety of other representations.  See
@@ -1006,15 +1026,15 @@ namespace turbo {
 
         TURBO_ATTRIBUTE_CONST_FUNCTION static timeval to_timeval(Time t);
 
-        // Helpers for TimeZone::At(Time) to return particularly aligned civil times.
+        // Helpers for TimeZone::at(Time) to return particularly aligned civil times.
         //
         // Example:
         //
         //   turbo::Time t = ...;
         //   turbo::TimeZone tz = ...;
         //   const auto cd = turbo::Time::to_civil_day(t, tz);
-        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilSecond to_civil_second(Time t,
-                                                                       TimeZone tz);
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilSecond to_civil_second(Time t, TimeZone tz);
+
         TURBO_ATTRIBUTE_PURE_FUNCTION static CivilMinute to_civil_minute(Time t, TimeZone tz);
 
         TURBO_ATTRIBUTE_PURE_FUNCTION static CivilHour to_civil_hour(Time t, TimeZone tz);
@@ -1030,8 +1050,32 @@ namespace turbo {
         // Converts the given `turbo::Time` to a struct tm using the given time zone.
         // See ctime(3) for a description of the values of the tm fields.
         TURBO_ATTRIBUTE_PURE_FUNCTION static struct tm to_tm(Time t, TimeZone tz);
+        // Time::to_utc_*
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilSecond to_utc_civil_second(Time t);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilMinute to_utc_civil_minute(Time t);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilHour to_utc_civil_hour(Time t);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilDay to_utc_civil_day(Time t);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilMonth to_utc_civil_month(Time t);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilYear to_utc_civil_year(Time t);
 
         TURBO_ATTRIBUTE_PURE_FUNCTION static struct tm to_utc_tm(Time t);
+        // Time::to_local_*
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilSecond to_local_civil_second(Time t);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilMinute to_local_civil_minute(Time t);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilHour to_local_civil_hour(Time t);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilDay to_local_civil_day(Time t);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilMonth to_local_civil_month(Time t);
+
+        TURBO_ATTRIBUTE_PURE_FUNCTION static CivilYear to_local_civil_year(Time t);
 
         TURBO_ATTRIBUTE_PURE_FUNCTION static struct tm to_local_tm(Time t);
 
@@ -1304,6 +1348,7 @@ namespace turbo {
         explicit operator time_internal::cctz::time_zone() const { return cz_; }
 
         std::string name() const { return cz_.name(); }
+
     public:
         // TimeZone::load()`
         //
@@ -1352,7 +1397,7 @@ namespace turbo {
             const char *zone_abbr;  // time-zone abbreviation (e.g., "PST")
         };
 
-        // TimeZone::At(Time)
+        // TimeZone::at(Time)
         //
         // Returns the civil time for this TimeZone at a certain `turbo::Time`.
         // If the input time is infinite, the output civil second will be set to
@@ -1360,13 +1405,13 @@ namespace turbo {
         //
         // Example:
         //
-        //   const auto epoch = lax.At(turbo::Time::from_unix_epoch());
+        //   const auto epoch = lax.at(turbo::Time::from_unix_epoch());
         //   // epoch.cs == 1969-12-31 16:00:00
         //   // epoch.subsecond == turbo::ZeroDuration()
         //   // epoch.offset == -28800
         //   // epoch.is_dst == false
         //   // epoch.abbr == "PST"
-        CivilInfo At(Time t) const;
+        CivilInfo at(Time t) const;
 
         // TimeZone::TimeInfo
         //
@@ -1393,7 +1438,7 @@ namespace turbo {
             Time post;   // time calculated using the post-transition offset
         };
 
-        // TimeZone::At(CivilSecond)
+        // TimeZone::at(CivilSecond)
         //
         // Returns an `turbo::TimeInfo` containing the absolute time(s) for this
         // TimeZone at an `turbo::CivilSecond`. When the civil time is skipped or
@@ -1403,26 +1448,26 @@ namespace turbo {
         // Examples:
         //
         //   // A unique civil time
-        //   const auto jan01 = lax.At(turbo::CivilSecond(2011, 1, 1, 0, 0, 0));
+        //   const auto jan01 = lax.at(turbo::CivilSecond(2011, 1, 1, 0, 0, 0));
         //   // jan01.kind == TimeZone::TimeInfo::UNIQUE
         //   // jan01.pre    is 2011-01-01 00:00:00 -0800
         //   // jan01.trans  is 2011-01-01 00:00:00 -0800
         //   // jan01.post   is 2011-01-01 00:00:00 -0800
         //
         //   // A Spring DST transition, when there is a gap in civil time
-        //   const auto mar13 = lax.At(turbo::CivilSecond(2011, 3, 13, 2, 15, 0));
+        //   const auto mar13 = lax.at(turbo::CivilSecond(2011, 3, 13, 2, 15, 0));
         //   // mar13.kind == TimeZone::TimeInfo::SKIPPED
         //   // mar13.pre   is 2011-03-13 03:15:00 -0700
         //   // mar13.trans is 2011-03-13 03:00:00 -0700
         //   // mar13.post  is 2011-03-13 01:15:00 -0800
         //
         //   // A Fall DST transition, when civil times are repeated
-        //   const auto nov06 = lax.At(turbo::CivilSecond(2011, 11, 6, 1, 15, 0));
+        //   const auto nov06 = lax.at(turbo::CivilSecond(2011, 11, 6, 1, 15, 0));
         //   // nov06.kind == TimeZone::TimeInfo::REPEATED
         //   // nov06.pre   is 2011-11-06 01:15:00 -0700
         //   // nov06.trans is 2011-11-06 01:00:00 -0800
         //   // nov06.post  is 2011-11-06 01:15:00 -0800
-        TimeInfo At(CivilSecond ct) const;
+        TimeInfo at(CivilSecond ct) const;
 
         // TimeZone::NextTransition()
         // TimeZone::PrevTransition()
@@ -1453,7 +1498,7 @@ namespace turbo {
         //   turbo::TimeZone::CivilTransition trans;
         //   while (t <= now && nyc.NextTransition(t, &trans)) {
         //     // transition: trans.from -> trans.to
-        //     t = nyc.At(trans.to).trans;
+        //     t = nyc.at(trans.to).trans;
         //   }
         struct CivilTransition {
             CivilSecond from;  // the civil time we jump from
@@ -1802,6 +1847,12 @@ namespace turbo {
 }  // namespace turbo
 
 namespace turbo {
+    /// Duration inlines and implementation details
+
+}  // namespace turbo
+
+namespace turbo {
+    /// Time inlines and implementation details
     template<typename T>
     inline T Time::current_microseconds() {
         return static_cast<T>(current_nanoseconds()) / T(1000);
@@ -1839,7 +1890,7 @@ namespace turbo {
 
     TURBO_ATTRIBUTE_PURE_FUNCTION inline Time Time::from_civil(CivilSecond ct,
                                                                TimeZone tz) {
-        const auto ti = tz.At(ct);
+        const auto ti = tz.at(ct);
         if (ti.kind == TimeZone::TimeInfo::SKIPPED) return ti.trans;
         return ti.pre;
     }
@@ -1877,43 +1928,133 @@ namespace turbo {
     }
 
     TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilSecond Time::to_civil_second(Time t,
-                                                                   TimeZone tz) {
-        return tz.At(t).cs;  // already a CivilSecond
+                                                                           TimeZone tz) {
+        return tz.at(t).cs;  // already a CivilSecond
     }
 
     TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilMinute Time::to_civil_minute(Time t, TimeZone tz) {
-        return CivilMinute(tz.At(t).cs);
+        return CivilMinute(tz.at(t).cs);
     }
 
     TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilHour Time::to_civil_hour(Time t, TimeZone tz) {
-        return CivilHour(tz.At(t).cs);
+        return CivilHour(tz.at(t).cs);
     }
 
     TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilDay Time::to_civil_day(Time t, TimeZone tz) {
-        return CivilDay(tz.At(t).cs);
+        return CivilDay(tz.at(t).cs);
     }
 
     TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilMonth Time::to_civil_month(Time t,
                                                                          TimeZone tz) {
-        return CivilMonth(tz.At(t).cs);
+        return CivilMonth(tz.at(t).cs);
     }
 
     TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilYear Time::to_civil_year(Time t, TimeZone tz) {
-        return CivilYear(tz.At(t).cs);
+        return CivilYear(tz.at(t).cs);
+    }
+
+    /// to utc
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilSecond Time::to_utc_civil_second(Time t) {
+        return CivilSecond(TimeZone::utc().at(t).cs);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilMinute Time::to_utc_civil_minute(Time t) {
+        return CivilMinute(TimeZone::utc().at(t).cs);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilHour Time::to_utc_civil_hour(Time t) {
+        return CivilHour(TimeZone::utc().at(t).cs);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilDay Time::to_utc_civil_day(Time t) {
+        return CivilDay(TimeZone::utc().at(t).cs);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilMonth Time::to_utc_civil_month(Time t) {
+        return CivilMonth(TimeZone::utc().at(t).cs);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilYear Time::to_utc_civil_year(Time t) {
+        return CivilYear(TimeZone::utc().at(t).cs);
     }
 
     TURBO_ATTRIBUTE_PURE_FUNCTION inline struct tm Time::to_utc_tm(Time t) {
         return to_tm(t, TimeZone::utc());
     }
+    /// to local
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilSecond Time::to_local_civil_second(Time t) {
+        return CivilSecond(TimeZone::local().at(t).cs);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilMinute Time::to_local_civil_minute(Time t) {
+        return CivilMinute(TimeZone::local().at(t).cs);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilHour Time::to_local_civil_hour(Time t) {
+        return CivilHour(TimeZone::local().at(t).cs);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilDay Time::to_local_civil_day(Time t) {
+        return CivilDay(TimeZone::local().at(t).cs);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilMonth Time::to_local_civil_month(Time t) {
+        return CivilMonth(TimeZone::local().at(t).cs);
+    }
+
+    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilYear Time::to_local_civil_year(Time t) {
+        return CivilYear(TimeZone::local().at(t).cs);
+    }
 
     TURBO_ATTRIBUTE_PURE_FUNCTION inline struct tm Time::to_local_tm(Time t) {
         return to_tm(t, TimeZone::local());
+    }
+
+    /// futures
+    TURBO_ATTRIBUTE_CONST_FUNCTION inline Time Time::future_time(Duration d) {
+        return Time::current_time() + d;
+    }
+
+    TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t Time::future_nanoseconds(int64_t ns) {
+        return Time::current_nanoseconds() + ns;
+    }
+
+    TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t Time::future_microseconds(int64_t us) {
+        return Time::current_microseconds() + us;
+    }
+
+    TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t Time::future_milliseconds(int64_t ms) {
+        return Time::current_milliseconds() + ms;
+    }
+
+    TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t Time::future_seconds(int64_t s) {
+        return Time::current_seconds() + s;
+    }
+
+    /// past
+    TURBO_ATTRIBUTE_CONST_FUNCTION inline Time Time::past_time(Duration d) {
+        return Time::current_time() - d;
+    }
+
+    TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t Time::past_nanoseconds(int64_t ns) {
+        return Time::current_nanoseconds() - ns;
+    }
+
+    TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t Time::past_microseconds(int64_t us) {
+        return Time::current_microseconds() - us;
+    }
+
+    TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t Time::past_milliseconds(int64_t ms) {
+        return Time::current_milliseconds() - ms;
 
     }
+
+    TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t Time::past_seconds(int64_t s) {
+        return Time::current_seconds() - s;
+    }
+
 }  // namespace turbo
 
-namespace turbo {
-
-}  // namespace turbo
 
 #endif  // TURBO_TIME_TIME_H_
