@@ -110,7 +110,7 @@ TYPED_TEST(BetaDistributionInterfaceTest, SerializeTest) {
   };
   for (TypeParam alpha : kValues) {
     for (TypeParam beta : kValues) {
-      LOG(INFO) << turbo::StreamFormat("Smoke test for Beta(%a, %a)", alpha,
+      LOG(INFO) << turbo::stream_format("Smoke test for Beta(%a, %a)", alpha,
                                       beta);
 
       param_type param(alpha, beta);
@@ -434,9 +434,9 @@ TEST_P(BetaDistributionTest, TestSampleStatistics) {
 
 std::string ParamName(
     const ::testing::TestParamInfo<::testing::tuple<double, double>>& info) {
-  std::string name = turbo::StrCat("alpha_", ::testing::get<0>(info.param),
+  std::string name = turbo::str_cat("alpha_", ::testing::get<0>(info.param),
                                   "__beta_", ::testing::get<1>(info.param));
-  return turbo::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
+  return turbo::str_replace_all(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
 }
 
 INSTANTIATE_TEST_SUITE_P(

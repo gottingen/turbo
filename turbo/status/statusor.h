@@ -641,7 +641,7 @@ std::ostream& operator<<(std::ostream& os, const StatusOr<T>& status_or) {
   return os;
 }
 
-// As above, but supports `StrCat`, `StrFormat`, etc.
+// As above, but supports `str_cat`, `str_format`, etc.
 //
 // Requires `T` has `turbo_stringify`.  Do not rely on the output format which
 // may change without notice.
@@ -650,9 +650,9 @@ template <
     typename std::enable_if<turbo::HasTurboStringify<T>::value, int>::type = 0>
 void turbo_stringify(Sink& sink, const StatusOr<T>& status_or) {
   if (status_or.ok()) {
-    turbo::Format(&sink, "%v", status_or.value());
+    turbo::format(&sink, "%v", status_or.value());
   } else {
-    turbo::Format(&sink, "%s%v%s",
+    turbo::format(&sink, "%s%v%s",
                  internal_statusor::StringifyRandom::OpenBrackets(),
                  status_or.status(),
                  internal_statusor::StringifyRandom::CloseBrackets());

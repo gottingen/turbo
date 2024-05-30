@@ -67,8 +67,8 @@ void DumpAll(const CordRep* rep,
   assert(depth <= CordRepBtree::kMaxDepth + 2);
   std::string sharing = const_cast<CordRep*>(rep)->refcount.IsOne()
                             ? std::string("Private")
-                            : turbo::StrCat("Shared(", rep->refcount.Get(), ")");
-  std::string sptr = turbo::StrCat("0x", turbo::Hex(rep));
+                            : turbo::str_cat("Shared(", rep->refcount.Get(), ")");
+  std::string sptr = turbo::str_cat("0x", turbo::Hex(rep));
 
   // Dumps the data contents of `rep` if `include_contents` is true.
   // Always emits a new line character.
@@ -91,7 +91,7 @@ void DumpAll(const CordRep* rep,
   if (rep->IsBtree()) {
     const CordRepBtree* node = rep->btree();
     std::string label =
-        node->height() ? turbo::StrCat("Node(", node->height(), ")") : "Leaf";
+        node->height() ? turbo::str_cat("Node(", node->height(), ")") : "Leaf";
     stream << label << ", len = " << node->length
            << ", begin = " << node->begin() << ", end = " << node->end()
            << "\n";
@@ -439,7 +439,7 @@ bool CordRepBtree::IsValid(const CordRepBtree* tree, bool shallow) {
   if ((x) != (y)) {                                                            \
     TURBO_RAW_LOG(ERROR,                                                        \
                  "CordRepBtree::CheckValid() FAILED: %s != %s (%s vs %s)", #x, \
-                 #y, turbo::StrCat(x).c_str(), turbo::StrCat(y).c_str());        \
+                 #y, turbo::str_cat(x).c_str(), turbo::str_cat(y).c_str());        \
     return false;                                                              \
   }
 

@@ -75,7 +75,7 @@ using turbo::log_internal::kTurboMinLogLevel;
 
 std::string Base64UnescapeOrDie(turbo::string_view data) {
   std::string decoded;
-  CHECK(turbo::Base64Unescape(data, &decoded));
+  CHECK(turbo::base64_decode(data, &decoded));
   return decoded;
 }
 
@@ -184,7 +184,7 @@ class StrippingTest : public ::testing::Test {
 #elif defined(__Fuchsia__)
     // TODO(b/242579714): We need to restore the test coverage on this platform.
     std::unique_ptr<FILE, std::function<void(FILE*)>> fp(
-        fopen(turbo::StrCat("/pkg/bin/",
+        fopen(turbo::str_cat("/pkg/bin/",
                            turbo::flags_internal::ShortProgramInvocationName())
                   .c_str(),
               "rb"),
@@ -260,7 +260,7 @@ TEST_F(StrippingTest, Control) {
   constexpr char kEncodedPositiveControl[] =
       "U3RyaXBwaW5nVGVzdC5Qb3NpdGl2ZUNvbnRyb2w=";
   const std::string encoded_negative_control =
-      turbo::Base64Escape("StrippingTest.NegativeControl");
+      turbo::base64_encode("StrippingTest.NegativeControl");
 
   // Verify this mainly so we can encode other strings and know definitely they
   // won't encode to `kEncodedPositiveControl`.
@@ -278,7 +278,7 @@ TEST_F(StrippingTest, Literal) {
   // for it) without leaving it lying around in plaintext in the executable file
   // as would happen if we used a literal.  We might (or might not) leave it
   // lying around later; that's what the tests are for!
-  const std::string needle = turbo::Base64Escape("StrippingTest.Literal");
+  const std::string needle = turbo::base64_encode("StrippingTest.Literal");
   LOG(INFO) << "U3RyaXBwaW5nVGVzdC5MaXRlcmFs";
   auto exe = OpenTestExecutable();
   ASSERT_THAT(exe, NotNull());
@@ -295,8 +295,8 @@ TEST_F(StrippingTest, LiteralInExpression) {
   // as would happen if we used a literal.  We might (or might not) leave it
   // lying around later; that's what the tests are for!
   const std::string needle =
-      turbo::Base64Escape("StrippingTest.LiteralInExpression");
-  LOG(INFO) << turbo::StrCat("secret: ",
+      turbo::base64_encode("StrippingTest.LiteralInExpression");
+  LOG(INFO) << turbo::str_cat("secret: ",
                             "U3RyaXBwaW5nVGVzdC5MaXRlcmFsSW5FeHByZXNzaW9u");
   std::unique_ptr<FILE, std::function<void(FILE*)>> exe = OpenTestExecutable();
   ASSERT_THAT(exe, NotNull());
@@ -312,7 +312,7 @@ TEST_F(StrippingTest, Fatal) {
   // for it) without leaving it lying around in plaintext in the executable file
   // as would happen if we used a literal.  We might (or might not) leave it
   // lying around later; that's what the tests are for!
-  const std::string needle = turbo::Base64Escape("StrippingTest.Fatal");
+  const std::string needle = turbo::base64_encode("StrippingTest.Fatal");
   // We don't care if the LOG statement is actually executed, we're just
   // checking that it's stripped.
   if (kReallyDie) LOG(FATAL) << "U3RyaXBwaW5nVGVzdC5GYXRhbA==";
@@ -331,7 +331,7 @@ TEST_F(StrippingTest, DFatal) {
   // for it) without leaving it lying around in plaintext in the executable file
   // as would happen if we used a literal.  We might (or might not) leave it
   // lying around later; that's what the tests are for!
-  const std::string needle = turbo::Base64Escape("StrippingTest.DFatal");
+  const std::string needle = turbo::base64_encode("StrippingTest.DFatal");
   // We don't care if the LOG statement is actually executed, we're just
   // checking that it's stripped.
   if (kReallyDie) LOG(DFATAL) << "U3RyaXBwaW5nVGVzdC5ERmF0YWw=";
@@ -370,7 +370,7 @@ TEST_F(StrippingTest, DFatal) {
 }
 
 TEST_F(StrippingTest, Level) {
-  const std::string needle = turbo::Base64Escape("StrippingTest.Level");
+  const std::string needle = turbo::base64_encode("StrippingTest.Level");
   volatile auto severity = turbo::LogSeverity::kWarning;
   // Ensure that `severity` is not a compile-time constant to prove that
   // stripping works regardless:
@@ -396,8 +396,8 @@ TEST_F(StrippingTest, Check) {
   // Here we also need a variable name with enough entropy that it's unlikely to
   // appear in the binary by chance.  `volatile` keeps the tautological
   // comparison (and the rest of the `CHECK`) from being optimized away.
-  const std::string var_needle = turbo::Base64Escape("StrippingTestCheckVar");
-  const std::string msg_needle = turbo::Base64Escape("StrippingTest.Check");
+  const std::string var_needle = turbo::base64_encode("StrippingTestCheckVar");
+  const std::string msg_needle = turbo::base64_encode("StrippingTest.Check");
   volatile int U3RyaXBwaW5nVGVzdENoZWNrVmFy = 0xCAFE;
   // We don't care if the CHECK is actually executed, just that stripping works.
   // Hiding it behind `kReallyDie` works around some overly aggressive
@@ -421,10 +421,10 @@ TEST_F(StrippingTest, Check) {
 TEST_F(StrippingTest, CheckOp) {
   // See `StrippingTest.Check` for some hairy implementation notes.
   const std::string var_needle1 =
-      turbo::Base64Escape("StrippingTestCheckOpVar1");
+      turbo::base64_encode("StrippingTestCheckOpVar1");
   const std::string var_needle2 =
-      turbo::Base64Escape("StrippingTestCheckOpVar2");
-  const std::string msg_needle = turbo::Base64Escape("StrippingTest.CheckOp");
+      turbo::base64_encode("StrippingTestCheckOpVar2");
+  const std::string msg_needle = turbo::base64_encode("StrippingTest.CheckOp");
   volatile int U3RyaXBwaW5nVGVzdENoZWNrT3BWYXIx = 0xFEED;
   volatile int U3RyaXBwaW5nVGVzdENoZWNrT3BWYXIy = 0xCAFE;
   if (kReallyDie) {
@@ -449,10 +449,10 @@ TEST_F(StrippingTest, CheckOp) {
 TEST_F(StrippingTest, CheckStrOp) {
   // See `StrippingTest.Check` for some hairy implementation notes.
   const std::string var_needle1 =
-      turbo::Base64Escape("StrippingTestCheckStrOpVar1");
+      turbo::base64_encode("StrippingTestCheckStrOpVar1");
   const std::string var_needle2 =
-      turbo::Base64Escape("StrippingTestCheckStrOpVar2");
-  const std::string msg_needle = turbo::Base64Escape("StrippingTest.CheckStrOp");
+      turbo::base64_encode("StrippingTestCheckStrOpVar2");
+  const std::string msg_needle = turbo::base64_encode("StrippingTest.CheckStrOp");
   const char *volatile U3RyaXBwaW5nVGVzdENoZWNrU3RyT3BWYXIx = "FEED";
   const char *volatile U3RyaXBwaW5nVGVzdENoZWNrU3RyT3BWYXIy = "CAFE";
   if (kReallyDie) {
@@ -477,8 +477,8 @@ TEST_F(StrippingTest, CheckStrOp) {
 
 TEST_F(StrippingTest, CheckOk) {
   // See `StrippingTest.Check` for some hairy implementation notes.
-  const std::string var_needle = turbo::Base64Escape("StrippingTestCheckOkVar1");
-  const std::string msg_needle = turbo::Base64Escape("StrippingTest.CheckOk");
+  const std::string var_needle = turbo::base64_encode("StrippingTestCheckOkVar1");
+  const std::string msg_needle = turbo::base64_encode("StrippingTest.CheckOk");
   volatile bool x = false;
   auto U3RyaXBwaW5nVGVzdENoZWNrT2tWYXIx = turbo::OkStatus();
   if (x) {

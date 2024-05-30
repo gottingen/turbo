@@ -15,8 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#ifndef TURBO_STRINGS_CORD_ANALYSIS_H_
-#define TURBO_STRINGS_CORD_ANALYSIS_H_
+#pragma once
 
 #include <cstddef>
 #include <cstdint>
@@ -26,41 +25,37 @@
 #include <turbo/strings/internal/cord_internal.h>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace cord_internal {
+    namespace cord_internal {
 
-// Returns the *approximate* number of bytes held in full or in part by this
-// Cord (which may not remain the same between invocations). Cords that share
-// memory could each be "charged" independently for the same shared memory.
-size_t GetEstimatedMemoryUsage(turbo::Nonnull<const CordRep*> rep);
+        // Returns the *approximate* number of bytes held in full or in part by this
+        // Cord (which may not remain the same between invocations). Cords that share
+        // memory could each be "charged" independently for the same shared memory.
+        size_t GetEstimatedMemoryUsage(turbo::Nonnull<const CordRep *> rep);
 
-// Returns the *approximate* number of bytes held in full or in part by this
-// Cord for the distinct memory held by this cord. This is similar to
-// `GetEstimatedMemoryUsage()`, except that if the cord has multiple references
-// to the same memory, that memory is only counted once.
-//
-// For example:
-//   turbo::Cord cord;
-//   cord.append(some_other_cord);
-//   cord.append(some_other_cord);
-//    // Calls GetEstimatedMemoryUsage() and counts `other_cord` twice:
-//   cord.EstimatedMemoryUsage(kTotal);
-//    // Calls GetMorePreciseMemoryUsage() and counts `other_cord` once:
-//   cord.EstimatedMemoryUsage(kTotalMorePrecise);
-//
-// This is more expensive than `GetEstimatedMemoryUsage()` as it requires
-// deduplicating all memory references.
-size_t GetMorePreciseMemoryUsage(turbo::Nonnull<const CordRep*> rep);
+        // Returns the *approximate* number of bytes held in full or in part by this
+        // Cord for the distinct memory held by this cord. This is similar to
+        // `GetEstimatedMemoryUsage()`, except that if the cord has multiple references
+        // to the same memory, that memory is only counted once.
+        //
+        // For example:
+        //   turbo::Cord cord;
+        //   cord.append(some_other_cord);
+        //   cord.append(some_other_cord);
+        //    // Calls GetEstimatedMemoryUsage() and counts `other_cord` twice:
+        //   cord.EstimatedMemoryUsage(kTotal);
+        //    // Calls GetMorePreciseMemoryUsage() and counts `other_cord` once:
+        //   cord.EstimatedMemoryUsage(kTotalMorePrecise);
+        //
+        // This is more expensive than `GetEstimatedMemoryUsage()` as it requires
+        // deduplicating all memory references.
+        size_t GetMorePreciseMemoryUsage(turbo::Nonnull<const CordRep *> rep);
 
-// Returns the *approximate* number of bytes held in full or in part by this
-// CordRep weighted by the sharing ratio of that data. For example, if some data
-// edge is shared by 4 different Cords, then each cord is attribute 1/4th of
-// the total memory usage as a 'fair share' of the total memory usage.
-size_t GetEstimatedFairShareMemoryUsage(turbo::Nonnull<const CordRep*> rep);
+        // Returns the *approximate* number of bytes held in full or in part by this
+        // CordRep weighted by the sharing ratio of that data. For example, if some data
+        // edge is shared by 4 different Cords, then each cord is attribute 1/4th of
+        // the total memory usage as a 'fair share' of the total memory usage.
+        size_t GetEstimatedFairShareMemoryUsage(turbo::Nonnull<const CordRep *> rep);
 
-}  // namespace cord_internal
-TURBO_NAMESPACE_END
+    }  // namespace cord_internal
 }  // namespace turbo
 
-
-#endif  // TURBO_STRINGS_CORD_ANALYSIS_H_

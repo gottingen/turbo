@@ -303,7 +303,7 @@ void StringViewMapBenchmark(benchmark::State& state) {
     do {
       keys[i].clear();
       for (int j = 0; j < WordsPerKey; j++) {
-        turbo::StrAppend(&keys[i], j > 0 ? " " : "", words[uniform(rng)]);
+        turbo::str_append(&keys[i], j > 0 ? " " : "", words[uniform(rng)]);
       }
     } while (!t.insert(keys[i]).second);
   }

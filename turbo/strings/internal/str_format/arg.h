@@ -48,7 +48,7 @@ namespace turbo {
 TURBO_NAMESPACE_BEGIN
 
 class Cord;
-class FormatCountCapture;
+class format_count_capture;
 class FormatSink;
 
 template <turbo::FormatConversionCharSet C>
@@ -383,13 +383,13 @@ StringConvertResult FormatConvertImpl(const StreamedWrapper<T>& v,
 }
 
 // Use templates and dependent types to delay evaluation of the function
-// until after FormatCountCapture is fully defined.
+// until after format_count_capture is fully defined.
 struct FormatCountCaptureHelper {
   template <class T = int>
   static ArgConvertResult<FormatConversionCharSetInternal::n> ConvertHelper(
-      const FormatCountCapture& v, FormatConversionSpecImpl conv,
+      const format_count_capture& v, FormatConversionSpecImpl conv,
       FormatSinkImpl* sink) {
-    const turbo::enable_if_t<sizeof(T) != 0, FormatCountCapture>& v2 = v;
+    const turbo::enable_if_t<sizeof(T) != 0, format_count_capture>& v2 = v;
 
     if (conv.conversion_char() !=
         str_format_internal::FormatConversionCharInternal::n) {
@@ -402,7 +402,7 @@ struct FormatCountCaptureHelper {
 
 template <class T = int>
 ArgConvertResult<FormatConversionCharSetInternal::n> FormatConvertImpl(
-    const FormatCountCapture& v, FormatConversionSpecImpl conv,
+    const format_count_capture& v, FormatConversionSpecImpl conv,
     FormatSinkImpl* sink) {
   return FormatCountCaptureHelper::ConvertHelper(v, conv, sink);
 }

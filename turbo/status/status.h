@@ -526,7 +526,7 @@ class TURBO_ATTRIBUTE_TRIVIAL_ABI Status final {
   std::string ToString(
       StatusToStringMode mode = StatusToStringMode::kDefault) const;
 
-  // Support `turbo::StrCat`, `turbo::StrFormat`, etc.
+  // Support `turbo::str_cat`, `turbo::str_format`, etc.
   template <typename Sink>
   friend void turbo_stringify(Sink& sink, const Status& status) {
     sink.Append(status.ToString(StatusToStringMode::kWithEverything));

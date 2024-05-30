@@ -310,7 +310,7 @@ template <class T>
 std::string TypeName() {
   std::string out;
 #if TURBO_INTERNAL_HAS_RTTI
-  turbo::StrAppend(&out, "<",
+  turbo::str_append(&out, "<",
                   turbo::debugging_internal::DemangleString(typeid(T).name()),
                   ">");
 #endif
@@ -668,16 +668,16 @@ class LayoutImpl<
     const size_t sizes[] = {SizeOf<ElementType<OffsetSeq>>::value...};
     const std::string types[] = {
         adl_barrier::TypeName<ElementType<OffsetSeq>>()...};
-    std::string res = turbo::StrCat("@0", types[0], "(", sizes[0], ")");
+    std::string res = turbo::str_cat("@0", types[0], "(", sizes[0], ")");
     for (size_t i = 0; i != NumOffsets - 1; ++i) {
-      turbo::StrAppend(&res, "[", DebugSize(i), "]; @", offsets[i + 1],
+      turbo::str_append(&res, "[", DebugSize(i), "]; @", offsets[i + 1],
                       types[i + 1], "(", sizes[i + 1], ")");
     }
     // NumSizes is a constant that may be zero. Some compilers cannot see that
     // inside the if statement "size_[NumSizes - 1]" must be valid.
     int last = static_cast<int>(NumSizes) - 1;
     if (NumTypes == NumSizes && last >= 0) {
-      turbo::StrAppend(&res, "[", DebugSize(static_cast<size_t>(last)), "]");
+      turbo::str_append(&res, "[", DebugSize(static_cast<size_t>(last)), "]");
     }
     return res;
   }

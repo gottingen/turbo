@@ -91,7 +91,7 @@ TEST(Status, CreateAndClassify) {
     // Ensure that the creator does, in fact, create status objects with the
     // expected error code and message.
     std::string message =
-        turbo::StrCat("error code ", test.code, " test message");
+        turbo::str_cat("error code ", test.code, " test message");
     turbo::Status status = test.creator(
         message
     );
@@ -204,8 +204,8 @@ TEST(Status, TestGetSetPayload) {
   EXPECT_THAT(bad_status.GetPayload(kUrl1), Optional(Eq(kPayload3)));
 
   // Testing dynamically generated type_url
-  bad_status.SetPayload(turbo::StrCat(kUrl1, ".1"), turbo::Cord(kPayload1));
-  EXPECT_THAT(bad_status.GetPayload(turbo::StrCat(kUrl1, ".1")),
+  bad_status.SetPayload(turbo::str_cat(kUrl1, ".1"), turbo::Cord(kPayload1));
+  EXPECT_THAT(bad_status.GetPayload(turbo::str_cat(kUrl1, ".1")),
               Optional(Eq(kPayload1)));
 }
 
@@ -362,12 +362,12 @@ TEST(Status, OstreamOperator) {
 
 TEST(Status, turbo_stringify) {
   turbo::Status status(turbo::StatusCode::kInternal, "fail");
-  EXPECT_EQ("INTERNAL: fail", turbo::StrCat(status));
-  EXPECT_EQ("INTERNAL: fail", turbo::StrFormat("%v", status));
+  EXPECT_EQ("INTERNAL: fail", turbo::str_cat(status));
+  EXPECT_EQ("INTERNAL: fail", turbo::str_format("%v", status));
   status.SetPayload("foo", turbo::Cord("bar"));
-  EXPECT_EQ("INTERNAL: fail [foo='bar']", turbo::StrCat(status));
+  EXPECT_EQ("INTERNAL: fail [foo='bar']", turbo::str_cat(status));
   status.SetPayload("bar", turbo::Cord("\377"));
-  EXPECT_THAT(turbo::StrCat(status),
+  EXPECT_THAT(turbo::str_cat(status),
               AllOf(HasSubstr("INTERNAL: fail"), HasSubstr("[foo='bar']"),
                     HasSubstr("[bar='\\xff']")));
 }
@@ -377,7 +377,7 @@ TEST(Status, OstreamEqStringify) {
   status.SetPayload("foo", turbo::Cord("bar"));
   std::stringstream stream;
   stream << status;
-  EXPECT_EQ(stream.str(), turbo::StrCat(status));
+  EXPECT_EQ(stream.str(), turbo::str_cat(status));
 }
 
 turbo::Status EraseAndReturn(const turbo::Status& base) {

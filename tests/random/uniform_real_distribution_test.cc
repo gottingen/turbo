@@ -321,10 +321,10 @@ TYPED_TEST(UniformRealDistributionTest, ChiSquaredTest50) {
       // Chi-squared test failed. Output does not appear to be uniform.
       std::string msg;
       for (const auto& a : counts) {
-        turbo::StrAppend(&msg, a, "\n");
+        turbo::str_append(&msg, a, "\n");
       }
-      turbo::StrAppend(&msg, kChiSquared, " p-value ", p_value, "\n");
-      turbo::StrAppend(&msg, "High ", kChiSquared, " value: ", chi_square, " > ",
+      turbo::str_append(&msg, kChiSquared, " p-value ", p_value, "\n");
+      turbo::str_append(&msg, "High ", kChiSquared, " value: ", chi_square, " > ",
                       kThreshold);
       LOG(INFO) << msg;
       FAIL() << msg;

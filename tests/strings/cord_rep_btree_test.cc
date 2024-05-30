@@ -87,7 +87,7 @@ MATCHER_P(EqFlatHolding, data, "Equals flat holding data") {
   return true;
 }
 
-MATCHER_P(IsNode, height, turbo::StrCat("Is a valid node of height ", height)) {
+MATCHER_P(IsNode, height, turbo::str_cat("Is a valid node of height ", height)) {
   if (arg == nullptr) {
     *result_listener << "Expected NODE, got nullptr";
     return false;
@@ -110,7 +110,7 @@ MATCHER_P(IsNode, height, turbo::StrCat("Is a valid node of height ", height)) {
 }
 
 MATCHER_P2(IsSubstring, start, length,
-           turbo::StrCat("Is a substring(start = ", start, ", length = ", length,
+           turbo::str_cat("Is a substring(start = ", start, ", length = ", length,
                         ")")) {
   if (arg == nullptr) {
     *result_listener << "Expected substring, got nullptr";
@@ -200,7 +200,7 @@ std::vector<CordRep*> GetLeafEdges(const CordRepBtree* tree) {
 // Creates a flat containing the hexadecimal value of `i` zero padded
 // to at least 4 digits prefixed with "0x", e.g.: "0x04AC".
 CordRepFlat* MakeHexFlat(size_t i) {
-  return MakeFlat(turbo::StrCat("0x", turbo::Hex(i, turbo::kZeroPad4)));
+  return MakeFlat(turbo::str_cat("0x", turbo::Hex(i, turbo::kZeroPad4)));
 }
 
 CordRepBtree* MakeLeaf(size_t size = CordRepBtree::kMaxCapacity) {
@@ -257,7 +257,7 @@ class CordRepBtreeHeightTest : public testing::TestWithParam<int> {
   int height() const { return GetParam(); }
 
   static std::string ToString(testing::TestParamInfo<int> param) {
-    return turbo::StrCat(param.param);
+    return turbo::str_cat(param.param);
   }
 };
 
@@ -1221,10 +1221,10 @@ TEST(CordRepBtreeTest, Dump) {
 
     // Contains address of all data edges
     EXPECT_THAT(
-        str, AllOf(HasSubstr(turbo::StrCat("0x", turbo::Hex(flat))),
-                   HasSubstr(turbo::StrCat("0x", turbo::Hex(external))),
-                   HasSubstr(turbo::StrCat("0x", turbo::Hex(substr_flat))),
-                   HasSubstr(turbo::StrCat("0x", turbo::Hex(substr_external)))));
+        str, AllOf(HasSubstr(turbo::str_cat("0x", turbo::Hex(flat))),
+                   HasSubstr(turbo::str_cat("0x", turbo::Hex(external))),
+                   HasSubstr(turbo::str_cat("0x", turbo::Hex(substr_flat))),
+                   HasSubstr(turbo::str_cat("0x", turbo::Hex(substr_external)))));
 
     if (api != 0) {
       // Contains label
@@ -1400,7 +1400,7 @@ TEST(CordRepBtreeTest, CheckAssertValidShallowVsDeep) {
 
 TEST_P(CordRepBtreeTest, Rebuild) {
   for (size_t size : {3u, 8u, 100u, 10000u, 1000000u}) {
-    SCOPED_TRACE(turbo::StrCat("Rebuild @", size));
+    SCOPED_TRACE(turbo::str_cat("Rebuild @", size));
 
     std::vector<CordRepFlat*> flats;
     for (size_t i = 0; i < size; ++i) {

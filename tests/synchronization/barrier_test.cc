@@ -55,7 +55,7 @@ TEST(Barrier, SanityTest) {
   // sleep has elapsed. Sleeping in a test is usually bad form, but we
   // need to make sure that we are testing the barrier instead of some
   // other synchronization method.
-  turbo::SleepFor(turbo::Duration::seconds(1));
+  turbo::sleep_for(turbo::Duration::seconds(1));
 
   // The counter should still be zero since no thread should have
   // been able to pass the barrier yet.

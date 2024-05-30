@@ -44,7 +44,7 @@ static_assert(!turbo::type_traits_internal::IsOwner<turbo::Span<int>>::value &&
               "Span is a view, not an owner");
 
 MATCHER_P(DataIs, data,
-          turbo::StrCat("data() ", negation ? "isn't " : "is ",
+          turbo::str_cat("data() ", negation ? "isn't " : "is ",
                        testing::PrintToString(data))) {
   return arg.data() == data;
 }

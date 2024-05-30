@@ -126,7 +126,7 @@ turbo::Nonnull<status_internal::StatusRep*> Status::PrepareToModify(
 
 std::string Status::ToStringSlow(uintptr_t rep, StatusToStringMode mode) {
   if (IsInlined(rep)) {
-    return turbo::StrCat(turbo::StatusCodeToString(InlinedRepToCode(rep)), ": ");
+    return turbo::str_cat(turbo::StatusCodeToString(InlinedRepToCode(rep)), ": ");
   }
   return RepToPointer(rep)->ToString(mode);
 }
@@ -403,7 +403,7 @@ StatusCode ErrnoToStatusCode(int error_number) {
 namespace {
 std::string MessageForErrnoToStatus(int error_number,
                                     turbo::string_view message) {
-  return turbo::StrCat(message, ": ",
+  return turbo::str_cat(message, ": ",
                       turbo::base_internal::StrError(error_number));
 }
 }  // namespace

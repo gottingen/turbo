@@ -108,7 +108,7 @@ TEST(ScopedMockLogTest, LogMockCatchAndMatchSendExpectations) {
                  SourceBasename(Eq("very_long_source_file.cc")),
                  SourceLine(Eq(777)), ThreadID(Eq(turbo::LogEntry::tid_t{1234})),
                  TextMessageWithPrefix(Truly([](turbo::string_view msg) {
-                   return turbo::EndsWith(
+                   return turbo::ends_with(
                        msg, " very_long_source_file.cc:777] Info message");
                  })))));
 

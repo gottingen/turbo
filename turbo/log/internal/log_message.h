@@ -275,7 +275,7 @@ class StringifySink final {
     message_.CopyToEncodedBuffer<LogMessage::StringType::kNotLiteral>(v);
   }
 
-  // For types that implement `turbo_stringify` using `turbo::Format()`.
+  // For types that implement `turbo_stringify` using `turbo::format()`.
   friend void TurboFormatFlush(StringifySink* sink, turbo::string_view v) {
     sink->Append(v);
   }

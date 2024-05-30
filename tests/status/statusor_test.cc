@@ -1841,7 +1841,7 @@ namespace {
         std::stringstream stream;
         stream << print_me;
         EXPECT_EQ(stream.str(), "ostream");
-        EXPECT_EQ(turbo::StrCat(print_me), "stringify");
+        EXPECT_EQ(turbo::str_cat(print_me), "stringify");
     }
 
     TEST(StatusOr, ErrorPrinting) {
@@ -1853,7 +1853,7 @@ namespace {
                       AnyOf(AllOf(StartsWith("("), EndsWith(")")),
                             AllOf(StartsWith("["), EndsWith("]"))));
         EXPECT_THAT(stream.str(), error_matcher);
-        EXPECT_THAT(turbo::StrCat(print_me), error_matcher);
+        EXPECT_THAT(turbo::str_cat(print_me), error_matcher);
     }
 
 }  // namespace

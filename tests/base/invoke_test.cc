@@ -67,15 +67,15 @@ struct EphemeralFunctor {
 struct OverloadedFunctor {
   template <typename... Args>
   std::string operator()(const Args&... args) & {
-    return StrCat("&", args...);
+    return str_cat("&", args...);
   }
   template <typename... Args>
   std::string operator()(const Args&... args) const& {
-    return StrCat("const&", args...);
+    return str_cat("const&", args...);
   }
   template <typename... Args>
   std::string operator()(const Args&... args) && {
-    return StrCat("&&", args...);
+    return str_cat("&&", args...);
   }
 };
 

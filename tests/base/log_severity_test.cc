@@ -66,7 +66,7 @@ INSTANTIATE_TEST_SUITE_P(
     Values(static_cast<int64_t>(std::numeric_limits<int>::min()) - 1,
            static_cast<int64_t>(std::numeric_limits<int>::max()) + 1));
 TEST_P(ParseFlagFromOutOfRangeIntegerTest, ReturnsError) {
-  const std::string to_parse = turbo::StrCat(GetParam());
+  const std::string to_parse = turbo::str_cat(GetParam());
   turbo::LogSeverity value;
   std::string error;
   EXPECT_THAT(turbo::ParseFlag(to_parse, &value, &error), IsFalse()) << value;
@@ -79,7 +79,7 @@ INSTANTIATE_TEST_SUITE_P(Instantiation,
                                 std::numeric_limits<int>::max()));
 TEST_P(ParseFlagFromAlmostOutOfRangeIntegerTest, YieldsExpectedValue) {
   const auto expected = static_cast<turbo::LogSeverity>(GetParam());
-  const std::string to_parse = turbo::StrCat(GetParam());
+  const std::string to_parse = turbo::str_cat(GetParam());
   turbo::LogSeverity value;
   std::string error;
   ASSERT_THAT(turbo::ParseFlag(to_parse, &value, &error), IsTrue()) << error;
@@ -202,7 +202,7 @@ INSTANTIATE_TEST_SUITE_P(Instantiation, UnparseFlagToOtherIntegerTest,
 TEST_P(UnparseFlagToOtherIntegerTest, ReturnsExpectedValueAndRoundTrips) {
   const turbo::LogSeverity to_unparse =
       static_cast<turbo::LogSeverity>(GetParam());
-  const std::string expected = turbo::StrCat(GetParam());
+  const std::string expected = turbo::str_cat(GetParam());
   const std::string stringified_value = turbo::UnparseFlag(to_unparse);
   EXPECT_THAT(stringified_value, Eq(expected));
   turbo::LogSeverity reparsed_value;

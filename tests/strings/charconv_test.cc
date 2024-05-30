@@ -267,7 +267,7 @@ TEST(FromChars, NearRoundingCasesExplicit) {
 //
 // mantissa and exponent represent the precise value between two floating point
 // numbers, `expected_low` and `expected_high`.  The floating point
-// representation to parse in `StrCat(mantissa, "e", exponent)`.
+// representation to parse in `str_cat(mantissa, "e", exponent)`.
 //
 // This function checks that an input just slightly less than the exact value
 // is rounded down to `expected_low`, and an input just slightly greater than
@@ -281,20 +281,20 @@ void TestHalfwayValue(const std::string& mantissa, int exponent,
                       FloatType expected_half) {
   std::string low_rep = mantissa;
   low_rep[low_rep.size() - 1] -= 1;
-  turbo::StrAppend(&low_rep, std::string(1000, '9'), "e", exponent);
+  turbo::str_append(&low_rep, std::string(1000, '9'), "e", exponent);
 
   FloatType actual_low = 0;
   turbo::from_chars(low_rep.data(), low_rep.data() + low_rep.size(), actual_low);
   EXPECT_EQ(expected_low, actual_low);
 
   std::string high_rep =
-      turbo::StrCat(mantissa, std::string(1000, '0'), "1e", exponent);
+      turbo::str_cat(mantissa, std::string(1000, '0'), "1e", exponent);
   FloatType actual_high = 0;
   turbo::from_chars(high_rep.data(), high_rep.data() + high_rep.size(),
                    actual_high);
   EXPECT_EQ(expected_high, actual_high);
 
-  std::string halfway_rep = turbo::StrCat(mantissa, "e", exponent);
+  std::string halfway_rep = turbo::str_cat(mantissa, "e", exponent);
   FloatType actual_half = 0;
   turbo::from_chars(halfway_rep.data(), halfway_rep.data() + halfway_rep.size(),
                    actual_half);
@@ -558,7 +558,7 @@ TEST(FromChars, ReturnValuePtr) {
 TEST(FromChars, TestVersusStrtod) {
   for (int mantissa = 1000000; mantissa <= 9999999; mantissa += 501) {
     for (int exponent = -300; exponent < 300; ++exponent) {
-      std::string candidate = turbo::StrCat(mantissa, "e", exponent);
+      std::string candidate = turbo::str_cat(mantissa, "e", exponent);
       double strtod_value = strtod(candidate.c_str(), nullptr);
       double turbo_value = 0;
       turbo::from_chars(candidate.data(), candidate.data() + candidate.size(),
@@ -576,7 +576,7 @@ TEST(FromChars, TestVersusStrtod) {
 TEST(FromChars, TestVersusStrtof) {
   for (int mantissa = 1000000; mantissa <= 9999999; mantissa += 501) {
     for (int exponent = -43; exponent < 32; ++exponent) {
-      std::string candidate = turbo::StrCat(mantissa, "e", exponent);
+      std::string candidate = turbo::str_cat(mantissa, "e", exponent);
       float strtod_value = strtof(candidate.c_str(), nullptr);
       float turbo_value = 0;
       turbo::from_chars(candidate.data(), candidate.data() + candidate.size(),
@@ -605,7 +605,7 @@ TEST(FromChars, NaNDoubles) {
        {"", "1", "2", "3", "fff", "FFF", "200000", "400000", "4000000000000",
         "8000000000000", "abc123", "legal_but_unexpected",
         "99999999999999999999999", "_"}) {
-    std::string input = turbo::StrCat("nan(", n_char_sequence, ")");
+    std::string input = turbo::str_cat("nan(", n_char_sequence, ")");
     SCOPED_TRACE(input);
     double from_chars_double;
     turbo::from_chars(input.data(), input.data() + input.size(),
@@ -638,7 +638,7 @@ TEST(FromChars, NaNFloats) {
        {"", "1", "2", "3", "fff", "FFF", "200000", "400000", "4000000000000",
         "8000000000000", "abc123", "legal_but_unexpected",
         "99999999999999999999999", "_"}) {
-    std::string input = turbo::StrCat("nan(", n_char_sequence, ")");
+    std::string input = turbo::str_cat("nan(", n_char_sequence, ")");
     SCOPED_TRACE(input);
     float from_chars_float;
     turbo::from_chars(input.data(), input.data() + input.size(),
@@ -701,7 +701,7 @@ void TestOverflowAndUnderflow(
         turbo::from_chars(input.data(), input.data() + input.size(), actual);
     EXPECT_EQ(result.ec, std::errc());
     EXPECT_EQ(expected, actual)
-        << turbo::StrFormat("%a vs %a", expected, actual);
+        << turbo::str_format("%a vs %a", expected, actual);
   }
   // test legal values near upper_bound
   for (index = upper_bound, step = 1; index > lower_bound;
@@ -714,7 +714,7 @@ void TestOverflowAndUnderflow(
         turbo::from_chars(input.data(), input.data() + input.size(), actual);
     EXPECT_EQ(result.ec, std::errc());
     EXPECT_EQ(expected, actual)
-        << turbo::StrFormat("%a vs %a", expected, actual);
+        << turbo::str_format("%a vs %a", expected, actual);
   }
   // Test underflow values below lower_bound
   for (index = lower_bound - 1, step = 1; index > -1000000;
@@ -747,7 +747,7 @@ void TestOverflowAndUnderflow(
 // 0x1p-1074.  Therefore 1023 and -1074 are the limits of acceptable exponents
 // in this test.
 TEST(FromChars, HexdecimalDoubleLimits) {
-  auto input_gen = [](int index) { return turbo::StrCat("0x1.0p", index); };
+  auto input_gen = [](int index) { return turbo::str_cat("0x1.0p", index); };
   auto expected_gen = [](int index) { return std::ldexp(1.0, index); };
   TestOverflowAndUnderflow<double>(input_gen, expected_gen, -1074, 1023);
 }
@@ -758,7 +758,7 @@ TEST(FromChars, HexdecimalDoubleLimits) {
 // representable subnormal is 0x0.000002p-126, which equals 0x1p-149.
 // Therefore 127 and -149 are the limits of acceptable exponents in this test.
 TEST(FromChars, HexdecimalFloatLimits) {
-  auto input_gen = [](int index) { return turbo::StrCat("0x1.0p", index); };
+  auto input_gen = [](int index) { return turbo::str_cat("0x1.0p", index); };
   auto expected_gen = [](int index) { return std::ldexp(1.0f, index); };
   TestOverflowAndUnderflow<float>(input_gen, expected_gen, -149, 127);
 }
@@ -770,7 +770,7 @@ TEST(FromChars, HexdecimalFloatLimits) {
 // the smallest representable positive value.  -323 and 308 are the limits of
 // acceptable exponents in this test.
 TEST(FromChars, DecimalDoubleLimits) {
-  auto input_gen = [](int index) { return turbo::StrCat("1.0e", index); };
+  auto input_gen = [](int index) { return turbo::str_cat("1.0e", index); };
   auto expected_gen = [](int index) { return Pow10(index); };
   TestOverflowAndUnderflow<double>(input_gen, expected_gen, -323, 308);
 }
@@ -782,7 +782,7 @@ TEST(FromChars, DecimalDoubleLimits) {
 // the smallest representable positive value.  -45 and 38 are the limits of
 // acceptable exponents in this test.
 TEST(FromChars, DecimalFloatLimits) {
-  auto input_gen = [](int index) { return turbo::StrCat("1.0e", index); };
+  auto input_gen = [](int index) { return turbo::str_cat("1.0e", index); };
   auto expected_gen = [](int index) { return Pow10(index); };
   TestOverflowAndUnderflow<float>(input_gen, expected_gen, -45, 38);
 }

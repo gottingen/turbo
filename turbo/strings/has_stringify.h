@@ -24,38 +24,38 @@
 #include <turbo/strings/string_view.h>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 
-namespace strings_internal {
+    namespace strings_internal {
 
-// This is an empty class not intended to be used. It exists so that
-// `HasTurboStringify` can reference a universal class rather than needing to be
-// copied for each new sink.
-class UnimplementedSink {
- public:
-  void Append(size_t count, char ch);
+        // This is an empty class not intended to be used. It exists so that
+        // `HasTurboStringify` can reference a universal class rather than needing to be
+        // copied for each new sink.
+        class UnimplementedSink {
+        public:
+            void Append(size_t count, char ch);
 
-  void Append(string_view v);
+            void Append(string_view v);
 
-  // Support `turbo::Format(&sink, format, args...)`.
-  friend void TurboFormatFlush(UnimplementedSink* sink, turbo::string_view v);
-};
+            // Support `turbo::format(&sink, format, args...)`.
+            friend void TurboFormatFlush(UnimplementedSink *sink, turbo::string_view v);
+        };
 
-}  // namespace strings_internal
+    }  // namespace strings_internal
 
-// `HasTurboStringify<T>` detects if type `T` supports the `turbo_stringify()`
-//
-// Note that there are types that can be `StrCat`-ed that do not use the
-// `turbo_stringify` customization point (for example, `int`).
+    // `HasTurboStringify<T>` detects if type `T` supports the `turbo_stringify()`
+    //
+    // Note that there are types that can be `str_cat`-ed that do not use the
+    // `turbo_stringify` customization point (for example, `int`).
 
-template <typename T, typename = void>
-struct HasTurboStringify : std::false_type {};
+    template<typename T, typename = void>
+    struct HasTurboStringify : std::false_type {
+    };
 
-template <typename T>
-struct HasTurboStringify<
-    T, std::enable_if_t<std::is_void<decltype(turbo_stringify(
-           std::declval<strings_internal::UnimplementedSink&>(),
-           std::declval<const T&>()))>::value>> : std::true_type {};
+    template<typename T>
+    struct HasTurboStringify<
+            T, std::enable_if_t<std::is_void<decltype(turbo_stringify(
+                    std::declval<strings_internal::UnimplementedSink &>(),
+                    std::declval<const T &>()))>::value>> : std::true_type {
+    };
 
-TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -25,59 +25,60 @@
 #include <turbo/times/time.h>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace {
+    TURBO_NAMESPACE_BEGIN
+    namespace {
 
-void PauseAndDecreaseCounter(BlockingCounter* counter, int* done) {
-  turbo::SleepFor(turbo::Duration::seconds(1));
-  *done = 1;
-  counter->DecrementCount();
-}
+        void PauseAndDecreaseCounter(BlockingCounter *counter, int *done) {
+            turbo::sleep_for(turbo::Duration::seconds(1));
+            *done = 1;
+            counter->DecrementCount();
+        }
 
-TEST(BlockingCounterTest, BasicFunctionality) {
-  // This test verifies that BlockingCounter functions correctly. Starts a
-  // number of threads that just sleep for a second and decrement a counter.
+        TEST(BlockingCounterTest, BasicFunctionality) {
+            // This test verifies that BlockingCounter functions correctly. Starts a
+            // number of threads that just sleep for a second and decrement a counter.
 
-  // Initialize the counter.
-  const int num_workers = 10;
-  BlockingCounter counter(num_workers);
+            // Initialize the counter.
+            const int num_workers = 10;
+            BlockingCounter counter(num_workers);
 
-  std::vector<std::thread> workers;
-  std::vector<int> done(num_workers, 0);
+            std::vector<std::thread> workers;
+            std::vector<int> done(num_workers, 0);
 
-  // Start a number of parallel tasks that will just wait for a seconds and
-  // then decrement the count.
-  workers.reserve(num_workers);
-  for (int k = 0; k < num_workers; k++) {
-    workers.emplace_back(
-        [&counter, &done, k] { PauseAndDecreaseCounter(&counter, &done[k]); });
-  }
+            // Start a number of parallel tasks that will just wait for a seconds and
+            // then decrement the count.
+            workers.reserve(num_workers);
+            for (int k = 0; k < num_workers; k++) {
+                workers.emplace_back(
+                        [&counter, &done, k] { PauseAndDecreaseCounter(&counter, &done[k]); });
+            }
 
-  // Wait for the threads to have all finished.
-  counter.Wait();
+            // Wait for the threads to have all finished.
+            counter.Wait();
 
-  // Check that all the workers have completed.
-  for (int k = 0; k < num_workers; k++) {
-    EXPECT_EQ(1, done[k]);
-  }
+            // Check that all the workers have completed.
+            for (int k = 0; k < num_workers; k++) {
+                EXPECT_EQ(1, done[k]);
+            }
 
-  for (std::thread& w : workers) {
-    w.join();
-  }
-}
+            for (std::thread &w: workers) {
+                w.join();
+            }
+        }
 
-TEST(BlockingCounterTest, WaitZeroInitialCount) {
-  BlockingCounter counter(0);
-  counter.Wait();
-}
+        TEST(BlockingCounterTest, WaitZeroInitialCount) {
+            BlockingCounter counter(0);
+            counter.Wait();
+        }
 
 #if GTEST_HAS_DEATH_TEST
-TEST(BlockingCounterTest, WaitNegativeInitialCount) {
-  EXPECT_DEATH(BlockingCounter counter(-1),
-               "BlockingCounter initial_count negative");
-}
+        TEST(BlockingCounterTest, WaitNegativeInitialCount) {
+            EXPECT_DEATH(BlockingCounter counter(-1),
+                         "BlockingCounter initial_count negative");
+        }
+
 #endif
 
-}  // namespace
-TURBO_NAMESPACE_END
+    }  // namespace
+    TURBO_NAMESPACE_END
 }  // namespace turbo

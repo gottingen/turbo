@@ -116,11 +116,11 @@ class SpyHashStateImpl : public HashStateBase<SpyHashStateImpl<T>> {
 
   static CompareResult Compare(const SpyHashStateImpl& a,
                                const SpyHashStateImpl& b) {
-    const std::string a_flat = turbo::StrJoin(a.hash_representation_, "");
-    const std::string b_flat = turbo::StrJoin(b.hash_representation_, "");
+    const std::string a_flat = turbo::str_join(a.hash_representation_, "");
+    const std::string b_flat = turbo::str_join(b.hash_representation_, "");
     if (a_flat == b_flat) return CompareResult::kEqual;
-    if (turbo::EndsWith(a_flat, b_flat)) return CompareResult::kBSuffixA;
-    if (turbo::EndsWith(b_flat, a_flat)) return CompareResult::kASuffixB;
+    if (turbo::ends_with(a_flat, b_flat)) return CompareResult::kBSuffixA;
+    if (turbo::ends_with(b_flat, a_flat)) return CompareResult::kASuffixB;
     return CompareResult::kUnequal;
   }
 
@@ -133,12 +133,12 @@ class SpyHashStateImpl : public HashStateBase<SpyHashStateImpl<T>> {
       size_t offset = 0;
       for (char c : s) {
         if (offset % 16 == 0) {
-          out << turbo::StreamFormat("\n0x%04x: ", offset);
+          out << turbo::stream_format("\n0x%04x: ", offset);
         }
         if (offset % 2 == 0) {
           out << " ";
         }
-        out << turbo::StreamFormat("%02x", c);
+        out << turbo::stream_format("%02x", c);
         ++offset;
       }
       out << "\n";
@@ -208,7 +208,7 @@ class SpyHashStateImpl : public HashStateBase<SpyHashStateImpl<T>> {
     template <typename U>
     void operator()(SpyHashStateImpl<U>& inner) {
       element_hash_representations.push_back(
-          turbo::StrJoin(inner.hash_representation_, ""));
+          turbo::str_join(inner.hash_representation_, ""));
       if (inner.error_->has_value()) {
         error = std::move(inner.error_);
       }

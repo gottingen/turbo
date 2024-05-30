@@ -134,7 +134,7 @@ void StatusRep::ForEachPayload(
 
 std::string StatusRep::ToString(StatusToStringMode mode) const {
   std::string text;
-  turbo::StrAppend(&text, turbo::StatusCodeToString(code()), ": ", message());
+  turbo::str_append(&text, turbo::StatusCodeToString(code()), ": ", message());
 
   const bool with_payload = (mode & StatusToStringMode::kWithPayload) ==
                             StatusToStringMode::kWithPayload;
@@ -146,9 +146,9 @@ std::string StatusRep::ToString(StatusToStringMode mode) const {
                              const turbo::Cord& payload) {
       turbo::optional<std::string> result;
       if (printer) result = printer(type_url, payload);
-      turbo::StrAppend(
+      turbo::str_append(
           &text, " [", type_url, "='",
-          result.has_value() ? *result : turbo::CHexEscape(std::string(payload)),
+          result.has_value() ? *result : turbo::c_hex_encode(std::string(payload)),
           "']");
     });
   }
@@ -241,7 +241,7 @@ turbo::Nonnull<std::string*> MakeCheckFailString(
     turbo::Nonnull<const turbo::Status*> status,
     turbo::Nonnull<const char*> prefix) {
   return new std::string(
-      turbo::StrCat(prefix, " (",
+      turbo::str_cat(prefix, " (",
                    status->ToString(StatusToStringMode::kWithEverything), ")"));
 }
 

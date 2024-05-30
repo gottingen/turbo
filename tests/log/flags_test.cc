@@ -125,7 +125,7 @@ TEST_F(LogFlagsTest, BacktraceAtWrongFile) {
 
   test_sink.StartCapturingLogs();
   turbo::SetFlag(&FLAGS_log_backtrace_at,
-                turbo::StrCat("some_other_file.cc:", log_line));
+                turbo::str_cat("some_other_file.cc:", log_line));
   do_log();
 }
 
@@ -139,7 +139,7 @@ TEST_F(LogFlagsTest, BacktraceAtWrongLine) {
 
   test_sink.StartCapturingLogs();
   turbo::SetFlag(&FLAGS_log_backtrace_at,
-                turbo::StrCat("flags_test.cc:", log_line + 1));
+                turbo::str_cat("flags_test.cc:", log_line + 1));
   do_log();
 }
 
@@ -152,7 +152,7 @@ TEST_F(LogFlagsTest, BacktraceAtWholeFilename) {
   EXPECT_CALL(test_sink, Send(TextMessage(Not(HasSubstr("(stacktrace:")))));
 
   test_sink.StartCapturingLogs();
-  turbo::SetFlag(&FLAGS_log_backtrace_at, turbo::StrCat(__FILE__, ":", log_line));
+  turbo::SetFlag(&FLAGS_log_backtrace_at, turbo::str_cat(__FILE__, ":", log_line));
   do_log();
 }
 
@@ -166,7 +166,7 @@ TEST_F(LogFlagsTest, BacktraceAtNonmatchingSuffix) {
 
   test_sink.StartCapturingLogs();
   turbo::SetFlag(&FLAGS_log_backtrace_at,
-                turbo::StrCat("flags_test.cc:", log_line, "gibberish"));
+                turbo::str_cat("flags_test.cc:", log_line, "gibberish"));
   do_log();
 }
 
@@ -182,7 +182,7 @@ TEST_F(LogFlagsTest, LogsBacktrace) {
 
   test_sink.StartCapturingLogs();
   turbo::SetFlag(&FLAGS_log_backtrace_at,
-                turbo::StrCat("flags_test.cc:", log_line));
+                turbo::str_cat("flags_test.cc:", log_line));
   do_log();
   turbo::SetFlag(&FLAGS_log_backtrace_at, "");
   do_log();

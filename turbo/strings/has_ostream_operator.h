@@ -15,8 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#ifndef TURBO_STRINGS_HAS_OSTREAM_OPERATOR_H_
-#define TURBO_STRINGS_HAS_OSTREAM_OPERATOR_H_
+#pragma once
 
 #include <ostream>
 #include <type_traits>
@@ -25,21 +24,19 @@
 #include <turbo/base/config.h>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 
-// Detects if type `T` supports streaming to `std::ostream`s with `operator<<`.
+    // Detects if type `T` supports streaming to `std::ostream`s with `operator<<`.
 
-template <typename T, typename = void>
-struct HasOstreamOperator : std::false_type {};
+    template<typename T, typename = void>
+    struct HasOstreamOperator : std::false_type {
+    };
 
-template <typename T>
-struct HasOstreamOperator<
-    T, std::enable_if_t<std::is_same<
-           std::ostream&, decltype(std::declval<std::ostream&>()
-                                   << std::declval<const T&>())>::value>>
-    : std::true_type {};
+    template<typename T>
+    struct HasOstreamOperator<
+            T, std::enable_if_t<std::is_same<
+                    std::ostream &, decltype(std::declval<std::ostream &>()
+                            << std::declval<const T &>())>::value>>
+            : std::true_type {
+    };
 
-TURBO_NAMESPACE_END
 }  // namespace turbo
-
-#endif  // TURBO_STRINGS_HAS_OSTREAM_OPERATOR_H_

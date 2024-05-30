@@ -31,7 +31,7 @@
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 
-bool EqualsIgnoreCase(turbo::string_view piece1,
+bool equals_ignore_case(turbo::string_view piece1,
                       turbo::string_view piece2) noexcept {
   return (piece1.size() == piece2.size() &&
           0 == turbo::strings_internal::memcasecmp(piece1.data(), piece2.data(),
@@ -39,40 +39,40 @@ bool EqualsIgnoreCase(turbo::string_view piece1,
   // memcasecmp uses turbo::ascii_tolower().
 }
 
-bool StrContainsIgnoreCase(turbo::string_view haystack,
+bool str_contains_ignore_case(turbo::string_view haystack,
                            turbo::string_view needle) noexcept {
   while (haystack.size() >= needle.size()) {
-    if (StartsWithIgnoreCase(haystack, needle)) return true;
+    if (starts_with_ignore_case(haystack, needle)) return true;
     haystack.remove_prefix(1);
   }
   return false;
 }
 
-bool StrContainsIgnoreCase(turbo::string_view haystack,
+bool str_contains_ignore_case(turbo::string_view haystack,
                            char needle) noexcept {
   char upper_needle = turbo::ascii_toupper(static_cast<unsigned char>(needle));
   char lower_needle = turbo::ascii_tolower(static_cast<unsigned char>(needle));
   if (upper_needle == lower_needle) {
-    return StrContains(haystack, needle);
+    return str_contains(haystack, needle);
   } else {
     const char both_cstr[3] = {lower_needle, upper_needle, '\0'};
     return haystack.find_first_of(both_cstr) != turbo::string_view::npos;
   }
 }
 
-bool StartsWithIgnoreCase(turbo::string_view text,
+bool starts_with_ignore_case(turbo::string_view text,
                           turbo::string_view prefix) noexcept {
   return (text.size() >= prefix.size()) &&
-         EqualsIgnoreCase(text.substr(0, prefix.size()), prefix);
+         equals_ignore_case(text.substr(0, prefix.size()), prefix);
 }
 
-bool EndsWithIgnoreCase(turbo::string_view text,
+bool ends_with_ignore_case(turbo::string_view text,
                         turbo::string_view suffix) noexcept {
   return (text.size() >= suffix.size()) &&
-         EqualsIgnoreCase(text.substr(text.size() - suffix.size()), suffix);
+         equals_ignore_case(text.substr(text.size() - suffix.size()), suffix);
 }
 
-turbo::string_view FindLongestCommonPrefix(turbo::string_view a,
+turbo::string_view find_longest_common_prefix(turbo::string_view a,
                                           turbo::string_view b) {
   const turbo::string_view::size_type limit = std::min(a.size(), b.size());
   const char* const pa = a.data();
@@ -115,7 +115,7 @@ turbo::string_view FindLongestCommonPrefix(turbo::string_view a,
   return turbo::string_view(pa, limit);
 }
 
-turbo::string_view FindLongestCommonSuffix(turbo::string_view a,
+turbo::string_view find_longest_common_suffix(turbo::string_view a,
                                           turbo::string_view b) {
   const turbo::string_view::size_type limit = std::min(a.size(), b.size());
   if (limit == 0) return turbo::string_view();

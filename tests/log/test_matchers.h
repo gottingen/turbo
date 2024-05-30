@@ -42,7 +42,7 @@ namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 // In some configurations, Googletest's string matchers (e.g.
-// `::testing::EndsWith`) need help to match `turbo::string_view`.
+// `::testing::ends_with`) need help to match `turbo::string_view`.
 ::testing::Matcher<turbo::string_view> AsString(
     const ::testing::Matcher<const std::string&>& str_matcher);
 

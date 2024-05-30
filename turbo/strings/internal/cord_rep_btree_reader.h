@@ -137,7 +137,7 @@ class CordRepBtreeReader {
   //
   //   CordRepBtreeReader reader;
   //   turbo::string_view sv = reader.Init(tree);
-  //   if (turbo::StartsWith(sv, "big:")) {
+  //   if (turbo::starts_with(sv, "big:")) {
   //     CordRepBtree tree;
   //     sv = reader.Read(1000, sv.size() - 4 /* "big:" */, &tree);
   //   }

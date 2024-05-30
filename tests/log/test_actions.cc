@@ -41,10 +41,10 @@ void WriteToStderrWithFilename::operator()(const turbo::LogEntry& entry) const {
 void WriteEntryToStderr::operator()(const turbo::LogEntry& entry) const {
   if (!message.empty()) std::cerr << message << "\n";
 
-  const std::string source_filename = turbo::CHexEscape(entry.source_filename());
-  const std::string source_basename = turbo::CHexEscape(entry.source_basename());
-  const std::string text_message = turbo::CHexEscape(entry.text_message());
-  const std::string encoded_message = turbo::CHexEscape(entry.encoded_message());
+  const std::string source_filename = turbo::c_hex_encode(entry.source_filename());
+  const std::string source_basename = turbo::c_hex_encode(entry.source_basename());
+  const std::string text_message = turbo::c_hex_encode(entry.text_message());
+  const std::string encoded_message = turbo::c_hex_encode(entry.encoded_message());
   std::string encoded_message_str;
   std::cerr << "LogEntry{\n"                                               //
             << "  source_filename: \"" << source_filename << "\"\n"        //
@@ -64,8 +64,8 @@ void WriteEntryToStderr::operator()(turbo::LogSeverity severity,
                                     turbo::string_view filename,
                                     turbo::string_view log_message) const {
   if (!message.empty()) std::cerr << message << "\n";
-  const std::string source_filename = turbo::CHexEscape(filename);
-  const std::string text_message = turbo::CHexEscape(log_message);
+  const std::string source_filename = turbo::c_hex_encode(filename);
+  const std::string text_message = turbo::c_hex_encode(log_message);
   std::cerr << "LogEntry{\n"                                         //
             << "  source_filename: \"" << source_filename << "\"\n"  //
             << "  log_severity: " << severity << "\n"                //

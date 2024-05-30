@@ -111,7 +111,7 @@ class PerThreadSemTest : public testing::Test {
     int64_t min_cycles = std::numeric_limits<int64_t>::max();
     int64_t total_cycles = 0;
     for (int i = 0; i < kNumIterations; ++i) {
-      turbo::SleepFor(turbo::Duration::milliseconds(20));
+      turbo::sleep_for(turbo::Duration::milliseconds(20));
       int64_t cycles = base_internal::CycleClock::Now();
       Post(t.identity2);
       Wait(t.timeout);
@@ -119,9 +119,9 @@ class PerThreadSemTest : public testing::Test {
       min_cycles = std::min(min_cycles, cycles);
       total_cycles += cycles;
     }
-    std::string out = StrCat(
+    std::string out = str_cat(
         msg, "min cycle count=", min_cycles, " avg cycle count=",
-        turbo::SixDigits(static_cast<double>(total_cycles) / kNumIterations));
+        turbo::six_digits(static_cast<double>(total_cycles) / kNumIterations));
     printf("%s\n", out.c_str());
 
     partner_thread.join();

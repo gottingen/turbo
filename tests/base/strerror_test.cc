@@ -70,7 +70,7 @@ TEST(StrErrorTest, MultipleThreads) {
       EXPECT_THAT(check_err, Eq(ERANGE));
       // Only the GNU implementation is guaranteed to provide the
       // string "Unknown error nnn". POSIX doesn't say anything.
-      if (!turbo::StartsWith(value, "Unknown error ")) {
+      if (!turbo::starts_with(value, "Unknown error ")) {
         EXPECT_THAT(value, Eq(expected_strings[i]));
       }
     }

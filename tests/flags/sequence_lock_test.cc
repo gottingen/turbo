@@ -84,7 +84,7 @@ TEST_P(ConcurrentSequenceLockTest, ReadAndWrite) {
     });
   }
   while (unsuccessful_reads.load(std::memory_order_relaxed) < num_threads_) {
-    turbo::SleepFor(turbo::Duration::milliseconds(1));
+    turbo::sleep_for(turbo::Duration::milliseconds(1));
   }
   seq_lock.MarkInitialized();
 
@@ -96,7 +96,7 @@ TEST_P(ConcurrentSequenceLockTest, ReadAndWrite) {
     turbo::FixedArray<char> writer_buf(buf_bytes_);
     for (auto& v : writer_buf) v = i;
     seq_lock.Write(protected_buf.data(), writer_buf.data(), buf_bytes_);
-    turbo::SleepFor(turbo::Duration::microseconds(10));
+    turbo::sleep_for(turbo::Duration::microseconds(10));
   }
   stop.store(true, std::memory_order_relaxed);
   for (auto& t : threads) t.join();

@@ -248,7 +248,7 @@ void BM_Sizeof(benchmark::State& state) {
     VecType vec;
     size = sizeof(vec);
   }
-  state.SetLabel(turbo::StrCat("sz=", size));
+  state.SetLabel(turbo::str_cat("sz=", size));
 }
 BENCHMARK_TEMPLATE(BM_Sizeof, turbo::InlinedVector<char, 1>);
 BENCHMARK_TEMPLATE(BM_Sizeof, turbo::InlinedVector<char, 4>);

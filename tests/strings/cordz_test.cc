@@ -81,7 +81,7 @@ namespace turbo {
         }
 
         std::string TestParamToString(::testing::TestParamInfo<TestCordSize> size) {
-            return turbo::StrCat("On", ToString(size.param), "Cord");
+            return turbo::str_cat("On", ToString(size.param), "Cord");
         }
 
         class CordzUpdateTest : public testing::TestWithParam<TestCordSize> {

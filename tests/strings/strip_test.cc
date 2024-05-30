@@ -32,91 +32,91 @@ namespace {
 
 TEST(Strip, ConsumePrefixOneChar) {
   turbo::string_view input("abc");
-  EXPECT_TRUE(turbo::ConsumePrefix(&input, "a"));
+  EXPECT_TRUE(turbo::consume_prefix(&input, "a"));
   EXPECT_EQ(input, "bc");
 
-  EXPECT_FALSE(turbo::ConsumePrefix(&input, "x"));
+  EXPECT_FALSE(turbo::consume_prefix(&input, "x"));
   EXPECT_EQ(input, "bc");
 
-  EXPECT_TRUE(turbo::ConsumePrefix(&input, "b"));
+  EXPECT_TRUE(turbo::consume_prefix(&input, "b"));
   EXPECT_EQ(input, "c");
 
-  EXPECT_TRUE(turbo::ConsumePrefix(&input, "c"));
+  EXPECT_TRUE(turbo::consume_prefix(&input, "c"));
   EXPECT_EQ(input, "");
 
-  EXPECT_FALSE(turbo::ConsumePrefix(&input, "a"));
+  EXPECT_FALSE(turbo::consume_prefix(&input, "a"));
   EXPECT_EQ(input, "");
 }
 
-TEST(Strip, ConsumePrefix) {
+TEST(Strip, consume_prefix) {
   turbo::string_view input("abcdef");
-  EXPECT_FALSE(turbo::ConsumePrefix(&input, "abcdefg"));
+  EXPECT_FALSE(turbo::consume_prefix(&input, "abcdefg"));
   EXPECT_EQ(input, "abcdef");
 
-  EXPECT_FALSE(turbo::ConsumePrefix(&input, "abce"));
+  EXPECT_FALSE(turbo::consume_prefix(&input, "abce"));
   EXPECT_EQ(input, "abcdef");
 
-  EXPECT_TRUE(turbo::ConsumePrefix(&input, ""));
+  EXPECT_TRUE(turbo::consume_prefix(&input, ""));
   EXPECT_EQ(input, "abcdef");
 
-  EXPECT_FALSE(turbo::ConsumePrefix(&input, "abcdeg"));
+  EXPECT_FALSE(turbo::consume_prefix(&input, "abcdeg"));
   EXPECT_EQ(input, "abcdef");
 
-  EXPECT_TRUE(turbo::ConsumePrefix(&input, "abcdef"));
+  EXPECT_TRUE(turbo::consume_prefix(&input, "abcdef"));
   EXPECT_EQ(input, "");
 
   input = "abcdef";
-  EXPECT_TRUE(turbo::ConsumePrefix(&input, "abcde"));
+  EXPECT_TRUE(turbo::consume_prefix(&input, "abcde"));
   EXPECT_EQ(input, "f");
 }
 
-TEST(Strip, ConsumeSuffix) {
+TEST(Strip, consume_suffix) {
   turbo::string_view input("abcdef");
-  EXPECT_FALSE(turbo::ConsumeSuffix(&input, "abcdefg"));
+  EXPECT_FALSE(turbo::consume_suffix(&input, "abcdefg"));
   EXPECT_EQ(input, "abcdef");
 
-  EXPECT_TRUE(turbo::ConsumeSuffix(&input, ""));
+  EXPECT_TRUE(turbo::consume_suffix(&input, ""));
   EXPECT_EQ(input, "abcdef");
 
-  EXPECT_TRUE(turbo::ConsumeSuffix(&input, "def"));
+  EXPECT_TRUE(turbo::consume_suffix(&input, "def"));
   EXPECT_EQ(input, "abc");
 
   input = "abcdef";
-  EXPECT_FALSE(turbo::ConsumeSuffix(&input, "abcdeg"));
+  EXPECT_FALSE(turbo::consume_suffix(&input, "abcdeg"));
   EXPECT_EQ(input, "abcdef");
 
-  EXPECT_TRUE(turbo::ConsumeSuffix(&input, "f"));
+  EXPECT_TRUE(turbo::consume_suffix(&input, "f"));
   EXPECT_EQ(input, "abcde");
 
-  EXPECT_TRUE(turbo::ConsumeSuffix(&input, "abcde"));
+  EXPECT_TRUE(turbo::consume_suffix(&input, "abcde"));
   EXPECT_EQ(input, "");
 }
 
-TEST(Strip, StripPrefix) {
+TEST(Strip, strip_prefix) {
   const turbo::string_view null_str;
 
-  EXPECT_EQ(turbo::StripPrefix("foobar", "foo"), "bar");
-  EXPECT_EQ(turbo::StripPrefix("foobar", ""), "foobar");
-  EXPECT_EQ(turbo::StripPrefix("foobar", null_str), "foobar");
-  EXPECT_EQ(turbo::StripPrefix("foobar", "foobar"), "");
-  EXPECT_EQ(turbo::StripPrefix("foobar", "bar"), "foobar");
-  EXPECT_EQ(turbo::StripPrefix("foobar", "foobarr"), "foobar");
-  EXPECT_EQ(turbo::StripPrefix("", ""), "");
+  EXPECT_EQ(turbo::strip_prefix("foobar", "foo"), "bar");
+  EXPECT_EQ(turbo::strip_prefix("foobar", ""), "foobar");
+  EXPECT_EQ(turbo::strip_prefix("foobar", null_str), "foobar");
+  EXPECT_EQ(turbo::strip_prefix("foobar", "foobar"), "");
+  EXPECT_EQ(turbo::strip_prefix("foobar", "bar"), "foobar");
+  EXPECT_EQ(turbo::strip_prefix("foobar", "foobarr"), "foobar");
+  EXPECT_EQ(turbo::strip_prefix("", ""), "");
 }
 
-TEST(Strip, StripSuffix) {
+TEST(Strip, strip_suffix) {
   const turbo::string_view null_str;
 
-  EXPECT_EQ(turbo::StripSuffix("foobar", "bar"), "foo");
-  EXPECT_EQ(turbo::StripSuffix("foobar", ""), "foobar");
-  EXPECT_EQ(turbo::StripSuffix("foobar", null_str), "foobar");
-  EXPECT_EQ(turbo::StripSuffix("foobar", "foobar"), "");
-  EXPECT_EQ(turbo::StripSuffix("foobar", "foo"), "foobar");
-  EXPECT_EQ(turbo::StripSuffix("foobar", "ffoobar"), "foobar");
-  EXPECT_EQ(turbo::StripSuffix("", ""), "");
+  EXPECT_EQ(turbo::strip_suffix("foobar", "bar"), "foo");
+  EXPECT_EQ(turbo::strip_suffix("foobar", ""), "foobar");
+  EXPECT_EQ(turbo::strip_suffix("foobar", null_str), "foobar");
+  EXPECT_EQ(turbo::strip_suffix("foobar", "foobar"), "");
+  EXPECT_EQ(turbo::strip_suffix("foobar", "foo"), "foobar");
+  EXPECT_EQ(turbo::strip_suffix("foobar", "ffoobar"), "foobar");
+  EXPECT_EQ(turbo::strip_suffix("", ""), "");
 }
 
-TEST(Strip, RemoveExtraAsciiWhitespace) {
+TEST(Strip, trim_complete) {
   const char* inputs[] = {
       "No extra space",
       "  Leading whitespace",
@@ -139,62 +139,62 @@ TEST(Strip, RemoveExtraAsciiWhitespace) {
 
   for (int i = 0; i < NUM_TESTS; i++) {
     std::string s(inputs[i]);
-    turbo::RemoveExtraAsciiWhitespace(&s);
+    turbo::trim_complete(&s);
     EXPECT_STREQ(outputs[i], s.c_str());
   }
 
-  // Test that turbo::RemoveExtraAsciiWhitespace returns immediately for empty
+  // Test that turbo::trim_complete returns immediately for empty
   // strings (It was adding the \0 character to the C++ std::string, which broke
   // tests involving empty())
   std::string zero_string = "";
   assert(zero_string.empty());
-  turbo::RemoveExtraAsciiWhitespace(&zero_string);
+  turbo::trim_complete(&zero_string);
   EXPECT_EQ(zero_string.size(), 0);
   EXPECT_TRUE(zero_string.empty());
 }
 
-TEST(Strip, StripTrailingAsciiWhitespace) {
+TEST(Strip, trim_right) {
   std::string test = "foo  ";
-  turbo::StripTrailingAsciiWhitespace(&test);
+  turbo::trim_right(&test);
   EXPECT_EQ(test, "foo");
 
   test = "   ";
-  turbo::StripTrailingAsciiWhitespace(&test);
+  turbo::trim_right(&test);
   EXPECT_EQ(test, "");
 
   test = "";
-  turbo::StripTrailingAsciiWhitespace(&test);
+  turbo::trim_right(&test);
   EXPECT_EQ(test, "");
 
   test = " abc\t";
-  turbo::StripTrailingAsciiWhitespace(&test);
+  turbo::trim_right(&test);
   EXPECT_EQ(test, " abc");
 }
 
-TEST(String, StripLeadingAsciiWhitespace) {
+TEST(String, trim_left) {
   turbo::string_view orig = "\t  \n\f\r\n\vfoo";
-  EXPECT_EQ("foo", turbo::StripLeadingAsciiWhitespace(orig));
+  EXPECT_EQ("foo", turbo::trim_left(orig));
   orig = "\t  \n\f\r\v\n\t  \n\f\r\v\n";
-  EXPECT_EQ(turbo::string_view(), turbo::StripLeadingAsciiWhitespace(orig));
+  EXPECT_EQ(turbo::string_view(), turbo::trim_left(orig));
 }
 
-TEST(Strip, StripAsciiWhitespace) {
+TEST(Strip, trim_all) {
   std::string test2 = "\t  \f\r\n\vfoo \t\f\r\v\n";
-  turbo::StripAsciiWhitespace(&test2);
+  turbo::trim_all(&test2);
   EXPECT_EQ(test2, "foo");
   std::string test3 = "bar";
-  turbo::StripAsciiWhitespace(&test3);
+  turbo::trim_all(&test3);
   EXPECT_EQ(test3, "bar");
   std::string test4 = "\t  \f\r\n\vfoo";
-  turbo::StripAsciiWhitespace(&test4);
+  turbo::trim_all(&test4);
   EXPECT_EQ(test4, "foo");
   std::string test5 = "foo \t\f\r\v\n";
-  turbo::StripAsciiWhitespace(&test5);
+  turbo::trim_all(&test5);
   EXPECT_EQ(test5, "foo");
   turbo::string_view test6("\t  \f\r\n\vfoo \t\f\r\v\n");
-  test6 = turbo::StripAsciiWhitespace(test6);
+  test6 = turbo::trim_all(test6);
   EXPECT_EQ(test6, "foo");
-  test6 = turbo::StripAsciiWhitespace(test6);
+  test6 = turbo::trim_all(test6);
   EXPECT_EQ(test6, "foo");  // already stripped
 }
 

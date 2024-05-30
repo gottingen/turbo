@@ -242,8 +242,8 @@ std::string ParamName(
     const ::testing::TestParamInfo<log_uniform_i32::param_type>& info) {
   const auto& p = info.param;
   std::string name =
-      turbo::StrCat("min_", p.min(), "__max_", p.max(), "__base_", p.base());
-  return turbo::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
+      turbo::str_cat("min_", p.min(), "__max_", p.max(), "__base_", p.base());
+  return turbo::str_replace_all(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
 }
 
 INSTANTIATE_TEST_SUITE_P(All, LogUniformIntChiSquaredTest,

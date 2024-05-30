@@ -80,7 +80,7 @@ class CordRepBtreeNavigatorTest : public testing::TestWithParam<size_t> {
   const std::vector<CordRep*>& flats() const { return flats_; }
 
   static std::string ToString(testing::TestParamInfo<size_t> param) {
-    return turbo::StrCat(param.param, "_Flats");
+    return turbo::str_cat(param.param, "_Flats");
   }
 
  private:

@@ -114,14 +114,14 @@ bool turbo_parse_flag(turbo::string_view in, CustomUDT* f, std::string*) {
 
   if (parts.size() != 2) return false;
 
-  if (!turbo::SimpleAtoi(parts[0], &f->a)) return false;
+  if (!turbo::simple_atoi(parts[0], &f->a)) return false;
 
-  if (!turbo::SimpleAtoi(parts[1], &f->b)) return false;
+  if (!turbo::simple_atoi(parts[1], &f->b)) return false;
 
   return true;
 }
 std::string turbo_unparse_flag(const CustomUDT& f) {
-  return turbo::StrCat(f.a, ":", f.b);
+  return turbo::str_cat(f.a, ":", f.b);
 }
 
 }  // namespace

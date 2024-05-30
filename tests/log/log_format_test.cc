@@ -78,7 +78,7 @@ TEST(LogFormatTest, NoMessage) {
 
   EXPECT_CALL(test_sink,
               Send(AllOf(TextMessage(MatchesOstream(ComparisonStream())),
-                         TextPrefix(AsString(EndsWith(turbo::StrCat(
+                         TextPrefix(AsString(EndsWith(turbo::str_cat(
                              " log_format_test.cc:", log_line, "] ")))),
                          TextMessage(IsEmpty()),
                          ENCODED_MESSAGE(EqualsProto(R"pb()pb")))));
@@ -881,7 +881,7 @@ TEST(LogFormatTest, CustomNonCopyable) {
 struct Point {
   template <typename Sink>
   friend void turbo_stringify(Sink& sink, const Point& p) {
-    turbo::Format(&sink, "(%d, %d)", p.x, p.y);
+    turbo::format(&sink, "(%d, %d)", p.x, p.y);
   }
 
   int x = 10;
@@ -896,7 +896,7 @@ TEST(LogFormatTest, TurboStringifyExample) {
   EXPECT_CALL(
       test_sink,
       Send(AllOf(
-          TextMessage(Eq("(10, 20)")), TextMessage(Eq(turbo::StrCat(p))),
+          TextMessage(Eq("(10, 20)")), TextMessage(Eq(turbo::str_cat(p))),
           ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "(10, 20)" })pb")))));
 
   test_sink.StartCapturingLogs();
@@ -907,7 +907,7 @@ struct PointWithTurboStringifiyAndOstream {
   template <typename Sink>
   friend void turbo_stringify(Sink& sink,
                             const PointWithTurboStringifiyAndOstream& p) {
-    turbo::Format(&sink, "(%d, %d)", p.x, p.y);
+    turbo::format(&sink, "(%d, %d)", p.x, p.y);
   }
 
   int x = 10;
@@ -927,7 +927,7 @@ TEST(LogFormatTest, CustomWithTurboStringifyAndOstream) {
   EXPECT_CALL(
       test_sink,
       Send(AllOf(
-          TextMessage(Eq("(10, 20)")), TextMessage(Eq(turbo::StrCat(p))),
+          TextMessage(Eq("(10, 20)")), TextMessage(Eq(turbo::str_cat(p))),
           ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "(10, 20)" })pb")))));
 
   test_sink.StartCapturingLogs();
@@ -949,7 +949,7 @@ TEST(LogFormatTest, TurboStringifyStreamsNothing) {
 
   EXPECT_CALL(
       test_sink,
-      Send(AllOf(TextMessage(Eq("77")), TextMessage(Eq(turbo::StrCat(p, 77))),
+      Send(AllOf(TextMessage(Eq("77")), TextMessage(Eq(turbo::str_cat(p, 77))),
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "77" })pb")))));
 
   test_sink.StartCapturingLogs();
@@ -960,7 +960,7 @@ struct PointMultipleAppend {
   template <typename Sink>
   friend void turbo_stringify(Sink& sink, const PointMultipleAppend& p) {
     sink.Append("(");
-    sink.Append(turbo::StrCat(p.x, ", ", p.y, ")"));
+    sink.Append(turbo::str_cat(p.x, ", ", p.y, ")"));
   }
 
   int x = 10;
@@ -975,7 +975,7 @@ TEST(LogFormatTest, TurboStringifyMultipleAppend) {
   EXPECT_CALL(
       test_sink,
       Send(AllOf(
-          TextMessage(Eq("(10, 20)")), TextMessage(Eq(turbo::StrCat(p))),
+          TextMessage(Eq("(10, 20)")), TextMessage(Eq(turbo::str_cat(p))),
           ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "(" }
                                            value { str: "10, 20)" })pb")))));
 
@@ -1631,7 +1631,7 @@ TEST(ManipulatorLogFormatTest, CustomClassStreamsNothing) {
 struct PointPercentV {
   template <typename Sink>
   friend void turbo_stringify(Sink& sink, const PointPercentV& p) {
-    turbo::Format(&sink, "(%v, %v)", p.x, p.y);
+    turbo::format(&sink, "(%v, %v)", p.x, p.y);
   }
 
   int x = 10;
@@ -1646,7 +1646,7 @@ TEST(ManipulatorLogFormatTest, IOManipsDoNotAffectTurboStringify) {
   EXPECT_CALL(
       test_sink,
       Send(AllOf(
-          TextMessage(Eq("(10, 20)")), TextMessage(Eq(turbo::StrCat(p))),
+          TextMessage(Eq("(10, 20)")), TextMessage(Eq(turbo::str_cat(p))),
           ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "(10, 20)" })pb")))));
 
   test_sink.StartCapturingLogs();

@@ -175,7 +175,7 @@ std::string FormatLogMessage(turbo::LogSeverity severity,
                              turbo::Duration subsecond, log_internal::Tid tid,
                              turbo::string_view basename, int line,
                              PrefixFormat format, turbo::string_view message) {
-  return turbo::StrFormat(
+  return turbo::str_format(
       "%c%02d%02d %02d:%02d:%02d.%06d %7d %s:%d] %s%s",
       turbo::LogSeverityName(severity)[0], civil_second.month(),
       civil_second.day(), civil_second.hour(), civil_second.minute(),

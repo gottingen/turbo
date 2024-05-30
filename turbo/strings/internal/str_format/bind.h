@@ -203,7 +203,7 @@ std::string Summarize(UntypedFormatSpecImpl format,
 bool BindWithPack(const UnboundConversion* props,
                   turbo::Span<const FormatArgImpl> pack, BoundConversion* bound);
 
-bool FormatUntyped(FormatRawSinkImpl raw_sink, UntypedFormatSpecImpl format,
+bool format_untyped(FormatRawSinkImpl raw_sink, UntypedFormatSpecImpl format,
                    turbo::Span<const FormatArgImpl> args);
 
 std::string& AppendPack(std::string* out, UntypedFormatSpecImpl format,

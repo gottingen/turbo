@@ -67,15 +67,15 @@ struct OverloadedFunctor {
   OverloadedFunctor(OverloadedFunctor&&) {}
   template <typename... Args>
   std::string operator()(const Args&... args) & {
-    return turbo::StrCat("&", args...);
+    return turbo::str_cat("&", args...);
   }
   template <typename... Args>
   std::string operator()(const Args&... args) const& {
-    return turbo::StrCat("const&", args...);
+    return turbo::str_cat("const&", args...);
   }
   template <typename... Args>
   std::string operator()(const Args&... args) && {
-    return turbo::StrCat("&&", args...);
+    return turbo::str_cat("&&", args...);
   }
 };
 

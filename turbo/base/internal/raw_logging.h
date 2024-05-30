@@ -74,7 +74,7 @@
 // few other dependencies.
 //
 // The API is a subset of the above: each macro only takes two arguments.  Use
-// StrCat if you need to build a richer message.
+// str_cat if you need to build a richer message.
 #define TURBO_INTERNAL_LOG(severity, message)                              \
   do {                                                                    \
     constexpr const char* turbo_raw_log_internal_filename = __FILE__;      \

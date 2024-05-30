@@ -54,7 +54,7 @@ std::string GetSpecString(TypeSpec spec) {
   std::string out;
   turbo::string_view sep;
   const auto append = [&](turbo::string_view s) {
-    turbo::StrAppend(&out, sep, s);
+    turbo::str_append(&out, sep, s);
     sep = " | ";
   };
   if (static_cast<bool>(TypeSpec::kNoThrowCopy & spec)) {

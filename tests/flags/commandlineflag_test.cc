@@ -33,7 +33,7 @@
 
 TURBO_FLAG(int, int_flag, 201, "int_flag help");
 TURBO_FLAG(std::string, string_flag, "dflt",
-          turbo::StrCat("string_flag", " help"));
+          turbo::str_cat("string_flag", " help"));
 TURBO_RETIRED_FLAG(bool, bool_retired_flag, false, "bool_retired_flag help");
 
 // These are only used to test default values.
@@ -84,7 +84,7 @@ TEST_F(CommandLineFlagTest, TestAttributesAccessMethods) {
   EXPECT_TRUE(flag_01->IsOfType<int>());
   EXPECT_TRUE(!flag_01->IsOfType<bool>());
   EXPECT_TRUE(!flag_01->IsOfType<std::string>());
-  EXPECT_TRUE(turbo::EndsWith(flag_01->Filename(),
+  EXPECT_TRUE(turbo::ends_with(flag_01->Filename(),
                              "tests/flags/commandlineflag_test.cc"))
       << flag_01->Filename();
 
@@ -97,7 +97,7 @@ TEST_F(CommandLineFlagTest, TestAttributesAccessMethods) {
   EXPECT_TRUE(flag_02->IsOfType<std::string>());
   EXPECT_TRUE(!flag_02->IsOfType<bool>());
   EXPECT_TRUE(!flag_02->IsOfType<int>());
-  EXPECT_TRUE(turbo::EndsWith(flag_02->Filename(),
+  EXPECT_TRUE(turbo::ends_with(flag_02->Filename(),
                              "tests/flags/commandlineflag_test.cc"))
       << flag_02->Filename();
 }

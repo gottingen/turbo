@@ -109,7 +109,7 @@ static void BM_StrToLower(benchmark::State& state) {
   std::string s(size, 'X');
   for (auto _ : state) {
     benchmark::DoNotOptimize(s);
-    std::string res = turbo::AsciiStrToLower(s);
+    std::string res = turbo::str_to_lower(s);
     benchmark::DoNotOptimize(res);
   }
 }
@@ -123,7 +123,7 @@ static void BM_StrToUpper(benchmark::State& state) {
   std::string s(size, 'x');
   for (auto _ : state) {
     benchmark::DoNotOptimize(s);
-    std::string res = turbo::AsciiStrToUpper(s);
+    std::string res = turbo::str_to_upper(s);
     benchmark::DoNotOptimize(res);
   }
 }

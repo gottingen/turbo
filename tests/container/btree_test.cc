@@ -749,10 +749,10 @@ struct CompareIntToString {
     return a < b;
   }
   bool operator()(const std::string &a, int b) const {
-    return a < turbo::StrCat(b);
+    return a < turbo::str_cat(b);
   }
   bool operator()(int a, const std::string &b) const {
-    return turbo::StrCat(a) < b;
+    return turbo::str_cat(a) < b;
   }
   using is_transparent = void;
 };
@@ -917,7 +917,7 @@ TEST(Btree, HeterogeneousLookupDoesntDegradePerformance) {
   using StringSet = turbo::btree_set<StringLike>;
   StringSet s;
   for (int i = 0; i < 100; ++i) {
-    ASSERT_TRUE(s.insert(turbo::StrCat(i).c_str()).second);
+    ASSERT_TRUE(s.insert(turbo::str_cat(i).c_str()).second);
   }
   StringLike::clear_constructor_call_count();
   s.find("50");
@@ -1982,19 +1982,19 @@ TEST(Btree, ExtractMultiMapEquivalentKeys) {
   turbo::btree_multimap<std::string, int> map;
   for (int i = 0; i < 100; ++i) {
     for (int j = 0; j < 100; ++j) {
-      map.insert({turbo::StrCat(i), j});
+      map.insert({turbo::str_cat(i), j});
     }
   }
 
   for (int i = 0; i < 100; ++i) {
-    const std::string key = turbo::StrCat(i);
+    const std::string key = turbo::str_cat(i);
     auto node_handle = map.extract(key);
     EXPECT_EQ(node_handle.key(), key);
     EXPECT_EQ(node_handle.mapped(), 0) << i;
   }
 
   for (int i = 0; i < 100; ++i) {
-    const std::string key = turbo::StrCat(i);
+    const std::string key = turbo::str_cat(i);
     auto node_handle = map.extract(key);
     EXPECT_EQ(node_handle.key(), key);
     EXPECT_EQ(node_handle.mapped(), 1) << i;

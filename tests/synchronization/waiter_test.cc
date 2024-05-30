@@ -84,9 +84,9 @@ namespace {
             // Include some `Poke()` calls to ensure they don't cause `waiter` to return
             // from `Wait()`.
             waiter.Poke();
-            turbo::SleepFor(turbo::Duration::seconds(1));
+            turbo::sleep_for(turbo::Duration::seconds(1));
             waiter.Poke();
-            turbo::SleepFor(turbo::Duration::seconds(1));
+            turbo::sleep_for(turbo::Duration::seconds(1));
             waiter.Post();
         });
         turbo::Time start = turbo::Time::current_time();
@@ -103,7 +103,7 @@ namespace {
             // Include some `Poke()` calls to ensure they don't cause `waiter` to return
             // from `Wait()`.
             waiter.Poke();
-            turbo::SleepFor(turbo::Duration::milliseconds(500));
+            turbo::sleep_for(turbo::Duration::milliseconds(500));
             waiter.Post();
         });
         turbo::Time start = turbo::Time::current_time();
@@ -121,7 +121,7 @@ namespace {
             // Include some `Poke()` calls to ensure they don't cause `waiter` to return
             // from `Wait()`.
             waiter.Poke();
-            turbo::SleepFor(turbo::Duration::milliseconds(500));
+            turbo::sleep_for(turbo::Duration::milliseconds(500));
             waiter.Post();
         });
         turbo::Time start = turbo::Time::current_time();

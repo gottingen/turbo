@@ -193,7 +193,7 @@ int MutexDelay(int32_t c, int mode) {
       c++;
     } else {
       // Then wait.
-      turbo::SleepFor(sleep_time);
+      turbo::sleep_for(sleep_time);
       c = 0;
     }
     TURBO_TSAN_MUTEX_POST_DIVERT(nullptr, 0);

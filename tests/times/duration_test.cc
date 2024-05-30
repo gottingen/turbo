@@ -1827,9 +1827,9 @@ namespace {
 
     TEST(Duration, turbo_stringify) {
         // Duration::format is already well tested, so just use one test case here to
-        // verify that StrFormat("%v", d) works as expected.
+        // verify that str_format("%v", d) works as expected.
         turbo::Duration d = turbo::Duration::seconds(1);
-        EXPECT_EQ(turbo::StrFormat("%v", d), turbo::Duration::format(d));
+        EXPECT_EQ(turbo::str_format("%v", d), turbo::Duration::format(d));
     }
 
     TEST(Duration, NoPadding) {

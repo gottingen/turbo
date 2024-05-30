@@ -217,7 +217,7 @@ void BM_SimpleAtof(benchmark::State& state) {
   float value;
   for (auto _ : state) {
     for (const T& input : inputs) {
-      benchmark::DoNotOptimize(turbo::SimpleAtof(input, &value));
+      benchmark::DoNotOptimize(turbo::simple_atof(input, &value));
     }
   }
 }
@@ -247,7 +247,7 @@ void BM_SimpleAtod(benchmark::State& state) {
   double value;
   for (auto _ : state) {
     for (const T& input : inputs) {
-      benchmark::DoNotOptimize(turbo::SimpleAtod(input, &value));
+      benchmark::DoNotOptimize(turbo::simple_atod(input, &value));
     }
   }
 }

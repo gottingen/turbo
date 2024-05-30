@@ -30,7 +30,7 @@ TURBO_NAMESPACE_BEGIN
 // Sets the "usage" message to be used by help reporting routines.
 // For example:
 //  turbo::SetProgramUsageMessage(
-//      turbo::StrCat("This program does nothing.  Sample usage:\n", argv[0],
+//      turbo::str_cat("This program does nothing.  Sample usage:\n", argv[0],
 //                   " <uselessarg1> <uselessarg2>"));
 // Do not include commandline flags in the usage: we do that for you!
 // Note: Calling SetProgramUsageMessage twice will trigger a call to std::exit.

@@ -43,23 +43,23 @@ using FormatEntryPointTest = ::testing::Test;
 
 TEST_F(FormatEntryPointTest, Format) {
   std::string sink;
-  EXPECT_TRUE(Format(&sink, "A format %d", 123));
+  EXPECT_TRUE(format(&sink, "A format %d", 123));
   EXPECT_EQ("A format 123", sink);
   sink.clear();
 
   ParsedFormat<'d'> pc("A format %d");
-  EXPECT_TRUE(Format(&sink, pc, 123));
+  EXPECT_TRUE(format(&sink, pc, 123));
   EXPECT_EQ("A format 123", sink);
 }
 
 TEST_F(FormatEntryPointTest, FormatWithV) {
   std::string sink;
-  EXPECT_TRUE(Format(&sink, "A format %v", 123));
+  EXPECT_TRUE(format(&sink, "A format %v", 123));
   EXPECT_EQ("A format 123", sink);
   sink.clear();
 
   ParsedFormat<'v'> pc("A format %v");
-  EXPECT_TRUE(Format(&sink, pc, 123));
+  EXPECT_TRUE(format(&sink, pc, 123));
   EXPECT_EQ("A format 123", sink);
 }
 
@@ -80,7 +80,7 @@ TEST_F(FormatEntryPointTest, UntypedFormat) {
     turbo::Span<const FormatArgImpl> args(&arg_123, 1);
     UntypedFormatSpec format(fmt);
 
-    EXPECT_TRUE(FormatUntyped(&actual, format, args));
+    EXPECT_TRUE(format_untyped(&actual, format, args));
     char buf[4096]{};
     snprintf(buf, sizeof(buf), fmt, 123);
     EXPECT_EQ(
@@ -94,35 +94,35 @@ TEST_F(FormatEntryPointTest, UntypedFormat) {
   int i = 345;
   FormatArg arg(i);
   std::string out;
-  EXPECT_TRUE(str_format_internal::FormatUntyped(
+  EXPECT_TRUE(str_format_internal::format_untyped(
       &out, str_format_internal::UntypedFormatSpecImpl(&pc), {&arg, 1}));
   EXPECT_EQ("A format 345", out);
 }
 
 TEST_F(FormatEntryPointTest, StringFormat) {
-  EXPECT_EQ("123", StrFormat("%d", 123));
+  EXPECT_EQ("123", str_format("%d", 123));
   constexpr turbo::string_view view("=%d=", 4);
-  EXPECT_EQ("=123=", StrFormat(view, 123));
+  EXPECT_EQ("=123=", str_format(view, 123));
 }
 
 TEST_F(FormatEntryPointTest, StringFormatV) {
   std::string hello = "hello";
-  EXPECT_EQ("hello", StrFormat("%v", hello));
-  EXPECT_EQ("123", StrFormat("%v", 123));
+  EXPECT_EQ("hello", str_format("%v", hello));
+  EXPECT_EQ("123", str_format("%v", 123));
   constexpr turbo::string_view view("=%v=", 4);
-  EXPECT_EQ("=123=", StrFormat(view, 123));
+  EXPECT_EQ("=123=", str_format(view, 123));
 }
 
 TEST_F(FormatEntryPointTest, AppendFormat) {
   std::string s;
-  std::string& r = StrAppendFormat(&s, "%d", 123);
+  std::string& r = str_append_format(&s, "%d", 123);
   EXPECT_EQ(&s, &r);  // should be same object
   EXPECT_EQ("123", r);
 }
 
 TEST_F(FormatEntryPointTest, AppendFormatWithV) {
   std::string s;
-  std::string& r = StrAppendFormat(&s, "%v", 123);
+  std::string& r = str_append_format(&s, "%v", 123);
   EXPECT_EQ(&s, &r);  // should be same object
   EXPECT_EQ("123", r);
 }
@@ -156,7 +156,7 @@ TEST_F(FormatEntryPointTest, ManyArgs) {
       "60 59 58 57 56 55 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40 39 38 37 "
       "36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 "
       "12 11 10 9 8 7 6 5 4 3 2 1",
-      StrFormat("%60$d %59$d %58$d %57$d %56$d %55$d %54$d %53$d %52$d %51$d "
+      str_format("%60$d %59$d %58$d %57$d %56$d %55$d %54$d %53$d %52$d %51$d "
                 "%50$d %49$d %48$d %47$d %46$d %45$d %44$d %43$d %42$d %41$d "
                 "%40$d %39$d %38$d %37$d %36$d %35$d %34$d %33$d %32$d %31$d "
                 "%30$d %29$d %28$d %27$d %26$d %25$d %24$d %23$d %22$d %21$d "
@@ -170,35 +170,35 @@ TEST_F(FormatEntryPointTest, ManyArgs) {
 
 TEST_F(FormatEntryPointTest, Preparsed) {
   ParsedFormat<'d'> pc("%d");
-  EXPECT_EQ("123", StrFormat(pc, 123));
+  EXPECT_EQ("123", str_format(pc, 123));
   // rvalue ok?
-  EXPECT_EQ("123", StrFormat(ParsedFormat<'d'>("%d"), 123));
+  EXPECT_EQ("123", str_format(ParsedFormat<'d'>("%d"), 123));
   constexpr turbo::string_view view("=%d=", 4);
-  EXPECT_EQ("=123=", StrFormat(ParsedFormat<'d'>(view), 123));
+  EXPECT_EQ("=123=", str_format(ParsedFormat<'d'>(view), 123));
 }
 
 TEST_F(FormatEntryPointTest, PreparsedWithV) {
   ParsedFormat<'v'> pc("%v");
-  EXPECT_EQ("123", StrFormat(pc, 123));
+  EXPECT_EQ("123", str_format(pc, 123));
   // rvalue ok?
-  EXPECT_EQ("123", StrFormat(ParsedFormat<'v'>("%v"), 123));
+  EXPECT_EQ("123", str_format(ParsedFormat<'v'>("%v"), 123));
   constexpr turbo::string_view view("=%v=", 4);
-  EXPECT_EQ("=123=", StrFormat(ParsedFormat<'v'>(view), 123));
+  EXPECT_EQ("=123=", str_format(ParsedFormat<'v'>(view), 123));
 }
 
-TEST_F(FormatEntryPointTest, FormatCountCapture) {
+TEST_F(FormatEntryPointTest, format_count_capture) {
   int n = 0;
-  EXPECT_EQ("", StrFormat("%n", FormatCountCapture(&n)));
+  EXPECT_EQ("", str_format("%n", format_count_capture(&n)));
   EXPECT_EQ(0, n);
-  EXPECT_EQ("123", StrFormat("%d%n", 123, FormatCountCapture(&n)));
+  EXPECT_EQ("123", str_format("%d%n", 123, format_count_capture(&n)));
   EXPECT_EQ(3, n);
 }
 
 TEST_F(FormatEntryPointTest, FormatCountCaptureWithV) {
   int n = 0;
-  EXPECT_EQ("", StrFormat("%n", FormatCountCapture(&n)));
+  EXPECT_EQ("", str_format("%n", format_count_capture(&n)));
   EXPECT_EQ(0, n);
-  EXPECT_EQ("123", StrFormat("%v%n", 123, FormatCountCapture(&n)));
+  EXPECT_EQ("123", str_format("%v%n", 123, format_count_capture(&n)));
   EXPECT_EQ(3, n);
 }
 
@@ -230,8 +230,8 @@ TEST_F(FormatEntryPointTest, FormatCountCaptureMultiple) {
   int n1 = 0;
   int n2 = 0;
   EXPECT_EQ("    1         2",
-            StrFormat("%5d%n%10d%n", 1, FormatCountCapture(&n1), 2,
-                      FormatCountCapture(&n2)));
+            str_format("%5d%n%10d%n", 1, format_count_capture(&n1), 2,
+                      format_count_capture(&n2)));
   EXPECT_EQ(5, n1);
   EXPECT_EQ(15, n2);
 }
@@ -239,8 +239,8 @@ TEST_F(FormatEntryPointTest, FormatCountCaptureMultiple) {
 TEST_F(FormatEntryPointTest, FormatCountCaptureExample) {
   int n;
   std::string s;
-  StrAppendFormat(&s, "%s: %n%s\n", "(1,1)", FormatCountCapture(&n), "(1,2)");
-  StrAppendFormat(&s, "%*s%s\n", n, "", "(2,2)");
+  str_append_format(&s, "%s: %n%s\n", "(1,1)", format_count_capture(&n), "(1,2)");
+  str_append_format(&s, "%*s%s\n", n, "", "(2,2)");
   EXPECT_EQ(7, n);
   EXPECT_EQ(
       "(1,1): (1,2)\n"
@@ -254,8 +254,8 @@ TEST_F(FormatEntryPointTest, FormatCountCaptureExampleWithV) {
   std::string a1 = "(1,1)";
   std::string a2 = "(1,2)";
   std::string a3 = "(2,2)";
-  StrAppendFormat(&s, "%v: %n%v\n", a1, FormatCountCapture(&n), a2);
-  StrAppendFormat(&s, "%*s%v\n", n, "", a3);
+  str_append_format(&s, "%v: %n%v\n", a1, format_count_capture(&n), a2);
+  str_append_format(&s, "%*s%v\n", n, "", a3);
   EXPECT_EQ(7, n);
   EXPECT_EQ(
       "(1,1): (1,2)\n"
@@ -279,7 +279,7 @@ TEST_F(FormatEntryPointTest, Stream) {
     const auto parsed =
         ParsedFormat<'d', 'u', 'c', 's', 'f', 'g'>::NewAllowIgnored(fmt);
     std::ostringstream oss;
-    oss << StreamFormat(*parsed, 123, 3, 49, "multistreaming!!!", 1.01, 1.01);
+    oss << stream_format(*parsed, 123, 3, 49, "multistreaming!!!", 1.01, 1.01);
     int fmt_result = snprintf(&*buf.begin(), buf.size(), fmt.c_str(),  //
                               123, 3, 49, "multistreaming!!!", 1.01, 1.01);
     ASSERT_TRUE(oss) << fmt;
@@ -307,7 +307,7 @@ TEST_F(FormatEntryPointTest, StreamWithV) {
     const auto parsed =
         ParsedFormat<'v', 'u', 'c', 'v', 'f', 'v'>::NewAllowIgnored(formats[i]);
     std::ostringstream oss;
-    oss << StreamFormat(*parsed, 123, 3, 49,
+    oss << stream_format(*parsed, 123, 3, 49,
                         turbo::string_view("multistreaming!!!"), 1.01, 1.01);
     int fmt_result =
         snprintf(&*buf.begin(), buf.size(), formats_for_buf[i].c_str(),  //
@@ -321,14 +321,14 @@ TEST_F(FormatEntryPointTest, StreamWithV) {
 
 TEST_F(FormatEntryPointTest, StreamOk) {
   std::ostringstream oss;
-  oss << StreamFormat("hello %d", 123);
+  oss << stream_format("hello %d", 123);
   EXPECT_EQ("hello 123", oss.str());
   EXPECT_TRUE(oss.good());
 }
 
 TEST_F(FormatEntryPointTest, StreamOkWithV) {
   std::ostringstream oss;
-  oss << StreamFormat("hello %v", 123);
+  oss << stream_format("hello %v", 123);
   EXPECT_EQ("hello 123", oss.str());
   EXPECT_TRUE(oss.good());
 }
@@ -370,13 +370,13 @@ TEST_F(FormatEntryPointTest, FloatPrecisionArg) {
   // Test that positional parameters for width and precision
   // are indexed to precede the value.
   // Also sanity check the same formats against snprintf.
-  EXPECT_EQ("0.1", StrFormat("%.1f", 0.1));
+  EXPECT_EQ("0.1", str_format("%.1f", 0.1));
   EXPECT_EQ("0.1", WithSnprintf("%.1f", 0.1));
-  EXPECT_EQ("  0.1", StrFormat("%*.1f", 5, 0.1));
+  EXPECT_EQ("  0.1", str_format("%*.1f", 5, 0.1));
   EXPECT_EQ("  0.1", WithSnprintf("%*.1f", 5, 0.1));
-  EXPECT_EQ("0.1", StrFormat("%.*f", 1, 0.1));
+  EXPECT_EQ("0.1", str_format("%.*f", 1, 0.1));
   EXPECT_EQ("0.1", WithSnprintf("%.*f", 1, 0.1));
-  EXPECT_EQ("  0.1", StrFormat("%*.*f", 5, 1, 0.1));
+  EXPECT_EQ("  0.1", str_format("%*.*f", 5, 1, 0.1));
   EXPECT_EQ("  0.1", WithSnprintf("%*.*f", 5, 1, 0.1));
 }
 namespace streamed_test {
@@ -386,18 +386,18 @@ std::ostream& operator<<(std::ostream& os, const X&) {
 }
 }  // streamed_test
 
-TEST_F(FormatEntryPointTest, FormatStreamed) {
-  EXPECT_EQ("123", StrFormat("%s", FormatStreamed(123)));
-  EXPECT_EQ("  123", StrFormat("%5s", FormatStreamed(123)));
-  EXPECT_EQ("123  ", StrFormat("%-5s", FormatStreamed(123)));
-  EXPECT_EQ("X", StrFormat("%s", FormatStreamed(streamed_test::X())));
-  EXPECT_EQ("123", StrFormat("%s", FormatStreamed(StreamFormat("%d", 123))));
+TEST_F(FormatEntryPointTest, format_streamed) {
+  EXPECT_EQ("123", str_format("%s", format_streamed(123)));
+  EXPECT_EQ("  123", str_format("%5s", format_streamed(123)));
+  EXPECT_EQ("123  ", str_format("%-5s", format_streamed(123)));
+  EXPECT_EQ("X", str_format("%s", format_streamed(streamed_test::X())));
+  EXPECT_EQ("123", str_format("%s", format_streamed(stream_format("%d", 123))));
 }
 
 TEST_F(FormatEntryPointTest, FormatStreamedWithV) {
-  EXPECT_EQ("123", StrFormat("%v", FormatStreamed(123)));
-  EXPECT_EQ("X", StrFormat("%v", FormatStreamed(streamed_test::X())));
-  EXPECT_EQ("123", StrFormat("%v", FormatStreamed(StreamFormat("%d", 123))));
+  EXPECT_EQ("123", str_format("%v", format_streamed(123)));
+  EXPECT_EQ("X", str_format("%v", format_streamed(streamed_test::X())));
+  EXPECT_EQ("123", str_format("%v", format_streamed(stream_format("%d", 123))));
 }
 
 // Helper class that creates a temporary file and exposes a FILE* to it.
@@ -552,125 +552,125 @@ TEST_F(FormatEntryPointTest, SNPrintFWithV) {
   EXPECT_EQ(result, 37);
 }
 
-TEST(StrFormat, BehavesAsDocumented) {
-  std::string s = turbo::StrFormat("%s, %d!", "Hello", 123);
+TEST(str_format, BehavesAsDocumented) {
+  std::string s = turbo::str_format("%s, %d!", "Hello", 123);
   EXPECT_EQ("Hello, 123!", s);
   std::string hello = "Hello";
-  std::string s2 = turbo::StrFormat("%v, %v!", hello, 123);
+  std::string s2 = turbo::str_format("%v, %v!", hello, 123);
   EXPECT_EQ("Hello, 123!", s2);
   // The format of a replacement is
   // '%'[position][flags][width['.'precision]][length_modifier][format]
-  EXPECT_EQ(turbo::StrFormat("%1$+3.2Lf", 1.1), "+1.10");
+  EXPECT_EQ(turbo::str_format("%1$+3.2Lf", 1.1), "+1.10");
   // Text conversion:
   //     "c" - Character.              Eg: 'a' -> "A", 20 -> " "
-  EXPECT_EQ(StrFormat("%c", 'a'), "a");
-  EXPECT_EQ(StrFormat("%c", 0x20), " ");
+  EXPECT_EQ(str_format("%c", 'a'), "a");
+  EXPECT_EQ(str_format("%c", 0x20), " ");
   //           Formats char and integral types: int, long, uint64_t, etc.
-  EXPECT_EQ(StrFormat("%c", int{'a'}), "a");
-  EXPECT_EQ(StrFormat("%c", long{'a'}), "a");  // NOLINT
-  EXPECT_EQ(StrFormat("%c", uint64_t{'a'}), "a");
+  EXPECT_EQ(str_format("%c", int{'a'}), "a");
+  EXPECT_EQ(str_format("%c", long{'a'}), "a");  // NOLINT
+  EXPECT_EQ(str_format("%c", uint64_t{'a'}), "a");
   //     "s" - string       Eg: "C" -> "C", std::string("C++") -> "C++"
   //           Formats std::string, char*, string_view, and Cord.
-  EXPECT_EQ(StrFormat("%s", "C"), "C");
-  EXPECT_EQ(StrFormat("%v", std::string("C")), "C");
-  EXPECT_EQ(StrFormat("%s", std::string("C++")), "C++");
-  EXPECT_EQ(StrFormat("%v", std::string("C++")), "C++");
-  EXPECT_EQ(StrFormat("%s", string_view("view")), "view");
-  EXPECT_EQ(StrFormat("%v", string_view("view")), "view");
-  EXPECT_EQ(StrFormat("%s", turbo::Cord("cord")), "cord");
-  EXPECT_EQ(StrFormat("%v", turbo::Cord("cord")), "cord");
+  EXPECT_EQ(str_format("%s", "C"), "C");
+  EXPECT_EQ(str_format("%v", std::string("C")), "C");
+  EXPECT_EQ(str_format("%s", std::string("C++")), "C++");
+  EXPECT_EQ(str_format("%v", std::string("C++")), "C++");
+  EXPECT_EQ(str_format("%s", string_view("view")), "view");
+  EXPECT_EQ(str_format("%v", string_view("view")), "view");
+  EXPECT_EQ(str_format("%s", turbo::Cord("cord")), "cord");
+  EXPECT_EQ(str_format("%v", turbo::Cord("cord")), "cord");
   // Integral Conversion
   //     These format integral types: char, int, long, uint64_t, etc.
-  EXPECT_EQ(StrFormat("%d", char{10}), "10");
-  EXPECT_EQ(StrFormat("%d", int{10}), "10");
-  EXPECT_EQ(StrFormat("%d", long{10}), "10");  // NOLINT
-  EXPECT_EQ(StrFormat("%d", uint64_t{10}), "10");
-  EXPECT_EQ(StrFormat("%v", int{10}), "10");
-  EXPECT_EQ(StrFormat("%v", long{10}), "10");  // NOLINT
-  EXPECT_EQ(StrFormat("%v", uint64_t{10}), "10");
+  EXPECT_EQ(str_format("%d", char{10}), "10");
+  EXPECT_EQ(str_format("%d", int{10}), "10");
+  EXPECT_EQ(str_format("%d", long{10}), "10");  // NOLINT
+  EXPECT_EQ(str_format("%d", uint64_t{10}), "10");
+  EXPECT_EQ(str_format("%v", int{10}), "10");
+  EXPECT_EQ(str_format("%v", long{10}), "10");  // NOLINT
+  EXPECT_EQ(str_format("%v", uint64_t{10}), "10");
   //     d,i - signed decimal          Eg: -10 -> "-10"
-  EXPECT_EQ(StrFormat("%d", -10), "-10");
-  EXPECT_EQ(StrFormat("%i", -10), "-10");
-  EXPECT_EQ(StrFormat("%v", -10), "-10");
+  EXPECT_EQ(str_format("%d", -10), "-10");
+  EXPECT_EQ(str_format("%i", -10), "-10");
+  EXPECT_EQ(str_format("%v", -10), "-10");
   //      o  - octal                   Eg:  10 -> "12"
-  EXPECT_EQ(StrFormat("%o", 10), "12");
+  EXPECT_EQ(str_format("%o", 10), "12");
   //      u  - unsigned decimal        Eg:  10 -> "10"
-  EXPECT_EQ(StrFormat("%u", 10), "10");
-  EXPECT_EQ(StrFormat("%v", 10), "10");
+  EXPECT_EQ(str_format("%u", 10), "10");
+  EXPECT_EQ(str_format("%v", 10), "10");
   //     x/X - lower,upper case hex    Eg:  10 -> "a"/"A"
-  EXPECT_EQ(StrFormat("%x", 10), "a");
-  EXPECT_EQ(StrFormat("%X", 10), "A");
+  EXPECT_EQ(str_format("%x", 10), "a");
+  EXPECT_EQ(str_format("%X", 10), "A");
   // Floating-point, with upper/lower-case output.
   //     These format floating points types: float, double, long double, etc.
-  EXPECT_EQ(StrFormat("%.1f", float{1}), "1.0");
-  EXPECT_EQ(StrFormat("%.1f", double{1}), "1.0");
+  EXPECT_EQ(str_format("%.1f", float{1}), "1.0");
+  EXPECT_EQ(str_format("%.1f", double{1}), "1.0");
   const long double long_double = 1.0;
-  EXPECT_EQ(StrFormat("%.1f", long_double), "1.0");
+  EXPECT_EQ(str_format("%.1f", long_double), "1.0");
   //     These also format integral types: char, int, long, uint64_t, etc.:
-  EXPECT_EQ(StrFormat("%.1f", char{1}), "1.0");
-  EXPECT_EQ(StrFormat("%.1f", int{1}), "1.0");
-  EXPECT_EQ(StrFormat("%.1f", long{1}), "1.0");  // NOLINT
-  EXPECT_EQ(StrFormat("%.1f", uint64_t{1}), "1.0");
+  EXPECT_EQ(str_format("%.1f", char{1}), "1.0");
+  EXPECT_EQ(str_format("%.1f", int{1}), "1.0");
+  EXPECT_EQ(str_format("%.1f", long{1}), "1.0");  // NOLINT
+  EXPECT_EQ(str_format("%.1f", uint64_t{1}), "1.0");
   //     f/F - decimal.                Eg: 123456789 -> "123456789.000000"
-  EXPECT_EQ(StrFormat("%f", 123456789), "123456789.000000");
-  EXPECT_EQ(StrFormat("%F", 123456789), "123456789.000000");
+  EXPECT_EQ(str_format("%f", 123456789), "123456789.000000");
+  EXPECT_EQ(str_format("%F", 123456789), "123456789.000000");
   //     e/E - exponentiated           Eg: .01 -> "1.00000e-2"/"1.00000E-2"
-  EXPECT_EQ(StrFormat("%e", .01), "1.000000e-02");
-  EXPECT_EQ(StrFormat("%E", .01), "1.000000E-02");
+  EXPECT_EQ(str_format("%e", .01), "1.000000e-02");
+  EXPECT_EQ(str_format("%E", .01), "1.000000E-02");
   //     g/G - exponentiate to fit     Eg: .01 -> "0.01", 1e10 ->"1e+10"/"1E+10"
-  EXPECT_EQ(StrFormat("%g", .01), "0.01");
-  EXPECT_EQ(StrFormat("%g", 1e10), "1e+10");
-  EXPECT_EQ(StrFormat("%G", 1e10), "1E+10");
-  EXPECT_EQ(StrFormat("%v", .01), "0.01");
-  EXPECT_EQ(StrFormat("%v", 1e10), "1e+10");
+  EXPECT_EQ(str_format("%g", .01), "0.01");
+  EXPECT_EQ(str_format("%g", 1e10), "1e+10");
+  EXPECT_EQ(str_format("%G", 1e10), "1E+10");
+  EXPECT_EQ(str_format("%v", .01), "0.01");
+  EXPECT_EQ(str_format("%v", 1e10), "1e+10");
   //     a/A - lower,upper case hex    Eg: -3.0 -> "-0x1.8p+1"/"-0X1.8P+1"
 
 // On Android platform <=21, there is a regression in hexfloat formatting.
 #if !defined(__ANDROID_API__) || __ANDROID_API__ > 21
-  EXPECT_EQ(StrFormat("%.1a", -3.0), "-0x1.8p+1");  // .1 to fix MSVC output
-  EXPECT_EQ(StrFormat("%.1A", -3.0), "-0X1.8P+1");  // .1 to fix MSVC output
+  EXPECT_EQ(str_format("%.1a", -3.0), "-0x1.8p+1");  // .1 to fix MSVC output
+  EXPECT_EQ(str_format("%.1A", -3.0), "-0X1.8P+1");  // .1 to fix MSVC output
 #endif
 
   // Other conversion
   int64_t value = 0x7ffdeb4;
   auto ptr_value = static_cast<uintptr_t>(value);
   const int& something = *reinterpret_cast<const int*>(ptr_value);
-  EXPECT_EQ(StrFormat("%p", &something), StrFormat("0x%x", ptr_value));
+  EXPECT_EQ(str_format("%p", &something), str_format("0x%x", ptr_value));
 
   // The output of formatting a null pointer is not documented as being a
   // specific thing, but the attempt should at least compile.
-  (void)StrFormat("%p", nullptr);
+  (void)str_format("%p", nullptr);
 
   // Output widths are supported, with optional flags.
-  EXPECT_EQ(StrFormat("%3d", 1), "  1");
-  EXPECT_EQ(StrFormat("%3d", 123456), "123456");
-  EXPECT_EQ(StrFormat("%06.2f", 1.234), "001.23");
-  EXPECT_EQ(StrFormat("%+d", 1), "+1");
-  EXPECT_EQ(StrFormat("% d", 1), " 1");
-  EXPECT_EQ(StrFormat("%-4d", -1), "-1  ");
-  EXPECT_EQ(StrFormat("%#o", 10), "012");
-  EXPECT_EQ(StrFormat("%#x", 15), "0xf");
-  EXPECT_EQ(StrFormat("%04d", 8), "0008");
-  EXPECT_EQ(StrFormat("%#04x", 0), "0000");
-  EXPECT_EQ(StrFormat("%#04x", 1), "0x01");
+  EXPECT_EQ(str_format("%3d", 1), "  1");
+  EXPECT_EQ(str_format("%3d", 123456), "123456");
+  EXPECT_EQ(str_format("%06.2f", 1.234), "001.23");
+  EXPECT_EQ(str_format("%+d", 1), "+1");
+  EXPECT_EQ(str_format("% d", 1), " 1");
+  EXPECT_EQ(str_format("%-4d", -1), "-1  ");
+  EXPECT_EQ(str_format("%#o", 10), "012");
+  EXPECT_EQ(str_format("%#x", 15), "0xf");
+  EXPECT_EQ(str_format("%04d", 8), "0008");
+  EXPECT_EQ(str_format("%#04x", 0), "0000");
+  EXPECT_EQ(str_format("%#04x", 1), "0x01");
   // Posix positional substitution.
-  EXPECT_EQ(turbo::StrFormat("%2$s, %3$s, %1$s!", "vici", "veni", "vidi"),
+  EXPECT_EQ(turbo::str_format("%2$s, %3$s, %1$s!", "vici", "veni", "vidi"),
             "veni, vidi, vici!");
   // Length modifiers are ignored.
-  EXPECT_EQ(StrFormat("%hhd", int{1}), "1");
-  EXPECT_EQ(StrFormat("%hd", int{1}), "1");
-  EXPECT_EQ(StrFormat("%ld", int{1}), "1");
-  EXPECT_EQ(StrFormat("%lld", int{1}), "1");
-  EXPECT_EQ(StrFormat("%Ld", int{1}), "1");
-  EXPECT_EQ(StrFormat("%jd", int{1}), "1");
-  EXPECT_EQ(StrFormat("%zd", int{1}), "1");
-  EXPECT_EQ(StrFormat("%td", int{1}), "1");
-  EXPECT_EQ(StrFormat("%qd", int{1}), "1");
+  EXPECT_EQ(str_format("%hhd", int{1}), "1");
+  EXPECT_EQ(str_format("%hd", int{1}), "1");
+  EXPECT_EQ(str_format("%ld", int{1}), "1");
+  EXPECT_EQ(str_format("%lld", int{1}), "1");
+  EXPECT_EQ(str_format("%Ld", int{1}), "1");
+  EXPECT_EQ(str_format("%jd", int{1}), "1");
+  EXPECT_EQ(str_format("%zd", int{1}), "1");
+  EXPECT_EQ(str_format("%td", int{1}), "1");
+  EXPECT_EQ(str_format("%qd", int{1}), "1");
 
   // Bool is handled correctly depending on whether %v is used
-  EXPECT_EQ(StrFormat("%v", true), "true");
-  EXPECT_EQ(StrFormat("%v", false), "false");
-  EXPECT_EQ(StrFormat("%d", true), "1");
+  EXPECT_EQ(str_format("%v", true), "true");
+  EXPECT_EQ(str_format("%v", false), "false");
+  EXPECT_EQ(str_format("%d", true), "1");
 }
 
 using str_format_internal::ExtendedParsedFormat;
@@ -1060,11 +1060,11 @@ TEST_F(ParsedFormatTest, DisallowModifiersWithV) {
 
 using FormatWrapperTest = ::testing::Test;
 
-// Plain wrapper for StrFormat.
+// Plain wrapper for str_format.
 template <typename... Args>
 std::string WrappedFormat(const turbo::FormatSpec<Args...>& format,
                           const Args&... args) {
-  return StrFormat(format, args...);
+  return str_format(format, args...);
 }
 
 TEST_F(FormatWrapperTest, ConstexprStringFormat) {
@@ -1101,9 +1101,9 @@ struct Point {
   TurboFormatConvert(const Point& p, const turbo::FormatConversionSpec& spec,
                     turbo::FormatSink* s) {
     if (spec.conversion_char() == turbo::FormatConversionChar::s) {
-      s->Append(turbo::StrCat("x=", p.x, " y=", p.y));
+      s->Append(turbo::str_cat("x=", p.x, " y=", p.y));
     } else {
-      s->Append(turbo::StrCat(p.x, ",", p.y));
+      s->Append(turbo::str_cat(p.x, ",", p.y));
     }
     return {true};
   }
@@ -1114,22 +1114,22 @@ struct Point {
 
 TEST_F(FormatExtensionTest, TurboFormatConvertExample) {
   Point p;
-  EXPECT_EQ(turbo::StrFormat("a %s z", p), "a x=10 y=20 z");
-  EXPECT_EQ(turbo::StrFormat("a %d z", p), "a 10,20 z");
-  EXPECT_EQ(turbo::StrFormat("a %v z", p), "a 10,20 z");
+  EXPECT_EQ(turbo::str_format("a %s z", p), "a x=10 y=20 z");
+  EXPECT_EQ(turbo::str_format("a %d z", p), "a 10,20 z");
+  EXPECT_EQ(turbo::str_format("a %v z", p), "a 10,20 z");
 
   // Typed formatting will fail to compile an invalid format.
-  // StrFormat("%f", p);  // Does not compile.
+  // str_format("%f", p);  // Does not compile.
   std::string actual;
   turbo::UntypedFormatSpec f1("%f");
-  // FormatUntyped will return false for bad character.
-  EXPECT_FALSE(turbo::FormatUntyped(&actual, f1, {turbo::FormatArg(p)}));
+  // format_untyped will return false for bad character.
+  EXPECT_FALSE(turbo::format_untyped(&actual, f1, {turbo::FormatArg(p)}));
 }
 
 struct PointStringify {
   template <typename FormatSink>
   friend void turbo_stringify(FormatSink& sink, const PointStringify& p) {
-    sink.Append(turbo::StrCat("(", p.x, ", ", p.y, ")"));
+    sink.Append(turbo::str_cat("(", p.x, ", ", p.y, ")"));
   }
 
   double x = 10.0;
@@ -1138,14 +1138,14 @@ struct PointStringify {
 
 TEST_F(FormatExtensionTest, TurboStringifyExample) {
   PointStringify p;
-  EXPECT_EQ(turbo::StrFormat("a %v z", p), "a (10, 20) z");
+  EXPECT_EQ(turbo::str_format("a %v z", p), "a (10, 20) z");
 }
 
 struct PointStringifyUsingFormat {
   template <typename FormatSink>
   friend void turbo_stringify(FormatSink& sink,
                             const PointStringifyUsingFormat& p) {
-    turbo::Format(&sink, "(%g, %g)", p.x, p.y);
+    turbo::format(&sink, "(%g, %g)", p.x, p.y);
   }
 
   double x = 10.0;
@@ -1154,14 +1154,14 @@ struct PointStringifyUsingFormat {
 
 TEST_F(FormatExtensionTest, TurboStringifyExampleUsingFormat) {
   PointStringifyUsingFormat p;
-  EXPECT_EQ(turbo::StrFormat("a %v z", p), "a (10, 20) z");
+  EXPECT_EQ(turbo::str_format("a %v z", p), "a (10, 20) z");
 }
 
 enum class EnumClassWithStringify { Many = 0, Choices = 1 };
 
 template <typename Sink>
 void turbo_stringify(Sink& sink, EnumClassWithStringify e) {
-  turbo::Format(&sink, "%s",
+  turbo::format(&sink, "%s",
                e == EnumClassWithStringify::Many ? "Many" : "Choices");
 }
 
@@ -1169,59 +1169,59 @@ enum EnumWithStringify { Many, Choices };
 
 template <typename Sink>
 void turbo_stringify(Sink& sink, EnumWithStringify e) {
-  turbo::Format(&sink, "%s", e == EnumWithStringify::Many ? "Many" : "Choices");
+  turbo::format(&sink, "%s", e == EnumWithStringify::Many ? "Many" : "Choices");
 }
 
 TEST_F(FormatExtensionTest, TurboStringifyWithEnumWithV) {
   const auto e_class = EnumClassWithStringify::Choices;
-  EXPECT_EQ(turbo::StrFormat("My choice is %v", e_class),
+  EXPECT_EQ(turbo::str_format("My choice is %v", e_class),
             "My choice is Choices");
 
   const auto e = EnumWithStringify::Choices;
-  EXPECT_EQ(turbo::StrFormat("My choice is %v", e), "My choice is Choices");
+  EXPECT_EQ(turbo::str_format("My choice is %v", e), "My choice is Choices");
 }
 
 TEST_F(FormatExtensionTest, TurboStringifyEnumWithD) {
   const auto e_class = EnumClassWithStringify::Many;
-  EXPECT_EQ(turbo::StrFormat("My choice is %d", e_class), "My choice is 0");
+  EXPECT_EQ(turbo::str_format("My choice is %d", e_class), "My choice is 0");
 
   const auto e = EnumWithStringify::Choices;
-  EXPECT_EQ(turbo::StrFormat("My choice is %d", e), "My choice is 1");
+  EXPECT_EQ(turbo::str_format("My choice is %d", e), "My choice is 1");
 }
 
 enum class EnumWithLargerValue { x = 32 };
 
 template <typename Sink>
 void turbo_stringify(Sink& sink, EnumWithLargerValue e) {
-  turbo::Format(&sink, "%s", "Many");
+  turbo::format(&sink, "%s", "Many");
 }
 
 TEST_F(FormatExtensionTest, TurboStringifyEnumOtherSpecifiers) {
   const auto e = EnumWithLargerValue::x;
-  EXPECT_EQ(turbo::StrFormat("My choice is %g", e), "My choice is 32");
-  EXPECT_EQ(turbo::StrFormat("My choice is %x", e), "My choice is 20");
+  EXPECT_EQ(turbo::str_format("My choice is %g", e), "My choice is 32");
+  EXPECT_EQ(turbo::str_format("My choice is %x", e), "My choice is 20");
 }
 
 }  // namespace
 
 // Some codegen thunks that we can use to easily dump the generated assembly for
-// different StrFormat calls.
+// different str_format calls.
 
 std::string CodegenTurboStrFormatInt(int i) {  // NOLINT
-  return turbo::StrFormat("%d", i);
+  return turbo::str_format("%d", i);
 }
 
 std::string CodegenTurboStrFormatIntStringInt64(int i, const std::string& s,
                                                int64_t i64) {  // NOLINT
-  return turbo::StrFormat("%d %s %d", i, s, i64);
+  return turbo::str_format("%d %s %d", i, s, i64);
 }
 
 void CodegenTurboStrAppendFormatInt(std::string* out, int i) {  // NOLINT
-  turbo::StrAppendFormat(out, "%d", i);
+  turbo::str_append_format(out, "%d", i);
 }
 
 void CodegenTurboStrAppendFormatIntStringInt64(std::string* out, int i,
                                               const std::string& s,
                                               int64_t i64) {  // NOLINT
-  turbo::StrAppendFormat(out, "%d %s %d", i, s, i64);
+  turbo::str_append_format(out, "%d %s %d", i, s, i64);
 }

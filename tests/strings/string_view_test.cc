@@ -964,7 +964,7 @@ TEST(StringViewTest, At) {
 }
 
 #if TURBO_INTERNAL_CPLUSPLUS_LANG >= 202002L
-TEST(StringViewTest, StartsWith) {
+TEST(StringViewTest, starts_with) {
   const turbo::string_view a("foobar");
   const turbo::string_view b("123\0abc", 7);
   const turbo::string_view e;
@@ -998,7 +998,7 @@ TEST(StringViewTest, StartsWith) {
   EXPECT_TRUE(k4);
 }
 
-TEST(StringViewTest, EndsWith) {
+TEST(StringViewTest, ends_with) {
   const turbo::string_view a("foobar");
   const turbo::string_view b("123\0abc", 7);
   const turbo::string_view e;

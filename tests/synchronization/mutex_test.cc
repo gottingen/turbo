@@ -70,7 +70,7 @@ static void ScheduleAfter(turbo::synchronization_internal::ThreadPool *tp,
                           turbo::Duration after,
                           const std::function<void()> &func) {
   tp->Schedule([func, after] {
-    turbo::SleepFor(after);
+    turbo::sleep_for(after);
     func();
   });
 }
@@ -130,7 +130,7 @@ static void TestTry(TestContext *cxt, int c) {
 static void TestR20ms(TestContext *cxt, int c) {
   for (int i = 0; i != cxt->iterations; i++) {
     turbo::ReaderMutexLock l(&cxt->mu);
-    turbo::SleepFor(turbo::Duration::milliseconds(20));
+    turbo::sleep_for(turbo::Duration::milliseconds(20));
     cxt->mu.AssertReaderHeld();
   }
 }
@@ -524,7 +524,7 @@ TEST(Mutex, MutexTimeoutBug) {
   x.a_waiter_count = 2;
   tp->Schedule(std::bind(&WaitForA, &x));
   tp->Schedule(std::bind(&WaitForA, &x));
-  turbo::SleepFor(turbo::Duration::seconds(1));  // Allow first two threads to hang.
+  turbo::sleep_for(turbo::Duration::seconds(1));  // Allow first two threads to hang.
   // The skip field of the second will point to the first because there are
   // only two.
 
@@ -599,7 +599,7 @@ TEST_P(CondVarWaitDeadlock, Test) {
   waiter2->Schedule([this] { this->Waiter2(); });
 
   // Wait while threads block (best-effort is fine).
-  turbo::SleepFor(turbo::Duration::milliseconds(100));
+  turbo::sleep_for(turbo::Duration::milliseconds(100));
 
   // Wake condwaiter.
   mu.Lock();
@@ -647,7 +647,7 @@ static void AcquireAsReader(DequeueAllWakeableBugStruct *x) {
   x->done1 = (x->unfinished_count == 0);
   x->mu2.Unlock();
   // make sure that both readers acquired mu before we release it.
-  turbo::SleepFor(turbo::Duration::seconds(2));
+  turbo::sleep_for(turbo::Duration::seconds(2));
   x->mu.ReaderUnlock();
 
   x->mu2.Lock();
@@ -669,7 +669,7 @@ TEST(Mutex, MutexReaderWakeupBug) {
   // queue two thread that will block on reader locks on x.mu
   tp->Schedule(std::bind(&AcquireAsReader, &x));
   tp->Schedule(std::bind(&AcquireAsReader, &x));
-  turbo::SleepFor(turbo::Duration::seconds(1));  // give time for reader threads to block
+  turbo::sleep_for(turbo::Duration::seconds(1));  // give time for reader threads to block
   x.mu.Unlock();                     // wake them up
 
   // both readers should finish promptly
@@ -1072,7 +1072,7 @@ static void ReaderForReaderOnCondVar(turbo::Mutex *mu, turbo::CondVar *cv,
   std::uniform_int_distribution<int> random_millis(0, 15);
   mu->ReaderLock();
   while (*running == 3) {
-    turbo::SleepFor(turbo::Duration::milliseconds(random_millis(gen)));
+    turbo::sleep_for(turbo::Duration::milliseconds(random_millis(gen)));
     cv->WaitWithTimeout(mu, turbo::Duration::milliseconds(random_millis(gen)));
   }
   mu->ReaderUnlock();
@@ -1092,7 +1092,7 @@ TEST(Mutex, TestReaderOnCondVar) {
   int running = 3;
   tp->Schedule(std::bind(&ReaderForReaderOnCondVar, &mu, &cv, &running));
   tp->Schedule(std::bind(&ReaderForReaderOnCondVar, &mu, &cv, &running));
-  turbo::SleepFor(turbo::Duration::seconds(2));
+  turbo::sleep_for(turbo::Duration::seconds(2));
   mu.Lock();
   running--;
   mu.Await(turbo::Condition(&IntIsZero, &running));
@@ -1146,7 +1146,7 @@ TEST(Mutex, AcquireFromCondition) {
       std::bind(&WaitForCond2, &x));  // run WaitForCond2() in a thread T
   // T will hang because the first invocation of ConditionWithAcquire() will
   // return false.
-  turbo::SleepFor(turbo::Duration::milliseconds(500));  // allow T time to hang
+  turbo::sleep_for(turbo::Duration::milliseconds(500));  // allow T time to hang
 
   x.mu0.Lock();
   x.cv.WaitWithTimeout(&x.mu0, turbo::Duration::milliseconds(500));  // wake T
@@ -1939,11 +1939,11 @@ TEST(Mutex, WriterPriority) {
         saw_wrote = true;
         break;
       }
-      turbo::SleepFor(turbo::Duration::seconds(1));
+      turbo::sleep_for(turbo::Duration::seconds(1));
     }
   };
   std::thread t1(readfunc);
-  turbo::SleepFor(turbo::Duration::milliseconds(500));
+  turbo::sleep_for(turbo::Duration::milliseconds(500));
   std::thread t2(readfunc);
   // Note: this test guards against a bug that was related to an uninit
   // PerThreadSynch::priority, so the writer intentionally runs on a new thread.
@@ -1991,7 +1991,7 @@ TEST(Mutex, CondVarPriority) {
     mu.Lock();
     mu.Await(turbo::Condition(&waiting));
     morph = true;
-    turbo::SleepFor(turbo::Duration::seconds(1));
+    turbo::sleep_for(turbo::Duration::seconds(1));
     cv.Signal();
     mu.Unlock();
   });
@@ -2031,7 +2031,7 @@ TEST(Mutex, LockWhenWithTimeoutResult) {
     EXPECT_FALSE(mu.LockWhenWithTimeout(kFalseCond, turbo::Duration::milliseconds(1)));
     mu.Unlock();
   });
-  turbo::SleepFor(turbo::Duration::milliseconds(100));
+  turbo::sleep_for(turbo::Duration::milliseconds(100));
   mu.Unlock();
   th1.join();
   th2.join();

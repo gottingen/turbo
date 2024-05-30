@@ -923,10 +923,10 @@ namespace turbo {
     //   Valid time units are "ns", "us" "ms", "s", "m", "h".
     bool Duration::parse(turbo::string_view dur_sv, Duration *d) {
         int sign = 1;
-        if (turbo::ConsumePrefix(&dur_sv, "-")) {
+        if (turbo::consume_prefix(&dur_sv, "-")) {
             sign = -1;
         } else {
-            turbo::ConsumePrefix(&dur_sv, "+");
+            turbo::consume_prefix(&dur_sv, "+");
         }
         if (dur_sv.empty()) return false;
 

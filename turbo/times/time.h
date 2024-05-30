@@ -730,7 +730,7 @@ namespace turbo {
         return os << Duration::format(d);
     }
 
-    // Support for StrFormat(), StrCat() etc.
+    // Support for str_format(), str_cat() etc.
     template<typename Sink>
     void turbo_stringify(Sink &sink, Duration d) {
         sink.Append(Duration::format(d));
@@ -1256,13 +1256,18 @@ namespace turbo {
     // the format specified by `turbo::Time::parse()`.
     std::string turbo_unparse_flag(Time t);
 
-    TURBO_DEPRECATED("Use turbo_parse_flag() instead.")
+    // sleep_for()
+    //
+    // Sleeps for the specified duration, expressed as an `turbo::Duration`.
+    //
+    // Notes:
+    // * Signal interruptions will not reduce the sleep duration.
+    // * Returns immediately when passed a nonpositive duration.
+    void sleep_for(turbo::Duration duration);
 
-    bool ParseFlag(const std::string &text, Time *t, std::string *error);
-
-    TURBO_DEPRECATED("Use turbo_unparse_flag() instead.")
-
-    std::string UnparseFlag(Time t);
+    inline void sleep_until(turbo::Time time) {
+        sleep_for(time - turbo::Time::current_time());
+    }
 
     // TimeZone
     //
@@ -1539,7 +1544,7 @@ namespace turbo {
         return os << Time::format(t);
     }
 
-    // Support for StrFormat(), StrCat() etc.
+    // Support for str_format(), str_cat() etc.
     template<typename Sink>
     void turbo_stringify(Sink &sink, Time t) {
         sink.Append(Time::format(t));
@@ -2030,6 +2035,19 @@ namespace turbo {
     }
 
 }  // namespace turbo
+// In some build configurations we pass --detect-odr-violations to the
+// gold linker.  This causes it to flag weak symbol overrides as ODR
+// violations.  Because ODR only applies to C++ and not C,
+// --detect-odr-violations ignores symbols not mangled with C++ names.
+// By changing our extension points to be extern "C", we dodge this
+// check.
+extern "C" {
+TURBO_DLL void TURBO_INTERNAL_C_SYMBOL(TurboInternalSleepFor)(
+        turbo::Duration duration);
+}  // extern "C"
 
+inline void turbo::sleep_for(turbo::Duration duration) {
+    TURBO_INTERNAL_C_SYMBOL(TurboInternalSleepFor)(duration);
+}
 
 #endif  // TURBO_TIME_TIME_H_

@@ -110,7 +110,7 @@ TEST_P(EngineParamTest, SmallCorrectnessCheckSourceAlignment) {
         *(base_data + i) =
             static_cast<char>(turbo::Uniform<unsigned char>(gen_));
       }
-      SCOPED_TRACE(turbo::StrCat("engine=<", GetParam().vector_lanes, ",",
+      SCOPED_TRACE(turbo::str_cat("engine=<", GetParam().vector_lanes, ",",
                                 GetParam().integer_lanes, ">, ", "size=", size,
                                 ", source_alignment=", source_alignment));
       turbo::crc32c_t initial_crc =
@@ -121,7 +121,7 @@ TEST_P(EngineParamTest, SmallCorrectnessCheckSourceAlignment) {
       // Check the memory region to make sure it is the same
       int mem_comparison =
           memcmp(destination_.get(), source_.get() + source_alignment, size);
-      SCOPED_TRACE(turbo::StrCat("Error in memcpy of size: ", size,
+      SCOPED_TRACE(turbo::str_cat("Error in memcpy of size: ", size,
                                 " with source alignment: ", source_alignment));
       ASSERT_EQ(mem_comparison, 0);
       turbo::crc32c_t baseline_crc = turbo::ExtendCrc32c(
@@ -144,7 +144,7 @@ TEST_P(EngineParamTest, SmallCorrectnessCheckDestAlignment) {
         *(base_data + i) =
             static_cast<char>(turbo::Uniform<unsigned char>(gen_));
       }
-      SCOPED_TRACE(turbo::StrCat("engine=<", GetParam().vector_lanes, ",",
+      SCOPED_TRACE(turbo::str_cat("engine=<", GetParam().vector_lanes, ",",
                                 GetParam().integer_lanes, ">, ", "size=", size,
                                 ", destination_alignment=", dest_alignment));
       turbo::crc32c_t initial_crc =
@@ -155,7 +155,7 @@ TEST_P(EngineParamTest, SmallCorrectnessCheckDestAlignment) {
       // Check the memory region to make sure it is the same
       int mem_comparison =
           memcmp(destination_.get() + dest_alignment, source_.get(), size);
-      SCOPED_TRACE(turbo::StrCat("Error in memcpy of size: ", size,
+      SCOPED_TRACE(turbo::str_cat("Error in memcpy of size: ", size,
                                 " with dest alignment: ", dest_alignment));
       ASSERT_EQ(mem_comparison, 0);
       turbo::crc32c_t baseline_crc = turbo::ExtendCrc32c(

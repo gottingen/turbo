@@ -205,7 +205,7 @@ void BM_CacheInSteadyState(benchmark::State& state) {
     }
   }
   state.SetItemsProcessed(state.iterations());
-  state.SetLabel(turbo::StrFormat("load_factor=%.2f", t.load_factor()));
+  state.SetLabel(turbo::str_format("load_factor=%.2f", t.load_factor()));
 }
 
 template <typename Benchmark>

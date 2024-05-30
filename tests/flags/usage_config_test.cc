@@ -40,15 +40,15 @@ class FlagsUsageConfigTest : public testing::Test {
 namespace flags = turbo::flags_internal;
 
 bool TstContainsHelpshortFlags(turbo::string_view f) {
-  return turbo::StartsWith(flags::Basename(f), "progname.");
+  return turbo::starts_with(flags::Basename(f), "progname.");
 }
 
 bool TstContainsHelppackageFlags(turbo::string_view f) {
-  return turbo::EndsWith(flags::Package(f), "aaa/");
+  return turbo::ends_with(flags::Package(f), "aaa/");
 }
 
 bool TstContainsHelpFlags(turbo::string_view f) {
-  return turbo::EndsWith(flags::Package(f), "zzz/");
+  return turbo::ends_with(flags::Package(f), "zzz/");
 }
 
 std::string TstVersionString() { return "program 1.0.0"; }

@@ -34,7 +34,7 @@ class StringifySink {
 
   void Append(string_view v);
 
-  // Support `turbo::Format(&sink, format, args...)`.
+  // Support `turbo::format(&sink, format, args...)`.
   friend void TurboFormatFlush(StringifySink* sink, turbo::string_view v) {
     sink->Append(v);
   }

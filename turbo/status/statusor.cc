@@ -67,7 +67,7 @@ const turbo::Status& BadStatusOrAccess::status() const { return status_; }
 
 void BadStatusOrAccess::InitWhat() const {
   turbo::call_once(init_what_, [this] {
-    what_ = turbo::StrCat("Bad StatusOr access: ", status_.ToString());
+    what_ = turbo::str_cat("Bad StatusOr access: ", status_.ToString());
   });
 }
 
@@ -88,7 +88,7 @@ void Helper::HandleInvalidStatusCtorArg(turbo::Nonnull<turbo::Status*> status) {
 void Helper::Crash(const turbo::Status& status) {
   TURBO_INTERNAL_LOG(
       FATAL,
-      turbo::StrCat("Attempting to fetch value instead of handling error ",
+      turbo::str_cat("Attempting to fetch value instead of handling error ",
                    status.ToString()));
 }
 
@@ -98,7 +98,7 @@ void ThrowBadStatusOrAccess(turbo::Status status) {
 #else
   TURBO_INTERNAL_LOG(
       FATAL,
-      turbo::StrCat("Attempting to fetch value instead of handling error ",
+      turbo::str_cat("Attempting to fetch value instead of handling error ",
                    status.ToString()));
   std::abort();
 #endif

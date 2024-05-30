@@ -1245,9 +1245,9 @@ namespace {
 
     TEST(Time, turbo_stringify) {
         // Time::format is already well tested, so just use one test case here to
-        // verify that StrFormat("%v", t) works as expected.
+        // verify that str_format("%v", t) works as expected.
         turbo::Time t = turbo::Time::current_time();
-        EXPECT_EQ(turbo::StrFormat("%v", t), turbo::Time::format(t));
+        EXPECT_EQ(turbo::str_format("%v", t), turbo::Time::format(t));
     }
 
 }  // namespace

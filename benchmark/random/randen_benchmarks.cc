@@ -144,7 +144,7 @@ void Measure(const char* name, const FuncInput (&inputs)[N]) {
 void RunAll(const int argc, char* argv[]) {
   if (argc == 2) {
     int cpu = -1;
-    if (!turbo::SimpleAtoi(argv[1], &cpu)) {
+    if (!turbo::simple_atoi(argv[1], &cpu)) {
       TURBO_RAW_LOG(FATAL, "The optional argument must be a CPU number >= 0.\n");
     }
     PinThreadToCPU(cpu);

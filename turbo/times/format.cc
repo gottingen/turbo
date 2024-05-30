@@ -28,7 +28,6 @@
 namespace cctz = turbo::time_internal::cctz;
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     TURBO_DLL extern const char RFC3339_full[] = "%Y-%m-%d%ET%H:%M:%E*S%Ez";
     TURBO_DLL extern const char RFC3339_sec[] = "%Y-%m-%d%ET%H:%M:%S%Ez";
@@ -120,7 +119,7 @@ namespace turbo {
         };
         strip_leading_space(&input);
         for (const auto &lit: literals) {
-            if (turbo::StartsWith(input, turbo::string_view(lit.name, lit.size))) {
+            if (turbo::starts_with(input, turbo::string_view(lit.name, lit.size))) {
                 turbo::string_view tail = input;
                 tail.remove_prefix(lit.size);
                 strip_leading_space(&tail);
@@ -153,13 +152,4 @@ namespace turbo {
         return turbo::Time::format(RFC3339_full, t, turbo::TimeZone::utc());
     }
 
-    bool ParseFlag(const std::string &text, turbo::Time *t, std::string *error) {
-        return turbo::Time::parse(RFC3339_full, text, turbo::TimeZone::utc(), t, error);
-    }
-
-    std::string UnparseFlag(turbo::Time t) {
-        return turbo::Time::format(RFC3339_full, t, turbo::TimeZone::utc());
-    }
-
-    TURBO_NAMESPACE_END
 }  // namespace turbo

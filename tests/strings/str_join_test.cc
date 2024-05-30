@@ -42,46 +42,46 @@
 
 namespace {
 
-TEST(StrJoin, APIExamples) {
+TEST(str_join, APIExamples) {
   {
     // Collection of strings
     std::vector<std::string> v = {"foo", "bar", "baz"};
-    EXPECT_EQ("foo-bar-baz", turbo::StrJoin(v, "-"));
+    EXPECT_EQ("foo-bar-baz", turbo::str_join(v, "-"));
   }
 
   {
     // Collection of turbo::string_view
     std::vector<turbo::string_view> v = {"foo", "bar", "baz"};
-    EXPECT_EQ("foo-bar-baz", turbo::StrJoin(v, "-"));
+    EXPECT_EQ("foo-bar-baz", turbo::str_join(v, "-"));
   }
 
   {
     // Collection of const char*
     std::vector<const char*> v = {"foo", "bar", "baz"};
-    EXPECT_EQ("foo-bar-baz", turbo::StrJoin(v, "-"));
+    EXPECT_EQ("foo-bar-baz", turbo::str_join(v, "-"));
   }
 
   {
     // Collection of non-const char*
     std::string a = "foo", b = "bar", c = "baz";
     std::vector<char*> v = {&a[0], &b[0], &c[0]};
-    EXPECT_EQ("foo-bar-baz", turbo::StrJoin(v, "-"));
+    EXPECT_EQ("foo-bar-baz", turbo::str_join(v, "-"));
   }
 
   {
     // Collection of ints
     std::vector<int> v = {1, 2, 3, -4};
-    EXPECT_EQ("1-2-3--4", turbo::StrJoin(v, "-"));
+    EXPECT_EQ("1-2-3--4", turbo::str_join(v, "-"));
   }
 
   {
     // Literals passed as a std::initializer_list
-    std::string s = turbo::StrJoin({"a", "b", "c"}, "-");
+    std::string s = turbo::str_join({"a", "b", "c"}, "-");
     EXPECT_EQ("a-b-c", s);
   }
   {
     // Join a std::tuple<T...>.
-    std::string s = turbo::StrJoin(std::make_tuple(123, "abc", 0.456), "-");
+    std::string s = turbo::str_join(std::make_tuple(123, "abc", 0.456), "-");
     EXPECT_EQ("123-abc-0.456", s);
   }
 
@@ -91,20 +91,20 @@ TEST(StrJoin, APIExamples) {
     v.emplace_back(new int(1));
     v.emplace_back(new int(2));
     v.emplace_back(new int(3));
-    EXPECT_EQ("1-2-3", turbo::StrJoin(v, "-"));
+    EXPECT_EQ("1-2-3", turbo::str_join(v, "-"));
   }
 
   {
     // Array of ints
     const int a[] = {1, 2, 3, -4};
-    EXPECT_EQ("1-2-3--4", turbo::StrJoin(a, a + TURBO_ARRAYSIZE(a), "-"));
+    EXPECT_EQ("1-2-3--4", turbo::str_join(a, a + TURBO_ARRAYSIZE(a), "-"));
   }
 
   {
     // Collection of pointers
     int x = 1, y = 2, z = 3;
     std::vector<int*> v = {&x, &y, &z};
-    EXPECT_EQ("1-2-3", turbo::StrJoin(v, "-"));
+    EXPECT_EQ("1-2-3", turbo::str_join(v, "-"));
   }
 
   {
@@ -112,27 +112,27 @@ TEST(StrJoin, APIExamples) {
     int x = 1, y = 2, z = 3;
     int *px = &x, *py = &y, *pz = &z;
     std::vector<int**> v = {&px, &py, &pz};
-    EXPECT_EQ("1-2-3", turbo::StrJoin(v, "-"));
+    EXPECT_EQ("1-2-3", turbo::str_join(v, "-"));
   }
 
   {
     // Collection of pointers to std::string
     std::string a("a"), b("b");
     std::vector<std::string*> v = {&a, &b};
-    EXPECT_EQ("a-b", turbo::StrJoin(v, "-"));
+    EXPECT_EQ("a-b", turbo::str_join(v, "-"));
   }
 
   {
     // A std::map, which is a collection of std::pair<>s.
     std::map<std::string, int> m = {{"a", 1}, {"b", 2}, {"c", 3}};
-    EXPECT_EQ("a=1,b=2,c=3", turbo::StrJoin(m, ",", turbo::PairFormatter("=")));
+    EXPECT_EQ("a=1,b=2,c=3", turbo::str_join(m, ",", turbo::pair_formatter("=")));
   }
 
   {
-    // Shows turbo::StrSplit and turbo::StrJoin working together. This example is
+    // Shows turbo::StrSplit and turbo::str_join working together. This example is
     // equivalent to s/=/-/g.
     const std::string s = "a=b=c=d";
-    EXPECT_EQ("a-b-c-d", turbo::StrJoin(turbo::StrSplit(s, "="), "-"));
+    EXPECT_EQ("a-b-c-d", turbo::str_join(turbo::StrSplit(s, "="), "-"));
   }
 
   //
@@ -142,47 +142,47 @@ TEST(StrJoin, APIExamples) {
   {
     // Empty range yields an empty string.
     std::vector<std::string> v;
-    EXPECT_EQ("", turbo::StrJoin(v, "-"));
+    EXPECT_EQ("", turbo::str_join(v, "-"));
   }
 
   {
     // A range of 1 element gives a string with that element but no
     // separator.
     std::vector<std::string> v = {"foo"};
-    EXPECT_EQ("foo", turbo::StrJoin(v, "-"));
+    EXPECT_EQ("foo", turbo::str_join(v, "-"));
   }
 
   {
     // A range with a single empty string element
     std::vector<std::string> v = {""};
-    EXPECT_EQ("", turbo::StrJoin(v, "-"));
+    EXPECT_EQ("", turbo::str_join(v, "-"));
   }
 
   {
     // A range with 2 elements, one of which is an empty string
     std::vector<std::string> v = {"a", ""};
-    EXPECT_EQ("a-", turbo::StrJoin(v, "-"));
+    EXPECT_EQ("a-", turbo::str_join(v, "-"));
   }
 
   {
     // A range with 2 empty elements.
     std::vector<std::string> v = {"", ""};
-    EXPECT_EQ("-", turbo::StrJoin(v, "-"));
+    EXPECT_EQ("-", turbo::str_join(v, "-"));
   }
 
   {
     // A std::vector of bool.
     std::vector<bool> v = {true, false, true};
-    EXPECT_EQ("1-0-1", turbo::StrJoin(v, "-"));
+    EXPECT_EQ("1-0-1", turbo::str_join(v, "-"));
   }
 }
 
-TEST(StrJoin, CustomFormatter) {
+TEST(str_join, CustomFormatter) {
   std::vector<std::string> v{"One", "Two", "Three"};
   {
     std::string joined =
-        turbo::StrJoin(v, "", [](std::string* out, const std::string& in) {
-          turbo::StrAppend(out, "(", in, ")");
+        turbo::str_join(v, "", [](std::string* out, const std::string& in) {
+          turbo::str_append(out, "(", in, ")");
         });
     EXPECT_EQ("(One)(Two)(Three)", joined);
   }
@@ -190,26 +190,26 @@ TEST(StrJoin, CustomFormatter) {
     class ImmovableFormatter {
      public:
       void operator()(std::string* out, const std::string& in) {
-        turbo::StrAppend(out, "(", in, ")");
+        turbo::str_append(out, "(", in, ")");
       }
       ImmovableFormatter() {}
       ImmovableFormatter(const ImmovableFormatter&) = delete;
     };
-    EXPECT_EQ("(One)(Two)(Three)", turbo::StrJoin(v, "", ImmovableFormatter()));
+    EXPECT_EQ("(One)(Two)(Three)", turbo::str_join(v, "", ImmovableFormatter()));
   }
   {
     class OverloadedFormatter {
      public:
       void operator()(std::string* out, const std::string& in) {
-        turbo::StrAppend(out, "(", in, ")");
+        turbo::str_append(out, "(", in, ")");
       }
       void operator()(std::string* out, const std::string& in) const {
-        turbo::StrAppend(out, "[", in, "]");
+        turbo::str_append(out, "[", in, "]");
       }
     };
-    EXPECT_EQ("(One)(Two)(Three)", turbo::StrJoin(v, "", OverloadedFormatter()));
+    EXPECT_EQ("(One)(Two)(Three)", turbo::str_join(v, "", OverloadedFormatter()));
     const OverloadedFormatter fmt = {};
-    EXPECT_EQ("[One][Two][Three]", turbo::StrJoin(v, "", fmt));
+    EXPECT_EQ("[One][Two][Three]", turbo::str_join(v, "", fmt));
   }
 }
 
@@ -217,10 +217,10 @@ TEST(StrJoin, CustomFormatter) {
 // Tests the Formatters
 //
 
-TEST(AlphaNumFormatter, FormatterAPI) {
+TEST(alpha_num_formatter, FormatterAPI) {
   // Not an exhaustive test. See strings/strcat_test.h for the exhaustive test
   // of what AlphaNum can convert.
-  auto f = turbo::AlphaNumFormatter();
+  auto f = turbo::alpha_num_formatter();
   std::string s;
   f(&s, "Testing: ");
   f(&s, static_cast<int>(1));
@@ -235,9 +235,9 @@ TEST(AlphaNumFormatter, FormatterAPI) {
 }
 
 // Make sure people who are mistakenly using std::vector<bool> even though
-// they're not memory-constrained can use turbo::AlphaNumFormatter().
-TEST(AlphaNumFormatter, VectorOfBool) {
-  auto f = turbo::AlphaNumFormatter();
+// they're not memory-constrained can use turbo::alpha_num_formatter().
+TEST(alpha_num_formatter, VectorOfBool) {
+  auto f = turbo::alpha_num_formatter();
   std::string s;
   std::vector<bool> v = {true, false, true};
   f(&s, *v.cbegin());
@@ -246,8 +246,8 @@ TEST(AlphaNumFormatter, VectorOfBool) {
   EXPECT_EQ("110", s);
 }
 
-TEST(AlphaNumFormatter, AlphaNum) {
-  auto f = turbo::AlphaNumFormatter();
+TEST(alpha_num_formatter, AlphaNum) {
+  auto f = turbo::alpha_num_formatter();
   std::string s;
   f(&s, turbo::AlphaNum("hello"));
   EXPECT_EQ("hello", s);
@@ -261,8 +261,8 @@ inline std::ostream& operator<<(std::ostream& os, const StreamableType& t) {
   return os;
 }
 
-TEST(StreamFormatter, FormatterAPI) {
-  auto f = turbo::StreamFormatter();
+TEST(stream_formatter, FormatterAPI) {
+  auto f = turbo::stream_formatter();
   std::string s;
   f(&s, "Testing: ");
   f(&s, static_cast<int>(1));
@@ -283,15 +283,15 @@ TEST(StreamFormatter, FormatterAPI) {
 struct TestingParenFormatter {
   template <typename T>
   void operator()(std::string* s, const T& t) {
-    turbo::StrAppend(s, "(", t, ")");
+    turbo::str_append(s, "(", t, ")");
   }
 };
 
-TEST(PairFormatter, FormatterAPI) {
+TEST(pair_formatter, FormatterAPI) {
   {
-    // Tests default PairFormatter(sep) that uses AlphaNumFormatter for the
+    // Tests default pair_formatter(sep) that uses alpha_num_formatter for the
     // 'first' and 'second' members.
-    const auto f = turbo::PairFormatter("=");
+    const auto f = turbo::pair_formatter("=");
     std::string s;
     f(&s, std::make_pair("a", "b"));
     f(&s, std::make_pair(1, 2));
@@ -300,7 +300,7 @@ TEST(PairFormatter, FormatterAPI) {
 
   {
     // Tests using a custom formatter for the 'first' and 'second' members.
-    auto f = turbo::PairFormatter(TestingParenFormatter(), "=",
+    auto f = turbo::pair_formatter(TestingParenFormatter(), "=",
                                  TestingParenFormatter());
     std::string s;
     f(&s, std::make_pair("a", "b"));
@@ -309,9 +309,9 @@ TEST(PairFormatter, FormatterAPI) {
   }
 }
 
-TEST(DereferenceFormatter, FormatterAPI) {
+TEST(dereference_formatter, FormatterAPI) {
   {
-    // Tests wrapping the default AlphaNumFormatter.
+    // Tests wrapping the default alpha_num_formatter.
     const turbo::strings_internal::DereferenceFormatterImpl<
         turbo::strings_internal::AlphaNumFormatterImpl>
         f;
@@ -341,7 +341,7 @@ TEST(DereferenceFormatter, FormatterAPI) {
 
   {
     // Tests wrapping a custom formatter.
-    auto f = turbo::DereferenceFormatter(TestingParenFormatter());
+    auto f = turbo::dereference_formatter(TestingParenFormatter());
     int x = 1, y = 2, z = 3;
     std::string s;
     f(&s, &x);
@@ -369,79 +369,79 @@ TEST(DereferenceFormatter, FormatterAPI) {
 // Tests the interfaces for the 4 public Join function overloads. The semantics
 // of the algorithm is covered in the above APIExamples test.
 //
-TEST(StrJoin, PublicAPIOverloads) {
+TEST(str_join, PublicAPIOverloads) {
   std::vector<std::string> v = {"a", "b", "c"};
 
   // Iterators + formatter
   EXPECT_EQ("a-b-c",
-            turbo::StrJoin(v.begin(), v.end(), "-", turbo::AlphaNumFormatter()));
+            turbo::str_join(v.begin(), v.end(), "-", turbo::alpha_num_formatter()));
   // Range + formatter
-  EXPECT_EQ("a-b-c", turbo::StrJoin(v, "-", turbo::AlphaNumFormatter()));
+  EXPECT_EQ("a-b-c", turbo::str_join(v, "-", turbo::alpha_num_formatter()));
   // Iterators, no formatter
-  EXPECT_EQ("a-b-c", turbo::StrJoin(v.begin(), v.end(), "-"));
+  EXPECT_EQ("a-b-c", turbo::str_join(v.begin(), v.end(), "-"));
   // Range, no formatter
-  EXPECT_EQ("a-b-c", turbo::StrJoin(v, "-"));
+  EXPECT_EQ("a-b-c", turbo::str_join(v, "-"));
 }
 
-TEST(StrJoin, Array) {
+TEST(str_join, Array) {
   const turbo::string_view a[] = {"a", "b", "c"};
-  EXPECT_EQ("a-b-c", turbo::StrJoin(a, "-"));
+  EXPECT_EQ("a-b-c", turbo::str_join(a, "-"));
 }
 
-TEST(StrJoin, InitializerList) {
-  { EXPECT_EQ("a-b-c", turbo::StrJoin({"a", "b", "c"}, "-")); }
+TEST(str_join, InitializerList) {
+  { EXPECT_EQ("a-b-c", turbo::str_join({"a", "b", "c"}, "-")); }
 
   {
     auto a = {"a", "b", "c"};
-    EXPECT_EQ("a-b-c", turbo::StrJoin(a, "-"));
+    EXPECT_EQ("a-b-c", turbo::str_join(a, "-"));
   }
 
   {
     std::initializer_list<const char*> a = {"a", "b", "c"};
-    EXPECT_EQ("a-b-c", turbo::StrJoin(a, "-"));
+    EXPECT_EQ("a-b-c", turbo::str_join(a, "-"));
   }
 
   {
     std::initializer_list<std::string> a = {"a", "b", "c"};
-    EXPECT_EQ("a-b-c", turbo::StrJoin(a, "-"));
+    EXPECT_EQ("a-b-c", turbo::str_join(a, "-"));
   }
 
   {
     std::initializer_list<turbo::string_view> a = {"a", "b", "c"};
-    EXPECT_EQ("a-b-c", turbo::StrJoin(a, "-"));
+    EXPECT_EQ("a-b-c", turbo::str_join(a, "-"));
   }
 
   {
     // Tests initializer_list with a non-default formatter
     auto a = {"a", "b", "c"};
     TestingParenFormatter f;
-    EXPECT_EQ("(a)-(b)-(c)", turbo::StrJoin(a, "-", f));
+    EXPECT_EQ("(a)-(b)-(c)", turbo::str_join(a, "-", f));
   }
 
   {
     // initializer_list of ints
-    EXPECT_EQ("1-2-3", turbo::StrJoin({1, 2, 3}, "-"));
+    EXPECT_EQ("1-2-3", turbo::str_join({1, 2, 3}, "-"));
   }
 
   {
     // Tests initializer_list of ints with a non-default formatter
     auto a = {1, 2, 3};
     TestingParenFormatter f;
-    EXPECT_EQ("(1)-(2)-(3)", turbo::StrJoin(a, "-", f));
+    EXPECT_EQ("(1)-(2)-(3)", turbo::str_join(a, "-", f));
   }
 }
 
-TEST(StrJoin, StringViewInitializerList) {
+TEST(str_join, StringViewInitializerList) {
   {
     // Tests initializer_list of string_views
     std::string b = "b";
-    EXPECT_EQ("a-b-c", turbo::StrJoin({"a", b, "c"}, "-"));
+    EXPECT_EQ("a-b-c", turbo::str_join({"a", b, "c"}, "-"));
   }
   {
     // Tests initializer_list of string_views with a non-default formatter
     TestingParenFormatter f;
     std::string b = "b";
-    EXPECT_EQ("(a)-(b)-(c)", turbo::StrJoin({"a", b, "c"}, "-", f));
+    EXPECT_EQ("(a)-(b)-(c)", turbo::str_join({"a", b, "c"}, "-", f));
   }
 
   class NoCopy {
@@ -456,29 +456,29 @@ TEST(StrJoin, StringViewInitializerList) {
     // Tests initializer_list of string_views preferred over initializer_list<T>
     // for T that is implicitly convertible to string_view
     EXPECT_EQ("a-b-c",
-              turbo::StrJoin({NoCopy("a"), NoCopy("b"), NoCopy("c")}, "-"));
+              turbo::str_join({NoCopy("a"), NoCopy("b"), NoCopy("c")}, "-"));
   }
   {
     // Tests initializer_list of string_views preferred over initializer_list<T>
     // for T that is implicitly convertible to string_view
     TestingParenFormatter f;
     EXPECT_EQ("(a)-(b)-(c)",
-              turbo::StrJoin({NoCopy("a"), NoCopy("b"), NoCopy("c")}, "-", f));
+              turbo::str_join({NoCopy("a"), NoCopy("b"), NoCopy("c")}, "-", f));
   }
 }
 
-TEST(StrJoin, Tuple) {
-  EXPECT_EQ("", turbo::StrJoin(std::make_tuple(), "-"));
-  EXPECT_EQ("hello", turbo::StrJoin(std::make_tuple("hello"), "-"));
+TEST(str_join, Tuple) {
+  EXPECT_EQ("", turbo::str_join(std::make_tuple(), "-"));
+  EXPECT_EQ("hello", turbo::str_join(std::make_tuple("hello"), "-"));
 
   int x(10);
   std::string y("hello");
   double z(3.14);
-  EXPECT_EQ("10-hello-3.14", turbo::StrJoin(std::make_tuple(x, y, z), "-"));
+  EXPECT_EQ("10-hello-3.14", turbo::str_join(std::make_tuple(x, y, z), "-"));
 
   // Faster! Faster!!
   EXPECT_EQ("10-hello-3.14",
-            turbo::StrJoin(std::make_tuple(x, std::cref(y), z), "-"));
+            turbo::str_join(std::make_tuple(x, std::cref(y), z), "-"));
 
   struct TestFormatter {
     char buffer[128];
@@ -496,24 +496,24 @@ TEST(StrJoin, Tuple) {
     }
   };
   EXPECT_EQ("0x0000000a-hell-3.",
-            turbo::StrJoin(std::make_tuple(x, y, z), "-", TestFormatter()));
+            turbo::str_join(std::make_tuple(x, y, z), "-", TestFormatter()));
   EXPECT_EQ(
       "0x0000000a-hell-3.",
-      turbo::StrJoin(std::make_tuple(x, std::cref(y), z), "-", TestFormatter()));
+      turbo::str_join(std::make_tuple(x, std::cref(y), z), "-", TestFormatter()));
   EXPECT_EQ("0x0000000a-hell-3.",
-            turbo::StrJoin(std::make_tuple(&x, &y, &z), "-",
-                          turbo::DereferenceFormatter(TestFormatter())));
+            turbo::str_join(std::make_tuple(&x, &y, &z), "-",
+                          turbo::dereference_formatter(TestFormatter())));
   EXPECT_EQ("0x0000000a-hell-3.",
-            turbo::StrJoin(std::make_tuple(turbo::make_unique<int>(x),
+            turbo::str_join(std::make_tuple(turbo::make_unique<int>(x),
                                           turbo::make_unique<std::string>(y),
                                           turbo::make_unique<double>(z)),
-                          "-", turbo::DereferenceFormatter(TestFormatter())));
+                          "-", turbo::dereference_formatter(TestFormatter())));
   EXPECT_EQ("0x0000000a-hell-3.",
-            turbo::StrJoin(std::make_tuple(turbo::make_unique<int>(x), &y, &z),
-                          "-", turbo::DereferenceFormatter(TestFormatter())));
+            turbo::str_join(std::make_tuple(turbo::make_unique<int>(x), &y, &z),
+                          "-", turbo::dereference_formatter(TestFormatter())));
 }
 
-// A minimal value type for `StrJoin` inputs.
+// A minimal value type for `str_join` inputs.
 // Used to ensure we do not excessively require more a specific type, such as a
 // `string_view`.
 //
@@ -530,7 +530,7 @@ class TestValue {
 };
 
 // A minimal C++20 forward iterator, used to test that we do not impose
-// excessive requirements on StrJoin inputs.
+// excessive requirements on str_join inputs.
 //
 // The 2 main differences between pre-C++20 LegacyForwardIterator and the
 // C++20 ForwardIterator are:
@@ -543,7 +543,7 @@ class TestValue {
 // See the `[iterator.requirements]` section of the C++ standard.
 //
 // The value type is a template parameter so that we can test the behaviour
-// of `StrJoin` specializations, e.g. the NoFormatter specialization for
+// of `str_join` specializations, e.g. the NoFormatter specialization for
 // `string_view`.
 template <typename ValueT>
 class TestIterator {
@@ -625,21 +625,21 @@ class TestIteratorRange {
   TestIterator<ValueT> end_;
 };
 
-TEST(StrJoin, TestIteratorRequirementsNoFormatter) {
+TEST(str_join, TestIteratorRequirementsNoFormatter) {
   const std::vector<turbo::string_view> a = {"a", "b", "c"};
 
   // When the value type is string-like (`std::string` or `string_view`),
   // the NoFormatter template specialization is used internally.
   EXPECT_EQ("a-b-c",
-            turbo::StrJoin(TestIteratorRange<turbo::string_view>(a), "-"));
+            turbo::str_join(TestIteratorRange<turbo::string_view>(a), "-"));
 }
 
-TEST(StrJoin, TestIteratorRequirementsCustomFormatter) {
+TEST(str_join, TestIteratorRequirementsCustomFormatter) {
   const std::vector<turbo::string_view> a = {"a", "b", "c"};
   EXPECT_EQ("a-b-c",
-            turbo::StrJoin(TestIteratorRange<TestValue>(a), "-",
+            turbo::str_join(TestIteratorRange<TestValue>(a), "-",
                           [](std::string* out, const TestValue& value) {
-                            turbo::StrAppend(
+                            turbo::str_append(
                                 out,
                                 turbo::string_view(value.data(), value.size()));
                           }));

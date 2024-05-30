@@ -20,8 +20,8 @@
 // -----------------------------------------------------------------------------
 //
 // This file contains various functions for stripping substrings from a string.
-#ifndef TURBO_STRINGS_STRIP_H_
-#define TURBO_STRINGS_STRIP_H_
+
+#pragma once
 
 #include <cstddef>
 #include <string>
@@ -33,66 +33,63 @@
 #include <turbo/strings/string_view.h>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 
-// ConsumePrefix()
-//
-// Strips the `expected` prefix, if found, from the start of `str`.
-// If the operation succeeded, `true` is returned.  If not, `false`
-// is returned and `str` is not modified.
-//
-// Example:
-//
-//   turbo::string_view input("abc");
-//   EXPECT_TRUE(turbo::ConsumePrefix(&input, "a"));
-//   EXPECT_EQ(input, "bc");
-inline bool ConsumePrefix(turbo::Nonnull<turbo::string_view*> str,
-                          turbo::string_view expected) {
-  if (!turbo::StartsWith(*str, expected)) return false;
-  str->remove_prefix(expected.size());
-  return true;
-}
-// ConsumeSuffix()
-//
-// Strips the `expected` suffix, if found, from the end of `str`.
-// If the operation succeeded, `true` is returned.  If not, `false`
-// is returned and `str` is not modified.
-//
-// Example:
-//
-//   turbo::string_view input("abcdef");
-//   EXPECT_TRUE(turbo::ConsumeSuffix(&input, "def"));
-//   EXPECT_EQ(input, "abc");
-inline bool ConsumeSuffix(turbo::Nonnull<turbo::string_view*> str,
-                          turbo::string_view expected) {
-  if (!turbo::EndsWith(*str, expected)) return false;
-  str->remove_suffix(expected.size());
-  return true;
-}
+    // consume_prefix()
+    //
+    // Strips the `expected` prefix, if found, from the start of `str`.
+    // If the operation succeeded, `true` is returned.  If not, `false`
+    // is returned and `str` is not modified.
+    //
+    // Example:
+    //
+    //   turbo::string_view input("abc");
+    //   EXPECT_TRUE(turbo::consume_prefix(&input, "a"));
+    //   EXPECT_EQ(input, "bc");
+    inline bool consume_prefix(turbo::Nonnull<turbo::string_view *> str,
+                              turbo::string_view expected) {
+        if (!turbo::starts_with(*str, expected)) return false;
+        str->remove_prefix(expected.size());
+        return true;
+    }
 
-// StripPrefix()
-//
-// Returns a view into the input string `str` with the given `prefix` removed,
-// but leaving the original string intact. If the prefix does not match at the
-// start of the string, returns the original string instead.
-TURBO_MUST_USE_RESULT inline turbo::string_view StripPrefix(
-    turbo::string_view str, turbo::string_view prefix) {
-  if (turbo::StartsWith(str, prefix)) str.remove_prefix(prefix.size());
-  return str;
-}
+    // consume_suffix()
+    //
+    // Strips the `expected` suffix, if found, from the end of `str`.
+    // If the operation succeeded, `true` is returned.  If not, `false`
+    // is returned and `str` is not modified.
+    //
+    // Example:
+    //
+    //   turbo::string_view input("abcdef");
+    //   EXPECT_TRUE(turbo::consume_suffix(&input, "def"));
+    //   EXPECT_EQ(input, "abc");
+    inline bool consume_suffix(turbo::Nonnull<turbo::string_view *> str,
+                              turbo::string_view expected) {
+        if (!turbo::ends_with(*str, expected)) return false;
+        str->remove_suffix(expected.size());
+        return true;
+    }
 
-// StripSuffix()
-//
-// Returns a view into the input string `str` with the given `suffix` removed,
-// but leaving the original string intact. If the suffix does not match at the
-// end of the string, returns the original string instead.
-TURBO_MUST_USE_RESULT inline turbo::string_view StripSuffix(
-    turbo::string_view str, turbo::string_view suffix) {
-  if (turbo::EndsWith(str, suffix)) str.remove_suffix(suffix.size());
-  return str;
-}
+    // strip_prefix()
+    //
+    // Returns a view into the input string `str` with the given `prefix` removed,
+    // but leaving the original string intact. If the prefix does not match at the
+    // start of the string, returns the original string instead.
+    TURBO_MUST_USE_RESULT inline turbo::string_view strip_prefix(
+            turbo::string_view str, turbo::string_view prefix) {
+        if (turbo::starts_with(str, prefix)) str.remove_prefix(prefix.size());
+        return str;
+    }
 
-TURBO_NAMESPACE_END
+    // strip_suffix()
+    //
+    // Returns a view into the input string `str` with the given `suffix` removed,
+    // but leaving the original string intact. If the suffix does not match at the
+    // end of the string, returns the original string instead.
+    TURBO_MUST_USE_RESULT inline turbo::string_view strip_suffix(
+            turbo::string_view str, turbo::string_view suffix) {
+        if (turbo::ends_with(str, suffix)) str.remove_suffix(suffix.size());
+        return str;
+    }
+
 }  // namespace turbo
-
-#endif  // TURBO_STRINGS_STRIP_H_

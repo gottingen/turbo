@@ -611,7 +611,7 @@ class string_view {
   // Returns true if the `string_view` starts with the prefix `s`.
   //
   // This method only exists when targeting at least C++20.
-  // If support for C++ prior to C++20 is required, use `turbo::StartsWith()`
+  // If support for C++ prior to C++20 is required, use `turbo::starts_with()`
   // from `//turbo/strings/match.h` for compatibility.
   constexpr bool starts_with(string_view s) const noexcept {
     return s.empty() ||
@@ -636,7 +636,7 @@ class string_view {
   // Returns true if the `string_view` ends with the suffix `s`.
   //
   // This method only exists when targeting at least C++20.
-  // If support for C++ prior to C++20 is required, use `turbo::EndsWith()`
+  // If support for C++ prior to C++20 is required, use `turbo::ends_with()`
   // from `//turbo/strings/match.h` for compatibility.
   constexpr bool ends_with(string_view s) const noexcept {
     return s.empty() || (size() >= s.size() && TURBO_INTERNAL_STRING_VIEW_MEMCMP(

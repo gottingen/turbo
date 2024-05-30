@@ -340,8 +340,8 @@ std::vector<Param> GenParams() {
 
 std::string ParamName(const ::testing::TestParamInfo<Param>& info) {
   const auto& p = info.param;
-  std::string name = turbo::StrCat("lambda_", turbo::SixDigits(p.lambda));
-  return turbo::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
+  std::string name = turbo::str_cat("lambda_", turbo::six_digits(p.lambda));
+  return turbo::str_replace_all(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
 }
 
 INSTANTIATE_TEST_SUITE_P(All, ExponentialDistributionTests,
