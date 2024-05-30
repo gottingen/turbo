@@ -30,8 +30,8 @@
 #include <turbo/base/config.h>
 #include <tests/log/test_helpers.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/time/clock.h>
-#include <turbo/time/time.h>
+//#include <turbo/times/clock.h>
+#include <turbo/times/time.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -136,8 +136,8 @@ Matcher<const turbo::LogEntry&> Timestamp(
 
 Matcher<const turbo::LogEntry&> TimestampInMatchWindow() {
   return Property("timestamp", &turbo::LogEntry::timestamp,
-                  AllOf(Ge(turbo::Now()), Truly([](turbo::Time arg) {
-                          return arg <= turbo::Now();
+                  AllOf(Ge(turbo::Time::current_time()), Truly([](turbo::Time arg) {
+                          return arg <= turbo::Time::current_time();
                         })));
 }
 

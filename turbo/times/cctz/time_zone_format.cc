@@ -25,7 +25,7 @@
 #endif
 
 #include <turbo/base/config.h>
-#include <turbo/time/cctz/time_zone.h>
+#include <turbo/times/cctz/time_zone.h>
 
 // Include time.h directly since, by C++ standards, ctime doesn't have to
 // declare strptime.
@@ -45,8 +45,8 @@
 #include <sstream>
 #endif
 
-#include <turbo/time/cctz/civil_time.h>
-#include <turbo/time/cctz/time_zone_if.h>
+#include <turbo/times/cctz/civil_time.h>
+#include <turbo/times/cctz/time_zone_if.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

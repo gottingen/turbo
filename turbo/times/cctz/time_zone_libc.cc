@@ -16,7 +16,7 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #endif
 
-#include <turbo/time/cctz/time_zone_libc.h>
+#include <turbo/times/cctz/time_zone_libc.h>
 
 #include <chrono>
 #include <ctime>
@@ -24,8 +24,8 @@
 #include <utility>
 
 #include <turbo/base/config.h>
-#include <turbo/time/cctz/civil_time.h>
-#include <turbo/time/cctz/time_zone.h>
+#include <turbo/times/cctz/civil_time.h>
+#include <turbo/times/cctz/time_zone.h>
 
 #if defined(_AIX)
 extern "C" {

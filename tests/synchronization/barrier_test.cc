@@ -22,7 +22,7 @@
 
 #include <gtest/gtest.h>
 #include <turbo/synchronization/mutex.h>
-#include <turbo/time/clock.h>
+#include <turbo/times/clock.h>
 
 
 TEST(Barrier, SanityTest) {

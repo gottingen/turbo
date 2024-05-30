@@ -15,8 +15,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/time/clock.h>
-
+#include <turbo/times/clock.h>
+#include <turbo/times/time.h>
 #include <turbo/base/attributes.h>
 #include <turbo/base/optimization.h>
 
@@ -38,17 +38,18 @@
 #include <turbo/base/thread_annotations.h>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
-Time Now() {
-  // TODO(bww): Get a timespec instead so we don't have to divide.
-  int64_t n = turbo::GetCurrentTimeNanos();
-  if (n >= 0) {
-    return time_internal::FromUnixDuration(
-        time_internal::MakeDuration(n / 1000000000, n % 1000000000 * 4));
-  }
-  return time_internal::FromUnixDuration(turbo::Nanoseconds(n));
-}
-TURBO_NAMESPACE_END
+    TURBO_NAMESPACE_BEGIN
+    Time Time::current_time() {
+        // TODO(bww): Get a timespec instead so we don't have to divide.
+        int64_t n = turbo::GetCurrentTimeNanos();
+        if (n >= 0) {
+            return time_internal::FromUnixDuration(
+                    time_internal::MakeDuration(n / 1000000000, n % 1000000000 * 4));
+        }
+        return time_internal::FromUnixDuration(turbo::Nanoseconds(n));
+    }
+
+    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 // Decide if we should use the fast GetCurrentTimeNanos() algorithm based on the
@@ -63,9 +64,11 @@ TURBO_NAMESPACE_END
 #endif
 
 #if defined(__APPLE__) || defined(_WIN32)
-#include <turbo/time/internal/get_current_time_chrono.inc>
+#include <turbo/times/internal/get_current_time_chrono.inc>
 #else
-#include <turbo/time/internal/get_current_time_posix.inc>
+
+#include <turbo/times/internal/get_current_time_posix.inc>
+
 #endif
 
 // Allows override by test.
@@ -76,9 +79,14 @@ TURBO_NAMESPACE_END
 
 #if !TURBO_USE_CYCLECLOCK_FOR_GET_CURRENT_TIME_NANOS
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
-int64_t GetCurrentTimeNanos() { return GET_CURRENT_TIME_NANOS_FROM_SYSTEM(); }
-TURBO_NAMESPACE_END
+    TURBO_NAMESPACE_BEGIN
+    int64_t GetCurrentTimeNanos() { return GET_CURRENT_TIME_NANOS_FROM_SYSTEM(); }
+
+    int64_t Time::current_nanoseconds() {
+        return GetCurrentTimeNanos();
+    }
+
+    TURBO_NAMESPACE_END
 }  // namespace turbo
 #else  // Use the cyclecounter-based implementation below.
 
@@ -562,46 +570,46 @@ TURBO_NAMESPACE_END
 #endif  // TURBO_USE_CYCLECLOCK_FOR_GET_CURRENT_TIME_NANOS
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace {
+    TURBO_NAMESPACE_BEGIN
+    namespace {
 
 // Returns the maximum duration that SleepOnce() can sleep for.
-constexpr turbo::Duration MaxSleep() {
+        constexpr turbo::Duration MaxSleep() {
 #ifdef _WIN32
-  // Windows Sleep() takes unsigned long argument in milliseconds.
-  return turbo::Milliseconds(
-      std::numeric_limits<unsigned long>::max());  // NOLINT(runtime/int)
+            // Windows Sleep() takes unsigned long argument in milliseconds.
+            return turbo::Milliseconds(
+                std::numeric_limits<unsigned long>::max());  // NOLINT(runtime/int)
 #else
-  return turbo::Seconds(std::numeric_limits<time_t>::max());
+            return turbo::Seconds(std::numeric_limits<time_t>::max());
 #endif
-}
+        }
 
 // Sleeps for the given duration.
 // REQUIRES: to_sleep <= MaxSleep().
-void SleepOnce(turbo::Duration to_sleep) {
+        void SleepOnce(turbo::Duration to_sleep) {
 #ifdef _WIN32
-  Sleep(static_cast<DWORD>(to_sleep / turbo::Milliseconds(1)));
+            Sleep(static_cast<DWORD>(to_sleep / turbo::Milliseconds(1)));
 #else
-  struct timespec sleep_time = turbo::ToTimespec(to_sleep);
-  while (nanosleep(&sleep_time, &sleep_time) != 0 && errno == EINTR) {
-    // Ignore signals and wait for the full interval to elapse.
-  }
+            struct timespec sleep_time = turbo::ToTimespec(to_sleep);
+            while (nanosleep(&sleep_time, &sleep_time) != 0 && errno == EINTR) {
+                // Ignore signals and wait for the full interval to elapse.
+            }
 #endif
-}
+        }
 
-}  // namespace
-TURBO_NAMESPACE_END
+    }  // namespace
+    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 extern "C" {
 
 TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalSleepFor)(
-    turbo::Duration duration) {
-  while (duration > turbo::ZeroDuration()) {
-    turbo::Duration to_sleep = std::min(duration, turbo::MaxSleep());
-    turbo::SleepOnce(to_sleep);
-    duration -= to_sleep;
-  }
+        turbo::Duration duration) {
+    while (duration > turbo::ZeroDuration()) {
+        turbo::Duration to_sleep = std::min(duration, turbo::MaxSleep());
+        turbo::SleepOnce(to_sleep);
+        duration -= to_sleep;
+    }
 }
 
 }  // extern "C"

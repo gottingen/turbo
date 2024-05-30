@@ -19,7 +19,7 @@
 #include <string>
 
 #include <tests/times/test_util.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 #include <benchmark/benchmark.h>
 
 namespace {

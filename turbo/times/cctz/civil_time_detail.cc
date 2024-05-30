@@ -12,7 +12,7 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-#include <turbo/time/cctz/civil_time_detail.h>
+#include <turbo/times/cctz/civil_time_detail.h>
 
 #include <iomanip>
 #include <ostream>

@@ -23,7 +23,7 @@
 
 #include <turbo/base/attributes.h>
 #include <turbo/flags/flag.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 #include <benchmark/benchmark.h>
 
 TURBO_FLAG(turbo::Duration, turbo_duration_flag_for_benchmark,

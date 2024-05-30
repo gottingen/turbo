@@ -22,13 +22,13 @@
 #include <vector>
 
 #include <turbo/base/config.h>
-#include <turbo/time/cctz/time_zone.h>
+#include <turbo/times/cctz/time_zone.h>
 #if defined(__linux__)
 #include <features.h>
 #endif
 
 #include <gtest/gtest.h>
-#include <turbo/time/cctz/civil_time.h>
+#include <turbo/times/cctz/civil_time.h>
 
 namespace chrono = std::chrono;
 

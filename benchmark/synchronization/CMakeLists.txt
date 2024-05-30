@@ -18,7 +18,7 @@
 
 carbin_cc_bm(
         NAME blocking_counter_benchmark
-        MODULE sync
+        MODULE synchronization
         SOURCES blocking_counter_benchmark.cc
         LINKS turbo::turbo benchmark::benchmark benchmark::benchmark_main ${CARBIN_DEPS_LINK}
         CXXOPTS ${USER_CXX_FLAGS}
@@ -26,7 +26,7 @@ carbin_cc_bm(
 
 carbin_cc_bm(
         NAME graphcycles_benchmark
-        MODULE sync
+        MODULE synchronization
         SOURCES graphcycles_benchmark.cc
         LINKS turbo::turbo benchmark::benchmark benchmark::benchmark_main ${CARBIN_DEPS_LINK}
         CXXOPTS ${USER_CXX_FLAGS}
@@ -34,7 +34,7 @@ carbin_cc_bm(
 
 carbin_cc_bm(
         NAME mutex_benchmark
-        MODULE sync
+        MODULE synchronization
         SOURCES mutex_benchmark.cc
         LINKS turbo::turbo benchmark::benchmark benchmark::benchmark_main ${CARBIN_DEPS_LINK}
         CXXOPTS ${USER_CXX_FLAGS}

@@ -29,7 +29,7 @@
 
 #include <turbo/base/config.h>
 #include <turbo/base/macros.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -37,12 +37,12 @@ TURBO_NAMESPACE_BEGIN
 // Now()
 //
 // Returns the current time, expressed as an `turbo::Time` absolute time value.
-turbo::Time Now();
+//turbo::Time Now();
 
 // GetCurrentTimeNanos()
 //
 // Returns the current time, expressed as a count of nanoseconds since the Unix
-// Epoch (https://en.wikipedia.org/wiki/Unix_time). Prefer `turbo::Now()` instead
+// Epoch (https://en.wikipedia.org/wiki/Unix_time). Prefer `turbo::Time::current_time()` instead
 // for all but the most performance-sensitive cases (i.e. when you are calling
 // this function hundreds of thousands of times per second).
 int64_t GetCurrentTimeNanos();

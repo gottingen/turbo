@@ -41,8 +41,8 @@
 #include <turbo/strings/str_cat.h>
 #include <turbo/strings/str_split.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/time/clock.h>
-#include <turbo/time/time.h>
+#include <turbo/times/clock.h>
+#include <turbo/times/time.h>
 #include <turbo/types/optional.h>
 
 TURBO_DECLARE_FLAG(int64_t, mistyped_int_flag);
@@ -688,9 +688,9 @@ TEST_F(FlagTest, ConcurrentSetAndGet) {
       }
     });
   }
-  turbo::Time end_time = turbo::Now() + turbo::Seconds(1);
+  turbo::Time end_time = turbo::Time::current_time() + turbo::Seconds(1);
   int i = 0;
-  while (turbo::Now() < end_time) {
+  while (turbo::Time::current_time() < end_time) {
     turbo::SetFlag(&FLAGS_test_flag_12,
                   kValidDurations[i++ % TURBO_ARRAYSIZE(kValidDurations)]);
   }

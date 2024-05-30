@@ -73,12 +73,12 @@ static void BasicTests(bool notify_before_waiting, Notification* notification) {
   EXPECT_FALSE(notification->HasBeenNotified());
   EXPECT_FALSE(
       notification->WaitForNotificationWithTimeout(turbo::Milliseconds(0)));
-  EXPECT_FALSE(notification->WaitForNotificationWithDeadline(turbo::Now()));
+  EXPECT_FALSE(notification->WaitForNotificationWithDeadline(turbo::Time::current_time()));
 
   const turbo::Duration delay = turbo::Milliseconds(50);
-  const turbo::Time start = turbo::Now();
+  const turbo::Time start = turbo::Time::current_time();
   EXPECT_FALSE(notification->WaitForNotificationWithTimeout(delay));
-  const turbo::Duration elapsed = turbo::Now() - start;
+  const turbo::Duration elapsed = turbo::Time::current_time() - start;
 
   // Allow for a slight early return, to account for quality of implementation
   // issues on various platforms.
@@ -118,7 +118,7 @@ static void BasicTests(bool notify_before_waiting, Notification* notification) {
   notification->WaitForNotification();  // should exit immediately
   EXPECT_TRUE(notification->HasBeenNotified());
   EXPECT_TRUE(notification->WaitForNotificationWithTimeout(turbo::Seconds(0)));
-  EXPECT_TRUE(notification->WaitForNotificationWithDeadline(turbo::Now()));
+  EXPECT_TRUE(notification->WaitForNotificationWithDeadline(turbo::Time::current_time()));
   for (std::thread& worker : workers) {
     worker.join();
   }

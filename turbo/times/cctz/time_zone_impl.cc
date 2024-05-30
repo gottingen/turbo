@@ -12,7 +12,7 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-#include <turbo/time/cctz/time_zone_impl.h>
+#include <turbo/times/cctz/time_zone_impl.h>
 
 #include <deque>
 #include <memory>
@@ -22,7 +22,7 @@
 #include <utility>
 
 #include <turbo/base/config.h>
-#include <turbo/time/cctz/time_zone_fixed.h>
+#include <turbo/times/cctz/time_zone_fixed.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

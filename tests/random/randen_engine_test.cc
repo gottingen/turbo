@@ -27,7 +27,7 @@
 #include <turbo/log/log.h>
 #include <turbo/random/internal/explicit_seed_seq.h>
 #include <turbo/strings/str_cat.h>
-#include <turbo/time/clock.h>
+#include <turbo/times/clock.h>
 
 #define UPDATE_GOLDEN 0
 

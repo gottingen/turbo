@@ -38,7 +38,7 @@
 #include <turbo/profiling/internal/exponential_biased.h>
 #include <turbo/profiling/internal/sample_recorder.h>
 #include <turbo/synchronization/mutex.h>
-#include <turbo/time/clock.h>
+#include <turbo/times/clock.h>
 #include <turbo/utility/utility.h>
 
 namespace turbo {
@@ -96,7 +96,7 @@ void HashtablezInfo::PrepareForSampling(int64_t stride,
   hashes_bitwise_xor.store(0, std::memory_order_relaxed);
   max_reserve.store(0, std::memory_order_relaxed);
 
-  create_time = turbo::Now();
+  create_time = turbo::Time::current_time();
   weight = stride;
   // The inliner makes hardcoded skip_count difficult (especially when combined
   // with LTO).  We use the ability to exclude stacks by regex when encoding

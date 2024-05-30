@@ -29,7 +29,7 @@ if (CARBIN_BUILD_TEST OR CARBIN_BUILD_BENCHMARK)
     #include(require_gtest)
     #include(require_gmock)
     #include(require_doctest)
-endif (CARBIN_BUILD_TEST)
+endif (CARBIN_BUILD_TEST OR CARBIN_BUILD_BENCHMARK)
 
 if (CARBIN_BUILD_BENCHMARK)
     #include(require_benchmark)

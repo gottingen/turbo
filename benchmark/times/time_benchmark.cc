@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 #if !defined(_WIN32)
 #include <sys/time.h>
@@ -28,7 +28,7 @@
 #include <memory>
 #include <string>
 
-#include <turbo/time/clock.h>
+#include <turbo/times/clock.h>
 #include <tests/times/test_util.h>
 #include <benchmark/benchmark.h>
 
@@ -54,7 +54,7 @@ BENCHMARK(BM_Time_Arithmetic);
 //
 
 void BM_Time_Difference(benchmark::State& state) {
-  turbo::Time start = turbo::Now();
+  turbo::Time start = turbo::Time::current_time();
   turbo::Time end = start + turbo::Nanoseconds(1);
   turbo::Duration diff;
   while (state.KeepRunning()) {
@@ -76,12 +76,12 @@ BENCHMARK(BM_Time_Difference);
 void BM_Time_ToDateTime_Turbo(benchmark::State& state) {
   const turbo::TimeZone tz =
       turbo::time_internal::LoadTimeZone("America/Los_Angeles");
-  turbo::Time t = turbo::FromUnixSeconds(1384569027);
-  turbo::Time t2 = turbo::FromUnixSeconds(1418962578);
+  turbo::Time t = turbo::Time::from_seconds(1384569027);
+  turbo::Time t2 = turbo::Time::from_seconds(1418962578);
   while (state.KeepRunning()) {
     std::swap(t, t2);
     t += turbo::Seconds(1);
-    benchmark::DoNotOptimize(t.In(tz));
+    benchmark::DoNotOptimize(tz.At(t));
   }
 }
 BENCHMARK(BM_Time_ToDateTime_Turbo);
@@ -105,10 +105,10 @@ BENCHMARK(BM_Time_ToDateTime_Libc);
 
 void BM_Time_ToDateTimeUTC_Turbo(benchmark::State& state) {
   const turbo::TimeZone tz = turbo::UTCTimeZone();
-  turbo::Time t = turbo::FromUnixSeconds(1384569027);
+  turbo::Time t = turbo::Time::from_seconds(1384569027);
   while (state.KeepRunning()) {
     t += turbo::Seconds(1);
-    benchmark::DoNotOptimize(t.In(tz));
+    benchmark::DoNotOptimize(tz.At(t));
   }
 }
 BENCHMARK(BM_Time_ToDateTimeUTC_Turbo);
@@ -128,13 +128,13 @@ void BM_Time_ToDateTimeUTC_Libc(benchmark::State& state) {
 BENCHMARK(BM_Time_ToDateTimeUTC_Libc);
 
 //
-// FromUnixMicros
+// Time::from_microseconds
 //
 
 void BM_Time_FromUnixMicros(benchmark::State& state) {
   int i = 0;
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::FromUnixMicros(i));
+    benchmark::DoNotOptimize(turbo::Time::from_microseconds(i));
     ++i;
   }
 }
@@ -285,7 +285,7 @@ BENCHMARK(BM_Time_FromCivilDay0_Libc);
 //
 
 void BM_Time_ToTimespec(benchmark::State& state) {
-  turbo::Time now = turbo::Now();
+  turbo::Time now = turbo::Time::current_time();
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(turbo::ToTimespec(now));
   }
@@ -293,7 +293,7 @@ void BM_Time_ToTimespec(benchmark::State& state) {
 BENCHMARK(BM_Time_ToTimespec);
 
 void BM_Time_FromTimespec(benchmark::State& state) {
-  timespec ts = turbo::ToTimespec(turbo::Now());
+  timespec ts = turbo::ToTimespec(turbo::Time::current_time());
   while (state.KeepRunning()) {
     if (++ts.tv_nsec == 1000 * 1000 * 1000) {
       ++ts.tv_sec;
@@ -310,16 +310,16 @@ BENCHMARK(BM_Time_FromTimespec);
 
 void BM_Time_InfiniteFuture(benchmark::State& state) {
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::InfiniteFuture());
+    benchmark::DoNotOptimize(turbo::Time::future_infinite());
   }
 }
 BENCHMARK(BM_Time_InfiniteFuture);
 
-void BM_Time_InfinitePast(benchmark::State& state) {
+void BM_Time_past_infinite(benchmark::State& state) {
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::InfinitePast());
+    benchmark::DoNotOptimize(turbo::Time::past_infinite());
   }
 }
-BENCHMARK(BM_Time_InfinitePast);
+BENCHMARK(BM_Time_past_infinite);
 
 }  // namespace

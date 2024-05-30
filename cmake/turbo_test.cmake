@@ -19,13 +19,29 @@ set(${PROJECT_NAME}_SKIP_BENCHMARK "")
 
 list(APPEND ${PROJECT_NAME}_SKIP_TEST
         "norun"
-      #[[  "base"
+        #[[  "base"
+          "container"
+          "algorithm"
+          "cleanup"
+          "crc"
+          "debugging"
+          "flags"
+          "functional"]]
+)
+list(APPEND ${PROJECT_NAME}_SKIP_BENCHMARK "norun"
+        "base"
         "container"
-        "algorithm"
-        "cleanup"
         "crc"
         "debugging"
         "flags"
-        "functional"]]
+        "functional"
+        "hash"
+        "log"
+        "numeric"
+        "profile"
+        "random"
+        "strings"
+        "synchronization"
+        "times"
+        "types"
 )
-list(APPEND ${PROJECT_NAME}_SKIP_BENCHMARK "norun")

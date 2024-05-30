@@ -18,7 +18,7 @@
 
 
 #include <turbo/log/sinks/hourly_file_sink.h>
-#include <turbo/time/clock.h>
+#include <turbo/times/clock.h>
 
 #include <algorithm>
 #include <array>
@@ -56,12 +56,12 @@ namespace turbo {
               _truncate(truncate),
               _max_files(max_files),
               _check_interval_s(check_interval_s),
-              _next_check_time(turbo::Now() + turbo::Seconds(check_interval_s)) {
-        _next_rotation_time = next_rotation_time(turbo::Now());
+              _next_check_time(turbo::Time::current_time() + turbo::Seconds(check_interval_s)) {
+        _next_rotation_time = next_rotation_time(turbo::Time::current_time());
         if (_max_files > 0) {
             init_file_queue();
         }
-        auto now = turbo::Now();
+        auto now = turbo::Time::current_time();
         auto filename = calc_hourly_filename(_base_filename, turbo::ToTM(now, turbo::LocalTimeZone()));
         _file_writer = std::make_unique<log_internal::AppendFile>();
         if (_truncate) {
@@ -97,7 +97,7 @@ namespace turbo {
     void HourlyFileSink::init_file_queue() {
         std::vector<std::string> filenames;
         _files = circular_queue<std::string>(static_cast<size_t>(_max_files));
-        auto now = turbo::Now();
+        auto now = turbo::Time::current_time();
         while (filenames.size() < _max_files) {
             auto filename = calc_hourly_filename(_base_filename, turbo::ToTM(now, turbo::LocalTimeZone()));
             if (!log_internal::path_exists(filename)) {

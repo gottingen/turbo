@@ -13,7 +13,7 @@
 //   limitations under the License.
 
 #include <turbo/base/config.h>
-#include <turbo/time/cctz/time_zone.h>
+#include <turbo/times/cctz/time_zone.h>
 
 #if defined(__ANDROID__)
 #include <sys/system_properties.h>
@@ -54,8 +54,8 @@
 #include <cstring>
 #include <string>
 
-#include <turbo/time/cctz/time_zone_fixed.h>
-#include <turbo/time/cctz/time_zone_impl.h>
+#include <turbo/times/cctz/time_zone_fixed.h>
+#include <turbo/times/cctz/time_zone_impl.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

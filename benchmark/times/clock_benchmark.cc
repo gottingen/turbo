@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/time/clock.h>
+#include <turbo/times/clock.h>
 
 #if !defined(_WIN32)
 #include <sys/time.h>
@@ -31,7 +31,7 @@ namespace {
 
 void BM_Clock_Now_TurboTime(benchmark::State& state) {
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::Now());
+    benchmark::DoNotOptimize(turbo::Time::current_time());
   }
 }
 BENCHMARK(BM_Clock_Now_TurboTime);
@@ -45,7 +45,7 @@ BENCHMARK(BM_Clock_Now_GetCurrentTimeNanos);
 
 void BM_Clock_Now_TurboTime_ToUnixNanos(benchmark::State& state) {
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::ToUnixNanos(turbo::Now()));
+    benchmark::DoNotOptimize(turbo::ToUnixNanos(turbo::Time::current_time()));
   }
 }
 BENCHMARK(BM_Clock_Now_TurboTime_ToUnixNanos);

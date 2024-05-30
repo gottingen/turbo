@@ -15,11 +15,11 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/time/cctz/time_zone.h>
+#include <turbo/times/cctz/time_zone.h>
 
 #include <gtest/gtest.h>
 #include <tests/times/test_util.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 namespace cctz = turbo::time_internal::cctz;
 

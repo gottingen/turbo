@@ -26,7 +26,7 @@
 #include <turbo/synchronization/internal/thread_pool.h>
 #include <turbo/synchronization/mutex.h>
 #include <turbo/synchronization/notification.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -141,7 +141,7 @@ TEST(SampleRecorderTest, MultiThreaded) {
           case 2: {
             turbo::Duration oldest = turbo::ZeroDuration();
             sampler.Iterate([&](const Info& info) {
-              oldest = std::max(oldest, turbo::Now() - info.create_time);
+              oldest = std::max(oldest, turbo::Time::current_time() - info.create_time);
             });
             ASSERT_GE(oldest, turbo::ZeroDuration());
             break;

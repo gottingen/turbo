@@ -45,7 +45,7 @@
 #include <turbo/log/log_sink.h>
 #include <turbo/strings/has_stringify.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

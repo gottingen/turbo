@@ -31,8 +31,8 @@
 #include <turbo/synchronization/internal/stdcpp_waiter.h>
 #include <turbo/synchronization/internal/thread_pool.h>
 #include <turbo/synchronization/internal/win32_waiter.h>
-#include <turbo/time/clock.h>
-#include <turbo/time/time.h>
+#include <turbo/times/clock.h>
+#include <turbo/times/time.h>
 #include <gtest/gtest.h>
 
 // Test go/btm support by randomizing the value of clock_gettime() for
@@ -89,10 +89,10 @@ TYPED_TEST_P(WaiterTest, WaitNoTimeout) {
     turbo::SleepFor(turbo::Seconds(1));
     waiter.Post();
   });
-  turbo::Time start = turbo::Now();
+  turbo::Time start = turbo::Time::current_time();
   EXPECT_TRUE(
       waiter.Wait(turbo::synchronization_internal::KernelTimeout::Never()));
-  turbo::Duration waited = turbo::Now() - start;
+  turbo::Duration waited = turbo::Time::current_time() - start;
   EXPECT_GE(waited, WithTolerance(turbo::Seconds(2)));
 }
 
@@ -106,10 +106,10 @@ TYPED_TEST_P(WaiterTest, WaitDurationWoken) {
     turbo::SleepFor(turbo::Milliseconds(500));
     waiter.Post();
   });
-  turbo::Time start = turbo::Now();
+  turbo::Time start = turbo::Time::current_time();
   EXPECT_TRUE(waiter.Wait(
       turbo::synchronization_internal::KernelTimeout(turbo::Seconds(10))));
-  turbo::Duration waited = turbo::Now() - start;
+  turbo::Duration waited = turbo::Time::current_time() - start;
   EXPECT_GE(waited, WithTolerance(turbo::Milliseconds(500)));
   EXPECT_LT(waited, turbo::Seconds(2));
 }
@@ -124,30 +124,30 @@ TYPED_TEST_P(WaiterTest, WaitTimeWoken) {
     turbo::SleepFor(turbo::Milliseconds(500));
     waiter.Post();
   });
-  turbo::Time start = turbo::Now();
+  turbo::Time start = turbo::Time::current_time();
   EXPECT_TRUE(waiter.Wait(turbo::synchronization_internal::KernelTimeout(
       start + turbo::Seconds(10))));
-  turbo::Duration waited = turbo::Now() - start;
+  turbo::Duration waited = turbo::Time::current_time() - start;
   EXPECT_GE(waited, WithTolerance(turbo::Milliseconds(500)));
   EXPECT_LT(waited, turbo::Seconds(2));
 }
 
 TYPED_TEST_P(WaiterTest, WaitDurationReached) {
   TypeParam waiter;
-  turbo::Time start = turbo::Now();
+  turbo::Time start = turbo::Time::current_time();
   EXPECT_FALSE(waiter.Wait(
       turbo::synchronization_internal::KernelTimeout(turbo::Milliseconds(500))));
-  turbo::Duration waited = turbo::Now() - start;
+  turbo::Duration waited = turbo::Time::current_time() - start;
   EXPECT_GE(waited, WithTolerance(turbo::Milliseconds(500)));
   EXPECT_LT(waited, turbo::Seconds(1));
 }
 
 TYPED_TEST_P(WaiterTest, WaitTimeReached) {
   TypeParam waiter;
-  turbo::Time start = turbo::Now();
+  turbo::Time start = turbo::Time::current_time();
   EXPECT_FALSE(waiter.Wait(turbo::synchronization_internal::KernelTimeout(
       start + turbo::Milliseconds(500))));
-  turbo::Duration waited = turbo::Now() - start;
+  turbo::Duration waited = turbo::Time::current_time() - start;
   EXPECT_GE(waited, WithTolerance(turbo::Milliseconds(500)));
   EXPECT_LT(waited, turbo::Seconds(1));
 }

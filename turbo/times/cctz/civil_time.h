@@ -15,7 +15,7 @@
 #pragma once
 
 #include <turbo/base/config.h>
-#include <turbo/time/cctz/civil_time_detail.h>
+#include <turbo/times/cctz/civil_time_detail.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

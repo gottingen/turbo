@@ -30,7 +30,7 @@
 // Note that we assume the proleptic Gregorian calendar and 60-second
 // minutes throughout.
 
-#include <turbo/time/cctz/time_zone_info.h>
+#include <turbo/times/cctz/time_zone_info.h>
 
 #include <algorithm>
 #include <cassert>
@@ -48,9 +48,9 @@
 #include <vector>
 
 #include <turbo/base/config.h>
-#include <turbo/time/cctz/civil_time.h>
-#include <turbo/time/cctz/time_zone_fixed.h>
-#include <turbo/time/cctz/time_zone_posix.h>
+#include <turbo/times/cctz/civil_time.h>
+#include <turbo/times/cctz/time_zone_fixed.h>
+#include <turbo/times/cctz/time_zone_posix.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

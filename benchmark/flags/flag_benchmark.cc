@@ -26,7 +26,7 @@
 #include <turbo/flags/parse.h>
 #include <turbo/flags/reflection.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 #include <turbo/types/optional.h>
 #include <benchmark/benchmark.h>
 

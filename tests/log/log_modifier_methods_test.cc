@@ -28,7 +28,7 @@
 #include <tests/log/scoped_mock_log.h>
 #include <turbo/strings/match.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 namespace {
 #if GTEST_HAS_DEATH_TEST

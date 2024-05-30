@@ -56,7 +56,7 @@
 #include <turbo/base/thread_annotations.h>
 #include <turbo/profiling/internal/sample_recorder.h>
 #include <turbo/synchronization/mutex.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 #include <turbo/utility/utility.h>
 
 namespace turbo {

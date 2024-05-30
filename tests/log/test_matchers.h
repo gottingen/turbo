@@ -36,7 +36,7 @@
 #include <tests/log/test_helpers.h>
 #include <turbo/log/log_entry.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

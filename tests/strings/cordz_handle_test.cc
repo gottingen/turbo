@@ -23,8 +23,8 @@
 #include <turbo/memory/memory.h>
 #include <turbo/synchronization/internal/thread_pool.h>
 #include <turbo/synchronization/notification.h>
-#include <turbo/time/clock.h>
-#include <turbo/time/time.h>
+#include <turbo/times/clock.h>
+#include <turbo/times/time.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

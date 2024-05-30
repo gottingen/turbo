@@ -18,7 +18,7 @@
 
 carbin_cc_bm(
         NAME function_type_benchmark
-        MODULE function
+        MODULE functional
         SOURCES function_type_benchmark.cc
         LINKS turbo::turbo benchmark::benchmark benchmark::benchmark_main ${CARBIN_DEPS_LINK}
         CXXOPTS ${USER_CXX_FLAGS}

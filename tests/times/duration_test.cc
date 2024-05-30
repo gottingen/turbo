@@ -33,7 +33,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <turbo/strings/str_format.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 namespace {
 

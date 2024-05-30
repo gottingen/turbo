@@ -29,7 +29,7 @@
 #include <turbo/container/btree_set.h>
 #include <turbo/container/flat_hash_set.h>
 #include <turbo/strings/cord.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -91,7 +91,7 @@ template <>
 struct Generator<turbo::Time> {
   int maxval;
   explicit Generator(int m) : maxval(m) {}
-  turbo::Time operator()(int i) const { return turbo::FromUnixMillis(i); }
+  turbo::Time operator()(int i) const { return turbo::Time::from_milliseconds(i); }
 };
 
 template <>

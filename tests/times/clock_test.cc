@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/time/clock.h>
+#include <turbo/times/clock.h>
 
 #include <turbo/base/config.h>
 #if defined(TURBO_HAVE_ALARM)
@@ -30,14 +30,14 @@ typedef void (*sig_t)(int);
 #endif
 
 #include <gtest/gtest.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 namespace {
 
 TEST(Time, Now) {
-  const turbo::Time before = turbo::FromUnixNanos(turbo::GetCurrentTimeNanos());
-  const turbo::Time now = turbo::Now();
-  const turbo::Time after = turbo::FromUnixNanos(turbo::GetCurrentTimeNanos());
+  const turbo::Time before = turbo::Time::from_nanoseconds(turbo::GetCurrentTimeNanos());
+  const turbo::Time now = turbo::Time::current_time();
+  const turbo::Time after = turbo::Time::from_nanoseconds(turbo::GetCurrentTimeNanos());
   EXPECT_GE(now, before);
   EXPECT_GE(after, now);
 }
@@ -59,8 +59,8 @@ void AlarmHandler(int signo) {
 bool SleepForBounded(turbo::Duration d, turbo::Duration lower_bound,
                      turbo::Duration upper_bound, turbo::Duration timeout,
                      AlarmPolicy alarm_policy, int* attempts) {
-  const turbo::Time deadline = turbo::Now() + timeout;
-  while (turbo::Now() < deadline) {
+  const turbo::Time deadline = turbo::Time::current_time() + timeout;
+  while (turbo::Time::current_time() < deadline) {
 #if defined(TURBO_HAVE_ALARM)
     sig_t old_alarm = SIG_DFL;
     if (alarm_policy == AlarmPolicy::kWithAlarm) {
@@ -72,9 +72,9 @@ bool SleepForBounded(turbo::Duration d, turbo::Duration lower_bound,
     EXPECT_EQ(alarm_policy, AlarmPolicy::kWithoutAlarm);
 #endif
     ++*attempts;
-    turbo::Time start = turbo::Now();
+    turbo::Time start = turbo::Time::current_time();
     turbo::SleepFor(d);
-    turbo::Duration actual = turbo::Now() - start;
+    turbo::Duration actual = turbo::Time::current_time() - start;
 #if defined(TURBO_HAVE_ALARM)
     if (alarm_policy == AlarmPolicy::kWithAlarm) {
       signal(SIGALRM, old_alarm);

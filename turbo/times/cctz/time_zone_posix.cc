@@ -12,7 +12,7 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-#include <turbo/time/cctz/time_zone_posix.h>
+#include <turbo/times/cctz/time_zone_posix.h>
 
 #include <cstddef>
 #include <cstring>

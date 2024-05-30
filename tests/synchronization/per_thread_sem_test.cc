@@ -30,8 +30,8 @@
 #include <turbo/base/internal/cycleclock.h>
 #include <turbo/base/internal/thread_identity.h>
 #include <turbo/strings/str_cat.h>
-#include <turbo/time/clock.h>
-#include <turbo/time/time.h>
+#include <turbo/times/clock.h>
+#include <turbo/times/time.h>
 
 // In this test we explicitly avoid the use of synchronization
 // primitives which might use PerThreadSem, most notably turbo::Mutex.
@@ -97,7 +97,7 @@ class PerThreadSemTest : public testing::Test {
     ThreadData t;
     t.num_iterations = kNumIterations;
     t.timeout = timeout ?
-        KernelTimeout(turbo::Now() + turbo::Seconds(10000))  // far in the future
+        KernelTimeout(turbo::Time::current_time() + turbo::Seconds(10000))  // far in the future
         : KernelTimeout::Never();
     t.identity1 = GetOrCreateCurrentThreadIdentity();
 
@@ -157,9 +157,9 @@ TEST_F(PerThreadSemTest, WithTimeout) {
 
 TEST_F(PerThreadSemTest, Timeouts) {
   const turbo::Duration delay = turbo::Milliseconds(50);
-  const turbo::Time start = turbo::Now();
+  const turbo::Time start = turbo::Time::current_time();
   EXPECT_FALSE(Wait(start + delay));
-  const turbo::Duration elapsed = turbo::Now() - start;
+  const turbo::Duration elapsed = turbo::Time::current_time() - start;
   // Allow for a slight early return, to account for quality of implementation
   // issues on various platforms.
   turbo::Duration slop = turbo::Milliseconds(1);
@@ -173,7 +173,7 @@ TEST_F(PerThreadSemTest, Timeouts) {
 
   turbo::Time negative_timeout = turbo::UnixEpoch() - turbo::Milliseconds(100);
   EXPECT_FALSE(Wait(negative_timeout));
-  EXPECT_LE(negative_timeout, turbo::Now() + slop);  // trivially true :)
+  EXPECT_LE(negative_timeout, turbo::Time::current_time() + slop);  // trivially true :)
 
   Post(GetOrCreateCurrentThreadIdentity());
   // The wait here has an expired timeout, but we have a wake to consume,

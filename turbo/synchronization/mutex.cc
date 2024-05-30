@@ -61,7 +61,7 @@
 #include <turbo/debugging/symbolize.h>
 #include <turbo/synchronization/internal/graphcycles.h>
 #include <turbo/synchronization/internal/per_thread_sem.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 using turbo::base_internal::CurrentThreadIdentityIfPresent;
 using turbo::base_internal::CycleClock;
@@ -142,9 +142,9 @@ struct TURBO_CACHELINE_ALIGNED MutexGlobals {
 TURBO_CONST_INIT static MutexGlobals globals;
 
 turbo::Duration MeasureTimeToYield() {
-  turbo::Time before = turbo::Now();
+  turbo::Time before = turbo::Time::current_time();
   TURBO_INTERNAL_C_SYMBOL(TurboInternalMutexYield)();
-  return turbo::Now() - before;
+  return turbo::Time::current_time() - before;
 }
 
 const MutexGlobals& GetMutexGlobals() {

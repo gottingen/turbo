@@ -16,11 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-carbin_cc_bm(
-        NAME periodic_sampler_benchmark
-        MODULE profile
-        SOURCES periodic_sampler_benchmark.cc
-        LINKS turbo::turbo benchmark::benchmark benchmark::benchmark_main ${CARBIN_DEPS_LINK}
-        CXXOPTS ${USER_CXX_FLAGS}
+carbin_cc_binary(
+        NAME time_ex
+        SOURCES time_ex.cc
+        LINKS turbo::turbo
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
 )
-

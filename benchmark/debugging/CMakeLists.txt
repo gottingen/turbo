@@ -18,7 +18,7 @@
 
 carbin_cc_bm(
         NAME stacktrace_benchmark
-        MODULE base
+        MODULE debugging
         SOURCES stacktrace_benchmark.cc
         LINKS turbo::turbo benchmark::benchmark benchmark::benchmark_main ${CARBIN_DEPS_LINK}
         CXXOPTS ${USER_CXX_FLAGS}

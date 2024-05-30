@@ -33,3 +33,4 @@ carbin_cc_binary(
 )
 ]]
 add_subdirectory(log)
+add_subdirectory(times)

@@ -34,8 +34,8 @@
 #include <turbo/synchronization/internal/thread_pool.h>
 #include <turbo/synchronization/mutex.h>
 #include <turbo/synchronization/notification.h>
-#include <turbo/time/clock.h>
-#include <turbo/time/time.h>
+#include <turbo/times/clock.h>
+#include <turbo/times/time.h>
 
 #ifdef TURBO_INTERNAL_HAVE_SSE2
 constexpr int kProbeLength = 16;
@@ -85,7 +85,7 @@ HashtablezInfo* Register(HashtablezSampler* s, size_t size) {
 }
 
 TEST(HashtablezInfoTest, PrepareForSampling) {
-  turbo::Time test_start = turbo::Now();
+  turbo::Time test_start = turbo::Time::current_time();
   const int64_t test_stride = 123;
   const size_t test_element_size = 17;
   const size_t test_key_size = 15;
@@ -475,7 +475,7 @@ TEST(HashtablezSamplerTest, MultiThreaded) {
           case 2: {
             turbo::Duration oldest = turbo::ZeroDuration();
             sampler.Iterate([&](const HashtablezInfo& info) {
-              oldest = std::max(oldest, turbo::Now() - info.create_time);
+              oldest = std::max(oldest, turbo::Time::current_time() - info.create_time);
             });
             ASSERT_GE(oldest, turbo::ZeroDuration());
             break;

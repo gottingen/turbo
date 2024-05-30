@@ -32,7 +32,7 @@
 #include <turbo/base/attributes.h>
 #include <turbo/base/call_once.h>
 #include <turbo/base/config.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -53,9 +53,9 @@ int64_t KernelTimeout::SteadyClockNow() {
 }
 
 KernelTimeout::KernelTimeout(turbo::Time t) {
-  // `turbo::InfiniteFuture()` is a common "no timeout" value and cheaper to
+  // `turbo::Time::future_infinite()` is a common "no timeout" value and cheaper to
   // compare than convert.
-  if (t == turbo::InfiniteFuture()) {
+  if (t == turbo::Time::future_infinite()) {
     rep_ = kNoTimeout;
     return;
   }
