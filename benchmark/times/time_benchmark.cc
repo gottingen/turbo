@@ -41,7 +41,7 @@ namespace {
 void BM_Time_Arithmetic(benchmark::State& state) {
   const turbo::Duration nano = turbo::Nanoseconds(1);
   const turbo::Duration sec = turbo::Seconds(1);
-  turbo::Time t = turbo::UnixEpoch();
+  turbo::Time t = turbo::Time::from_unix_epoch();
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(t += nano);
     benchmark::DoNotOptimize(t -= sec);
@@ -141,7 +141,7 @@ void BM_Time_FromUnixMicros(benchmark::State& state) {
 BENCHMARK(BM_Time_FromUnixMicros);
 
 void BM_Time_ToUnixNanos(benchmark::State& state) {
-  const turbo::Time t = turbo::UnixEpoch() + turbo::Seconds(123);
+  const turbo::Time t = turbo::Time::from_unix_epoch() + turbo::Seconds(123);
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(ToUnixNanos(t));
   }
@@ -149,7 +149,7 @@ void BM_Time_ToUnixNanos(benchmark::State& state) {
 BENCHMARK(BM_Time_ToUnixNanos);
 
 void BM_Time_ToUnixMicros(benchmark::State& state) {
-  const turbo::Time t = turbo::UnixEpoch() + turbo::Seconds(123);
+  const turbo::Time t = turbo::Time::from_unix_epoch() + turbo::Seconds(123);
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(ToUnixMicros(t));
   }
@@ -157,7 +157,7 @@ void BM_Time_ToUnixMicros(benchmark::State& state) {
 BENCHMARK(BM_Time_ToUnixMicros);
 
 void BM_Time_ToUnixMillis(benchmark::State& state) {
-  const turbo::Time t = turbo::UnixEpoch() + turbo::Seconds(123);
+  const turbo::Time t = turbo::Time::from_unix_epoch() + turbo::Seconds(123);
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(ToUnixMillis(t));
   }
@@ -165,7 +165,7 @@ void BM_Time_ToUnixMillis(benchmark::State& state) {
 BENCHMARK(BM_Time_ToUnixMillis);
 
 void BM_Time_ToUnixSeconds(benchmark::State& state) {
-  const turbo::Time t = turbo::UnixEpoch() + turbo::Seconds(123);
+  const turbo::Time t = turbo::Time::from_unix_epoch() + turbo::Seconds(123);
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(turbo::ToUnixSeconds(t));
   }
@@ -299,7 +299,7 @@ void BM_Time_FromTimespec(benchmark::State& state) {
       ++ts.tv_sec;
       ts.tv_nsec = 0;
     }
-    benchmark::DoNotOptimize(turbo::TimeFromTimespec(ts));
+    benchmark::DoNotOptimize(turbo::Time::from_timespec(ts));
   }
 }
 BENCHMARK(BM_Time_FromTimespec);

@@ -844,9 +844,9 @@ namespace turbo {
         // readable by explicitly initializing all instances before use.
         //
         // Example:
-        //   turbo::Time t = turbo::UnixEpoch();
+        //   turbo::Time t = turbo::Time::from_unix_epoch();
         //   turbo::Time t = turbo::Time::current_time();
-        //   turbo::Time t = turbo::TimeFromTimeval(tv);
+        //   turbo::Time t = turbo::Time::from_timeval(tv);
         //   turbo::Time t = turbo::Time::past_infinite();
         constexpr Time() = default;
 
@@ -889,18 +889,68 @@ namespace turbo {
         TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Time from_seconds(int64_t s);
 
         TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Time from_time_t(time_t t);
+
+        // Time::from_udate()
+        // Time::from_universal()
+        //
+        // Creates an `turbo::Time` from a variety of other representations.  See
+        // https://unicode-org.github.io/icu/userguide/datetime/universaltimescale.html
+
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static Time from_udate(double udate);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static Time from_universal(int64_t universal);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static Time from_timespec(timespec ts);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static Time from_timeval(timeval tv);
+        // FromChrono()
+        //
+        // Converts a std::chrono::system_clock::time_point to an turbo::Time.
+        //
+        // Example:
+        //
+        //   auto tp = std::chrono::system_clock::from_time_t(123);
+        //   turbo::Time t = turbo::FromChrono(tp);
+        //   // t == turbo::Time::from_time_t(123)
+        TURBO_ATTRIBUTE_PURE_FUNCTION static Time from_chrono(const std::chrono::system_clock::time_point &tp);
+
+        // Time::from_tm()
+        //
+        // Converts the `tm_year`, `tm_mon`, `tm_mday`, `tm_hour`, `tm_min`, and
+        // `tm_sec` fields to an `turbo::Time` using the given time zone. See ctime(3)
+        // for a description of the expected values of the tm fields. If the civil time
+        // is unique (see `turbo::TimeZone::At(turbo::CivilSecond)` above), the matching
+        // time instant is returned.  Otherwise, the `tm_isdst` field is consulted to
+        // choose between the possible results.  For a repeated civil time, `tm_isdst !=
+        // 0` returns the matching DST instant, while `tm_isdst == 0` returns the
+        // matching non-DST instant.  For a skipped civil time there is no matching
+        // instant, so `tm_isdst != 0` returns the DST instant, and `tm_isdst == 0`
+        // returns the non-DST instant, that would have matched if the transition never
+        // happened.
+        TURBO_ATTRIBUTE_PURE_FUNCTION static Time from_tm(const struct tm &tm, TimeZone tz);
+
+        // Time::from_unix_epoch()
+        //
+        // Returns the `turbo::Time` representing "1970-01-01 00:00:00.0 +0000".
+        TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Time from_unix_epoch();
+
+        // Time::from_universal_epoch()
+        //
+        // Returns the `turbo::Time` representing "0001-01-01 00:00:00.0 +0000", the
+        // epoch of the ICU Universal Time Scale.
+        TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Time from_universal_epoch();
     public:
         // future_infinite()
         //
         // Returns an `turbo::Time` that is infinitely far in the future.
         TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Time future_infinite();
 
+    public:
         // past_infinite()
         //
         // Returns an `turbo::Time` that is infinitely far in the past.
         TURBO_ATTRIBUTE_CONST_FUNCTION static constexpr Time past_infinite();
-    public:
-
     public:
         template<typename H>
         friend H turbo_hash_value(H h, Time t) {
@@ -917,8 +967,6 @@ namespace turbo {
         friend constexpr bool operator==(Time lhs, Time rhs);
 
         friend Duration operator-(Time lhs, Time rhs);
-
-        friend constexpr Time UniversalEpoch();
 
         constexpr explicit Time(Duration rep) : rep_(rep) {}
 
@@ -950,7 +998,7 @@ namespace turbo {
         return !(lhs == rhs);
     }
 
-// Additive Operators
+    // Additive Operators
     TURBO_ATTRIBUTE_CONST_FUNCTION inline Time operator+(Time lhs, Duration rhs) {
         return lhs += rhs;
     }
@@ -967,48 +1015,20 @@ namespace turbo {
         return lhs.rep_ - rhs.rep_;
     }
 
-    // UnixEpoch()
+    // ToUnixNanos()
+    // ToUnixMicros()
+    // ToUnixMillis()
+    // ToUnixSeconds()
+    // ToTimeT()
+    // ToUDate()
+    // ToUniversal()
     //
-    // Returns the `turbo::Time` representing "1970-01-01 00:00:00.0 +0000".
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time UnixEpoch() { return Time(); }
-
-    // UniversalEpoch()
-    //
-    // Returns the `turbo::Time` representing "0001-01-01 00:00:00.0 +0000", the
-    // epoch of the ICU Universal Time Scale.
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time UniversalEpoch() {
-        // 719162 is the number of days from 0001-01-01 to 1970-01-01,
-        // assuming the Gregorian calendar.
-        return Time(
-                time_internal::MakeDuration(-24 * 719162 * int64_t{3600}, uint32_t{0}));
-    }
-
-
-    // FromUDate()
-    // FromUniversal()
-    //
-    // Creates an `turbo::Time` from a variety of other representations.  See
+    // Converts an `turbo::Time` to a variety of other representations.  See
     // https://unicode-org.github.io/icu/userguide/datetime/universaltimescale.html
-
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION Time FromUDate(double udate);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION Time FromUniversal(int64_t universal);
-
-// ToUnixNanos()
-// ToUnixMicros()
-// ToUnixMillis()
-// ToUnixSeconds()
-// ToTimeT()
-// ToUDate()
-// ToUniversal()
-//
-// Converts an `turbo::Time` to a variety of other representations.  See
-// https://unicode-org.github.io/icu/userguide/datetime/universaltimescale.html
-//
-// Note that these operations round down toward negative infinity where
-// necessary to adjust to the resolution of the result type.  Beware of
-// possible time_t over/underflow in ToTime{T,val,spec}() on 32-bit platforms.
+    //
+    // Note that these operations round down toward negative infinity where
+    // necessary to adjust to the resolution of the result type.  Beware of
+    // possible time_t over/underflow in ToTime{T,val,spec}() on 32-bit platforms.
     TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToUnixNanos(Time t);
 
     TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToUnixMicros(Time t);
@@ -1023,20 +1043,20 @@ namespace turbo {
 
     TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToUniversal(Time t);
 
-// DurationFromTimespec()
-// DurationFromTimeval()
-// ToTimespec()
-// ToTimeval()
-// TimeFromTimespec()
-// TimeFromTimeval()
-// ToTimespec()
-// ToTimeval()
-//
-// Some APIs use a timespec or a timeval as a Duration (e.g., nanosleep(2)
-// and select(2)), while others use them as a Time (e.g. clock_gettime(2)
-// and gettimeofday(2)), so conversion functions are provided for both cases.
-// The "to timespec/val" direction is easily handled via overloading, but
-// for "from timespec/val" the desired type is part of the function name.
+    // DurationFromTimespec()
+    // DurationFromTimeval()
+    // ToTimespec()
+    // ToTimeval()
+    // Time::from_timespec()
+    // Time::from_timeval()
+    // ToTimespec()
+    // ToTimeval()
+    //
+    // Some APIs use a timespec or a timeval as a Duration (e.g., nanosleep(2)
+    // and select(2)), while others use them as a Time (e.g. clock_gettime(2)
+    // and gettimeofday(2)), so conversion functions are provided for both cases.
+    // The "to timespec/val" direction is easily handled via overloading, but
+    // for "from timespec/val" the desired type is part of the function name.
     TURBO_ATTRIBUTE_CONST_FUNCTION Duration DurationFromTimespec(timespec ts);
 
     TURBO_ATTRIBUTE_CONST_FUNCTION Duration DurationFromTimeval(timeval tv);
@@ -1045,60 +1065,44 @@ namespace turbo {
 
     TURBO_ATTRIBUTE_CONST_FUNCTION timeval ToTimeval(Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION Time TimeFromTimespec(timespec ts);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION Time TimeFromTimeval(timeval tv);
-
     TURBO_ATTRIBUTE_CONST_FUNCTION timespec ToTimespec(Time t);
 
     TURBO_ATTRIBUTE_CONST_FUNCTION timeval ToTimeval(Time t);
 
-// FromChrono()
-//
-// Converts a std::chrono::system_clock::time_point to an turbo::Time.
-//
-// Example:
-//
-//   auto tp = std::chrono::system_clock::from_time_t(123);
-//   turbo::Time t = turbo::FromChrono(tp);
-//   // t == turbo::Time::from_time_t(123)
-    TURBO_ATTRIBUTE_PURE_FUNCTION Time
-    FromChrono(const std::chrono::system_clock::time_point &tp);
-
-// ToChronoTime()
-//
-// Converts an turbo::Time to a std::chrono::system_clock::time_point. If
-// overflow would occur, the returned value will saturate at the min/max time
-// point value instead.
-//
-// Example:
-//
-//   turbo::Time t = turbo::Time::from_time_t(123);
-//   auto tp = turbo::ToChronoTime(t);
-//   // tp == std::chrono::system_clock::from_time_t(123);
+    // ToChronoTime()
+    //
+    // Converts an turbo::Time to a std::chrono::system_clock::time_point. If
+    // overflow would occur, the returned value will saturate at the min/max time
+    // point value instead.
+    //
+    // Example:
+    //
+    //   turbo::Time t = turbo::Time::from_time_t(123);
+    //   auto tp = turbo::ToChronoTime(t);
+    //   // tp == std::chrono::system_clock::from_time_t(123);
     TURBO_ATTRIBUTE_CONST_FUNCTION std::chrono::system_clock::time_point
     ToChronoTime(Time);
 
-// turbo_parse_flag()
-//
-// Parses the command-line flag string representation `text` into a Time value.
-// Time flags must be specified in a format that matches turbo::RFC3339_full.
-//
-// For example:
-//
-//   --start_time=2016-01-02T03:04:05.678+08:00
-//
-// Note: A UTC offset (or 'Z' indicating a zero-offset from UTC) is required.
-//
-// Additionally, if you'd like to specify a time as a count of
-// seconds/milliseconds/etc from the Unix epoch, use an turbo::Duration flag
-// and add that duration to turbo::UnixEpoch() to get an turbo::Time.
+    // turbo_parse_flag()
+    //
+    // Parses the command-line flag string representation `text` into a Time value.
+    // Time flags must be specified in a format that matches turbo::RFC3339_full.
+    //
+    // For example:
+    //
+    //   --start_time=2016-01-02T03:04:05.678+08:00
+    //
+    // Note: A UTC offset (or 'Z' indicating a zero-offset from UTC) is required.
+    //
+    // Additionally, if you'd like to specify a time as a count of
+    // seconds/milliseconds/etc from the Unix epoch, use an turbo::Duration flag
+    // and add that duration to turbo::Time::from_unix_epoch() to get an turbo::Time.
     bool turbo_parse_flag(turbo::string_view text, Time *t, std::string *error);
 
-// turbo_unparse_flag()
-//
-// Unparses a Time value into a command-line string representation using
-// the format specified by `turbo::ParseTime()`.
+    // turbo_unparse_flag()
+    //
+    // Unparses a Time value into a command-line string representation using
+    // the format specified by `turbo::ParseTime()`.
     std::string turbo_unparse_flag(Time t);
 
     TURBO_DEPRECATED("Use turbo_parse_flag() instead.")
@@ -1109,34 +1113,34 @@ namespace turbo {
 
     std::string UnparseFlag(Time t);
 
-// TimeZone
-//
-// The `turbo::TimeZone` is an opaque, small, value-type class representing a
-// geo-political region within which particular rules are used for converting
-// between absolute and civil times (see https://git.io/v59Ly). `turbo::TimeZone`
-// values are named using the TZ identifiers from the IANA Time Zone Database,
-// such as "America/Los_Angeles" or "Australia/Sydney". `turbo::TimeZone` values
-// are created from factory functions such as `turbo::LoadTimeZone()`. Note:
-// strings like "PST" and "EDT" are not valid TZ identifiers. Prefer to pass by
-// value rather than const reference.
-//
-// For more on the fundamental concepts of time zones, absolute times, and civil
-// times, see https://github.com/google/cctz#fundamental-concepts
-//
-// Examples:
-//
-//   turbo::TimeZone utc = turbo::UTCTimeZone();
-//   turbo::TimeZone pst = turbo::FixedTimeZone(-8 * 60 * 60);
-//   turbo::TimeZone loc = turbo::LocalTimeZone();
-//   turbo::TimeZone lax;
-//   if (!turbo::LoadTimeZone("America/Los_Angeles", &lax)) {
-//     // handle error case
-//   }
-//
-// See also:
-// - https://github.com/google/cctz
-// - https://www.iana.org/time-zones
-// - https://en.wikipedia.org/wiki/Zoneinfo
+    // TimeZone
+    //
+    // The `turbo::TimeZone` is an opaque, small, value-type class representing a
+    // geo-political region within which particular rules are used for converting
+    // between absolute and civil times (see https://git.io/v59Ly). `turbo::TimeZone`
+    // values are named using the TZ identifiers from the IANA Time Zone Database,
+    // such as "America/Los_Angeles" or "Australia/Sydney". `turbo::TimeZone` values
+    // are created from factory functions such as `turbo::LoadTimeZone()`. Note:
+    // strings like "PST" and "EDT" are not valid TZ identifiers. Prefer to pass by
+    // value rather than const reference.
+    //
+    // For more on the fundamental concepts of time zones, absolute times, and civil
+    // times, see https://github.com/google/cctz#fundamental-concepts
+    //
+    // Examples:
+    //
+    //   turbo::TimeZone utc = turbo::UTCTimeZone();
+    //   turbo::TimeZone pst = turbo::FixedTimeZone(-8 * 60 * 60);
+    //   turbo::TimeZone loc = turbo::LocalTimeZone();
+    //   turbo::TimeZone lax;
+    //   if (!turbo::LoadTimeZone("America/Los_Angeles", &lax)) {
+    //     // handle error case
+    //   }
+    //
+    // See also:
+    // - https://github.com/google/cctz
+    // - https://www.iana.org/time-zones
+    // - https://en.wikipedia.org/wiki/Zoneinfo
     class TimeZone {
     public:
         explicit TimeZone(time_internal::cctz::time_zone tz) : cz_(tz) {}
@@ -1180,7 +1184,7 @@ namespace turbo {
         //
         // Example:
         //
-        //   const auto epoch = lax.At(turbo::UnixEpoch());
+        //   const auto epoch = lax.At(turbo::Time::from_unix_epoch());
         //   // epoch.cs == 1969-12-31 16:00:00
         //   // epoch.subsecond == turbo::ZeroDuration()
         //   // epoch.offset == -28800
@@ -1478,21 +1482,6 @@ namespace turbo {
         TURBO_INTERNAL_RESTORE_DEPRECATED_DECLARATION_WARNING
     }
 
-    // FromTM()
-    //
-    // Converts the `tm_year`, `tm_mon`, `tm_mday`, `tm_hour`, `tm_min`, and
-    // `tm_sec` fields to an `turbo::Time` using the given time zone. See ctime(3)
-    // for a description of the expected values of the tm fields. If the civil time
-    // is unique (see `turbo::TimeZone::At(turbo::CivilSecond)` above), the matching
-    // time instant is returned.  Otherwise, the `tm_isdst` field is consulted to
-    // choose between the possible results.  For a repeated civil time, `tm_isdst !=
-    // 0` returns the matching DST instant, while `tm_isdst == 0` returns the
-    // matching non-DST instant.  For a skipped civil time there is no matching
-    // instant, so `tm_isdst != 0` returns the DST instant, and `tm_isdst == 0`
-    // returns the non-DST instant, that would have matched if the transition never
-    // happened.
-    TURBO_ATTRIBUTE_PURE_FUNCTION Time FromTM(const struct tm &tm, TimeZone tz);
-
     // ToTM()
     //
     // Converts the given `turbo::Time` to a struct tm using the given time zone.
@@ -1714,7 +1703,7 @@ namespace turbo {
         // Map between a Time and a Duration since the Unix epoch.  Note that these
         // functions depend on the above mentioned choice of the Unix epoch for the
         // Time representation (and both need to be Time friends).  Without this
-        // knowledge, we would need to add-in/subtract-out UnixEpoch() respectively.
+        // knowledge, we would need to add-in/subtract-out Time::from_unix_epoch() respectively.
         TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time FromUnixDuration(Duration d) {
             return Time(d);
         }
@@ -1948,6 +1937,22 @@ namespace turbo {
     TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time Time::past_infinite() {
         return Time(time_internal::MakeDuration((std::numeric_limits<int64_t>::min)(),
                                                 ~uint32_t{0}));
+    }
+
+    // Time::from_unix_epoch()
+    //
+    // Returns the `turbo::Time` representing "1970-01-01 00:00:00.0 +0000".
+    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time Time::from_unix_epoch() { return Time(); }
+
+    // Time::from_universal_epoch()
+    //
+    // Returns the `turbo::Time` representing "0001-01-01 00:00:00.0 +0000", the
+    // epoch of the ICU Universal Time Scale.
+    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time Time::from_universal_epoch() {
+        // 719162 is the number of days from 0001-01-01 to 1970-01-01,
+        // assuming the Gregorian calendar.
+        return Time(
+                time_internal::MakeDuration(-24 * 719162 * int64_t{3600}, uint32_t{0}));
     }
 }
 

@@ -149,7 +149,7 @@ namespace turbo {
         tm.tm_hour = _rotation_hour;
         tm.tm_min = _rotation_minute;
         tm.tm_sec = 0;
-        auto rotation_time = turbo::FromTM(tm, turbo::LocalTimeZone());
+        auto rotation_time = turbo::Time::from_tm(tm, turbo::LocalTimeZone());
         if (rotation_time > stamp) {
             return rotation_time;
         }

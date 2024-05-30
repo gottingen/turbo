@@ -171,7 +171,7 @@ TEST_F(PerThreadSemTest, Timeouts) {
       << "Wait returned " << delay - elapsed
       << " early (with " << slop << " slop), start time was " << start;
 
-  turbo::Time negative_timeout = turbo::UnixEpoch() - turbo::Milliseconds(100);
+  turbo::Time negative_timeout = turbo::Time::from_unix_epoch() - turbo::Milliseconds(100);
   EXPECT_FALSE(Wait(negative_timeout));
   EXPECT_LE(negative_timeout, turbo::Time::current_time() + slop);  // trivially true :)
 

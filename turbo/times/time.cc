@@ -180,12 +180,12 @@ namespace turbo {
     // Conversions from/to other time types.
     //
 
-    turbo::Time FromUDate(double udate) {
+    turbo::Time Time::from_udate(double udate) {
         return time_internal::FromUnixDuration(turbo::Milliseconds(udate));
     }
 
-    turbo::Time FromUniversal(int64_t universal) {
-        return turbo::UniversalEpoch() + 100 * turbo::Nanoseconds(universal);
+    turbo::Time Time::from_universal(int64_t universal) {
+        return turbo::Time::from_universal_epoch() + 100 * turbo::Nanoseconds(universal);
     }
 
     int64_t ToUnixNanos(Time t) {
@@ -230,14 +230,14 @@ namespace turbo {
     }
 
     int64_t ToUniversal(turbo::Time t) {
-        return turbo::FloorToUnit(t - turbo::UniversalEpoch(), turbo::Nanoseconds(100));
+        return turbo::FloorToUnit(t - turbo::Time::from_universal_epoch(), turbo::Nanoseconds(100));
     }
 
-    turbo::Time TimeFromTimespec(timespec ts) {
+    turbo::Time Time::from_timespec(timespec ts) {
         return time_internal::FromUnixDuration(turbo::DurationFromTimespec(ts));
     }
 
-    turbo::Time TimeFromTimeval(timeval tv) {
+    turbo::Time Time::from_timeval(timeval tv) {
         return time_internal::FromUnixDuration(turbo::DurationFromTimeval(tv));
     }
 
@@ -279,7 +279,7 @@ namespace turbo {
         return tv;
     }
 
-    Time FromChrono(const std::chrono::system_clock::time_point &tp) {
+    Time Time::from_chrono(const std::chrono::system_clock::time_point &tp) {
         return time_internal::FromUnixDuration(time_internal::FromChrono(
                 tp - std::chrono::system_clock::from_time_t(0)));
     }
@@ -382,7 +382,7 @@ namespace turbo {
 
     TURBO_INTERNAL_RESTORE_DEPRECATED_DECLARATION_WARNING
 
-    turbo::Time FromTM(const struct tm &tm, turbo::TimeZone tz) {
+    turbo::Time Time::from_tm(const struct tm &tm, turbo::TimeZone tz) {
         civil_year_t tm_year = tm.tm_year;
         // Avoids years that are too extreme for CivilSecond to normalize.
         if (tm_year > 300000000000ll) return Time::future_infinite();

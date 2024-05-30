@@ -148,7 +148,7 @@ namespace {
 
         // Simple edge cases.
         EXPECT_TRUE(turbo::ParseTime("", "", &t, &err)) << err;
-        EXPECT_EQ(turbo::UnixEpoch(), t);  // everything defaulted
+        EXPECT_EQ(turbo::Time::from_unix_epoch(), t);  // everything defaulted
         EXPECT_TRUE(turbo::ParseTime(" ", " ", &t, &err)) << err;
         EXPECT_TRUE(turbo::ParseTime("  ", "  ", &t, &err)) << err;
         EXPECT_TRUE(turbo::ParseTime("x", "x", &t, &err)) << err;
@@ -257,25 +257,25 @@ namespace {
         // Here is a "%E*S" case we got wrong for a while.  The fractional
         // part of the first instant is less than 2^31 and was correctly
         // parsed, while the second (and any subsecond field >=2^31) failed.
-        t = turbo::UnixEpoch();
+        t = turbo::Time::from_unix_epoch();
         EXPECT_TRUE(turbo::ParseTime("%E*S", "0.2147483647", &t, &err)) << err;
-        EXPECT_EQ(turbo::UnixEpoch() + turbo::Nanoseconds(214748364) +
+        EXPECT_EQ(turbo::Time::from_unix_epoch() + turbo::Nanoseconds(214748364) +
                   turbo::Nanoseconds(1) / 2,
                   t);
-        t = turbo::UnixEpoch();
+        t = turbo::Time::from_unix_epoch();
         EXPECT_TRUE(turbo::ParseTime("%E*S", "0.2147483648", &t, &err)) << err;
-        EXPECT_EQ(turbo::UnixEpoch() + turbo::Nanoseconds(214748364) +
+        EXPECT_EQ(turbo::Time::from_unix_epoch() + turbo::Nanoseconds(214748364) +
                   turbo::Nanoseconds(3) / 4,
                   t);
 
         // We should also be able to specify long strings of digits far
         // beyond the current resolution and have them convert the same way.
-        t = turbo::UnixEpoch();
+        t = turbo::Time::from_unix_epoch();
         EXPECT_TRUE(turbo::ParseTime(
                 "%E*S", "0.214748364801234567890123456789012345678901234567890123456789",
                 &t, &err))
                             << err;
-        EXPECT_EQ(turbo::UnixEpoch() + turbo::Nanoseconds(214748364) +
+        EXPECT_EQ(turbo::Time::from_unix_epoch() + turbo::Nanoseconds(214748364) +
                   turbo::Nanoseconds(3) / 4,
                   t);
     }
