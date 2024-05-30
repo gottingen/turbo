@@ -145,13 +145,13 @@ class FlagHelpPrettyPrinter {
 
     std::vector<turbo::string_view> tokens;
     if (wrap_line) {
-      for (auto line : turbo::StrSplit(str, turbo::ByAnyChar("\n\r"))) {
+      for (auto line : turbo::str_split(str, turbo::ByAnyChar("\n\r"))) {
         if (!tokens.empty()) {
           // Keep line separators in the input string.
           tokens.emplace_back("\n");
         }
         for (auto token :
-             turbo::StrSplit(line, turbo::ByAnyChar(" \t"), turbo::SkipEmpty())) {
+             turbo::str_split(line, turbo::ByAnyChar(" \t"), turbo::SkipEmpty())) {
           tokens.push_back(token);
         }
       }

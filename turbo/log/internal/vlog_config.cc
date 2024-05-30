@@ -287,7 +287,7 @@ void UpdateVLogSites() TURBO_UNLOCK_FUNCTION(mutex)
 void UpdateVModule(turbo::string_view vmodule)
     TURBO_LOCKS_EXCLUDED(mutex, GetUpdateSitesMutex()) {
   std::vector<std::pair<turbo::string_view, int>> glob_levels;
-  for (turbo::string_view glob_level : turbo::StrSplit(vmodule, ',')) {
+  for (turbo::string_view glob_level : turbo::str_split(vmodule, ',')) {
     const size_t eq = glob_level.rfind('=');
     if (eq == glob_level.npos) continue;
     const turbo::string_view glob = glob_level.substr(0, eq);

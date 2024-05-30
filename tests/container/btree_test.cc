@@ -1610,7 +1610,7 @@ TEST(Btree, ConstIteratorAccessors) {
 }
 
 TEST(Btree, StrSplitCompatible) {
-  const turbo::btree_set<std::string> split_set = turbo::StrSplit("a,b,c", ',');
+  const turbo::btree_set<std::string> split_set = turbo::str_split("a,b,c", ',');
   const turbo::btree_set<std::string> expected_set = {"a", "b", "c"};
 
   EXPECT_EQ(split_set, expected_set);

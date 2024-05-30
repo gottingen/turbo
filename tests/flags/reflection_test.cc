@@ -110,7 +110,7 @@ struct CustomUDT {
 };
 bool turbo_parse_flag(turbo::string_view in, CustomUDT* f, std::string*) {
   std::vector<turbo::string_view> parts =
-      turbo::StrSplit(in, ':', turbo::SkipWhitespace());
+      turbo::str_split(in, ':', turbo::SkipWhitespace());
 
   if (parts.size() != 2) return false;
 
