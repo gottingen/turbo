@@ -44,7 +44,7 @@ namespace {
     //
 
     TEST(FormatTime, Basics) {
-        turbo::TimeZone tz = turbo::UTCTimeZone();
+        turbo::TimeZone tz = turbo::TimeZone::utc();
         turbo::Time t = turbo::Time::from_time_t(0);
 
         // Starts with a couple basic edge cases.
@@ -68,7 +68,7 @@ namespace {
     }
 
     TEST(FormatTime, LocaleSpecific) {
-        const turbo::TimeZone tz = turbo::UTCTimeZone();
+        const turbo::TimeZone tz = turbo::TimeZone::utc();
         turbo::Time t = turbo::Time::from_time_t(0);
 
         TestFormatSpecifier(t, tz, "%a", "Thu");
@@ -78,7 +78,7 @@ namespace {
 
         // %c should at least produce the numeric year and time-of-day.
         const std::string s =
-                turbo::Time::format("%c", turbo::Time::from_time_t(0), turbo::UTCTimeZone());
+                turbo::Time::format("%c", turbo::Time::from_time_t(0), turbo::TimeZone::utc());
         EXPECT_THAT(s, HasSubstr("1970"));
         EXPECT_THAT(s, HasSubstr("00:00:00"));
 
@@ -88,7 +88,7 @@ namespace {
     }
 
     TEST(FormatTime, ExtendedSeconds) {
-        const turbo::TimeZone tz = turbo::UTCTimeZone();
+        const turbo::TimeZone tz = turbo::TimeZone::utc();
 
         // No subseconds.
         turbo::Time t = turbo::Time::from_time_t(0) + turbo::Seconds(5);
@@ -118,7 +118,7 @@ namespace {
     }
 
     TEST(FormatTime, RFC1123FormatPadsYear) {  // locale specific
-        turbo::TimeZone tz = turbo::UTCTimeZone();
+        turbo::TimeZone tz = turbo::TimeZone::utc();
 
         // A year of 77 should be padded to 0077.
         turbo::Time t = turbo::Time::from_civil(turbo::CivilSecond(77, 6, 28, 9, 8, 7), tz);
@@ -157,7 +157,7 @@ namespace {
         EXPECT_TRUE(turbo::Time::parse("%Y-%m-%d %H:%M:%S %z",
                                      "2013-06-28 19:08:09 -0800", &t, &err))
                             << err;
-        const auto ci = turbo::FixedTimeZone(-8 * 60 * 60).At(t);
+        const auto ci = turbo::TimeZone::fixed(-8 * 60 * 60).At(t);
         EXPECT_EQ(turbo::CivilSecond(2013, 6, 28, 19, 8, 9), ci.cs);
         EXPECT_EQ(turbo::ZeroDuration(), ci.subsecond);
     }
@@ -188,7 +188,7 @@ namespace {
         EXPECT_TRUE(turbo::Time::parse("%Y-%m-%d %H:%M:%S %z",
                                      "2013-06-28 19:08:09 +0800", tz, &t, &e))
                             << e;
-        ci = turbo::FixedTimeZone(8 * 60 * 60).At(t);
+        ci = turbo::TimeZone::fixed(8 * 60 * 60).At(t);
         EXPECT_EQ(turbo::CivilSecond(2013, 6, 28, 19, 8, 9), ci.cs);
         EXPECT_EQ(turbo::ZeroDuration(), ci.subsecond);
     }
@@ -331,7 +331,7 @@ namespace {
         EXPECT_EQ(turbo::Time::past_infinite(), t);
 
         // "infinite-future" as literal string
-        turbo::TimeZone tz = turbo::UTCTimeZone();
+        turbo::TimeZone tz = turbo::TimeZone::utc();
         EXPECT_TRUE(turbo::Time::parse("infinite-future %H:%M", "infinite-future 03:04",
                                      &t, &err));
         EXPECT_NE(turbo::Time::future_infinite(), t);
@@ -351,7 +351,7 @@ namespace {
     }
 
     TEST(ParseTime, FailsOnUnrepresentableTime) {
-        const turbo::TimeZone utc = turbo::UTCTimeZone();
+        const turbo::TimeZone utc = turbo::TimeZone::utc();
         turbo::Time t;
         EXPECT_FALSE(
                 turbo::Time::parse("%Y-%m-%d", "-292277022657-01-27", utc, &t, nullptr));
@@ -408,7 +408,7 @@ namespace {
         // but only in the 0-offset timezone.
         {
             turbo::Time out;
-            const std::string s = turbo::Time::format("%c", in, turbo::UTCTimeZone());
+            const std::string s = turbo::Time::format("%c", in, turbo::TimeZone::utc());
             EXPECT_TRUE(turbo::Time::parse("%c", s, &out, &err)) << s << ": " << err;
             EXPECT_EQ(in, out);
         }
@@ -416,7 +416,7 @@ namespace {
     }
 
     TEST(FormatParse, RoundTripDistantFuture) {
-        const turbo::TimeZone tz = turbo::UTCTimeZone();
+        const turbo::TimeZone tz = turbo::TimeZone::utc();
         const turbo::Time in =
                 turbo::Time::from_seconds(std::numeric_limits<int64_t>::max());
         std::string err;
@@ -429,7 +429,7 @@ namespace {
     }
 
     TEST(FormatParse, RoundTripDistantPast) {
-        const turbo::TimeZone tz = turbo::UTCTimeZone();
+        const turbo::TimeZone tz = turbo::TimeZone::utc();
         const turbo::Time in =
                 turbo::Time::from_seconds(std::numeric_limits<int64_t>::min());
         std::string err;

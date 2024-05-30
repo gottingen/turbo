@@ -41,7 +41,7 @@ namespace turbo {
         std::string FormatYearAnd(string_view fmt, CivilSecond cs) {
             const CivilSecond ncs(NormalizeYear(cs.year()), cs.month(), cs.day(),
                                   cs.hour(), cs.minute(), cs.second());
-            const TimeZone utc = UTCTimeZone();
+            const TimeZone utc = TimeZone::utc();
             return StrCat(cs.year(), Time::format(fmt, Time::from_civil(ncs, utc), utc));
         }
 
@@ -59,7 +59,7 @@ namespace turbo {
             if (endp == np || errno == ERANGE) return false;
             const std::string norm = StrCat(NormalizeYear(y), endp);
 
-            const TimeZone utc = UTCTimeZone();
+            const TimeZone utc = TimeZone::utc();
             Time t;
             if (Time::parse(StrCat("%Y", fmt), norm, utc, &t, nullptr)) {
                 const auto cs = Time::to_civil_second(t, utc);

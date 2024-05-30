@@ -111,7 +111,7 @@ namespace {
     BENCHMARK(BM_Time_ToDateTime_Libc);
 
     void BM_Time_ToDateTimeUTC_Turbo(benchmark::State &state) {
-        const turbo::TimeZone tz = turbo::UTCTimeZone();
+        const turbo::TimeZone tz = turbo::TimeZone::utc();
         turbo::Time t = turbo::Time::from_seconds(1384569027);
         while (state.KeepRunning()) {
             t += turbo::Seconds(1);
@@ -244,7 +244,7 @@ namespace {
     BENCHMARK(BM_Time_FromCivil_Libc);
 
     void BM_Time_FromCivilUTC_Turbo(benchmark::State &state) {
-        const turbo::TimeZone tz = turbo::UTCTimeZone();
+        const turbo::TimeZone tz = turbo::TimeZone::utc();
         while (state.KeepRunning()) {
             benchmark::DoNotOptimize(
                     turbo::Time::from_civil(turbo::CivilSecond(2014, 12, 18, 20, 16, 18), tz));

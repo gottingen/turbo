@@ -117,7 +117,7 @@ namespace {
     }
 
     TEST(Time, from_unix_epoch) {
-        const auto ci = turbo::UTCTimeZone().At(turbo::Time::from_unix_epoch());
+        const auto ci = turbo::TimeZone::utc().At(turbo::Time::from_unix_epoch());
         EXPECT_EQ(turbo::CivilSecond(1970, 1, 1, 0, 0, 0), ci.cs);
         EXPECT_EQ(turbo::ZeroDuration(), ci.subsecond);
         EXPECT_EQ(turbo::Weekday::thursday, turbo::GetWeekday(ci.cs));
@@ -683,13 +683,13 @@ namespace {
         EXPECT_EQ("Wed, 31 Dec 1969 18:59:59 -0500 (EST)",
                   turbo::Time::format(fmt, minus1_cl.pre, nyc));
         EXPECT_EQ("Wed, 31 Dec 1969 23:59:59 +0000 (UTC)",
-                  turbo::Time::format(fmt, minus1_cl.pre, turbo::UTCTimeZone()));
+                  turbo::Time::format(fmt, minus1_cl.pre, turbo::TimeZone::utc()));
     }
 
-    // Time::from_civil(CivilSecond(year, mon, day, hour, min, sec), UTCTimeZone())
+    // Time::from_civil(CivilSecond(year, mon, day, hour, min, sec), TimeZone::utc())
     // has a specialized fastpath implementation, which we exercise here.
     TEST(Time, FromCivilUTC) {
-        const turbo::TimeZone utc = turbo::UTCTimeZone();
+        const turbo::TimeZone utc = turbo::TimeZone::utc();
         const std::string fmt = "%a, %e %b %Y %H:%M:%S %z (%Z)";
         const int kMax = std::numeric_limits<int>::max();
         const int kMin = std::numeric_limits<int>::min();
@@ -729,7 +729,7 @@ namespace {
     }
 
     TEST(Time, ToTM) {
-        const turbo::TimeZone utc = turbo::UTCTimeZone();
+        const turbo::TimeZone utc = turbo::TimeZone::utc();
 
         // Compares the results of turbo::ToTM() to gmtime_r() for lots of times over
         // the course of a few days.
@@ -861,9 +861,9 @@ namespace {
         tm.tm_min = 2;
         tm.tm_sec = 3;
         tm.tm_isdst = -1;
-        t = turbo::Time::from_tm(tm, turbo::UTCTimeZone());
+        t = turbo::Time::from_tm(tm, turbo::TimeZone::utc());
         EXPECT_EQ("2147483648-06-28T01:02:03+00:00",
-                  turbo::Time::format(t, turbo::UTCTimeZone()));
+                  turbo::Time::format(t, turbo::TimeZone::utc()));
 
         // Adjusts tm to refer to a time with a very large month.
         tm.tm_year = 2019 - 1900;
@@ -873,9 +873,9 @@ namespace {
         tm.tm_min = 2;
         tm.tm_sec = 3;
         tm.tm_isdst = -1;
-        t = turbo::Time::from_tm(tm, turbo::UTCTimeZone());
+        t = turbo::Time::from_tm(tm, turbo::TimeZone::utc());
         EXPECT_EQ("178958989-08-28T01:02:03+00:00",
-                  turbo::Time::format(t, turbo::UTCTimeZone()));
+                  turbo::Time::format(t, turbo::TimeZone::utc()));
     }
 
     TEST(Time, TMRoundTrip) {
@@ -958,7 +958,7 @@ namespace {
     }
 
     TEST(Time, ConversionSaturation) {
-        const turbo::TimeZone utc = turbo::UTCTimeZone();
+        const turbo::TimeZone utc = turbo::TimeZone::utc();
         turbo::Time t;
 
         const auto max_time_t = std::numeric_limits<time_t>::max();
@@ -1083,7 +1083,7 @@ namespace {
                 t);
 
         // Checks that we can also get the maximal Time value for a far-east zone.
-        const turbo::TimeZone plus14 = turbo::FixedTimeZone(14 * 60 * 60);
+        const turbo::TimeZone plus14 = turbo::TimeZone::fixed(14 * 60 * 60);
         t = turbo::Time::from_civil(turbo::CivilSecond(292277026596, 12, 5, 5, 30, 7), plus14);
         EXPECT_EQ("292277026596-12-05T05:30:07+14:00",
                   turbo::Time::format(turbo::RFC3339_full, t, plus14));
@@ -1107,7 +1107,7 @@ namespace {
                 t);
 
         // Checks that we can also get the minimal Time value for a far-west zone.
-        const turbo::TimeZone minus12 = turbo::FixedTimeZone(-12 * 60 * 60);
+        const turbo::TimeZone minus12 = turbo::TimeZone::fixed(-12 * 60 * 60);
         t = turbo::Time::from_civil(turbo::CivilSecond(-292277022657, 1, 26, 20, 29, 52),
                              minus12);
         EXPECT_EQ("-292277022657-01-26T20:29:52-12:00",
@@ -1164,7 +1164,7 @@ namespace {
     }
 
     TEST(Time, FromCivilAlignment) {
-        const turbo::TimeZone utc = turbo::UTCTimeZone();
+        const turbo::TimeZone utc = turbo::TimeZone::utc();
         const turbo::CivilSecond cs(2015, 2, 3, 4, 5, 6);
         turbo::Time t = turbo::Time::from_civil(cs, utc);
         EXPECT_EQ("2015-02-03T04:05:06+00:00", turbo::Time::format(t, utc));
@@ -1181,7 +1181,7 @@ namespace {
     }
 
     TEST(Time, NextTransitionUTC) {
-        const auto tz = turbo::UTCTimeZone();
+        const auto tz = turbo::TimeZone::utc();
         turbo::TimeZone::CivilTransition trans;
 
         auto t = turbo::Time::past_infinite();
@@ -1192,7 +1192,7 @@ namespace {
     }
 
     TEST(Time, PrevTransitionUTC) {
-        const auto tz = turbo::UTCTimeZone();
+        const auto tz = turbo::TimeZone::utc();
         turbo::TimeZone::CivilTransition trans;
 
         auto t = turbo::Time::future_infinite();

@@ -62,7 +62,7 @@ namespace turbo {
             init_file_queue();
         }
         auto now = turbo::Time::current_time();
-        auto filename = calc_hourly_filename(_base_filename, turbo::Time::to_tm(now, turbo::LocalTimeZone()));
+        auto filename = calc_hourly_filename(_base_filename, turbo::Time::to_tm(now, turbo::TimeZone::local()));
         _file_writer = std::make_unique<log_internal::AppendFile>();
         if (_truncate) {
             ::remove(filename.c_str());
@@ -99,7 +99,7 @@ namespace turbo {
         _files = circular_queue<std::string>(static_cast<size_t>(_max_files));
         auto now = turbo::Time::current_time();
         while (filenames.size() < _max_files) {
-            auto filename = calc_hourly_filename(_base_filename, turbo::Time::to_tm(now, turbo::LocalTimeZone()));
+            auto filename = calc_hourly_filename(_base_filename, turbo::Time::to_tm(now, turbo::TimeZone::local()));
             if (!log_internal::path_exists(filename)) {
                 break;
             }
@@ -121,7 +121,7 @@ namespace turbo {
             return;
         }
         _next_rotation_time = next_rotation_time(stamp);
-        auto filename = calc_hourly_filename(_base_filename, turbo::Time::to_tm(stamp, turbo::LocalTimeZone()));
+        auto filename = calc_hourly_filename(_base_filename, turbo::Time::to_tm(stamp, turbo::TimeZone::local()));
         _file_writer->close();
         _file_writer.reset();
         _file_writer = std::make_unique<log_internal::AppendFile>();
@@ -144,10 +144,10 @@ namespace turbo {
     }
 
     turbo::Time HourlyFileSink::next_rotation_time(turbo::Time stamp) const {
-        auto tm = turbo::Time::to_tm(stamp, turbo::LocalTimeZone());
+        auto tm = turbo::Time::to_tm(stamp, turbo::TimeZone::local());
         tm.tm_min = _rotation_minute;
         tm.tm_sec = 0;
-        auto rotation_time = turbo::Time::from_tm(tm, turbo::LocalTimeZone());
+        auto rotation_time = turbo::Time::from_tm(tm, turbo::TimeZone::local());
         if (rotation_time > stamp) {
             return rotation_time;
         }

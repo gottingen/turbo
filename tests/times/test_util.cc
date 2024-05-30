@@ -26,7 +26,7 @@ namespace time_internal {
 
 TimeZone LoadTimeZone(const std::string& name) {
   TimeZone tz;
-  TURBO_RAW_CHECK(LoadTimeZone(name, &tz), name.c_str());
+  TURBO_RAW_CHECK(turbo::TimeZone::load(name, &tz), name.c_str());
   return tz;
 }
 

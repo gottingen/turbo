@@ -42,8 +42,8 @@
 // Example:
 //
 //   turbo::TimeZone nyc;
-//   // LoadTimeZone() may fail so it's always better to check for success.
-//   if (!turbo::LoadTimeZone("America/New_York", &nyc)) {
+//   // TimeZone::load() may fail so it's always better to check for success.
+//   if (!turbo::TimeZone::load("America/New_York", &nyc)) {
 //      // handle error case
 //   }
 //
@@ -55,7 +55,7 @@
 //   turbo::Time landing = takeoff + flight_duration;
 //
 //   turbo::TimeZone syd;
-//   if (!turbo::LoadTimeZone("Australia/Sydney", &syd)) {
+//   if (!turbo::TimeZone::load("Australia/Sydney", &syd)) {
 //      // handle error case
 //   }
 //   std::string s = turbo::Time::format(
@@ -1140,7 +1140,7 @@ namespace turbo {
 
         // Convenience functions that format the given time using the RFC3339_full
         // format.  The first overload uses the provided TimeZone, while the second
-        // uses LocalTimeZone().
+        // uses TimeZone::local().
         TURBO_ATTRIBUTE_PURE_FUNCTION static std::string format(Time t, TimeZone tz);
 
         TURBO_ATTRIBUTE_PURE_FUNCTION static std::string format(Time t);
@@ -1269,7 +1269,7 @@ namespace turbo {
     // between absolute and civil times (see https://git.io/v59Ly). `turbo::TimeZone`
     // values are named using the TZ identifiers from the IANA Time Zone Database,
     // such as "America/Los_Angeles" or "Australia/Sydney". `turbo::TimeZone` values
-    // are created from factory functions such as `turbo::LoadTimeZone()`. Note:
+    // are created from factory functions such as `turbo::TimeZone::load()`. Note:
     // strings like "PST" and "EDT" are not valid TZ identifiers. Prefer to pass by
     // value rather than const reference.
     //
@@ -1278,11 +1278,11 @@ namespace turbo {
     //
     // Examples:
     //
-    //   turbo::TimeZone utc = turbo::UTCTimeZone();
-    //   turbo::TimeZone pst = turbo::FixedTimeZone(-8 * 60 * 60);
-    //   turbo::TimeZone loc = turbo::LocalTimeZone();
+    //   turbo::TimeZone utc = turbo::TimeZone::utc();
+    //   turbo::TimeZone pst = turbo::TimeZone::fixed(-8 * 60 * 60);
+    //   turbo::TimeZone loc = turbo::TimeZone::local();
     //   turbo::TimeZone lax;
-    //   if (!turbo::LoadTimeZone("America/Los_Angeles", &lax)) {
+    //   if (!turbo::TimeZone::load("America/Los_Angeles", &lax)) {
     //     // handle error case
     //   }
     //
@@ -1294,7 +1294,7 @@ namespace turbo {
     public:
         explicit TimeZone(time_internal::cctz::time_zone tz) : cz_(tz) {}
 
-        TimeZone() = default;  // UTC, but prefer UTCTimeZone() to be explicit.
+        TimeZone() = default;  // UTC, but prefer TimeZone::utc() to be explicit.
 
         // Copyable.
         TimeZone(const TimeZone &) = default;
@@ -1304,6 +1304,33 @@ namespace turbo {
         explicit operator time_internal::cctz::time_zone() const { return cz_; }
 
         std::string name() const { return cz_.name(); }
+    public:
+        // TimeZone::load()`
+        //
+        // Loads the named zone. May perform I/O on the initial load of the named
+        // zone. If the name is invalid, or some other kind of error occurs, returns
+        // `false` and `*tz` is set to the UTC time zone.
+        static bool load(turbo::string_view name, TimeZone *tz);
+
+        // TimeZone::fixed()
+        //
+        // Returns a TimeZone that is a fixed offset (seconds east) from UTC.
+        // Note: If the absolute value of the offset is greater than 24 hours
+        // you'll get UTC (i.e., no offset) instead.
+        static TimeZone fixed(int seconds);
+
+        // TimeZone::utc()
+        //
+        // Convenience method returning the UTC time zone.
+        static TimeZone utc();
+
+        // TimeZone::local()
+        //
+        // Convenience method returning the local time zone, or UTC if there is
+        // no configured local zone.  Warning: Be wary of using TimeZone::local(),
+        // and particularly so in a server process, as the zone configured for the
+        // local machine should be irrelevant.  Prefer an explicit zone name.
+        static TimeZone local();
 
         // TimeZone::CivilInfo
         //
@@ -1420,7 +1447,7 @@ namespace turbo {
         //
         // Example:
         //   turbo::TimeZone nyc;
-        //   if (!turbo::LoadTimeZone("America/New_York", &nyc)) { ... }
+        //   if (!turbo::TimeZone::load("America/New_York", &nyc)) { ... }
         //   const auto now = turbo::Time::current_time();
         //   auto t = turbo::Time::past_infinite();
         //   turbo::TimeZone::CivilTransition trans;
@@ -1454,12 +1481,7 @@ namespace turbo {
         time_internal::cctz::time_zone cz_;
     };
 
-    // LoadTimeZone()
-    //
-    // Loads the named zone. May perform I/O on the initial load of the named
-    // zone. If the name is invalid, or some other kind of error occurs, returns
-    // `false` and `*tz` is set to the UTC time zone.
-    inline bool LoadTimeZone(turbo::string_view name, TimeZone *tz) {
+    inline bool TimeZone::load(turbo::string_view name, TimeZone *tz) {
         if (name == "localtime") {
             *tz = TimeZone(time_internal::cctz::local_time_zone());
             return true;
@@ -1470,30 +1492,22 @@ namespace turbo {
         return b;
     }
 
-    // FixedTimeZone()
-    //
-    // Returns a TimeZone that is a fixed offset (seconds east) from UTC.
-    // Note: If the absolute value of the offset is greater than 24 hours
-    // you'll get UTC (i.e., no offset) instead.
-    inline TimeZone FixedTimeZone(int seconds) {
+    inline TimeZone TimeZone::fixed(int seconds) {
         return TimeZone(
                 time_internal::cctz::fixed_time_zone(std::chrono::seconds(seconds)));
     }
 
-    // UTCTimeZone()
-    //
-    // Convenience method returning the UTC time zone.
-    inline TimeZone UTCTimeZone() {
+    inline TimeZone TimeZone::utc() {
         return TimeZone(time_internal::cctz::utc_time_zone());
     }
 
-    // LocalTimeZone()
+    // TimeZone::local()
     //
     // Convenience method returning the local time zone, or UTC if there is
-    // no configured local zone.  Warning: Be wary of using LocalTimeZone(),
+    // no configured local zone.  Warning: Be wary of using TimeZone::local(),
     // and particularly so in a server process, as the zone configured for the
     // local machine should be irrelevant.  Prefer an explicit zone name.
-    inline TimeZone LocalTimeZone() {
+    inline TimeZone TimeZone::local() {
         return TimeZone(time_internal::cctz::local_time_zone());
     }
 
@@ -1889,13 +1903,17 @@ namespace turbo {
     }
 
     TURBO_ATTRIBUTE_PURE_FUNCTION inline struct tm Time::to_utc_tm(Time t) {
-        return to_tm(t, UTCTimeZone());
+        return to_tm(t, TimeZone::utc());
     }
 
     TURBO_ATTRIBUTE_PURE_FUNCTION inline struct tm Time::to_local_tm(Time t) {
-        return to_tm(t, LocalTimeZone());
+        return to_tm(t, TimeZone::local());
 
     }
-}
+}  // namespace turbo
+
+namespace turbo {
+
+}  // namespace turbo
 
 #endif  // TURBO_TIME_TIME_H_
