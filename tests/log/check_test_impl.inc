@@ -168,8 +168,8 @@ TEST(CHECKTest, TestMacroExpansionStrCompare) {
 
 TEST(CHECKTest, TestMacroExpansionStatus) {
   EXPECT_DEATH(
-      TURBO_TEST_CHECK_OK(IDENTITY(turbo::FailedPreconditionError("message"))),
-      HasSubstr("IDENTITY(turbo::FailedPreconditionError(\"message\"))"));
+      TURBO_TEST_CHECK_OK(IDENTITY(turbo::failed_precondition_error("message"))),
+      HasSubstr("IDENTITY(turbo::failed_precondition_error(\"message\"))"));
 }
 
 TEST(CHECKTest, TestMacroExpansionComma) {
@@ -556,7 +556,7 @@ struct StringifiableType {
   }
   template <typename Sink>
   friend void turbo_stringify(Sink& sink, const StringifiableType& obj) {
-    turbo::Format(&sink, "StringifiableType{%d}", obj.x);
+    turbo::format(&sink, "StringifiableType{%d}", obj.x);
   }
 
   // Make sure no unintended copy happens.
@@ -583,7 +583,7 @@ TEST(CHECKDeathTest, TestUserDefinedTurboStringify) {
   // values.
   auto expected_output = [](int lhs, turbo::string_view condition, int rhs) {
     return HasSubstr(
-        turbo::Substitute("Check failed: v$0 $1 v$2 (StringifiableType{$0} vs. "
+        turbo::substitute("Check failed: v$0 $1 v$2 (StringifiableType{$0} vs. "
                          "StringifiableType{$2})",
                          lhs, condition, rhs));
   };
@@ -612,7 +612,7 @@ struct StringifiableStreamableType {
   template <typename Sink>
   friend void turbo_stringify(Sink& sink,
                             const StringifiableStreamableType& obj) {
-    turbo::Format(&sink, "Strigified{%d}", obj.x);
+    turbo::format(&sink, "Strigified{%d}", obj.x);
   }
   friend std::ostream& operator<<(std::ostream& out,
                                   const StringifiableStreamableType& obj) {

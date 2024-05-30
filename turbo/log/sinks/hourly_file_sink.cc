@@ -18,7 +18,7 @@
 
 
 #include <turbo/log/sinks/hourly_file_sink.h>
-#include <turbo/time/clock.h>
+#include <turbo/times/clock.h>
 
 #include <algorithm>
 #include <array>
@@ -40,10 +40,10 @@ namespace turbo {
     static std::string calc_hourly_filename(const std::string &filename, const tm &now_tm) {
         std::string basename, ext;
         std::tie(basename, ext) = log_internal::split_by_extension(filename);
-        char buff[256];
-        turbo::SNPrintF(buff, sizeof(buff), "%s_%04d-%02d-%02d%s", basename.c_str(),
-                        now_tm.tm_year + 1900, now_tm.tm_mon + 1, now_tm.tm_mday, ext.c_str());
-        return buff;
+        std::string fname;
+        turbo::format(&fname,"%s_%04d-%02d-%02d%s", basename.c_str(),
+                      now_tm.tm_year + 1900, now_tm.tm_mon + 1, now_tm.tm_mday, ext.c_str());
+        return fname;
     }
 
     HourlyFileSink::HourlyFileSink(turbo::string_view base_filename,
@@ -56,13 +56,13 @@ namespace turbo {
               _truncate(truncate),
               _max_files(max_files),
               _check_interval_s(check_interval_s),
-              _next_check_time(turbo::Now() + turbo::Seconds(check_interval_s)) {
-        _next_rotation_time = next_rotation_time(turbo::Now());
+              _next_check_time(turbo::Time::current_time() + turbo::Duration::seconds(check_interval_s)) {
+        _next_rotation_time = next_rotation_time(turbo::Time::current_time());
         if (_max_files > 0) {
             init_file_queue();
         }
-        auto now = turbo::Now();
-        auto filename = calc_hourly_filename(_base_filename, turbo::ToTM(now, turbo::LocalTimeZone()));
+        auto now = turbo::Time::current_time();
+        auto filename = calc_hourly_filename(_base_filename, turbo::Time::to_tm(now, turbo::TimeZone::local()));
         _file_writer = std::make_unique<log_internal::AppendFile>();
         if (_truncate) {
             ::remove(filename.c_str());
@@ -83,7 +83,7 @@ namespace turbo {
             return;
         }
         // Write to the current file
-        if(TURBO_PREDICT_TRUE(entry.log_severity() != LogSeverity::kFatal)) {
+        if(TURBO_LIKELY(entry.log_severity() != LogSeverity::kFatal)) {
             _file_writer->write(entry.text_message_with_prefix_and_newline());
         } else {
             if(!entry.stacktrace().empty()) {
@@ -97,14 +97,14 @@ namespace turbo {
     void HourlyFileSink::init_file_queue() {
         std::vector<std::string> filenames;
         _files = circular_queue<std::string>(static_cast<size_t>(_max_files));
-        auto now = turbo::Now();
+        auto now = turbo::Time::current_time();
         while (filenames.size() < _max_files) {
-            auto filename = calc_hourly_filename(_base_filename, turbo::ToTM(now, turbo::LocalTimeZone()));
+            auto filename = calc_hourly_filename(_base_filename, turbo::Time::to_tm(now, turbo::TimeZone::local()));
             if (!log_internal::path_exists(filename)) {
                 break;
             }
             filenames.emplace_back(filename);
-            now -= turbo::Hours(1);
+            now -= turbo::Duration::hours(1);
         }
         for (auto iter = filenames.rbegin(); iter != filenames.rend(); ++iter) {
             _files.push_back(std::move(*iter));
@@ -113,7 +113,7 @@ namespace turbo {
 
     void HourlyFileSink::rotate_file(turbo::Time stamp) {
         if (stamp >= _next_check_time) {
-            _next_check_time = stamp + turbo::Seconds(_check_interval_s);
+            _next_check_time = stamp + turbo::Duration::seconds(_check_interval_s);
             if(_file_writer != nullptr)
                 _file_writer->reopen();
         }
@@ -121,7 +121,7 @@ namespace turbo {
             return;
         }
         _next_rotation_time = next_rotation_time(stamp);
-        auto filename = calc_hourly_filename(_base_filename, turbo::ToTM(stamp, turbo::LocalTimeZone()));
+        auto filename = calc_hourly_filename(_base_filename, turbo::Time::to_tm(stamp, turbo::TimeZone::local()));
         _file_writer->close();
         _file_writer.reset();
         _file_writer = std::make_unique<log_internal::AppendFile>();
@@ -144,14 +144,14 @@ namespace turbo {
     }
 
     turbo::Time HourlyFileSink::next_rotation_time(turbo::Time stamp) const {
-        auto tm = turbo::ToTM(stamp, turbo::LocalTimeZone());
+        auto tm = turbo::Time::to_tm(stamp, turbo::TimeZone::local());
         tm.tm_min = _rotation_minute;
         tm.tm_sec = 0;
-        auto rotation_time = turbo::FromTM(tm, turbo::LocalTimeZone());
+        auto rotation_time = turbo::Time::from_tm(tm, turbo::TimeZone::local());
         if (rotation_time > stamp) {
             return rotation_time;
         }
-        return rotation_time + turbo::Hours(1);
+        return rotation_time + turbo::Duration::hours(1);
     }
 
     void HourlyFileSink::Flush() {

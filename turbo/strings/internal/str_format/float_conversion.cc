@@ -684,13 +684,13 @@ void FormatF(Int mantissa, int exp, const FormatState &state) {
 
     // Fallback to the slow stack-based approach if we can't do it in a 64 or
     // 128 bit state.
-    if (TURBO_PREDICT_FALSE(total_bits > 128)) {
+    if (TURBO_UNLIKELY(total_bits > 128)) {
       return FormatFPositiveExpSlow(mantissa, exp, state);
     }
   } else {
     // Fallback to the slow stack-based approach if we can't do it in a 64 or
     // 128 bit state.
-    if (TURBO_PREDICT_FALSE(exp < -128)) {
+    if (TURBO_UNLIKELY(exp < -128)) {
       return FormatFNegativeExpSlow(mantissa, -exp, state);
     }
   }
@@ -832,7 +832,7 @@ void FormatARound(bool precision_specified, const FormatState &state,
     // Need to round up.
     bool overflow = IncrementNibble(final_nibble_displayed, mantissa);
     *leading += (overflow ? 1 : 0);
-    if (TURBO_PREDICT_FALSE(*leading > 15)) {
+    if (TURBO_UNLIKELY(*leading > 15)) {
       // We have overflowed the leading digit. This would mean that we would
       // need two hex digits to the left of the dot, which is not allowed. So
       // adjust the mantissa and exponent so that the result is always 1.0eXXX.
@@ -857,7 +857,7 @@ void FormatANormalize(const HexFloatTypeParams float_traits, uint8_t *leading,
   // Normalize mantissa so that highest bit set is in MSB position, unless we
   // get interrupted by the exponent threshold.
   while (*mantissa && !(*mantissa & kHighIntBit)) {
-    if (TURBO_PREDICT_FALSE(*exp - 1 < float_traits.min_exponent)) {
+    if (TURBO_UNLIKELY(*exp - 1 < float_traits.min_exponent)) {
       *mantissa >>= (float_traits.min_exponent - *exp);
       *exp = float_traits.min_exponent;
       return;

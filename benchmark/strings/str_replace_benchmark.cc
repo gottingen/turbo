@@ -99,7 +99,7 @@ void BM_StrReplaceAllOneReplacement(benchmark::State& state) {
   SetUpStrings();
   std::string src = *big_string;
   for (auto _ : state) {
-    std::string dest = turbo::StrReplaceAll(src, {{"the", "box"}});
+    std::string dest = turbo::str_replace_all(src, {{"the", "box"}});
     TURBO_RAW_CHECK(dest == *after_replacing_the,
                    "not benchmarking intended behavior");
   }
@@ -110,7 +110,7 @@ void BM_StrReplaceAll(benchmark::State& state) {
   SetUpStrings();
   std::string src = *big_string;
   for (auto _ : state) {
-    std::string dest = turbo::StrReplaceAll(src, {{"the", "box"},
+    std::string dest = turbo::str_replace_all(src, {{"the", "box"},
                                                  {"brown", "quick"},
                                                  {"jumped", "liquored"},
                                                  {"dozen", "brown"},

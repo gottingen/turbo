@@ -66,7 +66,7 @@ TEST(InternalLog, CompilationTest) {
   TURBO_INTERNAL_LOG(INFO, log_msg + " 2");
 
   float d = 1.1f;
-  TURBO_INTERNAL_LOG(INFO, turbo::StrCat("Internal log ", 3, " + ", d));
+  TURBO_INTERNAL_LOG(INFO, turbo::str_cat("Internal log ", 3, " + ", d));
 }
 
 TEST(InternalLogDeathTest, FailingCheck) {

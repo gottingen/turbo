@@ -33,8 +33,8 @@
 #include <turbo/base/log_severity.h>
 #include <turbo/log/internal/config.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/time/civil_time.h>
-#include <turbo/time/time.h>
+#include <turbo/times/civil_time.h>
+#include <turbo/times/time.h>
 #include <turbo/types/span.h>
 
 namespace turbo {

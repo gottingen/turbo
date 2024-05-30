@@ -58,14 +58,14 @@ bool ModuleIsPath(turbo::string_view module_pattern) {
 }  // namespace
 
 bool VLogSite::SlowIsEnabled(int stale_v, int level) {
-  if (TURBO_PREDICT_TRUE(stale_v != kUninitialized)) {
+  if (TURBO_LIKELY(stale_v != kUninitialized)) {
     // Because of the prerequisites to this function, we know that stale_v is
     // either uninitialized or >= level. If it's not uninitialized, that means
     // it must be >= level, thus we should log.
     return true;
   }
   stale_v = log_internal::RegisterAndInitialize(this);
-  return TURBO_PREDICT_FALSE(stale_v >= level);
+  return TURBO_UNLIKELY(stale_v >= level);
 }
 
 bool VLogSite::SlowIsEnabled0(int stale_v) { return SlowIsEnabled(stale_v, 0); }
@@ -153,7 +153,7 @@ int VLogLevel(turbo::string_view file, const std::vector<VModuleInfo>* infos,
       stem.remove_suffix(stem_basename.size() - sep);
       stem_basename.remove_suffix(stem_basename.size() - sep);
     }
-    if (turbo::ConsumeSuffix(&stem_basename, "-inl")) {
+    if (turbo::consume_suffix(&stem_basename, "-inl")) {
       stem.remove_suffix(turbo::string_view("-inl").size());
     }
   }
@@ -292,7 +292,7 @@ void UpdateVModule(turbo::string_view vmodule)
     if (eq == glob_level.npos) continue;
     const turbo::string_view glob = glob_level.substr(0, eq);
     int level;
-    if (!turbo::SimpleAtoi(glob_level.substr(eq + 1), &level)) continue;
+    if (!turbo::simple_atoi(glob_level.substr(eq + 1), &level)) continue;
     glob_levels.emplace_back(glob, level);
   }
   mutex.Lock();  // Unlocked by UpdateVLogSites().

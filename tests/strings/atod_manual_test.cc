@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-// This program tests the turbo::SimpleAtod and turbo::SimpleAtof functions. Run
+// This program tests the turbo::simple_atod and turbo::simple_atof functions. Run
 // it as "atod_manual_test pnftd/data/*.txt" where the pnftd directory is a
 // local checkout of the https://github.com/nigeltao/parse-number-fxx-test-data
 // repository. The test suite lives in a separate repository because its more
@@ -120,10 +120,10 @@ static bool ProcessOneTestFile(const char* filename) {
     }
     turbo::string_view input = v.substr(31, new_line - 31);
 
-    // Test turbo::SimpleAtof.
+    // Test turbo::simple_atof.
     {
       float f;
-      if (!turbo::SimpleAtof(input, &f)) {
+      if (!turbo::simple_atof(input, &f)) {
         turbo::FPrintF(stderr, "Could not parse \"%s\" in %s\n", input,
                       filename);
         return false;
@@ -137,17 +137,17 @@ static bool ProcessOneTestFile(const char* filename) {
 
       if (have32 != want32) {
         turbo::FPrintF(stderr,
-                      "turbo::SimpleAtof failed parsing \"%s\" in %s\n  have  "
+                      "turbo::simple_atof failed parsing \"%s\" in %s\n  have  "
                       "%08X\n  want  %08X\n",
                       input, filename, have32, want32);
         return false;
       }
     }
 
-    // Test turbo::SimpleAtod.
+    // Test turbo::simple_atod.
     {
       double d;
-      if (!turbo::SimpleAtod(input, &d)) {
+      if (!turbo::simple_atod(input, &d)) {
         turbo::FPrintF(stderr, "Could not parse \"%s\" in %s\n", input,
                       filename);
         return false;
@@ -161,7 +161,7 @@ static bool ProcessOneTestFile(const char* filename) {
 
       if (have64 != want64) {
         turbo::FPrintF(stderr,
-                      "turbo::SimpleAtod failed parsing \"%s\" in %s\n  have  "
+                      "turbo::simple_atod failed parsing \"%s\" in %s\n  have  "
                       "%016X\n  want  %016X\n",
                       input, filename, have64, want64);
         return false;

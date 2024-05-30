@@ -192,10 +192,10 @@ TEST(DiscreteDistributionTest, ChiSquaredTest50) {
     // Chi-squared test failed. Output does not appear to be uniform.
     std::string msg;
     for (size_t i = 0; i < counts.size(); i++) {
-      turbo::StrAppend(&msg, i, ": ", counts[i], " vs ", weights[i], "\n");
+      turbo::str_append(&msg, i, ": ", counts[i], " vs ", weights[i], "\n");
     }
-    turbo::StrAppend(&msg, kChiSquared, " p-value ", p_value, "\n");
-    turbo::StrAppend(&msg, "High ", kChiSquared, " value: ", chi_square, " > ",
+    turbo::str_append(&msg, kChiSquared, " p-value ", p_value, "\n");
+    turbo::str_append(&msg, "High ", kChiSquared, " value: ", chi_square, " > ",
                     kThreshold);
     LOG(INFO) << msg;
     FAIL() << msg;

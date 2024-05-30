@@ -35,10 +35,10 @@ namespace {
 
 TEST(OverloadTest, DispatchConsidersTypeWithAutoFallback) {
   auto overloaded = turbo::Overload{
-      [](int v) { return turbo::StrCat("int ", v); },
-      [](double v) { return turbo::StrCat("double ", v); },
-      [](const char* v) { return turbo::StrCat("const char* ", v); },
-      [](auto v) { return turbo::StrCat("auto ", v); },
+      [](int v) { return turbo::str_cat("int ", v); },
+      [](double v) { return turbo::str_cat("double ", v); },
+      [](const char* v) { return turbo::str_cat("const char* ", v); },
+      [](auto v) { return turbo::str_cat("auto ", v); },
   };
 
   EXPECT_EQ("int 1", overloaded(1));
@@ -199,10 +199,10 @@ TEST(OverloadTest, UseWithParentheses) {
 
 TEST(OverloadTest, HasConstexprConstructor) {
   constexpr auto overloaded = turbo::Overload{
-      [](int v) { return turbo::StrCat("int ", v); },
-      [](double v) { return turbo::StrCat("double ", v); },
-      [](const char* v) { return turbo::StrCat("const char* ", v); },
-      [](auto v) { return turbo::StrCat("auto ", v); },
+      [](int v) { return turbo::str_cat("int ", v); },
+      [](double v) { return turbo::str_cat("double ", v); },
+      [](const char* v) { return turbo::str_cat("const char* ", v); },
+      [](auto v) { return turbo::str_cat("auto ", v); },
   };
 
   EXPECT_EQ("int 1", overloaded(1));

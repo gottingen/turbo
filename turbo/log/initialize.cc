@@ -19,7 +19,7 @@
 
 #include <turbo/base/config.h>
 #include <turbo/log/internal/globals.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -35,7 +35,7 @@ void InitializeLogImpl(turbo::TimeZone time_zone) {
 }
 }  // namespace
 
-void initialize_log() { InitializeLogImpl(turbo::LocalTimeZone()); }
+void initialize_log() { InitializeLogImpl(turbo::TimeZone::local()); }
 
 TURBO_NAMESPACE_END
 }  // namespace turbo

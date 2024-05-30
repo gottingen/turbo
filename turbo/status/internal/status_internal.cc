@@ -44,208 +44,203 @@
 #include <turbo/strings/string_view.h>
 #include <turbo/types/optional.h>
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace status_internal {
+namespace turbo::status_internal {
 
-void StatusRep::Unref() const {
-  // Fast path: if ref==1, there is no need for a RefCountDec (since
-  // this is the only reference and therefore no other thread is
-  // allowed to be mucking with r).
-  if (ref_.load(std::memory_order_acquire) == 1 ||
-      ref_.fetch_sub(1, std::memory_order_acq_rel) - 1 == 0) {
-    delete this;
-  }
-}
+    void StatusRep::Unref() const {
+        // Fast path: if ref==1, there is no need for a RefCountDec (since
+        // this is the only reference and therefore no other thread is
+        // allowed to be mucking with r).
+        if (ref_.load(std::memory_order_acquire) == 1 ||
+            ref_.fetch_sub(1, std::memory_order_acq_rel) - 1 == 0) {
+            delete this;
+        }
+    }
 
-static turbo::optional<size_t> FindPayloadIndexByUrl(
-    const Payloads* payloads, turbo::string_view type_url) {
-  if (payloads == nullptr) return turbo::nullopt;
+    static turbo::optional<size_t> FindPayloadIndexByUrl(
+            const Payloads *payloads, turbo::string_view type_url) {
+        if (payloads == nullptr) return turbo::nullopt;
 
-  for (size_t i = 0; i < payloads->size(); ++i) {
-    if ((*payloads)[i].type_url == type_url) return i;
-  }
+        for (size_t i = 0; i < payloads->size(); ++i) {
+            if ((*payloads)[i].type_url == type_url) return i;
+        }
 
-  return turbo::nullopt;
-}
+        return turbo::nullopt;
+    }
 
-turbo::optional<turbo::Cord> StatusRep::GetPayload(
-    turbo::string_view type_url) const {
-  turbo::optional<size_t> index =
-      status_internal::FindPayloadIndexByUrl(payloads_.get(), type_url);
-  if (index.has_value()) return (*payloads_)[index.value()].payload;
+    turbo::optional<turbo::Cord> StatusRep::get_payload(
+            turbo::string_view type_url) const {
+        turbo::optional<size_t> index =
+                status_internal::FindPayloadIndexByUrl(payloads_.get(), type_url);
+        if (index.has_value()) return (*payloads_)[index.value()].payload;
 
-  return turbo::nullopt;
-}
+        return turbo::nullopt;
+    }
 
-void StatusRep::SetPayload(turbo::string_view type_url, turbo::Cord payload) {
-  if (payloads_ == nullptr) {
-    payloads_ = turbo::make_unique<status_internal::Payloads>();
-  }
+    void StatusRep::set_payload(turbo::string_view type_url, turbo::Cord payload) {
+        if (payloads_ == nullptr) {
+            payloads_ = turbo::make_unique<status_internal::Payloads>();
+        }
 
-  turbo::optional<size_t> index =
-      status_internal::FindPayloadIndexByUrl(payloads_.get(), type_url);
-  if (index.has_value()) {
-    (*payloads_)[index.value()].payload = std::move(payload);
-    return;
-  }
+        turbo::optional<size_t> index =
+                status_internal::FindPayloadIndexByUrl(payloads_.get(), type_url);
+        if (index.has_value()) {
+            (*payloads_)[index.value()].payload = std::move(payload);
+            return;
+        }
 
-  payloads_->push_back({std::string(type_url), std::move(payload)});
-}
+        payloads_->push_back({std::string(type_url), std::move(payload)});
+    }
 
-StatusRep::EraseResult StatusRep::ErasePayload(turbo::string_view type_url) {
-  turbo::optional<size_t> index =
-      status_internal::FindPayloadIndexByUrl(payloads_.get(), type_url);
-  if (!index.has_value()) return {false, Status::PointerToRep(this)};
-  payloads_->erase(payloads_->begin() + index.value());
-  if (payloads_->empty() && message_.empty()) {
-    // Special case: If this can be represented inlined, it MUST be inlined
-    // (== depends on this behavior).
-    EraseResult result = {true, Status::CodeToInlinedRep(code_)};
-    Unref();
-    return result;
-  }
-  return {true, Status::PointerToRep(this)};
-}
+    StatusRep::EraseResult StatusRep::erase_payload(turbo::string_view type_url) {
+        turbo::optional<size_t> index =
+                status_internal::FindPayloadIndexByUrl(payloads_.get(), type_url);
+        if (!index.has_value()) return {false, Status::PointerToRep(this)};
+        payloads_->erase(payloads_->begin() + index.value());
+        if (payloads_->empty() && message_.empty()) {
+            // Special case: If this can be represented inlined, it MUST be inlined
+            // (== depends on this behavior).
+            EraseResult result = {true, Status::CodeToInlinedRep(code_)};
+            Unref();
+            return result;
+        }
+        return {true, Status::PointerToRep(this)};
+    }
 
-void StatusRep::ForEachPayload(
-    turbo::FunctionRef<void(turbo::string_view, const turbo::Cord&)> visitor)
+    void StatusRep::for_each_payload(
+            turbo::FunctionRef<void(turbo::string_view, const turbo::Cord &)> visitor)
     const {
-  if (auto* payloads = payloads_.get()) {
-    bool in_reverse =
-        payloads->size() > 1 && reinterpret_cast<uintptr_t>(payloads) % 13 > 6;
+        if (auto *payloads = payloads_.get()) {
+            bool in_reverse =
+                    payloads->size() > 1 && reinterpret_cast<uintptr_t>(payloads) % 13 > 6;
 
-    for (size_t index = 0; index < payloads->size(); ++index) {
-      const auto& elem =
-          (*payloads)[in_reverse ? payloads->size() - 1 - index : index];
+            for (size_t index = 0; index < payloads->size(); ++index) {
+                const auto &elem =
+                        (*payloads)[in_reverse ? payloads->size() - 1 - index : index];
 
 #ifdef NDEBUG
-      visitor(elem.type_url, elem.payload);
+                visitor(elem.type_url, elem.payload);
 #else
-      // In debug mode invalidate the type url to prevent users from relying on
-      // this string lifetime.
+                // In debug mode invalidate the type url to prevent users from relying on
+                // this string lifetime.
 
-      // NOLINTNEXTLINE intentional extra conversion to force temporary.
-      visitor(std::string(elem.type_url), elem.payload);
+                // NOLINTNEXTLINE intentional extra conversion to force temporary.
+                visitor(std::string(elem.type_url), elem.payload);
 #endif  // NDEBUG
-    }
-  }
-}
-
-std::string StatusRep::ToString(StatusToStringMode mode) const {
-  std::string text;
-  turbo::StrAppend(&text, turbo::StatusCodeToString(code()), ": ", message());
-
-  const bool with_payload = (mode & StatusToStringMode::kWithPayload) ==
-                            StatusToStringMode::kWithPayload;
-
-  if (with_payload) {
-    status_internal::StatusPayloadPrinter printer =
-        status_internal::GetStatusPayloadPrinter();
-    this->ForEachPayload([&](turbo::string_view type_url,
-                             const turbo::Cord& payload) {
-      turbo::optional<std::string> result;
-      if (printer) result = printer(type_url, payload);
-      turbo::StrAppend(
-          &text, " [", type_url, "='",
-          result.has_value() ? *result : turbo::CHexEscape(std::string(payload)),
-          "']");
-    });
-  }
-
-  return text;
-}
-
-bool StatusRep::operator==(const StatusRep& other) const {
-  assert(this != &other);
-  if (code_ != other.code_) return false;
-  if (message_ != other.message_) return false;
-  const status_internal::Payloads* this_payloads = payloads_.get();
-  const status_internal::Payloads* other_payloads = other.payloads_.get();
-
-  const status_internal::Payloads no_payloads;
-  const status_internal::Payloads* larger_payloads =
-      this_payloads ? this_payloads : &no_payloads;
-  const status_internal::Payloads* smaller_payloads =
-      other_payloads ? other_payloads : &no_payloads;
-  if (larger_payloads->size() < smaller_payloads->size()) {
-    std::swap(larger_payloads, smaller_payloads);
-  }
-  if ((larger_payloads->size() - smaller_payloads->size()) > 1) return false;
-  // Payloads can be ordered differently, so we can't just compare payload
-  // vectors.
-  for (const auto& payload : *larger_payloads) {
-
-    bool found = false;
-    for (const auto& other_payload : *smaller_payloads) {
-      if (payload.type_url == other_payload.type_url) {
-        if (payload.payload != other_payload.payload) {
-          return false;
+            }
         }
-        found = true;
-        break;
-      }
     }
-    if (!found) return false;
-  }
-  return true;
-}
 
-turbo::Nonnull<StatusRep*> StatusRep::CloneAndUnref() const {
-  // Optimization: no need to create a clone if we already have a refcount of 1.
-  if (ref_.load(std::memory_order_acquire) == 1) {
-    // All StatusRep instances are heap allocated and mutable, therefore this
-    // const_cast will never cast away const from a stack instance.
-    //
-    // CloneAndUnref is the only method that doesn't involve an external cast to
-    // get a mutable StatusRep* from the uintptr_t rep stored in Status.
-    return const_cast<StatusRep*>(this);
-  }
-  std::unique_ptr<status_internal::Payloads> payloads;
-  if (payloads_) {
-    payloads = turbo::make_unique<status_internal::Payloads>(*payloads_);
-  }
-  auto* new_rep = new StatusRep(code_, message_, std::move(payloads));
-  Unref();
-  return new_rep;
-}
+    std::string StatusRep::ToString(StatusToStringMode mode) const {
+        std::string text;
+        turbo::str_append(&text, turbo::StatusCodeToString(code()), ": ", message());
 
-// Convert canonical code to a value known to this binary.
-turbo::StatusCode MapToLocalCode(int value) {
-  turbo::StatusCode code = static_cast<turbo::StatusCode>(value);
-  switch (code) {
-    case turbo::StatusCode::kOk:
-    case turbo::StatusCode::kCancelled:
-    case turbo::StatusCode::kUnknown:
-    case turbo::StatusCode::kInvalidArgument:
-    case turbo::StatusCode::kDeadlineExceeded:
-    case turbo::StatusCode::kNotFound:
-    case turbo::StatusCode::kAlreadyExists:
-    case turbo::StatusCode::kPermissionDenied:
-    case turbo::StatusCode::kResourceExhausted:
-    case turbo::StatusCode::kFailedPrecondition:
-    case turbo::StatusCode::kAborted:
-    case turbo::StatusCode::kOutOfRange:
-    case turbo::StatusCode::kUnimplemented:
-    case turbo::StatusCode::kInternal:
-    case turbo::StatusCode::kUnavailable:
-    case turbo::StatusCode::kDataLoss:
-    case turbo::StatusCode::kUnauthenticated:
-      return code;
-    default:
-      return turbo::StatusCode::kUnknown;
-  }
-}
+        const bool with_payload = (mode & StatusToStringMode::kWithPayload) ==
+                                  StatusToStringMode::kWithPayload;
 
-turbo::Nonnull<std::string*> MakeCheckFailString(
-    turbo::Nonnull<const turbo::Status*> status,
-    turbo::Nonnull<const char*> prefix) {
-  return new std::string(
-      turbo::StrCat(prefix, " (",
-                   status->ToString(StatusToStringMode::kWithEverything), ")"));
-}
+        if (with_payload) {
+            status_internal::StatusPayloadPrinter printer =
+                    status_internal::GetStatusPayloadPrinter();
+            this->for_each_payload([&](turbo::string_view type_url,
+                                     const turbo::Cord &payload) {
+                turbo::optional<std::string> result;
+                if (printer) result = printer(type_url, payload);
+                turbo::str_append(
+                        &text, " [", type_url, "='",
+                        result.has_value() ? *result : turbo::c_hex_encode(std::string(payload)),
+                        "']");
+            });
+        }
 
-}  // namespace status_internal
+        return text;
+    }
 
-TURBO_NAMESPACE_END
-}  // namespace turbo
+    bool StatusRep::operator==(const StatusRep &other) const {
+        assert(this != &other);
+        if (code_ != other.code_) return false;
+        if (message_ != other.message_) return false;
+        const status_internal::Payloads *this_payloads = payloads_.get();
+        const status_internal::Payloads *other_payloads = other.payloads_.get();
+
+        const status_internal::Payloads no_payloads;
+        const status_internal::Payloads *larger_payloads =
+                this_payloads ? this_payloads : &no_payloads;
+        const status_internal::Payloads *smaller_payloads =
+                other_payloads ? other_payloads : &no_payloads;
+        if (larger_payloads->size() < smaller_payloads->size()) {
+            std::swap(larger_payloads, smaller_payloads);
+        }
+        if ((larger_payloads->size() - smaller_payloads->size()) > 1) return false;
+        // Payloads can be ordered differently, so we can't just compare payload
+        // vectors.
+        for (const auto &payload: *larger_payloads) {
+
+            bool found = false;
+            for (const auto &other_payload: *smaller_payloads) {
+                if (payload.type_url == other_payload.type_url) {
+                    if (payload.payload != other_payload.payload) {
+                        return false;
+                    }
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) return false;
+        }
+        return true;
+    }
+
+    turbo::Nonnull<StatusRep *> StatusRep::CloneAndUnref() const {
+        // Optimization: no need to create a clone if we already have a refcount of 1.
+        if (ref_.load(std::memory_order_acquire) == 1) {
+            // All StatusRep instances are heap allocated and mutable, therefore this
+            // const_cast will never cast away const from a stack instance.
+            //
+            // CloneAndUnref is the only method that doesn't involve an external cast to
+            // get a mutable StatusRep* from the uintptr_t rep stored in Status.
+            return const_cast<StatusRep *>(this);
+        }
+        std::unique_ptr<status_internal::Payloads> payloads;
+        if (payloads_) {
+            payloads = turbo::make_unique<status_internal::Payloads>(*payloads_);
+        }
+        auto *new_rep = new StatusRep(code_, message_, std::move(payloads));
+        Unref();
+        return new_rep;
+    }
+
+        // Convert canonical code to a value known to this binary.
+    turbo::StatusCode MapToLocalCode(int value) {
+        turbo::StatusCode code = static_cast<turbo::StatusCode>(value);
+        switch (code) {
+            case turbo::StatusCode::kOk:
+            case turbo::StatusCode::kCancelled:
+            case turbo::StatusCode::kUnknown:
+            case turbo::StatusCode::kInvalidArgument:
+            case turbo::StatusCode::kDeadlineExceeded:
+            case turbo::StatusCode::kNotFound:
+            case turbo::StatusCode::kAlreadyExists:
+            case turbo::StatusCode::kPermissionDenied:
+            case turbo::StatusCode::kResourceExhausted:
+            case turbo::StatusCode::kFailedPrecondition:
+            case turbo::StatusCode::kAborted:
+            case turbo::StatusCode::kOutOfRange:
+            case turbo::StatusCode::kUnimplemented:
+            case turbo::StatusCode::kInternal:
+            case turbo::StatusCode::kUnavailable:
+            case turbo::StatusCode::kDataLoss:
+            case turbo::StatusCode::kUnauthenticated:
+                return code;
+            default:
+                return turbo::StatusCode::kUnknown;
+        }
+    }
+
+    turbo::Nonnull<std::string *> MakeCheckFailString(
+            turbo::Nonnull<const turbo::Status *> status,
+            turbo::Nonnull<const char *> prefix) {
+        return new std::string(
+                turbo::str_cat(prefix, " (",
+                               status->to_string(StatusToStringMode::kWithEverything), ")"));
+    }
+
+}  // namespace turbo::status_internal

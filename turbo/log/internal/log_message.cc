@@ -54,8 +54,8 @@
 #include <turbo/log/log_sink_registry.h>
 #include <turbo/memory/memory.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/time/clock.h>
-#include <turbo/time/time.h>
+#include <turbo/times/clock.h>
+#include <turbo/times/time.h>
 #include <turbo/types/span.h>
 
 extern "C" TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(
@@ -226,7 +226,7 @@ void LogMessage::LogMessageData::FinalizeEncodingAndFormat() {
 
 LogMessage::LogMessage(const char* file, int line, turbo::LogSeverity severity)
     : data_(turbo::make_unique<LogMessageData>(file, line, severity,
-                                              turbo::Now())) {
+                                              turbo::Time::current_time())) {
   data_->first_fatal = false;
   data_->is_perror = false;
   data_->fail_quietly = false;

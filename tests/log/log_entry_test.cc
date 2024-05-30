@@ -39,8 +39,8 @@
 #include <turbo/strings/numbers.h>
 #include <turbo/strings/str_split.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/time/civil_time.h>
-#include <turbo/time/time.h>
+#include <turbo/times/civil_time.h>
+#include <turbo/times/time.h>
 #include <turbo/types/span.h>
 
 namespace {
@@ -71,8 +71,8 @@ class LogEntryTestPeer {
     entry_.severity_ = severity;
     std::string time_err;
     EXPECT_THAT(
-        turbo::ParseTime("%Y-%m-%d%ET%H:%M:%E*S", timestamp,
-                        turbo::LocalTimeZone(), &entry_.timestamp_, &time_err),
+        turbo::Time::parse("%Y-%m-%d%ET%H:%M:%E*S", timestamp,
+                        turbo::TimeZone::local(), &entry_.timestamp_, &time_err),
         IsTrue())
         << "Failed to parse time " << timestamp << ": " << time_err;
     entry_.tid_ = tid;
@@ -82,9 +82,9 @@ class LogEntryTestPeer {
         << "Failed to parse time " << timestamp_bits.first;
     timestamp_bits.second.resize(9, '0');
     int64_t nanos = 0;
-    EXPECT_THAT(turbo::SimpleAtoi(timestamp_bits.second, &nanos), IsTrue())
+    EXPECT_THAT(turbo::simple_atoi(timestamp_bits.second, &nanos), IsTrue())
         << "Failed to parse time " << timestamp_bits.first;
-    ci_.subsecond = turbo::Nanoseconds(nanos);
+    ci_.subsecond = turbo::Duration::nanoseconds(nanos);
 
     turbo::Span<char> view = turbo::MakeSpan(buf_);
     view.remove_suffix(2);

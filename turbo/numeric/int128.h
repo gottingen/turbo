@@ -221,7 +221,7 @@ class
     return H::combine(std::move(h), Uint128High64(v), Uint128Low64(v));
   }
 
-  // Support for turbo::StrCat() etc.
+  // Support for turbo::str_cat() etc.
   template <typename Sink>
   friend void turbo_stringify(Sink& sink, uint128 v) {
     sink.Append(v.ToString());
@@ -463,7 +463,7 @@ class int128 {
     return H::combine(std::move(h), Int128High64(v), Int128Low64(v));
   }
 
-  // Support for turbo::StrCat() etc.
+  // Support for turbo::str_cat() etc.
   template <typename Sink>
   friend void turbo_stringify(Sink& sink, int128 v) {
     sink.Append(v.ToString());

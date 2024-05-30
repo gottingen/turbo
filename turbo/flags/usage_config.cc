@@ -60,12 +60,12 @@ bool ContainsHelpshortFlags(turbo::string_view filename) {
   auto program_name = flags_internal::ShortProgramInvocationName();
   turbo::string_view program_name_ref = program_name;
 #if defined(_WIN32)
-  turbo::ConsumeSuffix(&program_name_ref, ".exe");
+  turbo::consume_suffix(&program_name_ref, ".exe");
 #endif
-  if (!turbo::ConsumePrefix(&suffix, program_name_ref))
+  if (!turbo::consume_prefix(&suffix, program_name_ref))
     return false;
-  return turbo::StartsWith(suffix, ".") || turbo::StartsWith(suffix, "-main.") ||
-         turbo::StartsWith(suffix, "_main.");
+  return turbo::starts_with(suffix, ".") || turbo::starts_with(suffix, "-main.") ||
+         turbo::starts_with(suffix, "_main.");
 }
 
 // --------------------------------------------------------------------

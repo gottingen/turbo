@@ -262,21 +262,21 @@ class TURBO_LOCKABLE CordzInfo : public CordzHandle {
 inline TURBO_ATTRIBUTE_ALWAYS_INLINE void CordzInfo::MaybeTrackCord(
     InlineData& cord, MethodIdentifier method) {
   auto stride = cordz_should_profile();
-  if (TURBO_PREDICT_FALSE(stride > 0)) {
+  if (TURBO_UNLIKELY(stride > 0)) {
     TrackCord(cord, method, stride);
   }
 }
 
 inline TURBO_ATTRIBUTE_ALWAYS_INLINE void CordzInfo::MaybeTrackCord(
     InlineData& cord, const InlineData& src, MethodIdentifier method) {
-  if (TURBO_PREDICT_FALSE(InlineData::is_either_profiled(cord, src))) {
+  if (TURBO_UNLIKELY(InlineData::is_either_profiled(cord, src))) {
     MaybeTrackCordImpl(cord, src, method);
   }
 }
 
 inline TURBO_ATTRIBUTE_ALWAYS_INLINE void CordzInfo::MaybeUntrackCord(
     CordzInfo* info) {
-  if (TURBO_PREDICT_FALSE(info)) {
+  if (TURBO_UNLIKELY(info)) {
     info->Untrack();
   }
 }

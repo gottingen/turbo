@@ -166,7 +166,7 @@ struct PrintVisitor {
   size_t index;
   template <typename T>
   std::string operator()(const T* value) const {
-    return turbo::StrCat("#", index, "(", testing::PrintToString(*value), ")");
+    return turbo::str_cat("#", index, "(", testing::PrintToString(*value), ")");
   }
 };
 

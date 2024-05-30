@@ -44,7 +44,7 @@ base_internal::ThreadIdentity* CreateThreadIdentity();
 inline base_internal::ThreadIdentity* GetOrCreateCurrentThreadIdentity() {
   base_internal::ThreadIdentity* identity =
       base_internal::CurrentThreadIdentityIfPresent();
-  if (TURBO_PREDICT_FALSE(identity == nullptr)) {
+  if (TURBO_UNLIKELY(identity == nullptr)) {
     return CreateThreadIdentity();
   }
   return identity;

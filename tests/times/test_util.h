@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -149,7 +149,7 @@
 // options: `turbo_stringify()` or `std::ostream& operator<<(std::ostream&, ...)`.
 // It is recommended that users make their types loggable through
 // `turbo_stringify()` as it is a universal stringification extension that also
-// enables `turbo::StrFormat` and `turbo::StrCat` support. If both
+// enables `turbo::str_format` and `turbo::str_cat` support. If both
 // `turbo_stringify()` and `std::ostream& operator<<(std::ostream&, ...)` are
 // defined, `turbo_stringify()` will be used.
 //
@@ -167,7 +167,7 @@
 //   struct Point {
 //     template <typename Sink>
 //     friend void turbo_stringify(Sink& sink, const Point& p) {
-//       turbo::Format(&sink, "(%v, %v)", p.x, p.y);
+//       turbo::format(&sink, "(%v, %v)", p.x, p.y);
 //     }
 //
 //     int x;

@@ -304,7 +304,7 @@ class string_view {
   // and an exception of type `std::out_of_range` will be thrown on invalid
   // access.
   constexpr const_reference at(size_type i) const {
-    return TURBO_PREDICT_TRUE(i < size())
+    return TURBO_LIKELY(i < size())
                ? ptr_[i]
                : ((void)base_internal::ThrowStdOutOfRange(
                       "turbo::string_view::at"),
@@ -378,7 +378,7 @@ class string_view {
   // Copies the contents of the `string_view` at offset `pos` and length `n`
   // into `buf`.
   size_type copy(char* buf, size_type n, size_type pos = 0) const {
-    if (TURBO_PREDICT_FALSE(pos > length_)) {
+    if (TURBO_UNLIKELY(pos > length_)) {
       base_internal::ThrowStdOutOfRange("turbo::string_view::copy");
     }
     size_type rlen = (std::min)(length_ - pos, n);
@@ -396,7 +396,7 @@ class string_view {
   // `pos > size`.
   // Use turbo::ClippedSubstr if you need a truncating substr operation.
   constexpr string_view substr(size_type pos = 0, size_type n = npos) const {
-    return TURBO_PREDICT_FALSE(pos > length_)
+    return TURBO_UNLIKELY(pos > length_)
                ? (base_internal::ThrowStdOutOfRange(
                       "turbo::string_view::substr"),
                   string_view())
@@ -611,7 +611,7 @@ class string_view {
   // Returns true if the `string_view` starts with the prefix `s`.
   //
   // This method only exists when targeting at least C++20.
-  // If support for C++ prior to C++20 is required, use `turbo::StartsWith()`
+  // If support for C++ prior to C++20 is required, use `turbo::starts_with()`
   // from `//turbo/strings/match.h` for compatibility.
   constexpr bool starts_with(string_view s) const noexcept {
     return s.empty() ||
@@ -636,7 +636,7 @@ class string_view {
   // Returns true if the `string_view` ends with the suffix `s`.
   //
   // This method only exists when targeting at least C++20.
-  // If support for C++ prior to C++20 is required, use `turbo::EndsWith()`
+  // If support for C++ prior to C++20 is required, use `turbo::ends_with()`
   // from `//turbo/strings/match.h` for compatibility.
   constexpr bool ends_with(string_view s) const noexcept {
     return s.empty() || (size() >= s.size() && TURBO_INTERNAL_STRING_VIEW_MEMCMP(

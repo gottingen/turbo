@@ -179,7 +179,7 @@ class ConstructorTracker {
                                   const std::string& address_description,
                                   int countdown,
                                   const std::string& error_description) {
-    return turbo::Substitute(
+    return turbo::substitute(
         "With coundtown at $0:\n"
         "  $1\n"
         "  Object originally constructed by $2\n"
@@ -596,7 +596,7 @@ class ThrowingValue : private exceptions_internal::TrackedObject {
 
  private:
   static std::string GetInstanceString(int dummy) {
-    return turbo::StrCat("ThrowingValue<",
+    return turbo::str_cat("ThrowingValue<",
                         exceptions_internal::GetSpecString(Spec), ">(", dummy,
                         ")");
   }
@@ -757,7 +757,7 @@ class ThrowingAllocator : private exceptions_internal::TrackedObject {
 
  private:
   static std::string GetInstanceString(int dummy) {
-    return turbo::StrCat("ThrowingAllocator<",
+    return turbo::str_cat("ThrowingAllocator<",
                         exceptions_internal::GetSpecString(Spec), ">(", dummy,
                         ")");
   }
@@ -774,7 +774,7 @@ class ThrowingAllocator : private exceptions_internal::TrackedObject {
   void ReadStateAndMaybeThrow(turbo::string_view msg) const {
     if (!IsSpecified(AllocSpec::kNoThrowAllocate)) {
       exceptions_internal::MaybeThrow(
-          turbo::Substitute("Allocator id $0 threw from $1", *dummy_, msg));
+          turbo::substitute("Allocator id $0 threw from $1", *dummy_, msg));
     }
   }
 

@@ -30,7 +30,7 @@
 #include <turbo/strings/internal/cordz_statistics.h>
 #include <turbo/strings/internal/cordz_update_tracker.h>
 #include <turbo/synchronization/mutex.h>
-#include <turbo/time/clock.h>
+#include <turbo/times/clock.h>
 #include <turbo/types/span.h>
 
 namespace turbo {
@@ -316,7 +316,7 @@ CordzInfo::CordzInfo(CordRep* rep, const CordzInfo* src,
       parent_stack_depth_(FillParentStack(src, parent_stack_)),
       method_(method),
       parent_method_(GetParentMethod(src)),
-      create_time_(turbo::Now()),
+      create_time_(turbo::Time::current_time()),
       sampling_stride_(sampling_stride) {
   update_tracker_.LossyAdd(method);
   if (src) {
@@ -328,7 +328,7 @@ CordzInfo::CordzInfo(CordRep* rep, const CordzInfo* src,
 CordzInfo::~CordzInfo() {
   // `rep_` is potentially kept alive if CordzInfo is included
   // in a collection snapshot (which should be rare).
-  if (TURBO_PREDICT_FALSE(rep_)) {
+  if (TURBO_UNLIKELY(rep_)) {
     CordRep::Unref(rep_);
   }
 }

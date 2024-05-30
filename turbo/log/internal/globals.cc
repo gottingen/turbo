@@ -30,7 +30,7 @@
 #include <turbo/base/log_severity.h>
 #include <turbo/strings/string_view.h>
 #include <turbo/strings/strip.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -67,7 +67,7 @@ void WriteToStderr(turbo::string_view message, turbo::LogSeverity severity) {
 #if defined(__EMSCRIPTEN__)
   // In WebAssembly, bypass filesystem emulation via fwrite.
   // Skip a trailing newline character as emscripten_errn adds one itself.
-  const auto message_minus_newline = turbo::StripSuffix(message, "\n");
+  const auto message_minus_newline = turbo::strip_suffix(message, "\n");
   // emscripten_errn was introduced in 3.1.41 but broken in standalone mode
   // until 3.1.43.
 #if TURBO_INTERNAL_EMSCRIPTEN_VERSION >= 3001043

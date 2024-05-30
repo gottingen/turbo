@@ -509,7 +509,7 @@ TEST(LowLevelHashTest, VerifyGolden) {
   (void)kGolden;  // Silence warning.
   for (size_t i = 0; i < kNumGoldenOutputs; ++i) {
     std::string str;
-    ASSERT_TRUE(turbo::Base64Unescape(cases[i].base64_data, &str));
+    ASSERT_TRUE(turbo::base64_decode(cases[i].base64_data, &str));
     uint64_t h = turbo::hash_internal::LowLevelHash(str.data(), str.size(),
                                                    cases[i].seed, kSalt);
     printf("0x%016" PRIx64 ", ", h);
@@ -524,7 +524,7 @@ TEST(LowLevelHashTest, VerifyGolden) {
     SCOPED_TRACE(::testing::Message()
                  << "i = " << i << "; input = " << cases[i].base64_data);
     std::string str;
-    ASSERT_TRUE(turbo::Base64Unescape(cases[i].base64_data, &str));
+    ASSERT_TRUE(turbo::base64_decode(cases[i].base64_data, &str));
     EXPECT_EQ(turbo::hash_internal::LowLevelHash(str.data(), str.size(),
                                                 cases[i].seed, kSalt),
               kGolden[i]);

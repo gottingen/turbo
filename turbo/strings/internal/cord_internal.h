@@ -404,7 +404,7 @@ inline CordRepSubstring* CordRepSubstring::Create(CordRep* child, size_t pos,
 
   // TODO(b/217376272): Harden internal logic.
   // Move to strategical places inside the Cord logic and make this an assert.
-  if (TURBO_PREDICT_FALSE(!(child->IsExternal() || child->IsFlat()))) {
+  if (TURBO_UNLIKELY(!(child->IsExternal() || child->IsFlat()))) {
     LogFatalNodeType(child);
   }
 
@@ -890,7 +890,7 @@ inline void CordRep::Unref(CordRep* rep) {
   assert(rep != nullptr);
   // Expect refcount to be 0. Avoiding the cost of an atomic decrement should
   // typically outweigh the cost of an extra branch checking for ref == 1.
-  if (TURBO_PREDICT_FALSE(!rep->refcount.DecrementExpectHighRefcount())) {
+  if (TURBO_UNLIKELY(!rep->refcount.DecrementExpectHighRefcount())) {
     Destroy(rep);
   }
 }

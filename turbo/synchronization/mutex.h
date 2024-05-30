@@ -77,7 +77,7 @@
 #include <turbo/base/thread_annotations.h>
 #include <turbo/synchronization/internal/kernel_timeout.h>
 #include <turbo/synchronization/internal/per_thread_sem.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

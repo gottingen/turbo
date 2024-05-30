@@ -117,7 +117,7 @@ void FlagRegistry::RegisterFlag(CommandLineFlag& flag, const char* filename) {
   if (filename != nullptr &&
       flag.Filename() != GetUsageConfig().normalize_filename(filename)) {
     flags_internal::ReportUsageError(
-        turbo::StrCat(
+        turbo::str_cat(
             "Inconsistency between flag object and registration for flag '",
             flag.Name(),
             "', likely due to duplicate flags or an ODR violation. Relevant "
@@ -136,14 +136,14 @@ void FlagRegistry::RegisterFlag(CommandLineFlag& flag, const char* filename) {
     if (flag.IsRetired() != old_flag.IsRetired()) {
       // All registrations must agree on the 'retired' flag.
       flags_internal::ReportUsageError(
-          turbo::StrCat(
+          turbo::str_cat(
               "Retired flag '", flag.Name(), "' was defined normally in file '",
               (flag.IsRetired() ? old_flag.Filename() : flag.Filename()), "'."),
           true);
     } else if (flags_internal::PrivateHandleAccessor::TypeId(flag) !=
                flags_internal::PrivateHandleAccessor::TypeId(old_flag)) {
       flags_internal::ReportUsageError(
-          turbo::StrCat("Flag '", flag.Name(),
+          turbo::str_cat("Flag '", flag.Name(),
                        "' was defined more than once but with "
                        "differing types. Defined in files '",
                        old_flag.Filename(), "' and '", flag.Filename(), "'."),
@@ -152,13 +152,13 @@ void FlagRegistry::RegisterFlag(CommandLineFlag& flag, const char* filename) {
       return;
     } else if (old_flag.Filename() != flag.Filename()) {
       flags_internal::ReportUsageError(
-          turbo::StrCat("Flag '", flag.Name(),
+          turbo::str_cat("Flag '", flag.Name(),
                        "' was defined more than once (in files '",
                        old_flag.Filename(), "' and '", flag.Filename(), "')."),
           true);
     } else {
       flags_internal::ReportUsageError(
-          turbo::StrCat(
+          turbo::str_cat(
               "Something is wrong with flag '", flag.Name(), "' in file '",
               flag.Filename(), "'. One possibility: file '", flag.Filename(),
               "' is being linked both statically and dynamically into this "
@@ -278,7 +278,7 @@ class RetiredFlagObj final : public CommandLineFlag {
 
   void OnAccess() const {
     flags_internal::ReportUsageError(
-        turbo::StrCat("Accessing retired flag '", name_, "'"), false);
+        turbo::str_cat("Accessing retired flag '", name_, "'"), false);
   }
 
   // Data members

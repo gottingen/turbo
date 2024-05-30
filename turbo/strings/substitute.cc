@@ -48,8 +48,8 @@ void SubstituteAndAppendArray(
       if (i + 1 >= format.size()) {
 #ifndef NDEBUG
         TURBO_RAW_LOG(FATAL,
-                     "Invalid turbo::Substitute() format string: \"%s\".",
-                     turbo::CEscape(format).c_str());
+                     "Invalid turbo::substitute() format string: \"%s\".",
+                     turbo::c_encode(format).c_str());
 #endif
         return;
       } else if (turbo::ascii_isdigit(
@@ -59,10 +59,10 @@ void SubstituteAndAppendArray(
 #ifndef NDEBUG
           TURBO_RAW_LOG(
               FATAL,
-              "Invalid turbo::Substitute() format string: asked for \"$"
+              "Invalid turbo::substitute() format string: asked for \"$"
               "%d\", but only %d args were given.  Full format string was: "
               "\"%s\".",
-              index, static_cast<int>(num_args), turbo::CEscape(format).c_str());
+              index, static_cast<int>(num_args), turbo::c_encode(format).c_str());
 #endif
           return;
         }
@@ -74,8 +74,8 @@ void SubstituteAndAppendArray(
       } else {
 #ifndef NDEBUG
         TURBO_RAW_LOG(FATAL,
-                     "Invalid turbo::Substitute() format string: \"%s\".",
-                     turbo::CEscape(format).c_str());
+                     "Invalid turbo::substitute() format string: \"%s\".",
+                     turbo::c_encode(format).c_str());
 #endif
         return;
       }

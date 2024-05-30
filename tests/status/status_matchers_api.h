@@ -19,7 +19,7 @@
 // File: status_matchers.h
 // -----------------------------------------------------------------------------
 //
-// Testing utilities for working with `turbo::Status` and `turbo::StatusOr`.
+// Testing utilities for working with `turbo::Status` and `turbo::Result`.
 //
 // Defines the following utilities:
 //
@@ -27,14 +27,14 @@
 //   `IsOkAndHolds(m)`
 //   ===============
 //
-//   This gMock matcher matches a StatusOr<T> value whose status is OK
+//   This gMock matcher matches a Result<T> value whose status is OK
 //   and whose inner value matches matcher m.  Example:
 //
 //   ```
 //   using ::testing::MatchesRegex;
 //   using ::turbo_testing::IsOkAndHolds;
 //   ...
-//   turbo::StatusOr<string> maybe_name = ...;
+//   turbo::Result<string> maybe_name = ...;
 //   EXPECT_THAT(maybe_name, IsOkAndHolds(MatchesRegex("John .*")));
 //   ```
 //
@@ -51,7 +51,7 @@
 //   `IsOk()`
 //   ===============
 //
-//   Matches an `turbo::Status` or `turbo::StatusOr<T>` value whose status value
+//   Matches an `turbo::Status` or `turbo::Result<T>` value whose status value
 //   is `turbo::StatusCode::kOk.`
 //
 //   Equivalent to 'StatusIs(turbo::StatusCode::kOk)'.
@@ -59,7 +59,7 @@
 //   ```
 //   using ::turbo_testing::IsOk;
 //   ...
-//   turbo::StatusOr<string> maybe_name = ...;
+//   turbo::Result<string> maybe_name = ...;
 //   EXPECT_THAT(maybe_name, IsOk());
 //   Status s = ...;
 //   EXPECT_THAT(s, IsOk());
@@ -79,7 +79,7 @@
 namespace turbo_testing {
     TURBO_NAMESPACE_BEGIN
 
-    // Returns a gMock matcher that matches a StatusOr<> whose status is
+    // Returns a gMock matcher that matches a Result<> whose status is
     // OK and whose value matches the inner matcher.
     template<typename InnerMatcherT>
     status_internal::IsOkAndHoldsMatcher<typename std::decay<InnerMatcherT>::type>
@@ -89,7 +89,7 @@ namespace turbo_testing {
                 std::forward<InnerMatcherT>(inner_matcher));
     }
 
-    // Returns a gMock matcher that matches a Status or StatusOr<> whose status code
+    // Returns a gMock matcher that matches a Status or Result<> whose status code
     // matches code_matcher and whose error message matches message_matcher.
     // Typically, code_matcher will be an turbo::StatusCode, e.g.
     //
@@ -103,14 +103,14 @@ namespace turbo_testing {
                 std::forward<StatusMessageMatcherT>(message_matcher));
     }
 
-    // Returns a gMock matcher that matches a Status or StatusOr<> and whose status
+    // Returns a gMock matcher that matches a Status or Result<> and whose status
     // code matches code_matcher.  See above for details.
     template<typename StatusCodeMatcherT>
     status_internal::StatusIsMatcher StatusIs(StatusCodeMatcherT &&code_matcher) {
         return StatusIs(std::forward<StatusCodeMatcherT>(code_matcher), ::testing::_);
     }
 
-    // Returns a gMock matcher that matches a Status or StatusOr<> which is OK.
+    // Returns a gMock matcher that matches a Status or Result<> which is OK.
     inline status_internal::IsOkMatcher IsOk() {
         return status_internal::IsOkMatcher();
     }

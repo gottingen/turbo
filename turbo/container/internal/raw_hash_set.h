@@ -1401,7 +1401,7 @@ class CommonFields : public CommonFieldsGenerationInfo {
   }
 
   bool has_infoz() const {
-    return TURBO_PREDICT_FALSE((size_ & HasInfozMask()) != 0);
+    return TURBO_UNLIKELY((size_ & HasInfozMask()) != 0);
   }
   void set_has_infoz(bool has_infoz) {
     size_ = (size() << HasInfozShift()) | static_cast<size_t>(has_infoz);
@@ -1570,31 +1570,31 @@ inline void AssertIsFull(const ctrl_t* ctrl, GenerationType generation,
   if (!SwisstableDebugEnabled()) return;
   // `SwisstableDebugEnabled()` is also true for release builds with hardening
   // enabled. To minimize their impact in those builds:
-  // - use `TURBO_PREDICT_FALSE()` to provide a compiler hint for code layout
+  // - use `TURBO_UNLIKELY()` to provide a compiler hint for code layout
   // - use `TURBO_RAW_LOG()` with a format string to reduce code size and improve
   //   the chances that the hot paths will be inlined.
-  if (TURBO_PREDICT_FALSE(ctrl == nullptr)) {
+  if (TURBO_UNLIKELY(ctrl == nullptr)) {
     TURBO_RAW_LOG(FATAL, "%s called on end() iterator.", operation);
   }
-  if (TURBO_PREDICT_FALSE(ctrl == EmptyGroup())) {
+  if (TURBO_UNLIKELY(ctrl == EmptyGroup())) {
     TURBO_RAW_LOG(FATAL, "%s called on default-constructed iterator.",
                  operation);
   }
   if (SwisstableGenerationsEnabled()) {
-    if (TURBO_PREDICT_FALSE(generation != *generation_ptr)) {
+    if (TURBO_UNLIKELY(generation != *generation_ptr)) {
       TURBO_RAW_LOG(FATAL,
                    "%s called on invalid iterator. The table could have "
                    "rehashed or moved since this iterator was initialized.",
                    operation);
     }
-    if (TURBO_PREDICT_FALSE(!IsFull(*ctrl))) {
+    if (TURBO_UNLIKELY(!IsFull(*ctrl))) {
       TURBO_RAW_LOG(
           FATAL,
           "%s called on invalid iterator. The element was likely erased.",
           operation);
     }
   } else {
-    if (TURBO_PREDICT_FALSE(!IsFull(*ctrl))) {
+    if (TURBO_UNLIKELY(!IsFull(*ctrl))) {
       TURBO_RAW_LOG(
           FATAL,
           "%s called on invalid iterator. The element might have been erased "
@@ -1613,12 +1613,12 @@ inline void AssertIsValidForComparison(const ctrl_t* ctrl,
   const bool ctrl_is_valid_for_comparison =
       ctrl == nullptr || ctrl == EmptyGroup() || IsFull(*ctrl);
   if (SwisstableGenerationsEnabled()) {
-    if (TURBO_PREDICT_FALSE(generation != *generation_ptr)) {
+    if (TURBO_UNLIKELY(generation != *generation_ptr)) {
       TURBO_RAW_LOG(FATAL,
                    "Invalid iterator comparison. The table could have rehashed "
                    "or moved since this iterator was initialized.");
     }
-    if (TURBO_PREDICT_FALSE(!ctrl_is_valid_for_comparison)) {
+    if (TURBO_UNLIKELY(!ctrl_is_valid_for_comparison)) {
       TURBO_RAW_LOG(
           FATAL, "Invalid iterator comparison. The element was likely erased.");
     }
@@ -1665,14 +1665,14 @@ inline void AssertSameContainer(const ctrl_t* ctrl_a, const ctrl_t* ctrl_b,
   if (!SwisstableDebugEnabled()) return;
   // `SwisstableDebugEnabled()` is also true for release builds with hardening
   // enabled. To minimize their impact in those builds:
-  // - use `TURBO_PREDICT_FALSE()` to provide a compiler hint for code layout
+  // - use `TURBO_UNLIKELY()` to provide a compiler hint for code layout
   // - use `TURBO_RAW_LOG()` with a format string to reduce code size and improve
   //   the chances that the hot paths will be inlined.
 
   // fail_if(is_invalid, message) crashes when is_invalid is true and provides
   // an error message based on `message`.
   const auto fail_if = [](bool is_invalid, const char* message) {
-    if (TURBO_PREDICT_FALSE(is_invalid)) {
+    if (TURBO_UNLIKELY(is_invalid)) {
       TURBO_RAW_LOG(FATAL, "Invalid iterator comparison. %s", message);
     }
   };
@@ -1685,7 +1685,7 @@ inline void AssertSameContainer(const ctrl_t* ctrl_a, const ctrl_t* ctrl_b,
           "non-default-constructed hashtable iterator.");
 
   if (SwisstableGenerationsEnabled()) {
-    if (TURBO_PREDICT_TRUE(generation_ptr_a == generation_ptr_b)) return;
+    if (TURBO_LIKELY(generation_ptr_a == generation_ptr_b)) return;
     // Users don't need to know whether the tables are SOO so don't mention SOO
     // in the debug message.
     const bool a_is_soo = IsSooControl(ctrl_a);
@@ -2463,7 +2463,7 @@ class raw_hash_set {
       ++ctrl_;
       ++slot_;
       skip_empty_or_deleted();
-      if (TURBO_PREDICT_FALSE(*ctrl_ == ctrl_t::kSentinel)) ctrl_ = nullptr;
+      if (TURBO_UNLIKELY(*ctrl_ == ctrl_t::kSentinel)) ctrl_ = nullptr;
       return *this;
     }
     // PRECONDITION: not an end() iterator.
@@ -2806,7 +2806,7 @@ class raw_hash_set {
   }
 
   raw_hash_set& operator=(const raw_hash_set& that) {
-    if (TURBO_PREDICT_FALSE(this == &that)) return *this;
+    if (TURBO_UNLIKELY(this == &that)) return *this;
     constexpr bool propagate_alloc =
         AllocTraits::propagate_on_container_copy_assignment::value;
     // TODO(ezb): maybe avoid allocating a new backing array if this->capacity()
@@ -2833,7 +2833,7 @@ class raw_hash_set {
   ~raw_hash_set() { destructor_impl(); }
 
   iterator begin() TURBO_ATTRIBUTE_LIFETIME_BOUND {
-    if (TURBO_PREDICT_FALSE(empty())) return end();
+    if (TURBO_UNLIKELY(empty())) return end();
     if (is_soo()) return soo_iterator();
     iterator it = {control(), common().slots_union(),
                    common().generation_ptr()};
@@ -3498,12 +3498,12 @@ class raw_hash_set {
     while (true) {
       Group g{ctrl + seq.offset()};
       for (uint32_t i : g.Match(H2(hash))) {
-        if (TURBO_PREDICT_TRUE(PolicyTraits::apply(
+        if (TURBO_LIKELY(PolicyTraits::apply(
                 EqualElement<K>{key, eq_ref()},
                 PolicyTraits::element(slot_array() + seq.offset(i)))))
           return iterator_at(seq.offset(i));
       }
-      if (TURBO_PREDICT_TRUE(g.MaskEmpty())) return end();
+      if (TURBO_LIKELY(g.MaskEmpty())) return end();
       seq.next();
       assert(seq.index() <= capacity() && "full table!");
     }
@@ -3805,13 +3805,13 @@ class raw_hash_set {
     while (true) {
       Group g{ctrl + seq.offset()};
       for (uint32_t i : g.Match(H2(hash))) {
-        if (TURBO_PREDICT_TRUE(PolicyTraits::apply(
+        if (TURBO_LIKELY(PolicyTraits::apply(
                 EqualElement<K>{key, eq_ref()},
                 PolicyTraits::element(slot_array() + seq.offset(i)))))
           return {iterator_at(seq.offset(i)), false};
       }
       auto mask_empty = g.MaskEmpty();
-      if (TURBO_PREDICT_TRUE(mask_empty)) {
+      if (TURBO_LIKELY(mask_empty)) {
         size_t target = seq.offset(
             GetInsertionOffset(mask_empty, capacity(), hash, control()));
         return {iterator_at(PrepareInsertNonSoo(common(), hash,

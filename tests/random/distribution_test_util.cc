@@ -75,7 +75,7 @@ DistributionMoments ComputeDistributionMoments(
 }
 
 std::ostream& operator<<(std::ostream& os, const DistributionMoments& moments) {
-  return os << turbo::StrFormat("mean=%f, stddev=%f, skewness=%f, kurtosis=%f",
+  return os << turbo::str_format("mean=%f, stddev=%f, skewness=%f, kurtosis=%f",
                                moments.mean, std::sqrt(moments.variance),
                                moments.skewness, moments.kurtosis);
 }
@@ -93,7 +93,7 @@ bool Near(turbo::string_view msg, double actual, double expected, double bound) 
     return true;
   }
 
-  std::string formatted = turbo::StrCat(
+  std::string formatted = turbo::str_cat(
       msg, " actual=", actual, " expected=", expected, " err=", delta / bound);
   TURBO_RAW_LOG(INFO, "%s", formatted.c_str());
   return false;

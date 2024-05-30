@@ -137,10 +137,10 @@ const std::string& GetTestTempDir() {
       auto len = GetTempPathA(MAX_PATH, temp_path_buffer);
       if (len < MAX_PATH && len != 0) {
         std::string temp_dir_name = temp_path_buffer;
-        if (!turbo::EndsWith(temp_dir_name, "\\")) {
+        if (!turbo::ends_with(temp_dir_name, "\\")) {
           temp_dir_name.push_back('\\');
         }
-        turbo::StrAppend(&temp_dir_name, "parse_test.", GetCurrentProcessId());
+        turbo::str_append(&temp_dir_name, "parse_test.", GetCurrentProcessId());
         if (CreateDirectoryA(temp_dir_name.c_str(), nullptr)) {
           *res = temp_dir_name;
         }
@@ -211,14 +211,14 @@ const char* GetFlagfileFlag(const std::vector<FlagfileData>& ffd,
   turbo::string_view separator;
   for (const auto& flagfile_data : ffd) {
     std::string flagfile_name =
-        turbo::StrCat(GetTestTempDir(), flagfile_data.file_name);
+        turbo::str_cat(GetTestTempDir(), flagfile_data.file_name);
 
     std::ofstream flagfile_out(flagfile_name);
     for (auto line : flagfile_data.file_lines) {
-      flagfile_out << turbo::Substitute(line, GetTestTempDir()) << "\n";
+      flagfile_out << turbo::substitute(line, GetTestTempDir()) << "\n";
     }
 
-    turbo::StrAppend(&flagfile_flag, separator, flagfile_name);
+    turbo::str_append(&flagfile_flag, separator, flagfile_name);
     separator = ",";
   }
 

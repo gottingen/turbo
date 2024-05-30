@@ -114,7 +114,7 @@ class FlagState : public flags_internal::FlagStateInterface {
     if (!flag_impl_.RestoreState(*this)) return;
 
     TURBO_INTERNAL_LOG(INFO,
-                      turbo::StrCat("Restore saved value of ", flag_impl_.Name(),
+                      turbo::str_cat("Restore saved value of ", flag_impl_.Name(),
                                    " to: ", flag_impl_.CurrentValue()));
   }
 
@@ -203,7 +203,7 @@ void FlagImpl::AssertValidType(FlagFastTypeId rhs_type_id,
   // visible at the call site. `lhs_type_id` is the fast type id
   // corresponding to the type specified in flag definition. They must match
   //  for this operation to be well-defined.
-  if (TURBO_PREDICT_TRUE(lhs_type_id == rhs_type_id)) return;
+  if (TURBO_LIKELY(lhs_type_id == rhs_type_id)) return;
 
   const std::type_info* lhs_runtime_type_id =
       flags_internal::RuntimeTypeId(op_);
@@ -216,7 +216,7 @@ void FlagImpl::AssertValidType(FlagFastTypeId rhs_type_id,
 #endif
 
   TURBO_INTERNAL_LOG(
-      FATAL, turbo::StrCat("Flag '", Name(),
+      FATAL, turbo::str_cat("Flag '", Name(),
                           "' is defined as one type and declared as another"));
 }
 
@@ -441,7 +441,7 @@ std::unique_ptr<void, DynValueDeleter> FlagImpl::TryParse(
   std::string parse_err;
   if (!flags_internal::Parse(op_, value, tentative_value.get(), &parse_err)) {
     turbo::string_view err_sep = parse_err.empty() ? "" : "; ";
-    err = turbo::StrCat("Illegal value '", value, "' specified for flag '",
+    err = turbo::str_cat("Illegal value '", value, "' specified for flag '",
                        Name(), "'", err_sep, parse_err);
     return nullptr;
   }
@@ -491,7 +491,7 @@ bool FlagImpl::ReadOneBool() const {
 void FlagImpl::ReadSequenceLockedData(void* dst) const {
   size_t size = Sizeof(op_);
   // Attempt to read using the sequence lock.
-  if (TURBO_PREDICT_TRUE(seq_lock_.TryRead(dst, AtomicBufferValue(), size))) {
+  if (TURBO_LIKELY(seq_lock_.TryRead(dst, AtomicBufferValue(), size))) {
     return;
   }
   // We failed due to contention. Acquire the lock to prevent contention
@@ -511,7 +511,7 @@ void FlagImpl::Write(const void* src) {
     std::string ignored_error;
     std::string src_as_str = flags_internal::Unparse(op_, src);
     if (!flags_internal::Parse(op_, src_as_str, obj.get(), &ignored_error)) {
-      TURBO_INTERNAL_LOG(ERROR, turbo::StrCat("Attempt to set flag '", Name(),
+      TURBO_INTERNAL_LOG(ERROR, turbo::str_cat("Attempt to set flag '", Name(),
                                             "' to invalid value ", src_as_str));
     }
   }
@@ -550,7 +550,7 @@ bool FlagImpl::ParseFrom(turbo::string_view value, FlagSettingMode set_mode,
         // TODO(rogeeff): review and fix this semantic. Currently we do not fail
         // in this case if flag is modified. This is misleading since the flag's
         // value is not updated even though we return true.
-        // *err = turbo::StrCat(Name(), " is already set to ",
+        // *err = turbo::str_cat(Name(), " is already set to ",
         //                     CurrentValue(), "\n");
         // return false;
         return true;
@@ -596,7 +596,7 @@ void FlagImpl::CheckDefaultValueParsingRoundtrip() const {
   if (!flags_internal::Parse(op_, v, dst.get(), &error)) {
     TURBO_INTERNAL_LOG(
         FATAL,
-        turbo::StrCat("Flag ", Name(), " (from ", Filename(),
+        turbo::str_cat("Flag ", Name(), " (from ", Filename(),
                      "): string form of default value '", v,
                      "' could not be parsed; error=", error));
   }

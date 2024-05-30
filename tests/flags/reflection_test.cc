@@ -114,14 +114,14 @@ bool turbo_parse_flag(turbo::string_view in, CustomUDT* f, std::string*) {
 
   if (parts.size() != 2) return false;
 
-  if (!turbo::SimpleAtoi(parts[0], &f->a)) return false;
+  if (!turbo::simple_atoi(parts[0], &f->a)) return false;
 
-  if (!turbo::SimpleAtoi(parts[1], &f->b)) return false;
+  if (!turbo::simple_atoi(parts[1], &f->b)) return false;
 
   return true;
 }
 std::string turbo_unparse_flag(const CustomUDT& f) {
-  return turbo::StrCat(f.a, ":", f.b);
+  return turbo::str_cat(f.a, ":", f.b);
 }
 
 }  // namespace
@@ -139,7 +139,7 @@ TURBO_FLAG(uint64_t, test_flag_08, 9876543, "");
 TURBO_FLAG(double, test_flag_09, -9.876e-50, "");
 TURBO_FLAG(float, test_flag_10, 1.234e12f, "");
 TURBO_FLAG(std::string, test_flag_11, "", "");
-TURBO_FLAG(turbo::Duration, test_flag_12, turbo::Minutes(10), "");
+TURBO_FLAG(turbo::Duration, test_flag_12, turbo::Duration::minutes(10), "");
 static int counter = 0;
 TURBO_FLAG(int, test_flag_13, 200, "").OnUpdate([]() { counter++; });
 TURBO_FLAG(CustomUDT, test_flag_14, {}, "");
@@ -161,7 +161,7 @@ TEST_F(ReflectionTest, TestFlagSaverInScope) {
     turbo::SetFlag(&FLAGS_test_flag_09, 1.00001);
     turbo::SetFlag(&FLAGS_test_flag_10, -3.54f);
     turbo::SetFlag(&FLAGS_test_flag_11, "asdf");
-    turbo::SetFlag(&FLAGS_test_flag_12, turbo::Hours(20));
+    turbo::SetFlag(&FLAGS_test_flag_12, turbo::Duration::hours(20));
     turbo::SetFlag(&FLAGS_test_flag_13, 4);
     turbo::SetFlag(&FLAGS_test_flag_14, CustomUDT{-1, -2});
   }
@@ -177,7 +177,7 @@ TEST_F(ReflectionTest, TestFlagSaverInScope) {
   EXPECT_NEAR(turbo::GetFlag(FLAGS_test_flag_09), -9.876e-50, 1e-55);
   EXPECT_NEAR(turbo::GetFlag(FLAGS_test_flag_10), 1.234e12f, 1e5f);
   EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_11), "");
-  EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_12), turbo::Minutes(10));
+  EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_12), turbo::Duration::minutes(10));
   EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_13), 200);
   EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_14), CustomUDT{});
   EXPECT_EQ(counter, 2);
@@ -245,7 +245,7 @@ TEST_F(ReflectionTest, TestFlagSaverVsUpdateViaReflection) {
   EXPECT_NEAR(turbo::GetFlag(FLAGS_test_flag_09), -9.876e-50, 1e-55);
   EXPECT_NEAR(turbo::GetFlag(FLAGS_test_flag_10), 1.234e12f, 1e5f);
   EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_11), "");
-  EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_12), turbo::Minutes(10));
+  EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_12), turbo::Duration::minutes(10));
   EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_13), 200);
   EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_14), CustomUDT{});
   EXPECT_EQ(counter, 2);

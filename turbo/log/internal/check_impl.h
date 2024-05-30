@@ -27,12 +27,12 @@
 // CHECK
 #define TURBO_LOG_INTERNAL_CHECK_IMPL(condition, condition_text)       \
   TURBO_LOG_INTERNAL_CONDITION_FATAL(STATELESS,                        \
-                                    TURBO_PREDICT_FALSE(!(condition))) \
+                                    TURBO_UNLIKELY(!(condition))) \
   TURBO_LOG_INTERNAL_CHECK(condition_text).InternalStream()
 
 #define TURBO_LOG_INTERNAL_QCHECK_IMPL(condition, condition_text)       \
   TURBO_LOG_INTERNAL_CONDITION_QFATAL(STATELESS,                        \
-                                     TURBO_PREDICT_FALSE(!(condition))) \
+                                     TURBO_UNLIKELY(!(condition))) \
   TURBO_LOG_INTERNAL_QCHECK(condition_text).InternalStream()
 
 #define TURBO_LOG_INTERNAL_PCHECK_IMPL(condition, condition_text) \

@@ -250,7 +250,7 @@ void DropDeletesWithoutResize(CommonFields& common,
     };
 
     // Element doesn't move.
-    if (TURBO_PREDICT_TRUE(probe_index(new_i) == probe_index(i))) {
+    if (TURBO_LIKELY(probe_index(new_i) == probe_index(i))) {
       SetCtrl(common, i, H2(hash), slot_size);
       continue;
     }
@@ -551,7 +551,7 @@ size_t PrepareInsertNonSoo(CommonFields& common, size_t hash, FindInfo target,
       // We have to rehash even sparse tables randomly in such mode.
       !SwisstableGenerationsEnabled() &&
       common.growth_info().HasNoDeletedAndGrowthLeft();
-  if (TURBO_PREDICT_FALSE(!use_target_hint)) {
+  if (TURBO_UNLIKELY(!use_target_hint)) {
     // Notes about optimized mode when generations are disabled:
     // We do not enter this branch if table has no deleted slots
     // and growth_left is positive.
@@ -560,7 +560,7 @@ size_t PrepareInsertNonSoo(CommonFields& common, size_t hash, FindInfo target,
     // 1. Table without deleted slots (>95% cases) that needs to be resized.
     // 2. Table with deleted slots that has space for the inserting element.
     // 3. Table with deleted slots that needs to be rehashed or resized.
-    if (TURBO_PREDICT_TRUE(common.growth_info().HasNoGrowthLeftAndNoDeleted())) {
+    if (TURBO_LIKELY(common.growth_info().HasNoGrowthLeftAndNoDeleted())) {
       const size_t old_capacity = common.capacity();
       policy.resize(common, NextCapacity(old_capacity), HashtablezInfoHandle{});
       target = HashSetResizeHelper::FindFirstNonFullAfterResize(
@@ -577,7 +577,7 @@ size_t PrepareInsertNonSoo(CommonFields& common, size_t hash, FindInfo target,
                       common.growth_left() > 0 ? cap : NextCapacity(cap),
                       HashtablezInfoHandle{});
       }
-      if (TURBO_PREDICT_TRUE(common.growth_left() > 0)) {
+      if (TURBO_LIKELY(common.growth_left() > 0)) {
         target = find_first_non_full(common, hash);
       } else {
         target = FindInsertPositionWithGrowthOrRehash(common, hash, policy);

@@ -124,7 +124,7 @@
 
 // Helper macro to convert a CPP variable to a string literal.
 #define TURBO_INTERNAL_DO_TOKEN_STR(x) #x
-#define TURBO_INTERNAL_TOKEN_STR(x) TURBO_INTERNAL_DO_TOKEN_STR(x)
+#define TURBO_STRINGIFY(x) TURBO_INTERNAL_DO_TOKEN_STR(x)
 
 // -----------------------------------------------------------------------------
 // Turbo namespace annotations
@@ -159,7 +159,7 @@
 #if defined(__cplusplus) && TURBO_OPTION_USE_INLINE_NAMESPACE == 1
 
 #define TURBO_INTERNAL_INLINE_NAMESPACE_STR \
-  TURBO_INTERNAL_TOKEN_STR(TURBO_OPTION_INLINE_NAMESPACE_NAME)
+  TURBO_STRINGIFY(TURBO_OPTION_INLINE_NAMESPACE_NAME)
 
 static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != '\0',
               "options.h misconfigured: TURBO_OPTION_INLINE_NAMESPACE_NAME must "
@@ -670,7 +670,7 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #define TURBO_INTERNAL_MANGLED_BACKREFERENCE "5"
 #else
 #define TURBO_INTERNAL_MANGLED_NS \
-  TURBO_INTERNAL_TOKEN_STR(TURBO_OPTION_INLINE_NAMESPACE_NAME) "@turbo"
+  TURBO_STRINGIFY(TURBO_OPTION_INLINE_NAMESPACE_NAME) "@turbo"
 #define TURBO_INTERNAL_MANGLED_BACKREFERENCE "6"
 #endif
 #endif

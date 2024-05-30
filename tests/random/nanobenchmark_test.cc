@@ -44,7 +44,7 @@ void MeasureDiv(const FuncInput (&inputs)[N]) {
     return;
   }
   for (size_t i = 0; i < num_results; ++i) {
-    LOG(INFO) << turbo::StreamFormat("%5u: %6.2f ticks; MAD=%4.2f%%\n",
+    LOG(INFO) << turbo::stream_format("%5u: %6.2f ticks; MAD=%4.2f%%\n",
                                     results[i].input, results[i].ticks,
                                     results[i].variability * 100.0);
     CHECK_NE(results[i].ticks, 0.0f) << "Zero duration";
@@ -55,7 +55,7 @@ void RunAll(const int argc, char* argv[]) {
   // Avoid migrating between cores - important on multi-socket systems.
   int cpu = -1;
   if (argc == 2) {
-    if (!turbo::SimpleAtoi(argv[1], &cpu)) {
+    if (!turbo::simple_atoi(argv[1], &cpu)) {
       LOG(FATAL) << "The optional argument must be a CPU number >= 0.";
     }
   }

@@ -258,11 +258,11 @@ path.
   std::string test_out = test_buf_05.str();
   turbo::string_view test_out_str(test_out);
   EXPECT_TRUE(
-      turbo::StartsWith(test_out_str, "usage_test: Custom usage message"));
-  EXPECT_TRUE(turbo::StrContains(
+      turbo::starts_with(test_out_str, "usage_test: Custom usage message"));
+  EXPECT_TRUE(turbo::str_contains(
       test_out_str, "Flags from turbo/tests/flags/usage_test.cc:"));
   EXPECT_TRUE(
-      turbo::StrContains(test_out_str, "-usage_reporting_test_flag_01 "));
+      turbo::str_contains(test_out_str, "-usage_reporting_test_flag_01 "));
 }
 
 // --------------------------------------------------------------------

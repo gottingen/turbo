@@ -84,13 +84,13 @@ class SequenceLock {
     // Acquire barrier ensures that no loads done by f() are reordered
     // above the first load of the sequence counter.
     int64_t seq_before = lock_.load(std::memory_order_acquire);
-    if (TURBO_PREDICT_FALSE(seq_before & 1) == 1) return false;
+    if (TURBO_UNLIKELY(seq_before & 1) == 1) return false;
     RelaxedCopyFromAtomic(dst, src, size);
     // Another acquire fence ensures that the load of 'lock_' below is
     // strictly ordered after the RelaxedCopyToAtomic call above.
     std::atomic_thread_fence(std::memory_order_acquire);
     int64_t seq_after = lock_.load(std::memory_order_relaxed);
-    return TURBO_PREDICT_TRUE(seq_before == seq_after);
+    return TURBO_LIKELY(seq_before == seq_after);
   }
 
   // Copy "size" bytes from "src" to "dst" as a write-side critical section

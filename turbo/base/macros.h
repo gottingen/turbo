@@ -97,7 +97,7 @@ TURBO_NAMESPACE_END
   (false ? static_cast<void>(expr) : static_cast<void>(0))
 #else
 #define TURBO_ASSERT(expr)                           \
-  (TURBO_PREDICT_TRUE((expr)) ? static_cast<void>(0) \
+  (TURBO_LIKELY((expr)) ? static_cast<void>(0) \
                              : [] { assert(false && #expr); }())  // NOLINT
 #endif
 
@@ -124,7 +124,7 @@ TURBO_NAMESPACE_END
 // hardened mode.
 #if TURBO_OPTION_HARDENED == 1 && defined(NDEBUG)
 #define TURBO_HARDENING_ASSERT(expr)                 \
-  (TURBO_PREDICT_TRUE((expr)) ? static_cast<void>(0) \
+  (TURBO_LIKELY((expr)) ? static_cast<void>(0) \
                              : [] { TURBO_INTERNAL_HARDENING_ABORT(); }())
 #else
 #define TURBO_HARDENING_ASSERT(expr) TURBO_ASSERT(expr)
@@ -186,6 +186,30 @@ TURBO_NAMESPACE_END
                              "error")))
 #else
 #define TURBO_INTERNAL_NEED_MIN_SIZE(Obj, N)
+#endif
+
+// ------------------------------------------------------------------------
+// TURBO_CONCAT
+//
+// This macro joins the two arguments together, even when one of
+// the arguments is itself a macro (see 16.3.1 in C++98 standard).
+// This is often used to create a unique name with __LINE__.
+//
+// For example, this declaration:
+//    char TURBO_CONCAT(unique_, __LINE__);
+// expands to this:
+//    char unique_73;
+//
+// Note that all versions of MSVC++ up to at least version 7.1
+// fail to properly compile macros that use __LINE__ in them
+// when the "program database for edit and continue" option
+// is enabled. The result is that __LINE__ gets converted to
+// something like __LINE__(Var+37).
+//
+#ifndef TURBO_CONCAT
+#define TURBO_CONCAT(a, b)  TURBO_CONCAT1(a, b)
+#define TURBO_CONCAT1(a, b) TURBO_CONCAT2(a, b)
+#define TURBO_CONCAT2(a, b) a##b
 #endif
 
 #endif  // TURBO_BASE_MACROS_H_

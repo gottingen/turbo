@@ -148,7 +148,7 @@ TEST(CRC32C, UnextendByZeroes) {
 TEST(CRC32C, Concat) {
   std::string hello = "Hello, ";
   std::string world = "world!";
-  std::string hello_world = turbo::StrCat(hello, world);
+  std::string hello_world = turbo::str_cat(hello, world);
 
   turbo::crc32c_t crc_a = turbo::ComputeCrc32c(hello);
   turbo::crc32c_t crc_b = turbo::ComputeCrc32c(world);
@@ -176,7 +176,7 @@ TEST(CRC32C, Memcpy) {
 TEST(CRC32C, RemovePrefix) {
   std::string hello = "Hello, ";
   std::string world = "world!";
-  std::string hello_world = turbo::StrCat(hello, world);
+  std::string hello_world = turbo::str_cat(hello, world);
 
   turbo::crc32c_t crc_a = turbo::ComputeCrc32c(hello);
   turbo::crc32c_t crc_b = turbo::ComputeCrc32c(world);
@@ -188,7 +188,7 @@ TEST(CRC32C, RemovePrefix) {
 TEST(CRC32C, RemoveSuffix) {
   std::string hello = "Hello, ";
   std::string world = "world!";
-  std::string hello_world = turbo::StrCat(hello, world);
+  std::string hello_world = turbo::str_cat(hello, world);
 
   turbo::crc32c_t crc_a = turbo::ComputeCrc32c(hello);
   turbo::crc32c_t crc_b = turbo::ComputeCrc32c(world);
@@ -216,15 +216,15 @@ TEST(CRC32C, InsertionOperator) {
 }
 
 TEST(CRC32C, turbo_stringify) {
-  // StrFormat
-  EXPECT_EQ(turbo::StrFormat("%v", turbo::crc32c_t{0xc99465aa}), "c99465aa");
-  EXPECT_EQ(turbo::StrFormat("%v", turbo::crc32c_t{0}), "00000000");
-  EXPECT_EQ(turbo::StrFormat("%v", turbo::crc32c_t{17}), "00000011");
+  // str_format
+  EXPECT_EQ(turbo::str_format("%v", turbo::crc32c_t{0xc99465aa}), "c99465aa");
+  EXPECT_EQ(turbo::str_format("%v", turbo::crc32c_t{0}), "00000000");
+  EXPECT_EQ(turbo::str_format("%v", turbo::crc32c_t{17}), "00000011");
 
-  // StrCat
-  EXPECT_EQ(turbo::StrCat(turbo::crc32c_t{0xc99465aa}), "c99465aa");
-  EXPECT_EQ(turbo::StrCat(turbo::crc32c_t{0}), "00000000");
-  EXPECT_EQ(turbo::StrCat(turbo::crc32c_t{17}), "00000011");
+  // str_cat
+  EXPECT_EQ(turbo::str_cat(turbo::crc32c_t{0xc99465aa}), "c99465aa");
+  EXPECT_EQ(turbo::str_cat(turbo::crc32c_t{0}), "00000000");
+  EXPECT_EQ(turbo::str_cat(turbo::crc32c_t{17}), "00000011");
 }
 
 }  // namespace

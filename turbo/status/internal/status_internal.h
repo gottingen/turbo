@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-#ifndef TURBO_STATUS_INTERNAL_STATUS_INTERNAL_H_
-#define TURBO_STATUS_INTERNAL_STATUS_INTERNAL_H_
+
+#pragma once
 
 #include <atomic>
 #include <cstdint>
@@ -34,102 +34,105 @@
 #ifndef SWIG
 // Disabled for SWIG as it doesn't parse attributes correctly.
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 // Returned Status objects may not be ignored. Codesearch doesn't handle ifdefs
 // as part of a class definitions (b/6995610), so we use a forward declaration.
 //
 // TODO(b/176172494): TURBO_MUST_USE_RESULT should expand to the more strict
 // [[nodiscard]]. For now, just use [[nodiscard]] directly when it is available.
 #if TURBO_HAVE_CPP_ATTRIBUTE(nodiscard)
-class [[nodiscard]] TURBO_ATTRIBUTE_TRIVIAL_ABI Status;
+    class [[nodiscard]] TURBO_ATTRIBUTE_TRIVIAL_ABI Status;
 #else
-class TURBO_MUST_USE_RESULT TURBO_ATTRIBUTE_TRIVIAL_ABI Status;
+
+    class TURBO_MUST_USE_RESULT TURBO_ATTRIBUTE_TRIVIAL_ABI Status;
+
 #endif
-TURBO_NAMESPACE_END
 }  // namespace turbo
 #endif  // !SWIG
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 
-enum class StatusCode : int;
-enum class StatusToStringMode : int;
+    enum class StatusCode : int;
+    enum class StatusToStringMode : int;
 
-namespace status_internal {
+    namespace status_internal {
 
-// Container for status payloads.
-struct Payload {
-  std::string type_url;
-  turbo::Cord payload;
-};
+        // Container for status payloads.
+        struct Payload {
+            std::string type_url;
+            turbo::Cord payload;
+        };
 
-using Payloads = turbo::InlinedVector<Payload, 1>;
+        using Payloads = turbo::InlinedVector<Payload, 1>;
 
-// Reference-counted representation of Status data.
-class StatusRep {
- public:
-  StatusRep(turbo::StatusCode code_arg, turbo::string_view message_arg,
-            std::unique_ptr<status_internal::Payloads> payloads_arg)
-      : ref_(int32_t{1}),
-        code_(code_arg),
-        message_(message_arg),
-        payloads_(std::move(payloads_arg)) {}
+        // Reference-counted representation of Status data.
+        class StatusRep {
+        public:
+            StatusRep(turbo::StatusCode code_arg, turbo::string_view message_arg,
+                      std::unique_ptr<status_internal::Payloads> payloads_arg)
+                    : ref_(int32_t{1}),
+                      code_(code_arg),
+                      message_(message_arg),
+                      payloads_(std::move(payloads_arg)) {}
 
-  turbo::StatusCode code() const { return code_; }
-  const std::string& message() const { return message_; }
+            turbo::StatusCode code() const { return code_; }
 
-  // Ref and unref are const to allow access through a const pointer, and are
-  // used during copying operations.
-  void Ref() const { ref_.fetch_add(1, std::memory_order_relaxed); }
-  void Unref() const;
+            const std::string &message() const { return message_; }
 
-  // Payload methods correspond to the same methods in turbo::Status.
-  turbo::optional<turbo::Cord> GetPayload(turbo::string_view type_url) const;
-  void SetPayload(turbo::string_view type_url, turbo::Cord payload);
-  struct EraseResult {
-    bool erased;
-    uintptr_t new_rep;
-  };
-  EraseResult ErasePayload(turbo::string_view type_url);
-  void ForEachPayload(
-      turbo::FunctionRef<void(turbo::string_view, const turbo::Cord&)> visitor)
-      const;
+            // Ref and unref are const to allow access through a const pointer, and are
+            // used during copying operations.
+            void Ref() const { ref_.fetch_add(1, std::memory_order_relaxed); }
 
-  std::string ToString(StatusToStringMode mode) const;
+            void Unref() const;
 
-  bool operator==(const StatusRep& other) const;
-  bool operator!=(const StatusRep& other) const { return !(*this == other); }
+            // Payload methods correspond to the same methods in turbo::Status.
+            turbo::optional<turbo::Cord> get_payload(turbo::string_view type_url) const;
 
-  // Returns an equivalent heap allocated StatusRep with refcount 1.
-  //
-  // `this` is not safe to be used after calling as it may have been deleted.
-  turbo::Nonnull<StatusRep*> CloneAndUnref() const;
+            void set_payload(turbo::string_view type_url, turbo::Cord payload);
 
- private:
-  mutable std::atomic<int32_t> ref_;
-  turbo::StatusCode code_;
+            struct EraseResult {
+                bool erased;
+                uintptr_t new_rep;
+            };
 
-  // As an internal implementation detail, we guarantee that if status.message()
-  // is non-empty, then the resulting string_view is null terminated.
-  // This is required to implement 'StatusMessageAsCStr(...)'
-  std::string message_;
-  std::unique_ptr<status_internal::Payloads> payloads_;
-};
+            EraseResult erase_payload(turbo::string_view type_url);
 
-turbo::StatusCode MapToLocalCode(int value);
+            void for_each_payload(
+                    turbo::FunctionRef<void(turbo::string_view, const turbo::Cord &)> visitor)
+            const;
 
-// Returns a pointer to a newly-allocated string with the given `prefix`,
-// suitable for output as an error message in assertion/`CHECK()` failures.
-//
-// This is an internal implementation detail for Turbo logging.
-TURBO_ATTRIBUTE_PURE_FUNCTION
-turbo::Nonnull<std::string*> MakeCheckFailString(
-    turbo::Nonnull<const turbo::Status*> status,
-    turbo::Nonnull<const char*> prefix);
+            std::string ToString(StatusToStringMode mode) const;
 
-}  // namespace status_internal
+            bool operator==(const StatusRep &other) const;
 
-TURBO_NAMESPACE_END
+            bool operator!=(const StatusRep &other) const { return !(*this == other); }
+
+            // Returns an equivalent heap allocated StatusRep with refcount 1.
+            //
+            // `this` is not safe to be used after calling as it may have been deleted.
+            turbo::Nonnull<StatusRep *> CloneAndUnref() const;
+
+        private:
+            mutable std::atomic<int32_t> ref_;
+            turbo::StatusCode code_;
+
+            // As an internal implementation detail, we guarantee that if status.message()
+            // is non-empty, then the resulting string_view is null terminated.
+            // This is required to implement 'StatusMessageAsCStr(...)'
+            std::string message_;
+            std::unique_ptr<status_internal::Payloads> payloads_;
+        };
+
+        turbo::StatusCode MapToLocalCode(int value);
+
+        // Returns a pointer to a newly-allocated string with the given `prefix`,
+        // suitable for output as an error message in assertion/`CHECK()` failures.
+        //
+        // This is an internal implementation detail for Turbo logging.
+        TURBO_ATTRIBUTE_PURE_FUNCTION
+        turbo::Nonnull<std::string *> MakeCheckFailString(
+                turbo::Nonnull<const turbo::Status *> status,
+                turbo::Nonnull<const char *> prefix);
+
+    }  // namespace status_internal
+
 }  // namespace turbo
-
-#endif  // TURBO_STATUS_INTERNAL_STATUS_INTERNAL_H_

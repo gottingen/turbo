@@ -60,7 +60,7 @@ std::string FormatStack(turbo::Span<void* const> raw_stack) {
   std::string output;
   for (void* stackp : raw_stack) {
     if (turbo::Symbolize(stackp, buf.get(), buf_size)) {
-      turbo::StrAppend(&output, "    ", buf.get(), "\n");
+      turbo::str_append(&output, "    ", buf.get(), "\n");
     }
   }
   return output;

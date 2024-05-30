@@ -85,7 +85,7 @@ MATCHER_P(HasValidCordzInfoOf, method, "CordzInfo matches cord") {
 // Matcher on Cord that verifies that the cord is sampled and that the CordzInfo
 // update tracker has 'method' with a call count of 'n'
 MATCHER_P2(CordzMethodCountEq, method, n,
-           turbo::StrCat("CordzInfo method count equals ", n)) {
+           turbo::str_cat("CordzInfo method count equals ", n)) {
   const cord_internal::CordzInfo* cord_info = GetCordzInfoForTesting(arg);
   if (cord_info == nullptr) {
     *result_listener << "cord is not sampled";

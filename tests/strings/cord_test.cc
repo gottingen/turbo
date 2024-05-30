@@ -475,33 +475,33 @@ TEST_P(CordTest, StartsEndsWith) {
   MaybeHarden(x);
   turbo::Cord empty("");
 
-  ASSERT_TRUE(x.StartsWith(turbo::Cord("abcde")));
-  ASSERT_TRUE(x.StartsWith(turbo::Cord("abc")));
-  ASSERT_TRUE(x.StartsWith(turbo::Cord("")));
-  ASSERT_TRUE(empty.StartsWith(turbo::Cord("")));
-  ASSERT_TRUE(x.EndsWith(turbo::Cord("abcde")));
-  ASSERT_TRUE(x.EndsWith(turbo::Cord("cde")));
-  ASSERT_TRUE(x.EndsWith(turbo::Cord("")));
-  ASSERT_TRUE(empty.EndsWith(turbo::Cord("")));
+  ASSERT_TRUE(x.starts_with(turbo::Cord("abcde")));
+  ASSERT_TRUE(x.starts_with(turbo::Cord("abc")));
+  ASSERT_TRUE(x.starts_with(turbo::Cord("")));
+  ASSERT_TRUE(empty.starts_with(turbo::Cord("")));
+  ASSERT_TRUE(x.ends_with(turbo::Cord("abcde")));
+  ASSERT_TRUE(x.ends_with(turbo::Cord("cde")));
+  ASSERT_TRUE(x.ends_with(turbo::Cord("")));
+  ASSERT_TRUE(empty.ends_with(turbo::Cord("")));
 
-  ASSERT_TRUE(!x.StartsWith(turbo::Cord("xyz")));
-  ASSERT_TRUE(!empty.StartsWith(turbo::Cord("xyz")));
-  ASSERT_TRUE(!x.EndsWith(turbo::Cord("xyz")));
-  ASSERT_TRUE(!empty.EndsWith(turbo::Cord("xyz")));
+  ASSERT_TRUE(!x.starts_with(turbo::Cord("xyz")));
+  ASSERT_TRUE(!empty.starts_with(turbo::Cord("xyz")));
+  ASSERT_TRUE(!x.ends_with(turbo::Cord("xyz")));
+  ASSERT_TRUE(!empty.ends_with(turbo::Cord("xyz")));
 
-  ASSERT_TRUE(x.StartsWith("abcde"));
-  ASSERT_TRUE(x.StartsWith("abc"));
-  ASSERT_TRUE(x.StartsWith(""));
-  ASSERT_TRUE(empty.StartsWith(""));
-  ASSERT_TRUE(x.EndsWith("abcde"));
-  ASSERT_TRUE(x.EndsWith("cde"));
-  ASSERT_TRUE(x.EndsWith(""));
-  ASSERT_TRUE(empty.EndsWith(""));
+  ASSERT_TRUE(x.starts_with("abcde"));
+  ASSERT_TRUE(x.starts_with("abc"));
+  ASSERT_TRUE(x.starts_with(""));
+  ASSERT_TRUE(empty.starts_with(""));
+  ASSERT_TRUE(x.ends_with("abcde"));
+  ASSERT_TRUE(x.ends_with("cde"));
+  ASSERT_TRUE(x.ends_with(""));
+  ASSERT_TRUE(empty.ends_with(""));
 
-  ASSERT_TRUE(!x.StartsWith("xyz"));
-  ASSERT_TRUE(!empty.StartsWith("xyz"));
-  ASSERT_TRUE(!x.EndsWith("xyz"));
-  ASSERT_TRUE(!empty.EndsWith("xyz"));
+  ASSERT_TRUE(!x.starts_with("xyz"));
+  ASSERT_TRUE(!empty.starts_with("xyz"));
+  ASSERT_TRUE(!x.ends_with("xyz"));
+  ASSERT_TRUE(!empty.ends_with("xyz"));
 }
 
 TEST_P(CordTest, Contains) {
@@ -712,7 +712,7 @@ static void VerifyAppendCordToString(const turbo::Cord& cord) {
 
   const turbo::string_view kInitialContents = "initial contents.";
   std::string expected_after_append =
-      turbo::StrCat(kInitialContents, std::string(cord));
+      turbo::str_cat(kInitialContents, std::string(cord));
 
   std::string no_reserve(kInitialContents);
   turbo::AppendCordToString(cord, &no_reserve);
@@ -805,8 +805,8 @@ TEST_P(CordTest, AppendAndPrependBufferArePrecise) {
   EXPECT_LE(cord1.EstimatedMemoryUsage() - size1, kMaxDelta);
   EXPECT_LE(cord2.EstimatedMemoryUsage() - size2, kMaxDelta);
 
-  EXPECT_EQ(cord1, turbo::StrCat(test_data, "Abc"));
-  EXPECT_EQ(cord2, turbo::StrCat("Abc", test_data));
+  EXPECT_EQ(cord1, turbo::str_cat(test_data, "Abc"));
+  EXPECT_EQ(cord2, turbo::str_cat("Abc", test_data));
 }
 
 TEST_P(CordTest, PrependSmallBuffer) {
@@ -2670,7 +2670,7 @@ TEST_P(CordTest, ForEachChunk) {
     SCOPED_TRACE(num_elements);
     std::vector<std::string> cord_chunks;
     for (int i = 0; i < num_elements; ++i) {
-      cord_chunks.push_back(turbo::StrCat("[", i, "]"));
+      cord_chunks.push_back(turbo::str_cat("[", i, "]"));
     }
     turbo::Cord c = turbo::MakeFragmentedCord(cord_chunks);
     MaybeHarden(c);
@@ -2702,10 +2702,10 @@ TEST_P(CordTest, SmallBufferAssignFromOwnData) {
 
 TEST_P(CordTest, Format) {
   turbo::Cord c;
-  turbo::Format(&c, "There were %04d little %s.", 3, "pigs");
+  turbo::format(&c, "There were %04d little %s.", 3, "pigs");
   EXPECT_EQ(c, "There were 0003 little pigs.");
   MaybeHarden(c);
-  turbo::Format(&c, "And %-3llx bad wolf!", 1);
+  turbo::format(&c, "And %-3llx bad wolf!", 1);
   MaybeHarden(c);
   EXPECT_EQ(c, "There were 0003 little pigs.And 1   bad wolf!");
 }
@@ -2714,7 +2714,7 @@ TEST_P(CordTest, Stringify) {
   turbo::Cord c =
       turbo::MakeFragmentedCord({"A ", "small ", "fragmented ", "Cord", "."});
   MaybeHarden(c);
-  EXPECT_EQ(turbo::StrCat(c), "A small fragmented Cord.");
+  EXPECT_EQ(turbo::str_cat(c), "A small fragmented Cord.");
 }
 
 TEST_P(CordTest, Hardening) {
@@ -2825,7 +2825,7 @@ void TestAfterExit(Str) {
     std::string expected_copy(expected);
     for (int i = 0; i < 10; ++i) {
       copy.Append(cord);
-      turbo::StrAppend(&expected_copy, expected);
+      turbo::str_append(&expected_copy, expected);
       EXPECT_EQ(copy, expected_copy);
     }
   }
@@ -2889,7 +2889,7 @@ PopulatedCordFactory cord_factories[] = {
   {"sso", [] { return turbo::Cord("abcde"); }},
   {"flat", [] {
     // Too large to live in SSO space, but small enough to be a simple FLAT.
-    turbo::Cord flat(turbo::StrCat("abcde", std::string(1000, 'x')));
+    turbo::Cord flat(turbo::str_cat("abcde", std::string(1000, 'x')));
     flat.Flatten();
     return flat;
   }},
@@ -2905,12 +2905,12 @@ PopulatedCordFactory cord_factories[] = {
     return turbo::CordTestPeer::MakeSubstring(ext, 1, ext.size() - 1);
   }},
   {"substring", [] {
-    turbo::Cord flat(turbo::StrCat("-abcde", std::string(1000, 'x')));
+    turbo::Cord flat(turbo::str_cat("-abcde", std::string(1000, 'x')));
     flat.Flatten();
     return flat.Subcord(1, 998);
   }},
   {"fragmented", [] {
-    std::string fragment = turbo::StrCat("abcde", std::string(195, 'x'));
+    std::string fragment = turbo::str_cat("abcde", std::string(195, 'x'));
     std::vector<std::string> fragments(200, fragment);
     turbo::Cord cord = turbo::MakeFragmentedCord(fragments);
     assert(cord.size() == 40000);
@@ -3133,7 +3133,7 @@ TEST_P(CordTest, ExpectedChecksum) {
       // expected checksum.
 
       // Test data precondition
-      ASSERT_TRUE(cc3.StartsWith("abcde"));
+      ASSERT_TRUE(cc3.starts_with("abcde"));
 
       EXPECT_EQ(cc3.size(), base_value_as_string.size());
       EXPECT_FALSE(cc3.empty());
@@ -3145,7 +3145,7 @@ TEST_P(CordTest, ExpectedChecksum) {
       EXPECT_EQ(cc3.Compare(turbo::Cord("aaaa")), 1);
       EXPECT_EQ(turbo::Cord("wxyz").Compare(cc3), 1);
       EXPECT_EQ(turbo::Cord("aaaa").Compare(cc3), -1);
-      EXPECT_TRUE(cc3.StartsWith("abcd"));
+      EXPECT_TRUE(cc3.starts_with("abcd"));
       EXPECT_EQ(std::string(cc3), base_value_as_string);
 
       std::string dest;
@@ -3155,7 +3155,7 @@ TEST_P(CordTest, ExpectedChecksum) {
       bool first_pass = true;
       for (turbo::string_view chunk : cc3.Chunks()) {
         if (first_pass) {
-          EXPECT_TRUE(turbo::StartsWith(chunk, "abcde"));
+          EXPECT_TRUE(turbo::starts_with(chunk, "abcde"));
         }
         first_pass = false;
       }
@@ -3166,7 +3166,7 @@ TEST_P(CordTest, ExpectedChecksum) {
         }
         first_pass = false;
       }
-      EXPECT_TRUE(turbo::StartsWith(*cc3.chunk_begin(), "abcde"));
+      EXPECT_TRUE(turbo::starts_with(*cc3.chunk_begin(), "abcde"));
       EXPECT_EQ(*cc3.char_begin(), 'a');
 
       auto char_it = cc3.char_begin();
@@ -3175,7 +3175,7 @@ TEST_P(CordTest, ExpectedChecksum) {
       EXPECT_EQ(*char_it, 'e');
       char_it = cc3.char_begin();
       turbo::Cord::Advance(&char_it, 2);
-      EXPECT_TRUE(turbo::StartsWith(turbo::Cord::ChunkRemaining(char_it), "cde"));
+      EXPECT_TRUE(turbo::starts_with(turbo::Cord::ChunkRemaining(char_it), "cde"));
 
       EXPECT_EQ(cc3[0], 'a');
       EXPECT_EQ(cc3[4], 'e');
@@ -3244,8 +3244,8 @@ TEST_P(CordTest, ChecksummedEmptyCord) {
 
   // Test that all cord reading operations function in the face of an
   // expected checksum.
-  EXPECT_TRUE(cc3.StartsWith(""));
-  EXPECT_TRUE(cc3.EndsWith(""));
+  EXPECT_TRUE(cc3.starts_with(""));
+  EXPECT_TRUE(cc3.ends_with(""));
   EXPECT_TRUE(cc3.empty());
   EXPECT_EQ(cc3, "");
   EXPECT_EQ(cc3, turbo::Cord());

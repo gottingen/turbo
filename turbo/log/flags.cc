@@ -106,7 +106,7 @@ TURBO_FLAG(std::string, log_backtrace_at, "",
     const turbo::string_view file =
             turbo::string_view(log_backtrace_at).substr(0, last_colon);
     int line;
-    if (!turbo::SimpleAtoi(
+    if (!turbo::simple_atoi(
             turbo::string_view(log_backtrace_at).substr(last_colon + 1),
             &line)) {
         turbo::clear_log_backtrace_location();

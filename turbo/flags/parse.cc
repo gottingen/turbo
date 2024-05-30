@@ -191,7 +191,7 @@ bool ArgsList::ReadFromFlagfile(const std::string& flag_file_name) {
 
   if (!flag_file) {
     flags_internal::ReportUsageError(
-        turbo::StrCat("Can't open flagfile ", flag_file_name), true);
+        turbo::str_cat("Can't open flagfile ", flag_file_name), true);
 
     return false;
   }
@@ -204,7 +204,7 @@ bool ArgsList::ReadFromFlagfile(const std::string& flag_file_name) {
   bool success = true;
 
   while (std::getline(flag_file, line)) {
-    turbo::string_view stripped = turbo::StripLeadingAsciiWhitespace(line);
+    turbo::string_view stripped = turbo::trim_left(line);
 
     if (stripped.empty() || stripped[0] == '#') {
       // Comment or empty line; just ignore.
@@ -225,7 +225,7 @@ bool ArgsList::ReadFromFlagfile(const std::string& flag_file_name) {
     }
 
     flags_internal::ReportUsageError(
-        turbo::StrCat("Unexpected line in the flagfile ", flag_file_name, ": ",
+        turbo::str_cat("Unexpected line in the flagfile ", flag_file_name, ": ",
                      line),
         true);
 
@@ -280,7 +280,7 @@ bool GetEnvVar(const char* var_name, std::string& var_value) {
 std::tuple<turbo::string_view, turbo::string_view, bool> SplitNameAndValue(
     turbo::string_view arg) {
   // Allow -foo and --foo
-  turbo::ConsumePrefix(&arg, "-");
+  turbo::consume_prefix(&arg, "-");
 
   if (arg.empty()) {
     return std::make_tuple("", "", false);
@@ -310,7 +310,7 @@ std::tuple<CommandLineFlag*, bool> LocateFlag(turbo::string_view flag_name) {
   CommandLineFlag* flag = turbo::FindCommandLineFlag(flag_name);
   bool is_negative = false;
 
-  if (!flag && turbo::ConsumePrefix(&flag_name, "no")) {
+  if (!flag && turbo::consume_prefix(&flag_name, "no")) {
     flag = turbo::FindCommandLineFlag(flag_name);
     is_negative = true;
   }
@@ -381,18 +381,18 @@ bool ReadFlagsFromEnv(const std::vector<std::string>& flag_names,
     // Avoid infinite recursion.
     if (flag_name == "fromenv" || flag_name == "tryfromenv") {
       flags_internal::ReportUsageError(
-          turbo::StrCat("Infinite recursion on flag ", flag_name), true);
+          turbo::str_cat("Infinite recursion on flag ", flag_name), true);
 
       success = false;
       continue;
     }
 
-    const std::string envname = turbo::StrCat("FLAGS_", flag_name);
+    const std::string envname = turbo::str_cat("FLAGS_", flag_name);
     std::string envval;
     if (!GetEnvVar(envname.c_str(), envval)) {
       if (fail_on_absent_in_env) {
         flags_internal::ReportUsageError(
-            turbo::StrCat(envname, " not found in environment"), true);
+            turbo::str_cat(envname, " not found in environment"), true);
 
         success = false;
       }
@@ -400,7 +400,7 @@ bool ReadFlagsFromEnv(const std::vector<std::string>& flag_names,
       continue;
     }
 
-    args.push_back(turbo::StrCat("--", flag_name, "=", envval));
+    args.push_back(turbo::str_cat("--", flag_name, "=", envval));
   }
 
   if (success) {
@@ -531,7 +531,7 @@ std::tuple<bool, turbo::string_view> DeduceFlagValue(const CommandLineFlag& flag
       if (is_empty_value) {
         // "--bool_flag=" case
         flags_internal::ReportUsageError(
-            turbo::StrCat(
+            turbo::str_cat(
                 "Missing the value after assignment for the boolean flag '",
                 flag.Name(), "'"),
             true);
@@ -543,7 +543,7 @@ std::tuple<bool, turbo::string_view> DeduceFlagValue(const CommandLineFlag& flag
     } else if (is_negative) {
       // "--nobool_flag=Y" case
       flags_internal::ReportUsageError(
-          turbo::StrCat("Negative form with assignment is not valid for the "
+          turbo::str_cat("Negative form with assignment is not valid for the "
                        "boolean flag '",
                        flag.Name(), "'"),
           true);
@@ -552,7 +552,7 @@ std::tuple<bool, turbo::string_view> DeduceFlagValue(const CommandLineFlag& flag
   } else if (is_negative) {
     // "--noint_flag=1" case
     flags_internal::ReportUsageError(
-        turbo::StrCat("Negative form is not valid for the flag '", flag.Name(),
+        turbo::str_cat("Negative form is not valid for the flag '", flag.Name(),
                      "'"),
         true);
     return std::make_tuple(false, "");
@@ -560,7 +560,7 @@ std::tuple<bool, turbo::string_view> DeduceFlagValue(const CommandLineFlag& flag
     if (curr_list->Size() == 1) {
       // "--int_flag" case
       flags_internal::ReportUsageError(
-          turbo::StrCat("Missing the value for the flag '", flag.Name(), "'"),
+          turbo::str_cat("Missing the value for the flag '", flag.Name(), "'"),
           true);
       return std::make_tuple(false, "");
     }
@@ -582,7 +582,7 @@ std::tuple<bool, turbo::string_view> DeduceFlagValue(const CommandLineFlag& flag
         // "--string_flag" "--known_flag" case
         TURBO_INTERNAL_LOG(
             WARNING,
-            turbo::StrCat("Did you really mean to set flag '", flag.Name(),
+            turbo::str_cat("Did you really mean to set flag '", flag.Name(),
                          "' to the value '", value, "'?"));
       }
     }
@@ -599,7 +599,7 @@ bool CanIgnoreUndefinedFlag(turbo::string_view flag_name) {
     return true;
   }
 
-  if (turbo::ConsumePrefix(&flag_name, "no") &&
+  if (turbo::consume_prefix(&flag_name, "no") &&
       std::find(undefok.begin(), undefok.end(), flag_name) != undefok.end()) {
     return true;
   }
@@ -622,14 +622,14 @@ void ReportUnrecognizedFlags(
 
     if (misspelling_hints.empty()) {
       flags_internal::ReportUsageError(
-          turbo::StrCat("Unknown command line flag '", unrecognized.flag_name,
+          turbo::str_cat("Unknown command line flag '", unrecognized.flag_name,
                        "'"),
           report_as_fatal_error);
     } else {
       flags_internal::ReportUsageError(
-          turbo::StrCat("Unknown command line flag '", unrecognized.flag_name,
+          turbo::str_cat("Unknown command line flag '", unrecognized.flag_name,
                        "'. Did you mean: ",
-                       turbo::StrJoin(misspelling_hints, ", "), " ?"),
+                       turbo::str_join(misspelling_hints, ", "), " ?"),
           report_as_fatal_error);
     }
   }
@@ -681,7 +681,7 @@ std::vector<std::string> GetMisspellingHints(const turbo::string_view flag) {
     best_hints.AddHint(f.Name(), distance);
     // For boolean flags, also calculate distance to the negated form.
     if (f.IsOfType<bool>()) {
-      const std::string negated_flag = turbo::StrCat("no", f.Name());
+      const std::string negated_flag = turbo::str_cat("no", f.Name());
       distance = strings_internal::CappedDamerauLevenshteinDistance(
           flag, negated_flag, best_hints.best_distance);
       best_hints.AddHint(negated_flag, distance);
@@ -692,7 +692,7 @@ std::vector<std::string> GetMisspellingHints(const turbo::string_view flag) {
     if (best_hints.hints.size() >= kMaxHints) return;
     uint8_t distance = strings_internal::CappedDamerauLevenshteinDistance(
         flag, f, best_hints.best_distance);
-    best_hints.AddHint(turbo::StrCat(f, " (undefok)"), distance);
+    best_hints.AddHint(turbo::str_cat(f, " (undefok)"), distance);
   });
   return best_hints.hints;
 }
@@ -803,7 +803,7 @@ HelpMode ParseTurboFlagsOnlyImpl(
 
     // If argument does not start with '-' or is just "-" - this is
     // positional argument.
-    if (!turbo::ConsumePrefix(&arg, "-") || arg.empty()) {
+    if (!turbo::consume_prefix(&arg, "-") || arg.empty()) {
       TURBO_INTERNAL_CHECK(arg_from_argv,
                           "Flagfile cannot contain positional argument");
 

@@ -28,7 +28,7 @@
 #include <tests/log/scoped_mock_log.h>
 #include <turbo/strings/match.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 namespace {
 #if GTEST_HAS_DEATH_TEST
@@ -71,7 +71,7 @@ TEST(TailCallsModifiesTest, AtLocationFileLine) {
           // The logged line should change too, even though the prefix must
           // grow to fit the new metadata.
           TextMessageWithPrefix(Truly([](turbo::string_view msg) {
-            return turbo::EndsWith(msg,
+            return turbo::ends_with(msg,
                                   " very_long_source_file.cc:777] hello world");
           })))));
 
@@ -124,10 +124,10 @@ TEST(TailCallsModifiesTest, WithVerbosityNoVerbosity) {
 TEST(TailCallsModifiesTest, WithTimestamp) {
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
-  EXPECT_CALL(test_sink, Send(Timestamp(Eq(turbo::UnixEpoch()))));
+  EXPECT_CALL(test_sink, Send(Timestamp(Eq(turbo::Time::from_unix_epoch()))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO).WithTimestamp(turbo::UnixEpoch()) << "hello world";
+  LOG(INFO).WithTimestamp(turbo::Time::from_unix_epoch()) << "hello world";
 }
 
 TEST(TailCallsModifiesTest, WithThreadID) {
@@ -156,7 +156,7 @@ TEST(TailCallsModifiesTest, WithMetadataFrom) {
       Send(AllOf(SourceFilename(Eq("fake/file")), SourceBasename(Eq("file")),
                  SourceLine(Eq(123)), Prefix(IsFalse()),
                  LogSeverity(Eq(turbo::LogSeverity::kWarning)),
-                 Timestamp(Eq(turbo::UnixEpoch())),
+                 Timestamp(Eq(turbo::Time::from_unix_epoch())),
                  ThreadID(Eq(turbo::LogEntry::tid_t{456})),
                  TextMessage(Eq("forwarded: hello world")), Verbosity(Eq(7)),
                  ENCODED_MESSAGE(
@@ -167,7 +167,7 @@ TEST(TailCallsModifiesTest, WithMetadataFrom) {
   LOG(WARNING)
           .AtLocation("fake/file", 123)
           .NoPrefix()
-          .WithTimestamp(turbo::UnixEpoch())
+          .WithTimestamp(turbo::Time::from_unix_epoch())
           .WithThreadID(456)
           .WithVerbosity(7)
           .ToSinkOnly(&forwarding_sink)

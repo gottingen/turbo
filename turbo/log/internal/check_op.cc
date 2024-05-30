@@ -111,7 +111,7 @@ void MakeCheckOpValueString(std::ostream& os, const void* p) {
       return nullptr;                                                      \
     } else {                                                               \
       return new std::string(                                              \
-          turbo::StrCat(exprtext, " (", s1, " vs. ", s2, ")"));             \
+          turbo::str_cat(exprtext, " (", s1, " vs. ", s2, ")"));             \
     }                                                                      \
   }
 DEFINE_CHECK_STROP_IMPL(CHECK_STREQ, strcmp, true)

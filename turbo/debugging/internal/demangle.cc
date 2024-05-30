@@ -444,7 +444,7 @@ static bool IsFunctionCloneSuffix(const char *str) {
   return true;  // Consumed everything in "str".
 }
 
-static bool EndsWith(State *state, const char chr) {
+static bool ends_with(State *state, const char chr) {
   return state->parse_state.out_cur_idx > 0 &&
          state->parse_state.out_cur_idx < state->out_end_idx &&
          chr == state->out[state->parse_state.out_cur_idx - 1];
@@ -456,7 +456,7 @@ static void MaybeAppendWithLength(State *state, const char *const str,
   if (state->parse_state.append && length > 0) {
     // Append a space if the output buffer ends with '<' and "str"
     // starts with '<' to avoid <<<.
-    if (str[0] == '<' && EndsWith(state, '<')) {
+    if (str[0] == '<' && ends_with(state, '<')) {
       Append(state, " ", 1);
     }
     // Remember the last identifier name for ctors/dtors,

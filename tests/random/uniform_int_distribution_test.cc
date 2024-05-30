@@ -128,7 +128,7 @@ TYPED_TEST(UniformIntDistributionTest, ViolatesPreconditionsDeathTest) {
   auto x = dist(gen);
 
   // Any value will generate a non-empty string.
-  EXPECT_FALSE(turbo::StrCat(+x).empty()) << x;
+  EXPECT_FALSE(turbo::str_cat(+x).empty()) << x;
 #endif  // NDEBUG
 }
 
@@ -207,10 +207,10 @@ TYPED_TEST(UniformIntDistributionTest, ChiSquaredTest50) {
     // Chi-squared test failed. Output does not appear to be uniform.
     std::string msg;
     for (const auto& a : counts) {
-      turbo::StrAppend(&msg, a, "\n");
+      turbo::str_append(&msg, a, "\n");
     }
-    turbo::StrAppend(&msg, kChiSquared, " p-value ", p_value, "\n");
-    turbo::StrAppend(&msg, "High ", kChiSquared, " value: ", chi_square, " > ",
+    turbo::str_append(&msg, kChiSquared, " p-value ", p_value, "\n");
+    turbo::str_append(&msg, "High ", kChiSquared, " value: ", chi_square, " > ",
                     kThreshold);
     LOG(INFO) << msg;
     FAIL() << msg;

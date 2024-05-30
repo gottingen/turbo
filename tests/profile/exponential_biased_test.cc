@@ -35,7 +35,7 @@ namespace profiling_internal {
 namespace {
 
 MATCHER_P2(IsBetween, a, b,
-           turbo::StrCat(std::string(negation ? "isn't" : "is"), " between ", a,
+           turbo::str_cat(std::string(negation ? "isn't" : "is"), " between ", a,
                         " and ", b)) {
   return a <= arg && arg <= b;
 }

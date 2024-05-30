@@ -153,14 +153,14 @@
 #define TURBO_CACHELINE_ALIGNED
 #endif
 
-// TURBO_PREDICT_TRUE, TURBO_PREDICT_FALSE
+// TURBO_LIKELY, TURBO_UNLIKELY
 //
 // Enables the compiler to prioritize compilation using static analysis for
 // likely paths within a boolean branch.
 //
 // Example:
 //
-//   if (TURBO_PREDICT_TRUE(expression)) {
+//   if (TURBO_LIKELY(expression)) {
 //     return result;                        // Faster if more likely
 //   } else {
 //     return 0;
@@ -177,11 +177,11 @@
 // to yield performance improvements.
 #if TURBO_HAVE_BUILTIN(__builtin_expect) || \
     (defined(__GNUC__) && !defined(__clang__))
-#define TURBO_PREDICT_FALSE(x) (__builtin_expect(false || (x), false))
-#define TURBO_PREDICT_TRUE(x) (__builtin_expect(false || (x), true))
+#define TURBO_UNLIKELY(x) (__builtin_expect(false || (x), false))
+#define TURBO_LIKELY(x) (__builtin_expect(false || (x), true))
 #else
-#define TURBO_PREDICT_FALSE(x) (x)
-#define TURBO_PREDICT_TRUE(x) (x)
+#define TURBO_UNLIKELY(x) (x)
+#define TURBO_LIKELY(x) (x)
 #endif
 
 // `TURBO_INTERNAL_IMMEDIATE_ABORT_IMPL()` aborts the program in the fastest

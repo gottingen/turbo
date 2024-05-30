@@ -18,7 +18,7 @@
 
 carbin_cc_bm(
         NAME periodic_sampler_benchmark
-        MODULE profiling
+        MODULE profile
         SOURCES periodic_sampler_benchmark.cc
         LINKS turbo::turbo benchmark::benchmark benchmark::benchmark_main ${CARBIN_DEPS_LINK}
         CXXOPTS ${USER_CXX_FLAGS}

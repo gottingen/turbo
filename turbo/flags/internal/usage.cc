@@ -213,10 +213,10 @@ void FlagHelpHumanReadable(const CommandLineFlag& flag, std::ostream& out) {
   FlagHelpPrettyPrinter printer(kHrfMaxLineLength, 4, 2, out);
 
   // Flag name.
-  printer.Write(turbo::StrCat("--", flag.Name()));
+  printer.Write(turbo::str_cat("--", flag.Name()));
 
   // Flag help.
-  printer.Write(turbo::StrCat("(", flag.Help(), ");"), /*wrap_line=*/true);
+  printer.Write(turbo::str_cat("(", flag.Help(), ");"), /*wrap_line=*/true);
 
   // The listed default value will be the actual default from the flag
   // definition in the originating source file, unless the value has
@@ -227,15 +227,15 @@ void FlagHelpHumanReadable(const CommandLineFlag& flag, std::ostream& out) {
   bool is_modified = curr_val != dflt_val;
 
   if (flag.IsOfType<std::string>()) {
-    dflt_val = turbo::StrCat("\"", dflt_val, "\"");
+    dflt_val = turbo::str_cat("\"", dflt_val, "\"");
   }
-  printer.Write(turbo::StrCat("default: ", dflt_val, ";"));
+  printer.Write(turbo::str_cat("default: ", dflt_val, ";"));
 
   if (is_modified) {
     if (flag.IsOfType<std::string>()) {
-      curr_val = turbo::StrCat("\"", curr_val, "\"");
+      curr_val = turbo::str_cat("\"", curr_val, "\"");
     }
-    printer.Write(turbo::StrCat("currently: ", curr_val, ";"));
+    printer.Write(turbo::str_cat("currently: ", curr_val, ";"));
   }
 
   printer.EndLine();
@@ -364,7 +364,7 @@ void FlagHelp(std::ostream& out, const CommandLineFlag& flag,
 void FlagsHelp(std::ostream& out, turbo::string_view filter, HelpFormat format,
                turbo::string_view program_usage_message) {
   flags_internal::FlagKindFilter filter_cb = [&](turbo::string_view filename) {
-    return filter.empty() || turbo::StrContains(filename, filter);
+    return filter.empty() || turbo::str_contains(filename, filter);
   };
   flags_internal::FlagsHelpImpl(out, filter_cb, format, program_usage_message);
 }
@@ -408,9 +408,9 @@ HelpMode HandleUsageFlags(std::ostream& out,
                                   program_usage_message);
       } else {
         auto filter_cb = [&substr](const turbo::CommandLineFlag& flag) {
-          if (turbo::StrContains(flag.Name(), substr)) return true;
-          if (turbo::StrContains(flag.Filename(), substr)) return true;
-          if (turbo::StrContains(flag.Help(), substr)) return true;
+          if (turbo::str_contains(flag.Name(), substr)) return true;
+          if (turbo::str_contains(flag.Filename(), substr)) return true;
+          if (turbo::str_contains(flag.Help(), substr)) return true;
 
           return false;
         };
@@ -483,7 +483,7 @@ void SetFlagsHelpFormat(HelpFormat format) {
 // --name. argument is already split into name and value before we call this
 // function.
 bool DeduceUsageFlags(turbo::string_view name, turbo::string_view value) {
-  if (turbo::ConsumePrefix(&name, "help")) {
+  if (turbo::consume_prefix(&name, "help")) {
     if (name.empty()) {
       if (value.empty()) {
         SetFlagsHelpMode(HelpMode::kImportant);
@@ -502,7 +502,7 @@ bool DeduceUsageFlags(turbo::string_view name, turbo::string_view value) {
 
     if (name == "on") {
       SetFlagsHelpMode(HelpMode::kMatch);
-      SetFlagsHelpMatchSubstr(turbo::StrCat("/", value, "."));
+      SetFlagsHelpMatchSubstr(turbo::str_cat("/", value, "."));
       return true;
     }
 

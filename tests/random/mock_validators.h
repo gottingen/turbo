@@ -74,7 +74,7 @@ class UniformDistributionValidator {
     // uniform_real_distribution is always closed-open, so the upper bound is
     // always non-inclusive.
     TURBO_INTERNAL_CHECK(lb <= x && x < ub,
-                        turbo::StrCat(x, " is not in ", TagLbBound(tag), lo,
+                        turbo::str_cat(x, " is not in ", TagLbBound(tag), lo,
                                      ", ", hi, TagUbBound(tag)));
   }
 
@@ -89,7 +89,7 @@ class UniformDistributionValidator {
     NumType ub = dist.b();
     TURBO_INTERNAL_CHECK(
         lb <= x && x <= ub,
-        turbo::StrCat(stream_type{x}, " is not in ", TagLbBound(tag),
+        turbo::str_cat(stream_type{x}, " is not in ", TagLbBound(tag),
                      stream_type{lo}, ", ", stream_type{hi}, TagUbBound(tag)));
   }
 };

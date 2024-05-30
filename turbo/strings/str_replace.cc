@@ -49,7 +49,7 @@ int ApplySubstitutions(
     auto& sub = subs.back();
     if (sub.offset >= pos) {
       if (pos <= s.size()) {
-        StrAppend(result_ptr, s.substr(pos, sub.offset - pos), sub.replacement);
+        str_append(result_ptr, s.substr(pos, sub.offset - pos), sub.replacement);
       }
       pos = sub.offset + sub.old.size();
       substitutions += 1;
@@ -72,7 +72,7 @@ int ApplySubstitutions(
 
 }  // namespace strings_internal
 
-// We can implement this in terms of the generic StrReplaceAll, but
+// We can implement this in terms of the generic str_replace_all, but
 // we must specify the template overload because C++ cannot deduce the type
 // of an initializer_list parameter to a function, and also if we don't specify
 // the type, we just call ourselves.
@@ -80,14 +80,14 @@ int ApplySubstitutions(
 // Note that we implement them here, rather than in the header, so that they
 // aren't inlined.
 
-std::string StrReplaceAll(turbo::string_view s,
+std::string str_replace_all(turbo::string_view s,
                           strings_internal::FixedMapping replacements) {
-  return StrReplaceAll<strings_internal::FixedMapping>(s, replacements);
+  return str_replace_all<strings_internal::FixedMapping>(s, replacements);
 }
 
-int StrReplaceAll(strings_internal::FixedMapping replacements,
+int str_replace_all(strings_internal::FixedMapping replacements,
                   turbo::Nonnull<std::string*> target) {
-  return StrReplaceAll<strings_internal::FixedMapping>(replacements, target);
+  return str_replace_all<strings_internal::FixedMapping>(replacements, target);
 }
 
 TURBO_NAMESPACE_END

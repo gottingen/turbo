@@ -341,9 +341,9 @@ std::vector<zipf_u64::param_type> GenParams() {
 std::string ParamName(
     const ::testing::TestParamInfo<zipf_u64::param_type>& info) {
   const auto& p = info.param;
-  std::string name = turbo::StrCat("k_", p.k(), "__q_", turbo::SixDigits(p.q()),
-                                  "__v_", turbo::SixDigits(p.v()));
-  return turbo::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
+  std::string name = turbo::str_cat("k_", p.k(), "__q_", turbo::six_digits(p.q()),
+                                  "__v_", turbo::six_digits(p.v()));
+  return turbo::str_replace_all(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
 }
 
 INSTANTIATE_TEST_SUITE_P(All, ZipfTest, ::testing::ValuesIn(GenParams()),

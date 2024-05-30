@@ -48,7 +48,7 @@ namespace turbo {
 TURBO_NAMESPACE_BEGIN
 
 class Cord;
-class FormatCountCapture;
+class format_count_capture;
 class FormatSink;
 
 template <turbo::FormatConversionCharSet C>
@@ -383,13 +383,13 @@ StringConvertResult FormatConvertImpl(const StreamedWrapper<T>& v,
 }
 
 // Use templates and dependent types to delay evaluation of the function
-// until after FormatCountCapture is fully defined.
+// until after format_count_capture is fully defined.
 struct FormatCountCaptureHelper {
   template <class T = int>
   static ArgConvertResult<FormatConversionCharSetInternal::n> ConvertHelper(
-      const FormatCountCapture& v, FormatConversionSpecImpl conv,
+      const format_count_capture& v, FormatConversionSpecImpl conv,
       FormatSinkImpl* sink) {
-    const turbo::enable_if_t<sizeof(T) != 0, FormatCountCapture>& v2 = v;
+    const turbo::enable_if_t<sizeof(T) != 0, format_count_capture>& v2 = v;
 
     if (conv.conversion_char() !=
         str_format_internal::FormatConversionCharInternal::n) {
@@ -402,7 +402,7 @@ struct FormatCountCaptureHelper {
 
 template <class T = int>
 ArgConvertResult<FormatConversionCharSetInternal::n> FormatConvertImpl(
-    const FormatCountCapture& v, FormatConversionSpecImpl conv,
+    const format_count_capture& v, FormatConversionSpecImpl conv,
     FormatSinkImpl* sink) {
   return FormatCountCaptureHelper::ConvertHelper(v, conv, sink);
 }
@@ -601,12 +601,12 @@ class FormatArgImpl {
   template <typename T>
   static bool Dispatch(Data arg, FormatConversionSpecImpl spec, void* out) {
     // A `none` conv indicates that we want the `int` conversion.
-    if (TURBO_PREDICT_FALSE(spec.conversion_char() ==
+    if (TURBO_UNLIKELY(spec.conversion_char() ==
                            FormatConversionCharInternal::kNone)) {
       return ToInt<T>(arg, static_cast<int*>(out), std::is_integral<T>(),
                       std::is_enum<T>());
     }
-    if (TURBO_PREDICT_FALSE(!Contains(ArgumentToConv<T>(),
+    if (TURBO_UNLIKELY(!Contains(ArgumentToConv<T>(),
                                      spec.conversion_char()))) {
       return false;
     }

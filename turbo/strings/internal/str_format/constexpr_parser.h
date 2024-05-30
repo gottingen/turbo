@@ -203,11 +203,11 @@ constexpr int ParseDigits(char& c, const char*& pos, const char* const end) {
   // digit doesn't match the expected characters.
   int num_digits = std::numeric_limits<int>::digits10;
   for (;;) {
-    if (TURBO_PREDICT_FALSE(pos == end)) break;
+    if (TURBO_UNLIKELY(pos == end)) break;
     c = *pos++;
     if ('0' > c || c > '9') break;
     --num_digits;
-    if (TURBO_PREDICT_FALSE(!num_digits)) break;
+    if (TURBO_UNLIKELY(!num_digits)) break;
     digits = 10 * digits + c - '0';
   }
   return digits;
@@ -223,16 +223,16 @@ constexpr const char* ConsumeConversion(const char* pos, const char* const end,
   // no more chars to read.
 #define TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR()          \
   do {                                                  \
-    if (TURBO_PREDICT_FALSE(pos == end)) return nullptr; \
+    if (TURBO_UNLIKELY(pos == end)) return nullptr; \
     c = *pos++;                                         \
   } while (0)
 
   if (is_positional) {
     TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR();
-    if (TURBO_PREDICT_FALSE(c < '1' || c > '9')) return nullptr;
+    if (TURBO_UNLIKELY(c < '1' || c > '9')) return nullptr;
     conv->arg_position = ParseDigits(c, pos, end);
     assert(conv->arg_position > 0);
-    if (TURBO_PREDICT_FALSE(c != '$')) return nullptr;
+    if (TURBO_UNLIKELY(c != '$')) return nullptr;
   }
 
   TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR();
@@ -258,7 +258,7 @@ constexpr const char* ConsumeConversion(const char* pos, const char* const end,
       if (c >= '0') {
         int maybe_width = ParseDigits(c, pos, end);
         if (!is_positional && c == '$') {
-          if (TURBO_PREDICT_FALSE(*next_arg != 0)) return nullptr;
+          if (TURBO_UNLIKELY(*next_arg != 0)) return nullptr;
           // Positional conversion.
           *next_arg = -1;
           return ConsumeConversion<true>(original_pos, end, conv, next_arg);
@@ -269,9 +269,9 @@ constexpr const char* ConsumeConversion(const char* pos, const char* const end,
         conv->flags = conv->flags | Flags::kNonBasic;
         TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR();
         if (is_positional) {
-          if (TURBO_PREDICT_FALSE(c < '1' || c > '9')) return nullptr;
+          if (TURBO_UNLIKELY(c < '1' || c > '9')) return nullptr;
           conv->width.set_from_arg(ParseDigits(c, pos, end));
-          if (TURBO_PREDICT_FALSE(c != '$')) return nullptr;
+          if (TURBO_UNLIKELY(c != '$')) return nullptr;
           TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR();
         } else {
           conv->width.set_from_arg(++*next_arg);
@@ -287,7 +287,7 @@ constexpr const char* ConsumeConversion(const char* pos, const char* const end,
       } else if (c == '*') {
         TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR();
         if (is_positional) {
-          if (TURBO_PREDICT_FALSE(c < '1' || c > '9')) return nullptr;
+          if (TURBO_UNLIKELY(c < '1' || c > '9')) return nullptr;
           conv->precision.set_from_arg(ParseDigits(c, pos, end));
           if (c != '$') return nullptr;
           TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR();
@@ -302,12 +302,12 @@ constexpr const char* ConsumeConversion(const char* pos, const char* const end,
 
   auto tag = GetTagForChar(c);
 
-  if (TURBO_PREDICT_FALSE(c == 'v' && conv->flags != Flags::kBasic)) {
+  if (TURBO_UNLIKELY(c == 'v' && conv->flags != Flags::kBasic)) {
     return nullptr;
   }
 
-  if (TURBO_PREDICT_FALSE(!tag.is_conv())) {
-    if (TURBO_PREDICT_FALSE(!tag.is_length())) return nullptr;
+  if (TURBO_UNLIKELY(!tag.is_conv())) {
+    if (TURBO_UNLIKELY(!tag.is_length())) return nullptr;
 
     // It is a length modifier.
     LengthMod length_mod = tag.as_length();
@@ -323,8 +323,8 @@ constexpr const char* ConsumeConversion(const char* pos, const char* const end,
     }
     tag = GetTagForChar(c);
 
-    if (TURBO_PREDICT_FALSE(c == 'v')) return nullptr;
-    if (TURBO_PREDICT_FALSE(!tag.is_conv())) return nullptr;
+    if (TURBO_UNLIKELY(c == 'v')) return nullptr;
+    if (TURBO_UNLIKELY(!tag.is_conv())) return nullptr;
 
     // `wchar_t` args are marked non-basic so `Bind()` will copy the length mod.
     if (conv->length_mod == LengthMod::l && c == 'c') {

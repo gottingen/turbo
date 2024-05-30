@@ -20,7 +20,7 @@
 #include <turbo/log/sinks/rotating_file_sink.h>
 #include <turbo/log/internal/fs_helper.h>
 #include <turbo/strings/str_format.h>
-#include <turbo/time/clock.h>
+#include <turbo/times/clock.h>
 
 namespace turbo {
 
@@ -30,17 +30,17 @@ namespace turbo {
         }
 
         std::string basename, ext;
-        char buff[256];
         std::tie(basename, ext) = log_internal::split_by_extension(filename);
-        turbo::SNPrintF(buff, sizeof(buff), "%s.%zu%s", basename.c_str(), index, ext.c_str());
-        return buff;
+        std::string fname;
+        turbo::format(&fname,"%s.%zu%s", basename.c_str(), index, ext.c_str());
+        return fname;
     }
 
     RotatingFileSink::RotatingFileSink(turbo::string_view base_filename,std::size_t max_size,
-            std::size_t max_files,int check_interval_s) : _base_filename(base_filename), max_size_(max_size), max_files_(max_files), _check_interval_s(check_interval_s), _next_check_time(turbo::Now() + turbo::Seconds(check_interval_s)) {
+            std::size_t max_files,int check_interval_s) : _base_filename(base_filename), max_size_(max_size), max_files_(max_files), _check_interval_s(check_interval_s), _next_check_time(turbo::Time::current_time() + turbo::Duration::seconds(check_interval_s)) {
         _file_writer = std::make_unique<log_internal::AppendFile>();
         _file_writer->initialize(_base_filename);
-        do_rotate(turbo::Now());
+        do_rotate(turbo::Time::current_time());
     }
 
     RotatingFileSink::~RotatingFileSink() {
@@ -56,7 +56,7 @@ namespace turbo {
             return;
         }
         // Write to the current file
-        if(TURBO_PREDICT_TRUE(entry.log_severity() != LogSeverity::kFatal)) {
+        if(TURBO_LIKELY(entry.log_severity() != LogSeverity::kFatal)) {
             _file_writer->write(entry.text_message_with_prefix_and_newline());
         } else {
             if(!entry.stacktrace().empty()) {
@@ -76,7 +76,7 @@ namespace turbo {
         if (stmp >= _next_check_time) {
             _file_writer->close();
             _file_writer->reopen();
-            _next_check_time = stmp + turbo::Seconds(_check_interval_s);
+            _next_check_time = stmp + turbo::Duration::seconds(_check_interval_s);
 
         }
 

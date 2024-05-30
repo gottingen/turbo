@@ -47,7 +47,7 @@ void BM_Sum_By_StrCat(benchmark::State& state) {
   char foo[100];
   for (auto _ : state) {
     // NOLINTNEXTLINE(runtime/printf)
-    strcpy(foo, turbo::StrCat(kStringOne, i, kStringTwo, i * 65536ULL).c_str());
+    strcpy(foo, turbo::str_cat(kStringOne, i, kStringTwo, i * 65536ULL).c_str());
     int sum = 0;
     for (char* f = &foo[0]; *f != 0; ++f) {
       sum += *f;
@@ -72,7 +72,7 @@ void BM_StrCat_By_Strings(benchmark::State& state) {
   int i = 0;
   for (auto _ : state) {
     std::string result =
-        std::string(kStringOne) + " " + kStringTwo + ":" + turbo::StrCat(i);
+        std::string(kStringOne) + " " + kStringTwo + ":" + turbo::str_cat(i);
     benchmark::DoNotOptimize(result);
     i = IncrementAlternatingSign(i);
   }
@@ -86,7 +86,7 @@ void BM_StrCat_By_StringOpPlus(benchmark::State& state) {
     result += " ";
     result += kStringTwo;
     result += ":";
-    result += turbo::StrCat(i);
+    result += turbo::str_cat(i);
     benchmark::DoNotOptimize(result);
     i = IncrementAlternatingSign(i);
   }
@@ -96,7 +96,7 @@ BENCHMARK(BM_StrCat_By_StringOpPlus);
 void BM_StrCat_By_StrCat(benchmark::State& state) {
   int i = 0;
   for (auto _ : state) {
-    std::string result = turbo::StrCat(kStringOne, " ", kStringTwo, ":", i);
+    std::string result = turbo::str_cat(kStringOne, " ", kStringTwo, ":", i);
     benchmark::DoNotOptimize(result);
     i = IncrementAlternatingSign(i);
   }
@@ -107,7 +107,7 @@ void BM_HexCat_By_StrCat(benchmark::State& state) {
   int i = 0;
   for (auto _ : state) {
     std::string result =
-        turbo::StrCat(kStringOne, " ", turbo::Hex(int64_t{i} + 0x10000000));
+        turbo::str_cat(kStringOne, " ", turbo::Hex(int64_t{i} + 0x10000000));
     benchmark::DoNotOptimize(result);
     i = IncrementAlternatingSign(i);
   }
@@ -117,7 +117,7 @@ BENCHMARK(BM_HexCat_By_StrCat);
 void BM_HexCat_By_Substitute(benchmark::State& state) {
   int i = 0;
   for (auto _ : state) {
-    std::string result = turbo::Substitute(
+    std::string result = turbo::substitute(
         "$0 $1", kStringOne, reinterpret_cast<void*>(int64_t{i} + 0x10000000));
     benchmark::DoNotOptimize(result);
     i = IncrementAlternatingSign(i);
@@ -129,7 +129,7 @@ void BM_FloatToString_By_StrCat(benchmark::State& state) {
   int i = 0;
   float foo = 0.0f;
   for (auto _ : state) {
-    std::string result = turbo::StrCat(foo += 1.001f, " != ", int64_t{i});
+    std::string result = turbo::str_cat(foo += 1.001f, " != ", int64_t{i});
     benchmark::DoNotOptimize(result);
     i = IncrementAlternatingSign(i);
   }
@@ -141,7 +141,7 @@ void BM_DoubleToString_By_SixDigits(benchmark::State& state) {
   double foo = 0.0;
   for (auto _ : state) {
     std::string result =
-        turbo::StrCat(turbo::SixDigits(foo += 1.001), " != ", int64_t{i});
+        turbo::str_cat(turbo::six_digits(foo += 1.001), " != ", int64_t{i});
     benchmark::DoNotOptimize(result);
     i = IncrementAlternatingSign(i);
   }
@@ -156,7 +156,7 @@ void BM_StrAppendImpl(benchmark::State& state, Table table, size_t total_bytes,
     size_t i = 0;
     std::string result;
     while (result.size() < total_bytes) {
-      turbo::StrAppend(&result, std::get<Index>(table[i])...);
+      turbo::str_append(&result, std::get<Index>(table[i])...);
       benchmark::DoNotOptimize(result);
       ++i;
       i -= i >= table_size ? table_size : 0;
@@ -229,7 +229,7 @@ template <typename... Chunks>
 void BM_StrCatImpl(benchmark::State& state,
                       Chunks... chunks) {
   for (auto s : state) {
-    std::string result = turbo::StrCat(chunks...);
+    std::string result = turbo::str_cat(chunks...);
     benchmark::DoNotOptimize(result);
   }
 }
@@ -257,7 +257,7 @@ BENCHMARK(BM_StrCat)->Arg(1)->Arg(2)->Arg(3)->Arg(4);
 void BM_StrCat_int(benchmark::State& state) {
   int i = 0;
   for (auto s : state) {
-    std::string result = turbo::StrCat(i);
+    std::string result = turbo::str_cat(i);
     benchmark::DoNotOptimize(result);
     i = IncrementAlternatingSign(i);
   }

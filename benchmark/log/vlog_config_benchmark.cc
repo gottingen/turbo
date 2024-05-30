@@ -51,7 +51,7 @@ class SyntheticBinary {
     auto sites = turbo::make_unique<VLogSite *[]>(num_tus * max_sites_per_tu);
     for (size_t i = 0; i < num_tus; i++) {
       const std::string filename =
-          turbo::StrCat("directory-", i / 100, "/subdirectory-", i % 100 / 10,
+          turbo::str_cat("directory-", i / 100, "/subdirectory-", i % 100 / 10,
                        "/file-", i % 10, ".cc");
       container_internal::Layout<char, VLogSite, char> layout(
           filename.size() + 1,

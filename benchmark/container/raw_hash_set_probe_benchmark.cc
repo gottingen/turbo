@@ -254,7 +254,7 @@ template <bool small>
 struct String {
   std::string value;
   static std::string Make(uint32_t v) {
-    return {small ? turbo::StrCat(v) : turbo::StrFormat(kStringFormat, v)};
+    return {small ? turbo::str_cat(v) : turbo::str_format(kStringFormat, v)};
   }
 };
 
@@ -416,12 +416,12 @@ std::string Name(IntIdentity*) { return "IntIdentity"; }
 
 template <int Align>
 std::string Name(Ptr<Align>**) {
-  return turbo::StrCat("Ptr", Align);
+  return turbo::str_cat("Ptr", Align);
 }
 
 template <int Align>
 std::string Name(PtrIdentity<Align>*) {
-  return turbo::StrCat("PtrIdentity", Align);
+  return turbo::str_cat("PtrIdentity", Align);
 }
 
 template <bool small>
@@ -432,8 +432,8 @@ std::string Name(String<small>*) {
 template <class T, class U>
 std::string Name(std::pair<T, U>*) {
   if (output() == OutputStyle::kBenchmark)
-    return turbo::StrCat("P_", Name<T>(), "_", Name<U>());
-  return turbo::StrCat("P<", Name<T>(), ",", Name<U>(), ">");
+    return turbo::str_cat("P_", Name<T>(), "_", Name<U>());
+  return turbo::str_cat("P<", Name<T>(), ",", Name<U>(), ">");
 }
 
 template <class T>
@@ -443,7 +443,7 @@ std::string Name(Sequential<T>*) {
 
 template <class T, int P>
 std::string Name(AlmostSequential<T, P>*) {
-  return turbo::StrCat("AlmostSeq_", P);
+  return turbo::str_cat("AlmostSeq_", P);
 }
 
 template <class T>
@@ -486,12 +486,12 @@ struct Result {
 
 template <typename T, typename Dist>
 void RunForTypeAndDistribution(std::vector<Result>& results) {
-  std::string name = turbo::StrCat(Name<T>(), "/", Name<Dist>());
+  std::string name = turbo::str_cat(Name<T>(), "/", Name<Dist>());
   // We have to check against all three names (min/avg/max) before we run it.
   // If any of them is enabled, we run it.
-  if (!CanRunBenchmark(turbo::StrCat(name, "/min")) &&
-      !CanRunBenchmark(turbo::StrCat(name, "/avg")) &&
-      !CanRunBenchmark(turbo::StrCat(name, "/max"))) {
+  if (!CanRunBenchmark(turbo::str_cat(name, "/min")) &&
+      !CanRunBenchmark(turbo::str_cat(name, "/avg")) &&
+      !CanRunBenchmark(turbo::str_cat(name, "/max"))) {
     return;
   }
   results.push_back({Name<T>(), Name<Dist>(), CollectMeanProbeLengths<Dist>()});
@@ -518,18 +518,18 @@ int main(int argc, char** argv) {
     turbo::string_view arg = argv[i];
     const auto next = [&] { return argv[std::min(i + 1, argc - 1)]; };
 
-    if (turbo::ConsumePrefix(&arg, "--benchmark_filter")) {
+    if (turbo::consume_prefix(&arg, "--benchmark_filter")) {
       if (arg == "") {
         // --benchmark_filter X
         benchmarks = next();
-      } else if (turbo::ConsumePrefix(&arg, "=")) {
+      } else if (turbo::consume_prefix(&arg, "=")) {
         // --benchmark_filter=X
         benchmarks = arg;
       }
     }
 
     // Any --benchmark flag turns on the mode.
-    if (turbo::ConsumePrefix(&arg, "--benchmark")) {
+    if (turbo::consume_prefix(&arg, "--benchmark")) {
       if (benchmarks.empty()) benchmarks="all";
     }
   }
@@ -571,7 +571,7 @@ int main(int argc, char** argv) {
       for (const auto& result : results) {
         auto print = [&](turbo::string_view stat, double Ratios::*val) {
           std::string name =
-              turbo::StrCat(result.name, "/", result.dist_name, "/", stat);
+              turbo::str_cat(result.name, "/", result.dist_name, "/", stat);
           // Check the regex again. We might had have enabled only one of the
           // stats for the benchmark.
           if (!CanRunBenchmark(name)) return;

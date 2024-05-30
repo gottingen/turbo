@@ -41,8 +41,8 @@
 #include <turbo/memory/memory.h>
 #include <turbo/synchronization/internal/create_thread_identity.h>
 #include <turbo/synchronization/internal/thread_pool.h>
-#include <turbo/time/clock.h>
-#include <turbo/time/time.h>
+#include <turbo/times/clock.h>
+#include <turbo/times/time.h>
 
 #ifdef TURBO_HAVE_PTHREAD_GETSCHEDPARAM
 #include <pthread.h>
@@ -70,7 +70,7 @@ static void ScheduleAfter(turbo::synchronization_internal::ThreadPool *tp,
                           turbo::Duration after,
                           const std::function<void()> &func) {
   tp->Schedule([func, after] {
-    turbo::SleepFor(after);
+    turbo::sleep_for(after);
     func();
   });
 }
@@ -130,7 +130,7 @@ static void TestTry(TestContext *cxt, int c) {
 static void TestR20ms(TestContext *cxt, int c) {
   for (int i = 0; i != cxt->iterations; i++) {
     turbo::ReaderMutexLock l(&cxt->mu);
-    turbo::SleepFor(turbo::Milliseconds(20));
+    turbo::sleep_for(turbo::Duration::milliseconds(20));
     cxt->mu.AssertReaderHeld();
   }
 }
@@ -223,7 +223,7 @@ static void TestCVTimeout(TestContext *cxt, int c) {
   cxt->mu.AssertHeld();
   while (cxt->g0 < cxt->iterations) {
     while (cxt->g0 != target && cxt->g0 != cxt->iterations) {
-      cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Seconds(100));
+      cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Duration::seconds(100));
     }
     if (cxt->g0 < cxt->iterations) {
       int a = cxt->g0 + 1;
@@ -245,92 +245,92 @@ static void TestTime(TestContext *cxt, int c, bool use_cv) {
   if (c == 0) {
     turbo::MutexLock l(&cxt->mu);
 
-    turbo::Time start = turbo::Now();
+    turbo::Time start = turbo::Time::current_time();
     if (use_cv) {
-      cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Seconds(1));
+      cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Duration::seconds(1));
     } else {
-      CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Seconds(1)))
+      CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Duration::seconds(1)))
           << "TestTime failed";
     }
-    turbo::Duration elapsed = turbo::Now() - start;
-    CHECK(turbo::Seconds(0.9) <= elapsed && elapsed <= turbo::Seconds(2.0))
+    turbo::Duration elapsed = turbo::Time::current_time() - start;
+    CHECK(turbo::Duration::seconds(0.9) <= elapsed && elapsed <= turbo::Duration::seconds(2.0))
         << "TestTime failed";
     CHECK_EQ(cxt->g0, 1) << "TestTime failed";
 
-    start = turbo::Now();
+    start = turbo::Time::current_time();
     if (use_cv) {
-      cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Seconds(1));
+      cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Duration::seconds(1));
     } else {
-      CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Seconds(1)))
+      CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Duration::seconds(1)))
           << "TestTime failed";
     }
-    elapsed = turbo::Now() - start;
-    CHECK(turbo::Seconds(0.9) <= elapsed && elapsed <= turbo::Seconds(2.0))
+    elapsed = turbo::Time::current_time() - start;
+    CHECK(turbo::Duration::seconds(0.9) <= elapsed && elapsed <= turbo::Duration::seconds(2.0))
         << "TestTime failed";
     cxt->g0++;
     if (use_cv) {
       cxt->cv.Signal();
     }
 
-    start = turbo::Now();
+    start = turbo::Time::current_time();
     if (use_cv) {
-      cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Seconds(4));
+      cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Duration::seconds(4));
     } else {
-      CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Seconds(4)))
+      CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Duration::seconds(4)))
           << "TestTime failed";
     }
-    elapsed = turbo::Now() - start;
-    CHECK(turbo::Seconds(3.9) <= elapsed && elapsed <= turbo::Seconds(6.0))
+    elapsed = turbo::Time::current_time() - start;
+    CHECK(turbo::Duration::seconds(3.9) <= elapsed && elapsed <= turbo::Duration::seconds(6.0))
         << "TestTime failed";
     CHECK_GE(cxt->g0, 3) << "TestTime failed";
 
-    start = turbo::Now();
+    start = turbo::Time::current_time();
     if (use_cv) {
-      cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Seconds(1));
+      cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Duration::seconds(1));
     } else {
-      CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Seconds(1)))
+      CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Duration::seconds(1)))
           << "TestTime failed";
     }
-    elapsed = turbo::Now() - start;
-    CHECK(turbo::Seconds(0.9) <= elapsed && elapsed <= turbo::Seconds(2.0))
+    elapsed = turbo::Time::current_time() - start;
+    CHECK(turbo::Duration::seconds(0.9) <= elapsed && elapsed <= turbo::Duration::seconds(2.0))
         << "TestTime failed";
     if (use_cv) {
       cxt->cv.SignalAll();
     }
 
-    start = turbo::Now();
+    start = turbo::Time::current_time();
     if (use_cv) {
-      cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Seconds(1));
+      cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Duration::seconds(1));
     } else {
-      CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Seconds(1)))
+      CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Duration::seconds(1)))
           << "TestTime failed";
     }
-    elapsed = turbo::Now() - start;
-    CHECK(turbo::Seconds(0.9) <= elapsed && elapsed <= turbo::Seconds(2.0))
+    elapsed = turbo::Time::current_time() - start;
+    CHECK(turbo::Duration::seconds(0.9) <= elapsed && elapsed <= turbo::Duration::seconds(2.0))
         << "TestTime failed";
     CHECK_EQ(cxt->g0, cxt->threads) << "TestTime failed";
 
   } else if (c == 1) {
     turbo::MutexLock l(&cxt->mu);
-    const turbo::Time start = turbo::Now();
+    const turbo::Time start = turbo::Time::current_time();
     if (use_cv) {
-      cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Milliseconds(500));
+      cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Duration::milliseconds(500));
     } else {
-      CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Milliseconds(500)))
+      CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Duration::milliseconds(500)))
           << "TestTime failed";
     }
-    const turbo::Duration elapsed = turbo::Now() - start;
-    CHECK(turbo::Seconds(0.4) <= elapsed && elapsed <= turbo::Seconds(0.9))
+    const turbo::Duration elapsed = turbo::Time::current_time() - start;
+    CHECK(turbo::Duration::seconds(0.4) <= elapsed && elapsed <= turbo::Duration::seconds(0.9))
         << "TestTime failed";
     cxt->g0++;
   } else if (c == 2) {
     turbo::MutexLock l(&cxt->mu);
     if (use_cv) {
       while (cxt->g0 < 2) {
-        cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Seconds(100));
+        cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Duration::seconds(100));
       }
     } else {
-      CHECK(cxt->mu.AwaitWithTimeout(g0ge2, turbo::Seconds(100)))
+      CHECK(cxt->mu.AwaitWithTimeout(g0ge2, turbo::Duration::seconds(100)))
           << "TestTime failed";
     }
     cxt->g0++;
@@ -508,7 +508,7 @@ TEST(Mutex, CondVarWaitWithTimeoutSignalsAwait) {
   // which will signal released_cv.  If not, the test will hang.
   state.release = true;
   EXPECT_TRUE(
-      !state.released_cv.WaitWithTimeout(&state.release_mu, turbo::Seconds(10)))
+      !state.released_cv.WaitWithTimeout(&state.release_mu, turbo::Duration::seconds(10)))
       << "; Unrecoverable test failure: CondVar::WaitWithTimeout did not "
          "unblock the turbo::Mutex::Await call in another thread.";
 
@@ -524,7 +524,7 @@ TEST(Mutex, MutexTimeoutBug) {
   x.a_waiter_count = 2;
   tp->Schedule(std::bind(&WaitForA, &x));
   tp->Schedule(std::bind(&WaitForA, &x));
-  turbo::SleepFor(turbo::Seconds(1));  // Allow first two threads to hang.
+  turbo::sleep_for(turbo::Duration::seconds(1));  // Allow first two threads to hang.
   // The skip field of the second will point to the first because there are
   // only two.
 
@@ -532,7 +532,7 @@ TEST(Mutex, MutexTimeoutBug) {
   // This would deadlock when the bug was present.
   bool always_false = false;
   x.mu.LockWhenWithTimeout(turbo::Condition(&always_false),
-                           turbo::Milliseconds(500));
+                           turbo::Duration::milliseconds(500));
 
   // if we get here, the bug is not present.   Cleanup the state.
 
@@ -599,7 +599,7 @@ TEST_P(CondVarWaitDeadlock, Test) {
   waiter2->Schedule([this] { this->Waiter2(); });
 
   // Wait while threads block (best-effort is fine).
-  turbo::SleepFor(turbo::Milliseconds(100));
+  turbo::sleep_for(turbo::Duration::milliseconds(100));
 
   // Wake condwaiter.
   mu.Lock();
@@ -647,7 +647,7 @@ static void AcquireAsReader(DequeueAllWakeableBugStruct *x) {
   x->done1 = (x->unfinished_count == 0);
   x->mu2.Unlock();
   // make sure that both readers acquired mu before we release it.
-  turbo::SleepFor(turbo::Seconds(2));
+  turbo::sleep_for(turbo::Duration::seconds(2));
   x->mu.ReaderUnlock();
 
   x->mu2.Lock();
@@ -669,16 +669,16 @@ TEST(Mutex, MutexReaderWakeupBug) {
   // queue two thread that will block on reader locks on x.mu
   tp->Schedule(std::bind(&AcquireAsReader, &x));
   tp->Schedule(std::bind(&AcquireAsReader, &x));
-  turbo::SleepFor(turbo::Seconds(1));  // give time for reader threads to block
+  turbo::sleep_for(turbo::Duration::seconds(1));  // give time for reader threads to block
   x.mu.Unlock();                     // wake them up
 
   // both readers should finish promptly
   EXPECT_TRUE(
-      x.mu2.LockWhenWithTimeout(turbo::Condition(&x.done1), turbo::Seconds(10)));
+      x.mu2.LockWhenWithTimeout(turbo::Condition(&x.done1), turbo::Duration::seconds(10)));
   x.mu2.Unlock();
 
   EXPECT_TRUE(
-      x.mu2.LockWhenWithTimeout(turbo::Condition(&x.done2), turbo::Seconds(10)));
+      x.mu2.LockWhenWithTimeout(turbo::Condition(&x.done2), turbo::Duration::seconds(10)));
   x.mu2.Unlock();
 }
 
@@ -1072,8 +1072,8 @@ static void ReaderForReaderOnCondVar(turbo::Mutex *mu, turbo::CondVar *cv,
   std::uniform_int_distribution<int> random_millis(0, 15);
   mu->ReaderLock();
   while (*running == 3) {
-    turbo::SleepFor(turbo::Milliseconds(random_millis(gen)));
-    cv->WaitWithTimeout(mu, turbo::Milliseconds(random_millis(gen)));
+    turbo::sleep_for(turbo::Duration::milliseconds(random_millis(gen)));
+    cv->WaitWithTimeout(mu, turbo::Duration::milliseconds(random_millis(gen)));
   }
   mu->ReaderUnlock();
   mu->Lock();
@@ -1092,7 +1092,7 @@ TEST(Mutex, TestReaderOnCondVar) {
   int running = 3;
   tp->Schedule(std::bind(&ReaderForReaderOnCondVar, &mu, &cv, &running));
   tp->Schedule(std::bind(&ReaderForReaderOnCondVar, &mu, &cv, &running));
-  turbo::SleepFor(turbo::Seconds(2));
+  turbo::sleep_for(turbo::Duration::seconds(2));
   mu.Lock();
   running--;
   mu.Await(turbo::Condition(&IntIsZero, &running));
@@ -1119,7 +1119,7 @@ static bool ConditionWithAcquire(AcquireFromConditionStruct *x) {
     // this side effect; previously it did not.  it was illegal.
     bool always_false = false;
     x->mu1.LockWhenWithTimeout(turbo::Condition(&always_false),
-                               turbo::Milliseconds(100));
+                               turbo::Duration::milliseconds(100));
     x->mu1.Unlock();
   }
   CHECK_LT(x->value, 4) << "should not be invoked a fourth time";
@@ -1146,10 +1146,10 @@ TEST(Mutex, AcquireFromCondition) {
       std::bind(&WaitForCond2, &x));  // run WaitForCond2() in a thread T
   // T will hang because the first invocation of ConditionWithAcquire() will
   // return false.
-  turbo::SleepFor(turbo::Milliseconds(500));  // allow T time to hang
+  turbo::sleep_for(turbo::Duration::milliseconds(500));  // allow T time to hang
 
   x.mu0.Lock();
-  x.cv.WaitWithTimeout(&x.mu0, turbo::Milliseconds(500));  // wake T
+  x.cv.WaitWithTimeout(&x.mu0, turbo::Duration::milliseconds(500));  // wake T
   // T will be woken because the Wait() will call ConditionWithAcquire()
   // for the second time, and it will return true.
 
@@ -1355,7 +1355,7 @@ TEST(Mutex, DeadlockIdBug) TURBO_NO_THREAD_SAFETY_ANALYSIS {
 static turbo::Duration TimeoutTestAllowedSchedulingDelay() {
   // Note: we use a function here because Microsoft Visual Studio fails to
   // properly initialize constexpr static turbo::Duration variables.
-  return turbo::Milliseconds(150);
+  return turbo::Duration::milliseconds(150);
 }
 
 // Returns true if `actual_delay` is close enough to `expected_delay` to pass
@@ -1366,7 +1366,7 @@ static bool DelayIsWithinBounds(turbo::Duration expected_delay,
   bool pass = true;
   // Do not allow the observed delay to be less than expected.  This may occur
   // in practice due to clock skew or when the synchronization primitives use a
-  // different clock than turbo::Now(), but these cases should be handled by the
+  // different clock than turbo::Time::current_time(), but these cases should be handled by the
   // the retry mechanism in each TimeoutTest.
   if (actual_delay < expected_delay) {
     LOG(WARNING) << "Actual delay " << actual_delay
@@ -1378,8 +1378,8 @@ static bool DelayIsWithinBounds(turbo::Duration expected_delay,
   // we do not expect context switches to occur during test execution.
   // Otherwise, thread scheduling delays may be substantial in rare cases, so
   // tolerate up to kTimeoutTestAllowedSchedulingDelay of error.
-  turbo::Duration tolerance = expected_delay <= turbo::ZeroDuration()
-                                 ? turbo::Milliseconds(10)
+  turbo::Duration tolerance = expected_delay <= turbo::Duration::zero()
+                                 ? turbo::Duration::milliseconds(10)
                                  : TimeoutTestAllowedSchedulingDelay();
   if (actual_delay > expected_delay + tolerance) {
     LOG(WARNING) << "Actual delay " << actual_delay
@@ -1441,9 +1441,9 @@ std::ostream &operator<<(std::ostream &os, const TimeoutTestParam &param) {
 static void RunAfterDelay(turbo::Duration delay,
                           turbo::synchronization_internal::ThreadPool *pool,
                           const std::function<void()> &callback) {
-  if (delay <= turbo::ZeroDuration()) {
+  if (delay <= turbo::Duration::zero()) {
     callback();  // immediate
-  } else if (delay != turbo::InfiniteDuration()) {
+  } else if (delay != turbo::Duration::max_infinite()) {
     ScheduleAfter(pool, delay, callback);
   }
 }
@@ -1456,9 +1456,9 @@ std::vector<TimeoutTestParam> MakeTimeoutTestParamValues() {
   // than our allowed scheduling delay (slop factor) to avoid confusion when
   // diagnosing test failures.  The other constants here have clear meanings.
   const turbo::Duration finite = 3 * TimeoutTestAllowedSchedulingDelay();
-  const turbo::Duration never = turbo::InfiniteDuration();
-  const turbo::Duration negative = -turbo::InfiniteDuration();
-  const turbo::Duration immediate = turbo::ZeroDuration();
+  const turbo::Duration never = turbo::Duration::max_infinite();
+  const turbo::Duration negative = -turbo::Duration::max_infinite();
+  const turbo::Duration immediate = turbo::Duration::zero();
 
   // Every test case is run twice; once using the absolute deadline API and once
   // using the relative timeout API.
@@ -1582,13 +1582,13 @@ TEST_P(TimeoutTest, Await) {
     });
 
     turbo::MutexLock lock(&mu);
-    turbo::Time start_time = turbo::Now();
+    turbo::Time start_time = turbo::Time::current_time();
     turbo::Condition cond(&value);
     bool result =
         params.use_absolute_deadline
             ? mu.AwaitWithDeadline(cond, start_time + params.wait_timeout)
             : mu.AwaitWithTimeout(cond, params.wait_timeout);
-    if (DelayIsWithinBounds(params.expected_delay, turbo::Now() - start_time)) {
+    if (DelayIsWithinBounds(params.expected_delay, turbo::Time::current_time() - start_time)) {
       EXPECT_EQ(params.expected_result, result);
       break;
     }
@@ -1615,7 +1615,7 @@ TEST_P(TimeoutTest, LockWhen) {
       value = true;
     });
 
-    turbo::Time start_time = turbo::Now();
+    turbo::Time start_time = turbo::Time::current_time();
     turbo::Condition cond(&value);
     bool result =
         params.use_absolute_deadline
@@ -1623,7 +1623,7 @@ TEST_P(TimeoutTest, LockWhen) {
             : mu.LockWhenWithTimeout(cond, params.wait_timeout);
     mu.Unlock();
 
-    if (DelayIsWithinBounds(params.expected_delay, turbo::Now() - start_time)) {
+    if (DelayIsWithinBounds(params.expected_delay, turbo::Time::current_time() - start_time)) {
       EXPECT_EQ(params.expected_result, result);
       break;
     }
@@ -1650,7 +1650,7 @@ TEST_P(TimeoutTest, ReaderLockWhen) {
       value = true;
     });
 
-    turbo::Time start_time = turbo::Now();
+    turbo::Time start_time = turbo::Time::current_time();
     bool result =
         params.use_absolute_deadline
             ? mu.ReaderLockWhenWithDeadline(turbo::Condition(&value),
@@ -1659,7 +1659,7 @@ TEST_P(TimeoutTest, ReaderLockWhen) {
                                            params.wait_timeout);
     mu.ReaderUnlock();
 
-    if (DelayIsWithinBounds(params.expected_delay, turbo::Now() - start_time)) {
+    if (DelayIsWithinBounds(params.expected_delay, turbo::Time::current_time() - start_time)) {
       EXPECT_EQ(params.expected_result, result);
       break;
     }
@@ -1689,7 +1689,7 @@ TEST_P(TimeoutTest, Wait) {
     });
 
     turbo::MutexLock lock(&mu);
-    turbo::Time start_time = turbo::Now();
+    turbo::Time start_time = turbo::Time::current_time();
     turbo::Duration timeout = params.wait_timeout;
     turbo::Time deadline = start_time + timeout;
     while (!value) {
@@ -1697,11 +1697,11 @@ TEST_P(TimeoutTest, Wait) {
                                        : cv.WaitWithTimeout(&mu, timeout)) {
         break;  // deadline/timeout exceeded
       }
-      timeout = deadline - turbo::Now();  // recompute
+      timeout = deadline - turbo::Time::current_time();  // recompute
     }
     bool result = value;  // note: `mu` is still held
 
-    if (DelayIsWithinBounds(params.expected_delay, turbo::Now() - start_time)) {
+    if (DelayIsWithinBounds(params.expected_delay, turbo::Time::current_time() - start_time)) {
       EXPECT_EQ(params.expected_result, result);
       break;
     }
@@ -1715,7 +1715,7 @@ TEST(Mutex, Logging) {
   turbo::CondVar logged_cv;
   logged_cv.EnableDebugLog("rover_cv");
   logged_mutex.Lock();
-  logged_cv.WaitWithTimeout(&logged_mutex, turbo::Milliseconds(20));
+  logged_cv.WaitWithTimeout(&logged_mutex, turbo::Duration::milliseconds(20));
   logged_mutex.Unlock();
   logged_mutex.ReaderLock();
   logged_mutex.ReaderUnlock();
@@ -1939,11 +1939,11 @@ TEST(Mutex, WriterPriority) {
         saw_wrote = true;
         break;
       }
-      turbo::SleepFor(turbo::Seconds(1));
+      turbo::sleep_for(turbo::Duration::seconds(1));
     }
   };
   std::thread t1(readfunc);
-  turbo::SleepFor(turbo::Milliseconds(500));
+  turbo::sleep_for(turbo::Duration::milliseconds(500));
   std::thread t2(readfunc);
   // Note: this test guards against a bug that was related to an uninit
   // PerThreadSynch::priority, so the writer intentionally runs on a new thread.
@@ -1991,7 +1991,7 @@ TEST(Mutex, CondVarPriority) {
     mu.Lock();
     mu.Await(turbo::Condition(&waiting));
     morph = true;
-    turbo::SleepFor(turbo::Seconds(1));
+    turbo::sleep_for(turbo::Duration::seconds(1));
     cv.Signal();
     mu.Unlock();
   });
@@ -2018,20 +2018,20 @@ TEST(Mutex, LockWhenWithTimeoutResult) {
   turbo::Mutex mu;
   const bool kAlwaysTrue = true, kAlwaysFalse = false;
   const turbo::Condition kTrueCond(&kAlwaysTrue), kFalseCond(&kAlwaysFalse);
-  EXPECT_TRUE(mu.LockWhenWithTimeout(kTrueCond, turbo::Milliseconds(1)));
+  EXPECT_TRUE(mu.LockWhenWithTimeout(kTrueCond, turbo::Duration::milliseconds(1)));
   mu.Unlock();
-  EXPECT_FALSE(mu.LockWhenWithTimeout(kFalseCond, turbo::Milliseconds(1)));
-  EXPECT_TRUE(mu.AwaitWithTimeout(kTrueCond, turbo::Milliseconds(1)));
-  EXPECT_FALSE(mu.AwaitWithTimeout(kFalseCond, turbo::Milliseconds(1)));
+  EXPECT_FALSE(mu.LockWhenWithTimeout(kFalseCond, turbo::Duration::milliseconds(1)));
+  EXPECT_TRUE(mu.AwaitWithTimeout(kTrueCond, turbo::Duration::milliseconds(1)));
+  EXPECT_FALSE(mu.AwaitWithTimeout(kFalseCond, turbo::Duration::milliseconds(1)));
   std::thread th1([&]() {
-    EXPECT_TRUE(mu.LockWhenWithTimeout(kTrueCond, turbo::Milliseconds(1)));
+    EXPECT_TRUE(mu.LockWhenWithTimeout(kTrueCond, turbo::Duration::milliseconds(1)));
     mu.Unlock();
   });
   std::thread th2([&]() {
-    EXPECT_FALSE(mu.LockWhenWithTimeout(kFalseCond, turbo::Milliseconds(1)));
+    EXPECT_FALSE(mu.LockWhenWithTimeout(kFalseCond, turbo::Duration::milliseconds(1)));
     mu.Unlock();
   });
-  turbo::SleepFor(turbo::Milliseconds(100));
+  turbo::sleep_for(turbo::Duration::milliseconds(100));
   mu.Unlock();
   th1.join();
   th2.join();

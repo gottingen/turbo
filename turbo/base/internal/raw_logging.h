@@ -61,7 +61,7 @@
 // so that the args are not computed when not needed.
 #define TURBO_RAW_CHECK(condition, message)                             \
   do {                                                                 \
-    if (TURBO_PREDICT_FALSE(!(condition))) {                            \
+    if (TURBO_UNLIKELY(!(condition))) {                            \
       TURBO_RAW_LOG(FATAL, "Check %s failed: %s", #condition, message); \
     }                                                                  \
   } while (0)
@@ -74,7 +74,7 @@
 // few other dependencies.
 //
 // The API is a subset of the above: each macro only takes two arguments.  Use
-// StrCat if you need to build a richer message.
+// str_cat if you need to build a richer message.
 #define TURBO_INTERNAL_LOG(severity, message)                              \
   do {                                                                    \
     constexpr const char* turbo_raw_log_internal_filename = __FILE__;      \
@@ -86,7 +86,7 @@
 
 #define TURBO_INTERNAL_CHECK(condition, message)                    \
   do {                                                             \
-    if (TURBO_PREDICT_FALSE(!(condition))) {                        \
+    if (TURBO_UNLIKELY(!(condition))) {                        \
       std::string death_message = "Check " #condition " failed: "; \
       death_message += std::string(message);                       \
       TURBO_INTERNAL_LOG(FATAL, death_message);                     \

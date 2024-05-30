@@ -65,7 +65,7 @@ enum class MockLogDefault { kIgnoreUnexpected, kDisallowUnexpected };
 //         .Times(2);
 //
 //     // But we want no messages from foo.cc.
-//     EXPECT_CALL(log, Log(_, EndsWith("/foo.cc"), _)).Times(0);
+//     EXPECT_CALL(log, Log(_, ends_with("/foo.cc"), _)).Times(0);
 //
 //     log.StartCapturingLogs();  // Call this after done setting expectations.
 //     Foo();  // Exercises the code under test.
@@ -80,7 +80,7 @@ enum class MockLogDefault { kIgnoreUnexpected, kDisallowUnexpected };
 //         .Times(AnyNumber());
 //
 //     // We expect the ERROR "Something bad!" exactly once.
-//     EXPECT_CALL(log, Log(turbo::LogSeverity::kError, EndsWith("/foo.cc"),
+//     EXPECT_CALL(log, Log(turbo::LogSeverity::kError, ends_with("/foo.cc"),
 //                 "Something bad!"))
 //         .Times(1);
 //

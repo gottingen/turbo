@@ -309,7 +309,7 @@ class Span {
   //
   // Returns a reference to the i'th element of this span.
   constexpr reference at(size_type i) const {
-    return TURBO_PREDICT_TRUE(i < size())  //
+    return TURBO_LIKELY(i < size())  //
                ? *(data() + i)
                : (base_internal::ThrowStdOutOfRange(
                       "Span::at failed bounds check"),

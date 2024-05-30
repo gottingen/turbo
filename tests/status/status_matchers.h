@@ -26,7 +26,7 @@
 #include <gmock/gmock.h>  // gmock_for_status_matchers.h
 #include <turbo/base/config.h>
 #include <turbo/status/status.h>
-#include <turbo/status/statusor.h>
+#include <turbo/status/result.h>
 #include <turbo/strings/string_view.h>
 
 namespace turbo_testing {
@@ -38,7 +38,7 @@ inline const turbo::Status& GetStatus(const turbo::Status& status) {
 }
 
 template <typename T>
-inline const turbo::Status& GetStatus(const turbo::StatusOr<T>& status) {
+inline const turbo::Status& GetStatus(const turbo::Result<T>& status) {
   return status.status();
 }
 
@@ -46,7 +46,7 @@ inline const turbo::Status& GetStatus(const turbo::StatusOr<T>& status) {
 // Implementation of IsOkAndHolds().
 
 // Monomorphic implementation of matcher IsOkAndHolds(m).  StatusOrType is a
-// reference to StatusOr<T>.
+// reference to Result<T>.
 template <typename StatusOrType>
 class IsOkAndHoldsMatcherImpl
     : public ::testing::MatcherInterface<StatusOrType> {
@@ -93,8 +93,8 @@ class IsOkAndHoldsMatcher {
       : inner_matcher_(std::forward<InnerMatcher>(inner_matcher)) {}
 
   // Converts this polymorphic matcher to a monomorphic matcher of the
-  // given type.  StatusOrType can be either StatusOr<T> or a
-  // reference to StatusOr<T>.
+  // given type.  StatusOrType can be either Result<T> or a
+  // reference to Result<T>.
   template <typename StatusOrType>
   operator ::testing::Matcher<StatusOrType>() const {  // NOLINT
     return ::testing::Matcher<StatusOrType>(
@@ -167,7 +167,7 @@ class StatusIsMatcherCommonImpl {
 };
 
 // Monomorphic implementation of matcher StatusIs() for a given type
-// T.  T can be Status, StatusOr<>, or a reference to either of them.
+// T.  T can be Status, Result<>, or a reference to either of them.
 template <typename T>
 class MonoStatusIsMatcherImpl : public ::testing::MatcherInterface<T> {
  public:
@@ -206,7 +206,7 @@ class StatusIsMatcher {
   }
 
   // Converts this polymorphic matcher to a monomorphic matcher of the
-  // given type.  T can be StatusOr<>, Status, or a reference to
+  // given type.  T can be Result<>, Status, or a reference to
   // either of them.
   template <typename T>
   /*implicit*/ operator ::testing::Matcher<T>() const {  // NOLINT
@@ -219,7 +219,7 @@ class StatusIsMatcher {
 };
 
 // Monomorphic implementation of matcher IsOk() for a given type T.
-// T can be Status, StatusOr<>, or a reference to either of them.
+// T can be Status, Result<>, or a reference to either of them.
 template <typename T>
 class MonoIsOkMatcherImpl : public ::testing::MatcherInterface<T> {
  public:

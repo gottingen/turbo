@@ -92,7 +92,7 @@ constexpr std::ios::fmtflags kPos = std::ios::showpos;
 
 void CheckUint128Case(const Uint128TestCase& test_case) {
   if (test_case.flags == kDec && test_case.width == 0) {
-    EXPECT_EQ(turbo::StrCat(test_case.value), test_case.expected);
+    EXPECT_EQ(turbo::str_cat(test_case.value), test_case.expected);
   }
   std::ostringstream os;
   os.flags(test_case.flags);
@@ -163,7 +163,7 @@ struct Int128TestCase {
 
 void CheckInt128Case(const Int128TestCase& test_case) {
   if (test_case.flags == kDec && test_case.width == 0) {
-    EXPECT_EQ(turbo::StrCat(test_case.value), test_case.expected);
+    EXPECT_EQ(turbo::str_cat(test_case.value), test_case.expected);
   }
   std::ostringstream os;
   os.flags(test_case.flags);

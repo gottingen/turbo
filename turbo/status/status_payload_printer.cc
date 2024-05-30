@@ -19,21 +19,17 @@
 #include <turbo/base/config.h>
 #include <turbo/base/internal/atomic_hook.h>
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace status_internal {
+namespace turbo::status_internal {
 
-TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
-static turbo::base_internal::AtomicHook<StatusPayloadPrinter> storage;
+    TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
+    static turbo::base_internal::AtomicHook<StatusPayloadPrinter> storage;
 
-void SetStatusPayloadPrinter(StatusPayloadPrinter printer) {
-  storage.Store(printer);
-}
+    void SetStatusPayloadPrinter(StatusPayloadPrinter printer) {
+        storage.Store(printer);
+    }
 
-StatusPayloadPrinter GetStatusPayloadPrinter() {
-  return storage.Load();
-}
+    StatusPayloadPrinter GetStatusPayloadPrinter() {
+        return storage.Load();
+    }
 
-}  // namespace status_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::status_internal

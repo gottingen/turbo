@@ -74,7 +74,7 @@ class VLogSite final {
   TURBO_ATTRIBUTE_ALWAYS_INLINE
   bool IsEnabled(int level) {
     int stale_v = v_.load(std::memory_order_relaxed);
-    if (TURBO_PREDICT_TRUE(level > stale_v)) {
+    if (TURBO_LIKELY(level > stale_v)) {
       return false;
     }
 

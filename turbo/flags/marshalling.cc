@@ -51,13 +51,13 @@ bool turbo_parse_flag(turbo::string_view text, bool* dst, std::string*) {
   const char* kFalse[] = {"0", "f", "false", "n", "no"};
   static_assert(sizeof(kTrue) == sizeof(kFalse), "true_false_equal");
 
-  text = turbo::StripAsciiWhitespace(text);
+  text = turbo::trim_all(text);
 
   for (size_t i = 0; i < TURBO_ARRAYSIZE(kTrue); ++i) {
-    if (turbo::EqualsIgnoreCase(text, kTrue[i])) {
+    if (turbo::equals_ignore_case(text, kTrue[i])) {
       *dst = true;
       return true;
-    } else if (turbo::EqualsIgnoreCase(text, kFalse[i])) {
+    } else if (turbo::equals_ignore_case(text, kFalse[i])) {
       *dst = false;
       return true;
     }
@@ -81,7 +81,7 @@ static int NumericBase(turbo::string_view text) {
 
 template <typename IntType>
 inline bool ParseFlagImpl(turbo::string_view text, IntType& dst) {
-  text = turbo::StripAsciiWhitespace(text);
+  text = turbo::trim_all(text);
 
   return turbo::numbers_internal::safe_strtoi_base(text, &dst,
                                                   NumericBase(text));
@@ -132,7 +132,7 @@ bool turbo_parse_flag(turbo::string_view text, unsigned long long* dst,
 }
 
 bool turbo_parse_flag(turbo::string_view text, turbo::int128* dst, std::string*) {
-  text = turbo::StripAsciiWhitespace(text);
+  text = turbo::trim_all(text);
 
   // check hex
   int base = NumericBase(text);
@@ -140,12 +140,12 @@ bool turbo_parse_flag(turbo::string_view text, turbo::int128* dst, std::string*)
     return false;
   }
 
-  return base == 16 ? turbo::SimpleHexAtoi(text, dst)
-                    : turbo::SimpleAtoi(text, dst);
+  return base == 16 ? turbo::simple_hex_atoi(text, dst)
+                    : turbo::simple_atoi(text, dst);
 }
 
 bool turbo_parse_flag(turbo::string_view text, turbo::uint128* dst, std::string*) {
-  text = turbo::StripAsciiWhitespace(text);
+  text = turbo::trim_all(text);
 
   // check hex
   int base = NumericBase(text);
@@ -153,19 +153,19 @@ bool turbo_parse_flag(turbo::string_view text, turbo::uint128* dst, std::string*
     return false;
   }
 
-  return base == 16 ? turbo::SimpleHexAtoi(text, dst)
-                    : turbo::SimpleAtoi(text, dst);
+  return base == 16 ? turbo::simple_hex_atoi(text, dst)
+                    : turbo::simple_atoi(text, dst);
 }
 
 // --------------------------------------------------------------------
 // turbo_parse_flag for floating point types.
 
 bool turbo_parse_flag(turbo::string_view text, float* dst, std::string*) {
-  return turbo::SimpleAtof(text, dst);
+  return turbo::simple_atof(text, dst);
 }
 
 bool turbo_parse_flag(turbo::string_view text, double* dst, std::string*) {
-  return turbo::SimpleAtod(text, dst);
+  return turbo::simple_atod(text, dst);
 }
 
 // --------------------------------------------------------------------
@@ -195,14 +195,14 @@ bool turbo_parse_flag(turbo::string_view text, std::vector<std::string>* dst,
 // turbo_unparse_flag specializations for various builtin flag types.
 
 std::string Unparse(bool v) { return v ? "true" : "false"; }
-std::string Unparse(short v) { return turbo::StrCat(v); }
-std::string Unparse(unsigned short v) { return turbo::StrCat(v); }
-std::string Unparse(int v) { return turbo::StrCat(v); }
-std::string Unparse(unsigned int v) { return turbo::StrCat(v); }
-std::string Unparse(long v) { return turbo::StrCat(v); }
-std::string Unparse(unsigned long v) { return turbo::StrCat(v); }
-std::string Unparse(long long v) { return turbo::StrCat(v); }
-std::string Unparse(unsigned long long v) { return turbo::StrCat(v); }
+std::string Unparse(short v) { return turbo::str_cat(v); }
+std::string Unparse(unsigned short v) { return turbo::str_cat(v); }
+std::string Unparse(int v) { return turbo::str_cat(v); }
+std::string Unparse(unsigned int v) { return turbo::str_cat(v); }
+std::string Unparse(long v) { return turbo::str_cat(v); }
+std::string Unparse(unsigned long v) { return turbo::str_cat(v); }
+std::string Unparse(long long v) { return turbo::str_cat(v); }
+std::string Unparse(unsigned long long v) { return turbo::str_cat(v); }
 std::string Unparse(turbo::int128 v) {
   std::stringstream ss;
   ss << v;
@@ -219,7 +219,7 @@ std::string UnparseFloatingPointVal(T v) {
   // digits10 is guaranteed to roundtrip correctly in string -> value -> string
   // conversions, but may not be enough to represent all the values correctly.
   std::string digit10_str =
-      turbo::StrFormat("%.*g", std::numeric_limits<T>::digits10, v);
+      turbo::str_format("%.*g", std::numeric_limits<T>::digits10, v);
   if (std::isnan(v) || std::isinf(v)) return digit10_str;
 
   T roundtrip_val = 0;
@@ -231,46 +231,46 @@ std::string UnparseFloatingPointVal(T v) {
 
   // max_digits10 is the number of base-10 digits that are necessary to uniquely
   // represent all distinct values.
-  return turbo::StrFormat("%.*g", std::numeric_limits<T>::max_digits10, v);
+  return turbo::str_format("%.*g", std::numeric_limits<T>::max_digits10, v);
 }
 std::string Unparse(float v) { return UnparseFloatingPointVal(v); }
 std::string Unparse(double v) { return UnparseFloatingPointVal(v); }
 std::string turbo_unparse_flag(turbo::string_view v) { return std::string(v); }
 std::string turbo_unparse_flag(const std::vector<std::string>& v) {
-  return turbo::StrJoin(v, ",");
+  return turbo::str_join(v, ",");
 }
 
 }  // namespace flags_internal
 
 bool turbo_parse_flag(turbo::string_view text, turbo::LogSeverity* dst,
                    std::string* err) {
-  text = turbo::StripAsciiWhitespace(text);
+  text = turbo::trim_all(text);
   if (text.empty()) {
     *err = "no value provided";
     return false;
   }
-  if (turbo::EqualsIgnoreCase(text, "dfatal")) {
+  if (turbo::equals_ignore_case(text, "dfatal")) {
     *dst = turbo::kLogDebugFatal;
     return true;
   }
-  if (turbo::EqualsIgnoreCase(text, "klogdebugfatal")) {
+  if (turbo::equals_ignore_case(text, "klogdebugfatal")) {
     *dst = turbo::kLogDebugFatal;
     return true;
   }
   if (text.front() == 'k' || text.front() == 'K') text.remove_prefix(1);
-  if (turbo::EqualsIgnoreCase(text, "info")) {
+  if (turbo::equals_ignore_case(text, "info")) {
     *dst = turbo::LogSeverity::kInfo;
     return true;
   }
-  if (turbo::EqualsIgnoreCase(text, "warning")) {
+  if (turbo::equals_ignore_case(text, "warning")) {
     *dst = turbo::LogSeverity::kWarning;
     return true;
   }
-  if (turbo::EqualsIgnoreCase(text, "error")) {
+  if (turbo::equals_ignore_case(text, "error")) {
     *dst = turbo::LogSeverity::kError;
     return true;
   }
-  if (turbo::EqualsIgnoreCase(text, "fatal")) {
+  if (turbo::equals_ignore_case(text, "fatal")) {
     *dst = turbo::LogSeverity::kFatal;
     return true;
   }

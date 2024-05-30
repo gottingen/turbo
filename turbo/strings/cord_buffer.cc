@@ -22,12 +22,10 @@
 #include <turbo/base/config.h>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 
 #ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
 constexpr size_t CordBuffer::kDefaultLimit;
 constexpr size_t CordBuffer::kCustomLimit;
 #endif
 
-TURBO_NAMESPACE_END
 }  // namespace turbo

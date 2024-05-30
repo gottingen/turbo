@@ -831,7 +831,7 @@ template <typename... Args>
 auto Storage<T, N, A>::EmplaceBack(Args&&... args) -> Reference<A> {
   StorageView<A> storage_view = MakeStorageView();
   const SizeType<A> n = storage_view.size;
-  if (TURBO_PREDICT_TRUE(n != storage_view.capacity)) {
+  if (TURBO_LIKELY(n != storage_view.capacity)) {
     // Fast path; new element fits.
     Pointer<A> last_ptr = storage_view.data + n;
     AllocatorTraits<A>::construct(GetAllocator(), last_ptr,
@@ -919,7 +919,7 @@ template <typename T, size_t N, typename A>
 auto Storage<T, N, A>::Reserve(SizeType<A> requested_capacity) -> void {
   StorageView<A> storage_view = MakeStorageView();
 
-  if (TURBO_PREDICT_FALSE(requested_capacity <= storage_view.capacity)) return;
+  if (TURBO_UNLIKELY(requested_capacity <= storage_view.capacity)) return;
 
   AllocationTransaction<A> allocation_tx(GetAllocator());
 
@@ -949,7 +949,7 @@ auto Storage<T, N, A>::ShrinkToFit() -> void {
   StorageView<A> storage_view{GetAllocatedData(), GetSize(),
                               GetAllocatedCapacity()};
 
-  if (TURBO_PREDICT_FALSE(storage_view.size == storage_view.capacity)) return;
+  if (TURBO_UNLIKELY(storage_view.size == storage_view.capacity)) return;
 
   AllocationTransaction<A> allocation_tx(GetAllocator());
 

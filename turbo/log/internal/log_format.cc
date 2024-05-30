@@ -41,8 +41,8 @@
 #include <turbo/strings/numbers.h>
 #include <turbo/strings/str_format.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/time/civil_time.h>
-#include <turbo/time/time.h>
+#include <turbo/times/civil_time.h>
+#include <turbo/times/time.h>
 #include <turbo/types/span.h>
 
 namespace turbo {
@@ -82,7 +82,7 @@ size_t FormatBoundedFields(turbo::LogSeverity severity, turbo::Time timestamp,
   constexpr size_t kBoundedFieldsMaxLen =
       sizeof("SMMDD HH:MM:SS.NNNNNN  ") +
       (1 + std::numeric_limits<log_internal::Tid>::digits10 + 1) - sizeof("");
-  if (TURBO_PREDICT_FALSE(buf.size() < kBoundedFieldsMaxLen)) {
+  if (TURBO_UNLIKELY(buf.size() < kBoundedFieldsMaxLen)) {
     // We don't bother trying to truncate these fields if the buffer is too
     // short (or almost too short) because it would require doing a lot more
     // length checking (slow) and it should never happen.  A 15kB buffer should
@@ -96,12 +96,12 @@ size_t FormatBoundedFields(turbo::LogSeverity severity, turbo::Time timestamp,
   // isn't async-signal-safe. We can only use the time zone if it has already
   // been loaded.
   const turbo::TimeZone* tz = turbo::log_internal::TimeZone();
-  if (TURBO_PREDICT_FALSE(tz == nullptr)) {
+  if (TURBO_UNLIKELY(tz == nullptr)) {
     // If a time zone hasn't been set yet because we are logging before the
     // logging library has been initialized, we fallback to a simpler, slower
     // method. Just report the raw Unix time in seconds. We cram this into the
     // normal time format for the benefit of parsers.
-    auto tv = turbo::ToTimeval(timestamp);
+    auto tv = turbo::Time::to_timeval(timestamp);
     int snprintf_result = turbo::SNPrintF(
         buf.data(), buf.size(), "%c0000 00:00:%02d.%06d %7d ",
         turbo::LogSeverityName(severity)[0], static_cast<int>(tv.tv_sec),
@@ -115,7 +115,7 @@ size_t FormatBoundedFields(turbo::LogSeverity severity, turbo::Time timestamp,
 
   char* p = buf.data();
   *p++ = turbo::LogSeverityName(severity)[0];
-  const turbo::TimeZone::CivilInfo ci = tz->At(timestamp);
+  const turbo::TimeZone::CivilInfo ci = tz->at(timestamp);
   turbo::numbers_internal::PutTwoDigits(static_cast<uint32_t>(ci.cs.month()), p);
   p += 2;
   turbo::numbers_internal::PutTwoDigits(static_cast<uint32_t>(ci.cs.day()), p);
@@ -132,7 +132,7 @@ size_t FormatBoundedFields(turbo::LogSeverity severity, turbo::Time timestamp,
                                        p);
   p += 2;
   *p++ = '.';
-  const int64_t usecs = turbo::ToInt64Microseconds(ci.subsecond);
+  const int64_t usecs = turbo::Duration::to_microseconds(ci.subsecond);
   turbo::numbers_internal::PutTwoDigits(static_cast<uint32_t>(usecs / 10000), p);
   p += 2;
   turbo::numbers_internal::PutTwoDigits(static_cast<uint32_t>(usecs / 100 % 100),
@@ -152,7 +152,7 @@ size_t FormatBoundedFields(turbo::LogSeverity severity, turbo::Time timestamp,
 size_t FormatLineNumber(int line, turbo::Span<char>& buf) {
   constexpr size_t kLineFieldMaxLen =
       sizeof(":] ") + (1 + std::numeric_limits<int>::digits10 + 1) - sizeof("");
-  if (TURBO_PREDICT_FALSE(buf.size() < kLineFieldMaxLen)) {
+  if (TURBO_UNLIKELY(buf.size() < kLineFieldMaxLen)) {
     // As above, we don't bother trying to truncate this if the buffer is too
     // short and it should never happen.
     buf.remove_suffix(buf.size());
@@ -175,11 +175,11 @@ std::string FormatLogMessage(turbo::LogSeverity severity,
                              turbo::Duration subsecond, log_internal::Tid tid,
                              turbo::string_view basename, int line,
                              PrefixFormat format, turbo::string_view message) {
-  return turbo::StrFormat(
+  return turbo::str_format(
       "%c%02d%02d %02d:%02d:%02d.%06d %7d %s:%d] %s%s",
       turbo::LogSeverityName(severity)[0], civil_second.month(),
       civil_second.day(), civil_second.hour(), civil_second.minute(),
-      civil_second.second(), turbo::ToInt64Microseconds(subsecond), tid,
+      civil_second.second(), turbo::Duration::to_microseconds(subsecond), tid,
       basename, line, format == PrefixFormat::kRaw ? "RAW: " : "", message);
 }
 

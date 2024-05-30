@@ -43,7 +43,7 @@ TEST(FlagsPathUtilTest, TestProgamNameInterfaces) {
   const std::string expect_basename = "this.program";
 #endif
 
-  EXPECT_TRUE(turbo::EndsWith(program_name, expect_name)) << program_name;
+  EXPECT_TRUE(turbo::ends_with(program_name, expect_name)) << program_name;
   EXPECT_EQ(flags::ShortProgramInvocationName(), expect_basename);
 
   flags::SetProgramInvocationName("a/my_test");

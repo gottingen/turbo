@@ -21,7 +21,7 @@
 
 #include <turbo/base/internal/raw_logging.h>
 #include <turbo/synchronization/mutex.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -30,7 +30,7 @@ void Notification::Notify() {
   MutexLock l(&this->mutex_);
 
 #ifndef NDEBUG
-  if (TURBO_PREDICT_FALSE(notified_yet_.load(std::memory_order_relaxed))) {
+  if (TURBO_UNLIKELY(notified_yet_.load(std::memory_order_relaxed))) {
     TURBO_RAW_LOG(
         FATAL,
         "Notify() method called more than once for Notification object %p",

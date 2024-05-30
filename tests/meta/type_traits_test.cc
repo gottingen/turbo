@@ -26,8 +26,8 @@
 #include <gtest/gtest.h>
 #include <turbo/base/attributes.h>
 #include <turbo/base/config.h>
-#include <turbo/time/clock.h>
-#include <turbo/time/time.h>
+#include <turbo/times/clock.h>
+#include <turbo/times/time.h>
 
 #ifdef TURBO_HAVE_STD_STRING_VIEW
 #include <string_view>
@@ -808,7 +808,7 @@ TEST(IsConstantEvaluated, is_constant_evaluated) {
   constexpr int64_t constant = NegateIfConstantEvaluated(42);
   EXPECT_EQ(constant, -42);
 
-  int64_t now = turbo::ToUnixSeconds(turbo::Now());
+  int64_t now = turbo::Time::to_seconds(turbo::Time::current_time());
   int64_t not_constant = NegateIfConstantEvaluated(now);
   EXPECT_EQ(not_constant, now);
 

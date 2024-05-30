@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/time/civil_time.h>
+#include <turbo/times/civil_time.h>
 
 #include <iomanip>
 #include <limits>
@@ -875,19 +875,19 @@ TEST(CivilTime, ParseEdgeCases) {
 
 TEST(CivilTime, turbo_stringify) {
   EXPECT_EQ("2015-01-02T03:04:05",
-            turbo::StrFormat("%v", turbo::CivilSecond(2015, 1, 2, 3, 4, 5)));
+            turbo::str_format("%v", turbo::CivilSecond(2015, 1, 2, 3, 4, 5)));
 
   EXPECT_EQ("2015-01-02T03:04",
-            turbo::StrFormat("%v", turbo::CivilMinute(2015, 1, 2, 3, 4)));
+            turbo::str_format("%v", turbo::CivilMinute(2015, 1, 2, 3, 4)));
 
   EXPECT_EQ("2015-01-02T03",
-            turbo::StrFormat("%v", turbo::CivilHour(2015, 1, 2, 3)));
+            turbo::str_format("%v", turbo::CivilHour(2015, 1, 2, 3)));
 
-  EXPECT_EQ("2015-01-02", turbo::StrFormat("%v", turbo::CivilDay(2015, 1, 2)));
+  EXPECT_EQ("2015-01-02", turbo::str_format("%v", turbo::CivilDay(2015, 1, 2)));
 
-  EXPECT_EQ("2015-01", turbo::StrFormat("%v", turbo::CivilMonth(2015, 1)));
+  EXPECT_EQ("2015-01", turbo::str_format("%v", turbo::CivilMonth(2015, 1)));
 
-  EXPECT_EQ("2015", turbo::StrFormat("%v", turbo::CivilYear(2015)));
+  EXPECT_EQ("2015", turbo::str_format("%v", turbo::CivilYear(2015)));
 }
 
 TEST(CivilTime, OutputStream) {

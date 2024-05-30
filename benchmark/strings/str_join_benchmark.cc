@@ -33,7 +33,7 @@ void BM_Join2_Strings(benchmark::State& state) {
   const std::string s(string_len, 'x');
   const std::vector<std::string> v(num_strings, s);
   for (auto _ : state) {
-    std::string s = turbo::StrJoin(v, "-");
+    std::string s = turbo::str_join(v, "-");
     benchmark::DoNotOptimize(s);
   }
 }
@@ -52,7 +52,7 @@ void BM_Join2_Ints(benchmark::State& state) {
   const int num_ints = state.range(0);
   const std::vector<int> v(num_ints, 42);
   for (auto _ : state) {
-    std::string s = turbo::StrJoin(v, "-");
+    std::string s = turbo::str_join(v, "-");
     benchmark::DoNotOptimize(s);
   }
 }
@@ -65,7 +65,7 @@ void BM_Join2_KeysAndValues(benchmark::State& state) {
   const std::vector<std::pair<std::string, int>> v(num_pairs,
                                                    std::make_pair(s, 42));
   for (auto _ : state) {
-    std::string s = turbo::StrJoin(v, ",", turbo::PairFormatter("="));
+    std::string s = turbo::str_join(v, ",", turbo::pair_formatter("="));
     benchmark::DoNotOptimize(s);
   }
 }
@@ -85,7 +85,7 @@ void BM_JoinStreamable(benchmark::State& state) {
   const int num_strings = state.range(1);
   const std::vector<std::string> v(num_strings, std::string(string_len, 'x'));
   for (auto _ : state) {
-    std::string s = turbo::StrJoin(v, "", turbo::StreamFormatter());
+    std::string s = turbo::str_join(v, "", turbo::stream_formatter());
     benchmark::DoNotOptimize(s);
   }
 }
@@ -101,7 +101,7 @@ BENCHMARK(BM_JoinStreamable)
 void BM_JoinTuple(benchmark::State& state) {
   for (auto _ : state) {
     std::string s =
-        turbo::StrJoin(std::make_tuple(123456789, 987654321, 24680, 13579), "/");
+        turbo::str_join(std::make_tuple(123456789, 987654321, 24680, 13579), "/");
     benchmark::DoNotOptimize(s);
   }
 }

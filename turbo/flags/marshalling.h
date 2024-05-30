@@ -149,7 +149,7 @@
 //      case kPlainText: return "plaintext";
 //      case kHtml: return "html";
 //    }
-//    return turbo::StrCat(mode);
+//    return turbo::str_cat(mode);
 //  }
 //
 // Notice that neither `turbo_parse_flag()` nor `turbo_unparse_flag()` are class
@@ -194,7 +194,7 @@
 //   // Similarly, for unparsing, we can simply invoke `turbo::UnparseFlag()` on
 //   // the constituent types.
 //   std::string turbo_unparse_flag(const MyFlagType& flag) {
-//     return turbo::StrCat(turbo::UnparseFlag(flag.my_flag_data.first),
+//     return turbo::str_cat(turbo::UnparseFlag(flag.my_flag_data.first),
 //                         ",",
 //                         turbo::UnparseFlag(flag.my_flag_data.second));
 //   }

@@ -212,7 +212,7 @@ std::string Summarize(const UntypedFormatSpecImpl format,
   return out;
 }
 
-bool FormatUntyped(FormatRawSinkImpl raw_sink,
+bool format_untyped(FormatRawSinkImpl raw_sink,
                    const UntypedFormatSpecImpl format,
                    turbo::Span<const FormatArgImpl> args) {
   FormatSinkImpl sink(raw_sink);
@@ -221,14 +221,14 @@ bool FormatUntyped(FormatRawSinkImpl raw_sink,
 }
 
 std::ostream& Streamable::Print(std::ostream& os) const {
-  if (!FormatUntyped(&os, format_, args_)) os.setstate(std::ios::failbit);
+  if (!format_untyped(&os, format_, args_)) os.setstate(std::ios::failbit);
   return os;
 }
 
 std::string& AppendPack(std::string* out, const UntypedFormatSpecImpl format,
                         turbo::Span<const FormatArgImpl> args) {
   size_t orig = out->size();
-  if (TURBO_PREDICT_FALSE(!FormatUntyped(out, format, args))) {
+  if (TURBO_UNLIKELY(!format_untyped(out, format, args))) {
     out->erase(orig);
   }
   return *out;
@@ -237,7 +237,7 @@ std::string& AppendPack(std::string* out, const UntypedFormatSpecImpl format,
 std::string FormatPack(UntypedFormatSpecImpl format,
                        turbo::Span<const FormatArgImpl> args) {
   std::string out;
-  if (TURBO_PREDICT_FALSE(!FormatUntyped(&out, format, args))) {
+  if (TURBO_UNLIKELY(!format_untyped(&out, format, args))) {
     out.clear();
   }
   return out;
@@ -246,7 +246,7 @@ std::string FormatPack(UntypedFormatSpecImpl format,
 int FprintF(std::FILE* output, const UntypedFormatSpecImpl format,
             turbo::Span<const FormatArgImpl> args) {
   FILERawSink sink(output);
-  if (!FormatUntyped(&sink, format, args)) {
+  if (!format_untyped(&sink, format, args)) {
     errno = EINVAL;
     return -1;
   }
@@ -264,7 +264,7 @@ int FprintF(std::FILE* output, const UntypedFormatSpecImpl format,
 int SnprintF(char* output, size_t size, const UntypedFormatSpecImpl format,
              turbo::Span<const FormatArgImpl> args) {
   BufferRawSink sink(output, size ? size - 1 : 0);
-  if (!FormatUntyped(&sink, format, args)) {
+  if (!format_untyped(&sink, format, args)) {
     errno = EINVAL;
     return -1;
   }

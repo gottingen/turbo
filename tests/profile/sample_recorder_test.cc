@@ -26,7 +26,7 @@
 #include <turbo/synchronization/internal/thread_pool.h>
 #include <turbo/synchronization/mutex.h>
 #include <turbo/synchronization/notification.h>
-#include <turbo/time/time.h>
+#include <turbo/times/time.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -139,11 +139,11 @@ TEST(SampleRecorderTest, MultiThreaded) {
             break;
           }
           case 2: {
-            turbo::Duration oldest = turbo::ZeroDuration();
+            turbo::Duration oldest = turbo::Duration::zero();
             sampler.Iterate([&](const Info& info) {
-              oldest = std::max(oldest, turbo::Now() - info.create_time);
+              oldest = std::max(oldest, turbo::Time::current_time() - info.create_time);
             });
-            ASSERT_GE(oldest, turbo::ZeroDuration());
+            ASSERT_GE(oldest, turbo::Duration::zero());
             break;
           }
         }
@@ -152,7 +152,7 @@ TEST(SampleRecorderTest, MultiThreaded) {
   }
   // The threads will hammer away.  Give it a little bit of time for tsan to
   // spot errors.
-  turbo::SleepFor(turbo::Seconds(3));
+  turbo::sleep_for(turbo::Duration::seconds(3));
   stop.Notify();
 }
 

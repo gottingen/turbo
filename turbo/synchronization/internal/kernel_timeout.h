@@ -30,8 +30,8 @@
 
 #include <turbo/base/config.h>
 #include <turbo/base/internal/raw_logging.h>
-#include <turbo/time/clock.h>
-#include <turbo/time/time.h>
+#include <turbo/times/clock.h>
+#include <turbo/times/time.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

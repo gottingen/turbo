@@ -38,7 +38,7 @@
 #include <turbo/profiling/internal/exponential_biased.h>
 #include <turbo/profiling/internal/sample_recorder.h>
 #include <turbo/synchronization/mutex.h>
-#include <turbo/time/clock.h>
+#include <turbo/times/clock.h>
 #include <turbo/utility/utility.h>
 
 namespace turbo {
@@ -96,7 +96,7 @@ void HashtablezInfo::PrepareForSampling(int64_t stride,
   hashes_bitwise_xor.store(0, std::memory_order_relaxed);
   max_reserve.store(0, std::memory_order_relaxed);
 
-  create_time = turbo::Now();
+  create_time = turbo::Time::current_time();
   weight = stride;
   // The inliner makes hardcoded skip_count difficult (especially when combined
   // with LTO).  We use the ability to exclude stacks by regex when encoding
@@ -118,7 +118,7 @@ static bool ShouldForceSampling() {
   TURBO_CONST_INIT static std::atomic<ForceState> global_state{
       kUninitialized};
   ForceState state = global_state.load(std::memory_order_relaxed);
-  if (TURBO_PREDICT_TRUE(state == kDontForce)) return false;
+  if (TURBO_LIKELY(state == kDontForce)) return false;
 
   if (state == kUninitialized) {
     state = TURBO_INTERNAL_C_SYMBOL(TurboContainerInternalSampleEverything)()
@@ -132,7 +132,7 @@ static bool ShouldForceSampling() {
 HashtablezInfo* SampleSlow(SamplingState& next_sample,
                            size_t inline_element_size, size_t key_size,
                            size_t value_size, uint16_t soo_capacity) {
-  if (TURBO_PREDICT_FALSE(ShouldForceSampling())) {
+  if (TURBO_UNLIKELY(ShouldForceSampling())) {
     next_sample.next_sample = 1;
     const int64_t old_stride = exchange(next_sample.sample_stride, 1);
     HashtablezInfo* result = GlobalHashtablezSampler().Register(
@@ -165,7 +165,7 @@ HashtablezInfo* SampleSlow(SamplingState& next_sample,
   // We will only be negative on our first count, so we should just retry in
   // that case.
   if (first) {
-    if (TURBO_PREDICT_TRUE(--next_sample.next_sample > 0)) return nullptr;
+    if (TURBO_LIKELY(--next_sample.next_sample > 0)) return nullptr;
     return SampleSlow(next_sample, inline_element_size, key_size, value_size,
                       soo_capacity);
   }

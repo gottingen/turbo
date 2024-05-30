@@ -102,7 +102,7 @@ void FutexWaiter::Post() {
 void FutexWaiter::Poke() {
   // Wake one thread waiting on the futex.
   const int err = Futex::Wake(&futex_, 1);
-  if (TURBO_PREDICT_FALSE(err < 0)) {
+  if (TURBO_UNLIKELY(err < 0)) {
     TURBO_RAW_LOG(FATAL, "Futex operation failed with error %d\n", err);
   }
 }

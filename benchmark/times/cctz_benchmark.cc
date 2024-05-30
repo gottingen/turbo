@@ -21,9 +21,9 @@
 #include <vector>
 
 #include <benchmark/benchmark.h>
-#include <turbo/time/cctz/civil_time.h>
-#include <turbo/time/cctz/time_zone.h>
-#include <turbo/time/cctz/time_zone_impl.h>
+#include <turbo/times/cctz/civil_time.h>
+#include <turbo/times/cctz/time_zone.h>
+#include <turbo/times/cctz/time_zone_impl.h>
 
 namespace {
 
@@ -782,7 +782,7 @@ void BM_Time_ToCivilUTC_Libc(benchmark::State& state) {
 }
 BENCHMARK(BM_Time_ToCivilUTC_Libc);
 
-// In each "FromCivil" benchmark we switch between two YMDhms values
+// In each "Time::from_civil" benchmark we switch between two YMDhms values
 // separated by at least one transition in order to defeat any internal
 // caching of previous results (e.g., see time_local_hint_).
 //

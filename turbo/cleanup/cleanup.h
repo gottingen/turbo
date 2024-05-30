@@ -28,7 +28,7 @@
 //   turbo::Status CopyGoodData(const char* source_path, const char* sink_path) {
 //     FILE* source_file = fopen(source_path, "r");
 //     if (source_file == nullptr) {
-//       return turbo::NotFoundError("No source file");  // No cleanups execute
+//       return turbo::not_found_error("No source file");  // No cleanups execute
 //     }
 //
 //     // C++17 style cleanup using class template argument deduction
@@ -36,7 +36,7 @@
 //
 //     FILE* sink_file = fopen(sink_path, "w");
 //     if (sink_file == nullptr) {
-//       return turbo::NotFoundError("No sink file");  // First cleanup executes
+//       return turbo::not_found_error("No sink file");  // First cleanup executes
 //     }
 //
 //     // C++11 style cleanup using the factory function
@@ -45,7 +45,7 @@
 //     Data data;
 //     while (ReadData(source_file, &data)) {
 //       if (!data.IsGood()) {
-//         turbo::Status result = turbo::FailedPreconditionError("Read bad data");
+//         turbo::Status result = turbo::failed_precondition_error("Read bad data");
 //         return result;  // Both cleanups execute
 //       }
 //       SaveData(sink_file, &data);

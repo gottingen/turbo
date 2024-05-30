@@ -31,8 +31,8 @@
 #include <turbo/strings/internal/cordz_info.h>
 #include <turbo/synchronization/internal/thread_pool.h>
 #include <turbo/synchronization/notification.h>
-#include <turbo/time/clock.h>
-#include <turbo/time/time.h>
+#include <turbo/times/clock.h>
+#include <turbo/times/time.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -201,7 +201,7 @@ TEST(CordzSampleTokenTest, MultiThreaded) {
   }
   // The threads will hammer away.  Give it a little bit of time for tsan to
   // spot errors.
-  turbo::SleepFor(turbo::Seconds(3));
+  turbo::sleep_for(turbo::Duration::seconds(3));
   stop.Notify();
 }
 
