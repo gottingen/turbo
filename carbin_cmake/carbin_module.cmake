@@ -33,7 +33,7 @@ option(CONDA_ENV_ENABLE "enable conda auto env" OFF)
 
 option(CARBIN_USE_CXX11_ABI "use cxx11 abi or not" ON)
 
-option(CARBIN_BUILD_TEST "enable project test or not" OFF)
+option(CARBIN_BUILD_TEST "enable project test or not" ON)
 
 option(CARBIN_BUILD_BENCHMARK "enable project benchmark or not" OFF)
 

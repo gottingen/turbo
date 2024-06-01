@@ -66,6 +66,7 @@ set(STRINGS_TEST_SRC
         string_view_test
         strip_test
         substitute_test
+        uri_test
         utf8_test
 )
 foreach (test ${STRINGS_TEST_SRC})
