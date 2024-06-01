@@ -24,7 +24,7 @@
 
 #include <turbo/base/attributes.h>
 #include <turbo/base/config.h>
-#include <turbo/base/internal/endian.h>
+#include <turbo/base/endian.h>
 #include <turbo/base/prefetch.h>
 #include <turbo/crc/internal/cpu_detect.h>
 #include <turbo/crc/internal/crc32_x86_arm_combined_simd.h>
@@ -74,19 +74,19 @@ constexpr size_t kMediumCutoff = 2048;
 #define TURBO_INTERNAL_STEP2(crc)                                               \
   do {                                                                         \
     crc =                                                                      \
-        CRC32_u16(static_cast<uint32_t>(crc), turbo::little_endian::Load16(p)); \
+        CRC32_u16(static_cast<uint32_t>(crc), turbo::little_endian::load16(p)); \
     p += 2;                                                                    \
   } while (0)
 #define TURBO_INTERNAL_STEP4(crc)                                               \
   do {                                                                         \
     crc =                                                                      \
-        CRC32_u32(static_cast<uint32_t>(crc), turbo::little_endian::Load32(p)); \
+        CRC32_u32(static_cast<uint32_t>(crc), turbo::little_endian::load32(p)); \
     p += 4;                                                                    \
   } while (0)
 #define TURBO_INTERNAL_STEP8(crc, data)                  \
   do {                                                  \
     crc = CRC32_u64(static_cast<uint32_t>(crc),         \
-                    turbo::little_endian::Load64(data)); \
+                    turbo::little_endian::load64(data)); \
     data += 8;                                          \
   } while (0)
 #define TURBO_INTERNAL_STEP8BY2(crc0, crc1, p0, p1) \
@@ -322,7 +322,7 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreamsBase
                                                           uint64_t crc) const {
     for (int i = 0; i < 8; i++) {
       crc =
-          CRC32_u64(static_cast<uint32_t>(crc), turbo::little_endian::Load64(p));
+          CRC32_u64(static_cast<uint32_t>(crc), turbo::little_endian::load64(p));
       p += 8;
     }
     return crc;
@@ -460,7 +460,7 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreams
         V128 res2 = V128_PMul10(tmp, magic);
         V128 x = V128_Xor(res1, res2);
         l64 = static_cast<uint64_t>(V128_Low64(x)) ^
-              turbo::little_endian::Load64(p2);
+              turbo::little_endian::load64(p2);
         l64 = CRC32_u64(static_cast<uint32_t>(l642), l64);
 
         p = p2 + 8;

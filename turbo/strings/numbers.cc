@@ -35,7 +35,7 @@
 
 #include <turbo/base/attributes.h>
 #include <turbo/base/config.h>
-#include <turbo/base/internal/endian.h>
+#include <turbo/base/endian.h>
 #include <turbo/base/internal/raw_logging.h>
 #include <turbo/base/nullability.h>
 #include <turbo/base/optimization.h>
@@ -175,7 +175,7 @@ namespace turbo {
             uint32_t mod10 = n - 10u * div10;
             uint32_t base = kTwoZeroBytes + div10 + (mod10 << 8);
             base >>= num_digits & 8;
-            little_endian::Store16(out_str, static_cast<uint16_t>(base));
+            little_endian::store16(out_str, static_cast<uint16_t>(base));
             return out_str + 2 + num_digits;
         }
 
@@ -201,7 +201,7 @@ namespace turbo {
             uint32_t zeroes = static_cast<uint32_t>(turbo::countr_zero(tens)) & (0 - 8u);
             tens += kFourZeroBytes;
             tens >>= zeroes;
-            little_endian::Store32(out_str, tens);
+            little_endian::store32(out_str, tens);
             return out_str + sizeof(tens) - zeroes / 8;
         }
 
@@ -247,14 +247,14 @@ namespace turbo {
                 // 0 minus 8 to make MSVC happy.
                 uint32_t zeroes =
                         static_cast<uint32_t>(turbo::countr_zero(bottom)) & (0 - 8u);
-                little_endian::Store64(out_str, (bottom + kEightZeroBytes) >> zeroes);
+                little_endian::store64(out_str, (bottom + kEightZeroBytes) >> zeroes);
                 return out_str + sizeof(bottom) - zeroes / 8;
             }
             uint32_t div08 = n / 100'000'000;
             uint32_t mod08 = n % 100'000'000;
             uint64_t bottom = PrepareEightDigits(mod08) + kEightZeroBytes;
             out_str = EncodeHundred(div08, out_str);
-            little_endian::Store64(out_str, bottom);
+            little_endian::store64(out_str, bottom);
             return out_str + sizeof(bottom);
         }
 
@@ -275,11 +275,11 @@ namespace turbo {
                 uint32_t div08mod08 = static_cast<uint32_t>(div08 % 100'000'000ull);
                 uint64_t mid_result = PrepareEightDigits(div08mod08) + kEightZeroBytes;
                 buffer = EncodeTenThousand(div016, buffer);
-                little_endian::Store64(buffer, mid_result);
+                little_endian::store64(buffer, mid_result);
                 buffer += sizeof(mid_result);
             }
             uint64_t mod_result = PrepareEightDigits(mod08) + kEightZeroBytes;
-            little_endian::Store64(buffer, mod_result);
+            little_endian::store64(buffer, mod_result);
             return buffer + sizeof(mod_result);
         }
 
@@ -291,7 +291,7 @@ namespace turbo {
         uint32_t div10 = (i * kDivisionBy10Mul) / kDivisionBy10Div;
         uint32_t mod10 = i - 10u * div10;
         base += div10 + (mod10 << 8);
-        little_endian::Store16(buf, static_cast<uint16_t>(base));
+        little_endian::store16(buf, static_cast<uint16_t>(base));
     }
 
     turbo::Nonnull<char *> numbers_internal::FastIntToBuffer(

@@ -73,7 +73,7 @@
 
 #include <turbo/base/attributes.h>
 #include <turbo/base/config.h>
-#include <turbo/base/internal/endian.h>
+#include <turbo/base/endian.h>
 #include <turbo/base/internal/per_thread_tls.h>
 #include <turbo/base/macros.h>
 #include <turbo/base/nullability.h>

@@ -46,7 +46,7 @@
 
 #include <cstdint>
 
-#include <turbo/base/internal/endian.h>
+#include <turbo/base/endian.h>
 #include <turbo/base/internal/raw_logging.h>
 #include <turbo/base/prefetch.h>
 #include <turbo/crc/internal/crc_internal.h>
@@ -281,17 +281,17 @@ void CRC32::Extend(uint32_t* crc, const void* bytes, size_t length) const {
   const size_t kSwathSize = 16;
   if (static_cast<size_t>(e - p) >= kSwathSize) {
     // Load one swath of data into the operating buffers.
-    uint32_t buf0 = turbo::little_endian::Load32(p) ^ l;
-    uint32_t buf1 = turbo::little_endian::Load32(p + 4);
-    uint32_t buf2 = turbo::little_endian::Load32(p + 8);
-    uint32_t buf3 = turbo::little_endian::Load32(p + 12);
+    uint32_t buf0 = turbo::little_endian::load32(p) ^ l;
+    uint32_t buf1 = turbo::little_endian::load32(p + 4);
+    uint32_t buf2 = turbo::little_endian::load32(p + 8);
+    uint32_t buf3 = turbo::little_endian::load32(p + 12);
     p += kSwathSize;
 
     // Increment a CRC value by a "swath"; this combines the four bytes
     // starting at `ptr` and twelve zero bytes, so that four CRCs can be
     // built incrementally and combined at the end.
     const auto step_swath = [this](uint32_t crc_in, const std::uint8_t* ptr) {
-      return turbo::little_endian::Load32(ptr) ^
+      return turbo::little_endian::load32(ptr) ^
              this->table_[3][crc_in & 0xff] ^
              this->table_[2][(crc_in >> 8) & 0xff] ^
              this->table_[1][(crc_in >> 16) & 0xff] ^

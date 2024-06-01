@@ -37,118 +37,118 @@ using turbo::random_internal::GenerateSignedTag;
 namespace {
 
 TEST(GenerateRealTest, U64ToFloat_Positive_NoZero_Test) {
-  auto ToFloat = [](uint64_t a) {
+  auto to_float = [](uint64_t a) {
     return GenerateRealFromBits<float, GeneratePositiveTag, false>(a);
   };
-  EXPECT_EQ(ToFloat(0x0000000000000000), 2.710505431e-20f);
-  EXPECT_EQ(ToFloat(0x0000000000000001), 5.421010862e-20f);
-  EXPECT_EQ(ToFloat(0x8000000000000000), 0.5);
-  EXPECT_EQ(ToFloat(0x8000000000000001), 0.5);
-  EXPECT_EQ(ToFloat(0xFFFFFFFFFFFFFFFF), 0.9999999404f);
+  EXPECT_EQ(to_float(0x0000000000000000), 2.710505431e-20f);
+  EXPECT_EQ(to_float(0x0000000000000001), 5.421010862e-20f);
+  EXPECT_EQ(to_float(0x8000000000000000), 0.5);
+  EXPECT_EQ(to_float(0x8000000000000001), 0.5);
+  EXPECT_EQ(to_float(0xFFFFFFFFFFFFFFFF), 0.9999999404f);
 }
 
 TEST(GenerateRealTest, U64ToFloat_Positive_Zero_Test) {
-  auto ToFloat = [](uint64_t a) {
+  auto to_float = [](uint64_t a) {
     return GenerateRealFromBits<float, GeneratePositiveTag, true>(a);
   };
-  EXPECT_EQ(ToFloat(0x0000000000000000), 0.0);
-  EXPECT_EQ(ToFloat(0x0000000000000001), 5.421010862e-20f);
-  EXPECT_EQ(ToFloat(0x8000000000000000), 0.5);
-  EXPECT_EQ(ToFloat(0x8000000000000001), 0.5);
-  EXPECT_EQ(ToFloat(0xFFFFFFFFFFFFFFFF), 0.9999999404f);
+  EXPECT_EQ(to_float(0x0000000000000000), 0.0);
+  EXPECT_EQ(to_float(0x0000000000000001), 5.421010862e-20f);
+  EXPECT_EQ(to_float(0x8000000000000000), 0.5);
+  EXPECT_EQ(to_float(0x8000000000000001), 0.5);
+  EXPECT_EQ(to_float(0xFFFFFFFFFFFFFFFF), 0.9999999404f);
 }
 
 TEST(GenerateRealTest, U64ToFloat_Negative_NoZero_Test) {
-  auto ToFloat = [](uint64_t a) {
+  auto to_float = [](uint64_t a) {
     return GenerateRealFromBits<float, GenerateNegativeTag, false>(a);
   };
-  EXPECT_EQ(ToFloat(0x0000000000000000), -2.710505431e-20f);
-  EXPECT_EQ(ToFloat(0x0000000000000001), -5.421010862e-20f);
-  EXPECT_EQ(ToFloat(0x8000000000000000), -0.5);
-  EXPECT_EQ(ToFloat(0x8000000000000001), -0.5);
-  EXPECT_EQ(ToFloat(0xFFFFFFFFFFFFFFFF), -0.9999999404f);
+  EXPECT_EQ(to_float(0x0000000000000000), -2.710505431e-20f);
+  EXPECT_EQ(to_float(0x0000000000000001), -5.421010862e-20f);
+  EXPECT_EQ(to_float(0x8000000000000000), -0.5);
+  EXPECT_EQ(to_float(0x8000000000000001), -0.5);
+  EXPECT_EQ(to_float(0xFFFFFFFFFFFFFFFF), -0.9999999404f);
 }
 
 TEST(GenerateRealTest, U64ToFloat_Negative_Zero_Test) {
-  auto ToFloat = [](uint64_t a) {
+  auto to_float = [](uint64_t a) {
     return GenerateRealFromBits<float, GenerateNegativeTag, true>(a);
   };
-  EXPECT_EQ(ToFloat(0x0000000000000000), 0.0);
-  EXPECT_EQ(ToFloat(0x0000000000000001), -5.421010862e-20f);
-  EXPECT_EQ(ToFloat(0x8000000000000000), -0.5);
-  EXPECT_EQ(ToFloat(0x8000000000000001), -0.5);
-  EXPECT_EQ(ToFloat(0xFFFFFFFFFFFFFFFF), -0.9999999404f);
+  EXPECT_EQ(to_float(0x0000000000000000), 0.0);
+  EXPECT_EQ(to_float(0x0000000000000001), -5.421010862e-20f);
+  EXPECT_EQ(to_float(0x8000000000000000), -0.5);
+  EXPECT_EQ(to_float(0x8000000000000001), -0.5);
+  EXPECT_EQ(to_float(0xFFFFFFFFFFFFFFFF), -0.9999999404f);
 }
 
 TEST(GenerateRealTest, U64ToFloat_Signed_NoZero_Test) {
-  auto ToFloat = [](uint64_t a) {
+  auto to_float = [](uint64_t a) {
     return GenerateRealFromBits<float, GenerateSignedTag, false>(a);
   };
-  EXPECT_EQ(ToFloat(0x0000000000000000), 5.421010862e-20f);
-  EXPECT_EQ(ToFloat(0x0000000000000001), 1.084202172e-19f);
-  EXPECT_EQ(ToFloat(0x7FFFFFFFFFFFFFFF), 0.9999999404f);
-  EXPECT_EQ(ToFloat(0x8000000000000000), -5.421010862e-20f);
-  EXPECT_EQ(ToFloat(0x8000000000000001), -1.084202172e-19f);
-  EXPECT_EQ(ToFloat(0xFFFFFFFFFFFFFFFF), -0.9999999404f);
+  EXPECT_EQ(to_float(0x0000000000000000), 5.421010862e-20f);
+  EXPECT_EQ(to_float(0x0000000000000001), 1.084202172e-19f);
+  EXPECT_EQ(to_float(0x7FFFFFFFFFFFFFFF), 0.9999999404f);
+  EXPECT_EQ(to_float(0x8000000000000000), -5.421010862e-20f);
+  EXPECT_EQ(to_float(0x8000000000000001), -1.084202172e-19f);
+  EXPECT_EQ(to_float(0xFFFFFFFFFFFFFFFF), -0.9999999404f);
 }
 
 TEST(GenerateRealTest, U64ToFloat_Signed_Zero_Test) {
-  auto ToFloat = [](uint64_t a) {
+  auto to_float = [](uint64_t a) {
     return GenerateRealFromBits<float, GenerateSignedTag, true>(a);
   };
-  EXPECT_EQ(ToFloat(0x0000000000000000), 0);
-  EXPECT_EQ(ToFloat(0x0000000000000001), 1.084202172e-19f);
-  EXPECT_EQ(ToFloat(0x7FFFFFFFFFFFFFFF), 0.9999999404f);
-  EXPECT_EQ(ToFloat(0x8000000000000000), 0);
-  EXPECT_EQ(ToFloat(0x8000000000000001), -1.084202172e-19f);
-  EXPECT_EQ(ToFloat(0xFFFFFFFFFFFFFFFF), -0.9999999404f);
+  EXPECT_EQ(to_float(0x0000000000000000), 0);
+  EXPECT_EQ(to_float(0x0000000000000001), 1.084202172e-19f);
+  EXPECT_EQ(to_float(0x7FFFFFFFFFFFFFFF), 0.9999999404f);
+  EXPECT_EQ(to_float(0x8000000000000000), 0);
+  EXPECT_EQ(to_float(0x8000000000000001), -1.084202172e-19f);
+  EXPECT_EQ(to_float(0xFFFFFFFFFFFFFFFF), -0.9999999404f);
 }
 
 TEST(GenerateRealTest, U64ToFloat_Signed_Bias_Test) {
-  auto ToFloat = [](uint64_t a) {
+  auto to_float = [](uint64_t a) {
     return GenerateRealFromBits<float, GenerateSignedTag, true>(a, 1);
   };
-  EXPECT_EQ(ToFloat(0x0000000000000000), 0);
-  EXPECT_EQ(ToFloat(0x0000000000000001), 2 * 1.084202172e-19f);
-  EXPECT_EQ(ToFloat(0x7FFFFFFFFFFFFFFF), 2 * 0.9999999404f);
-  EXPECT_EQ(ToFloat(0x8000000000000000), 0);
-  EXPECT_EQ(ToFloat(0x8000000000000001), 2 * -1.084202172e-19f);
-  EXPECT_EQ(ToFloat(0xFFFFFFFFFFFFFFFF), 2 * -0.9999999404f);
+  EXPECT_EQ(to_float(0x0000000000000000), 0);
+  EXPECT_EQ(to_float(0x0000000000000001), 2 * 1.084202172e-19f);
+  EXPECT_EQ(to_float(0x7FFFFFFFFFFFFFFF), 2 * 0.9999999404f);
+  EXPECT_EQ(to_float(0x8000000000000000), 0);
+  EXPECT_EQ(to_float(0x8000000000000001), 2 * -1.084202172e-19f);
+  EXPECT_EQ(to_float(0xFFFFFFFFFFFFFFFF), 2 * -0.9999999404f);
 }
 
 TEST(GenerateRealTest, U64ToFloatTest) {
-  auto ToFloat = [](uint64_t a) -> float {
+  auto to_float = [](uint64_t a) -> float {
     return GenerateRealFromBits<float, GeneratePositiveTag, true>(a);
   };
 
-  EXPECT_EQ(ToFloat(0x0000000000000000), 0.0f);
+  EXPECT_EQ(to_float(0x0000000000000000), 0.0f);
 
-  EXPECT_EQ(ToFloat(0x8000000000000000), 0.5f);
-  EXPECT_EQ(ToFloat(0x8000000000000001), 0.5f);
-  EXPECT_EQ(ToFloat(0x800000FFFFFFFFFF), 0.5f);
-  EXPECT_EQ(ToFloat(0xFFFFFFFFFFFFFFFF), 0.9999999404f);
+  EXPECT_EQ(to_float(0x8000000000000000), 0.5f);
+  EXPECT_EQ(to_float(0x8000000000000001), 0.5f);
+  EXPECT_EQ(to_float(0x800000FFFFFFFFFF), 0.5f);
+  EXPECT_EQ(to_float(0xFFFFFFFFFFFFFFFF), 0.9999999404f);
 
-  EXPECT_GT(ToFloat(0x0000000000000001), 0.0f);
+  EXPECT_GT(to_float(0x0000000000000001), 0.0f);
 
-  EXPECT_NE(ToFloat(0x7FFFFF0000000000), ToFloat(0x7FFFFEFFFFFFFFFF));
+  EXPECT_NE(to_float(0x7FFFFF0000000000), to_float(0x7FFFFEFFFFFFFFFF));
 
-  EXPECT_LT(ToFloat(0xFFFFFFFFFFFFFFFF), 1.0f);
+  EXPECT_LT(to_float(0xFFFFFFFFFFFFFFFF), 1.0f);
   int32_t two_to_24 = 1 << 24;
-  EXPECT_EQ(static_cast<int32_t>(ToFloat(0xFFFFFFFFFFFFFFFF) * two_to_24),
+  EXPECT_EQ(static_cast<int32_t>(to_float(0xFFFFFFFFFFFFFFFF) * two_to_24),
             two_to_24 - 1);
-  EXPECT_NE(static_cast<int32_t>(ToFloat(0xFFFFFFFFFFFFFFFF) * two_to_24 * 2),
+  EXPECT_NE(static_cast<int32_t>(to_float(0xFFFFFFFFFFFFFFFF) * two_to_24 * 2),
             two_to_24 * 2 - 1);
-  EXPECT_EQ(ToFloat(0xFFFFFFFFFFFFFFFF), ToFloat(0xFFFFFF0000000000));
-  EXPECT_NE(ToFloat(0xFFFFFFFFFFFFFFFF), ToFloat(0xFFFFFEFFFFFFFFFF));
-  EXPECT_EQ(ToFloat(0x7FFFFFFFFFFFFFFF), ToFloat(0x7FFFFF8000000000));
-  EXPECT_NE(ToFloat(0x7FFFFFFFFFFFFFFF), ToFloat(0x7FFFFF7FFFFFFFFF));
-  EXPECT_EQ(ToFloat(0x3FFFFFFFFFFFFFFF), ToFloat(0x3FFFFFC000000000));
-  EXPECT_NE(ToFloat(0x3FFFFFFFFFFFFFFF), ToFloat(0x3FFFFFBFFFFFFFFF));
+  EXPECT_EQ(to_float(0xFFFFFFFFFFFFFFFF), to_float(0xFFFFFF0000000000));
+  EXPECT_NE(to_float(0xFFFFFFFFFFFFFFFF), to_float(0xFFFFFEFFFFFFFFFF));
+  EXPECT_EQ(to_float(0x7FFFFFFFFFFFFFFF), to_float(0x7FFFFF8000000000));
+  EXPECT_NE(to_float(0x7FFFFFFFFFFFFFFF), to_float(0x7FFFFF7FFFFFFFFF));
+  EXPECT_EQ(to_float(0x3FFFFFFFFFFFFFFF), to_float(0x3FFFFFC000000000));
+  EXPECT_NE(to_float(0x3FFFFFFFFFFFFFFF), to_float(0x3FFFFFBFFFFFFFFF));
 
   // For values where every bit counts, the values scale as multiples of the
   // input.
   for (int i = 0; i < 100; ++i) {
-    EXPECT_EQ(i * ToFloat(0x0000000000000001), ToFloat(i));
+    EXPECT_EQ(i * to_float(0x0000000000000001), to_float(i));
   }
 
   // For each i: value generated from (1 << i).
@@ -157,160 +157,160 @@ TEST(GenerateRealTest, U64ToFloatTest) {
   for (int i = 62; i >= 0; --i) exp_values[i] = 0.5f * exp_values[i + 1];
   constexpr uint64_t one = 1;
   for (int i = 0; i < 64; ++i) {
-    EXPECT_EQ(ToFloat(one << i), exp_values[i]);
+    EXPECT_EQ(to_float(one << i), exp_values[i]);
     for (int j = 1; j < FLT_MANT_DIG && i - j >= 0; ++j) {
       EXPECT_NE(exp_values[i] + exp_values[i - j], exp_values[i]);
-      EXPECT_EQ(ToFloat((one << i) + (one << (i - j))),
+      EXPECT_EQ(to_float((one << i) + (one << (i - j))),
                 exp_values[i] + exp_values[i - j]);
     }
     for (int j = FLT_MANT_DIG; i - j >= 0; ++j) {
       EXPECT_EQ(exp_values[i] + exp_values[i - j], exp_values[i]);
-      EXPECT_EQ(ToFloat((one << i) + (one << (i - j))), exp_values[i]);
+      EXPECT_EQ(to_float((one << i) + (one << (i - j))), exp_values[i]);
     }
   }
 }
 
 TEST(GenerateRealTest, U64ToDouble_Positive_NoZero_Test) {
-  auto ToDouble = [](uint64_t a) {
+  auto to_double = [](uint64_t a) {
     return GenerateRealFromBits<double, GeneratePositiveTag, false>(a);
   };
 
-  EXPECT_EQ(ToDouble(0x0000000000000000), 2.710505431213761085e-20);
-  EXPECT_EQ(ToDouble(0x0000000000000001), 5.42101086242752217004e-20);
-  EXPECT_EQ(ToDouble(0x0000000000000002), 1.084202172485504434e-19);
-  EXPECT_EQ(ToDouble(0x8000000000000000), 0.5);
-  EXPECT_EQ(ToDouble(0x8000000000000001), 0.5);
-  EXPECT_EQ(ToDouble(0xFFFFFFFFFFFFFFFF), 0.999999999999999888978);
+  EXPECT_EQ(to_double(0x0000000000000000), 2.710505431213761085e-20);
+  EXPECT_EQ(to_double(0x0000000000000001), 5.42101086242752217004e-20);
+  EXPECT_EQ(to_double(0x0000000000000002), 1.084202172485504434e-19);
+  EXPECT_EQ(to_double(0x8000000000000000), 0.5);
+  EXPECT_EQ(to_double(0x8000000000000001), 0.5);
+  EXPECT_EQ(to_double(0xFFFFFFFFFFFFFFFF), 0.999999999999999888978);
 }
 
 TEST(GenerateRealTest, U64ToDouble_Positive_Zero_Test) {
-  auto ToDouble = [](uint64_t a) {
+  auto to_double = [](uint64_t a) {
     return GenerateRealFromBits<double, GeneratePositiveTag, true>(a);
   };
 
-  EXPECT_EQ(ToDouble(0x0000000000000000), 0.0);
-  EXPECT_EQ(ToDouble(0x0000000000000001), 5.42101086242752217004e-20);
-  EXPECT_EQ(ToDouble(0x8000000000000000), 0.5);
-  EXPECT_EQ(ToDouble(0x8000000000000001), 0.5);
-  EXPECT_EQ(ToDouble(0xFFFFFFFFFFFFFFFF), 0.999999999999999888978);
+  EXPECT_EQ(to_double(0x0000000000000000), 0.0);
+  EXPECT_EQ(to_double(0x0000000000000001), 5.42101086242752217004e-20);
+  EXPECT_EQ(to_double(0x8000000000000000), 0.5);
+  EXPECT_EQ(to_double(0x8000000000000001), 0.5);
+  EXPECT_EQ(to_double(0xFFFFFFFFFFFFFFFF), 0.999999999999999888978);
 }
 
 TEST(GenerateRealTest, U64ToDouble_Negative_NoZero_Test) {
-  auto ToDouble = [](uint64_t a) {
+  auto to_double = [](uint64_t a) {
     return GenerateRealFromBits<double, GenerateNegativeTag, false>(a);
   };
 
-  EXPECT_EQ(ToDouble(0x0000000000000000), -2.710505431213761085e-20);
-  EXPECT_EQ(ToDouble(0x0000000000000001), -5.42101086242752217004e-20);
-  EXPECT_EQ(ToDouble(0x0000000000000002), -1.084202172485504434e-19);
-  EXPECT_EQ(ToDouble(0x8000000000000000), -0.5);
-  EXPECT_EQ(ToDouble(0x8000000000000001), -0.5);
-  EXPECT_EQ(ToDouble(0xFFFFFFFFFFFFFFFF), -0.999999999999999888978);
+  EXPECT_EQ(to_double(0x0000000000000000), -2.710505431213761085e-20);
+  EXPECT_EQ(to_double(0x0000000000000001), -5.42101086242752217004e-20);
+  EXPECT_EQ(to_double(0x0000000000000002), -1.084202172485504434e-19);
+  EXPECT_EQ(to_double(0x8000000000000000), -0.5);
+  EXPECT_EQ(to_double(0x8000000000000001), -0.5);
+  EXPECT_EQ(to_double(0xFFFFFFFFFFFFFFFF), -0.999999999999999888978);
 }
 
 TEST(GenerateRealTest, U64ToDouble_Negative_Zero_Test) {
-  auto ToDouble = [](uint64_t a) {
+  auto to_double = [](uint64_t a) {
     return GenerateRealFromBits<double, GenerateNegativeTag, true>(a);
   };
 
-  EXPECT_EQ(ToDouble(0x0000000000000000), 0.0);
-  EXPECT_EQ(ToDouble(0x0000000000000001), -5.42101086242752217004e-20);
-  EXPECT_EQ(ToDouble(0x0000000000000002), -1.084202172485504434e-19);
-  EXPECT_EQ(ToDouble(0x8000000000000000), -0.5);
-  EXPECT_EQ(ToDouble(0x8000000000000001), -0.5);
-  EXPECT_EQ(ToDouble(0xFFFFFFFFFFFFFFFF), -0.999999999999999888978);
+  EXPECT_EQ(to_double(0x0000000000000000), 0.0);
+  EXPECT_EQ(to_double(0x0000000000000001), -5.42101086242752217004e-20);
+  EXPECT_EQ(to_double(0x0000000000000002), -1.084202172485504434e-19);
+  EXPECT_EQ(to_double(0x8000000000000000), -0.5);
+  EXPECT_EQ(to_double(0x8000000000000001), -0.5);
+  EXPECT_EQ(to_double(0xFFFFFFFFFFFFFFFF), -0.999999999999999888978);
 }
 
 TEST(GenerateRealTest, U64ToDouble_Signed_NoZero_Test) {
-  auto ToDouble = [](uint64_t a) {
+  auto to_double = [](uint64_t a) {
     return GenerateRealFromBits<double, GenerateSignedTag, false>(a);
   };
 
-  EXPECT_EQ(ToDouble(0x0000000000000000), 5.42101086242752217004e-20);
-  EXPECT_EQ(ToDouble(0x0000000000000001), 1.084202172485504434e-19);
-  EXPECT_EQ(ToDouble(0x7FFFFFFFFFFFFFFF), 0.999999999999999888978);
-  EXPECT_EQ(ToDouble(0x8000000000000000), -5.42101086242752217004e-20);
-  EXPECT_EQ(ToDouble(0x8000000000000001), -1.084202172485504434e-19);
-  EXPECT_EQ(ToDouble(0xFFFFFFFFFFFFFFFF), -0.999999999999999888978);
+  EXPECT_EQ(to_double(0x0000000000000000), 5.42101086242752217004e-20);
+  EXPECT_EQ(to_double(0x0000000000000001), 1.084202172485504434e-19);
+  EXPECT_EQ(to_double(0x7FFFFFFFFFFFFFFF), 0.999999999999999888978);
+  EXPECT_EQ(to_double(0x8000000000000000), -5.42101086242752217004e-20);
+  EXPECT_EQ(to_double(0x8000000000000001), -1.084202172485504434e-19);
+  EXPECT_EQ(to_double(0xFFFFFFFFFFFFFFFF), -0.999999999999999888978);
 }
 
 TEST(GenerateRealTest, U64ToDouble_Signed_Zero_Test) {
-  auto ToDouble = [](uint64_t a) {
+  auto to_double = [](uint64_t a) {
     return GenerateRealFromBits<double, GenerateSignedTag, true>(a);
   };
-  EXPECT_EQ(ToDouble(0x0000000000000000), 0);
-  EXPECT_EQ(ToDouble(0x0000000000000001), 1.084202172485504434e-19);
-  EXPECT_EQ(ToDouble(0x7FFFFFFFFFFFFFFF), 0.999999999999999888978);
-  EXPECT_EQ(ToDouble(0x8000000000000000), 0);
-  EXPECT_EQ(ToDouble(0x8000000000000001), -1.084202172485504434e-19);
-  EXPECT_EQ(ToDouble(0xFFFFFFFFFFFFFFFF), -0.999999999999999888978);
+  EXPECT_EQ(to_double(0x0000000000000000), 0);
+  EXPECT_EQ(to_double(0x0000000000000001), 1.084202172485504434e-19);
+  EXPECT_EQ(to_double(0x7FFFFFFFFFFFFFFF), 0.999999999999999888978);
+  EXPECT_EQ(to_double(0x8000000000000000), 0);
+  EXPECT_EQ(to_double(0x8000000000000001), -1.084202172485504434e-19);
+  EXPECT_EQ(to_double(0xFFFFFFFFFFFFFFFF), -0.999999999999999888978);
 }
 
 TEST(GenerateRealTest, U64ToDouble_GenerateSignedTag_Bias_Test) {
-  auto ToDouble = [](uint64_t a) {
+  auto to_double = [](uint64_t a) {
     return GenerateRealFromBits<double, GenerateSignedTag, true>(a, -1);
   };
-  EXPECT_EQ(ToDouble(0x0000000000000000), 0);
-  EXPECT_EQ(ToDouble(0x0000000000000001), 1.084202172485504434e-19 / 2);
-  EXPECT_EQ(ToDouble(0x7FFFFFFFFFFFFFFF), 0.999999999999999888978 / 2);
-  EXPECT_EQ(ToDouble(0x8000000000000000), 0);
-  EXPECT_EQ(ToDouble(0x8000000000000001), -1.084202172485504434e-19 / 2);
-  EXPECT_EQ(ToDouble(0xFFFFFFFFFFFFFFFF), -0.999999999999999888978 / 2);
+  EXPECT_EQ(to_double(0x0000000000000000), 0);
+  EXPECT_EQ(to_double(0x0000000000000001), 1.084202172485504434e-19 / 2);
+  EXPECT_EQ(to_double(0x7FFFFFFFFFFFFFFF), 0.999999999999999888978 / 2);
+  EXPECT_EQ(to_double(0x8000000000000000), 0);
+  EXPECT_EQ(to_double(0x8000000000000001), -1.084202172485504434e-19 / 2);
+  EXPECT_EQ(to_double(0xFFFFFFFFFFFFFFFF), -0.999999999999999888978 / 2);
 }
 
 TEST(GenerateRealTest, U64ToDoubleTest) {
-  auto ToDouble = [](uint64_t a) {
+  auto to_double = [](uint64_t a) {
     return GenerateRealFromBits<double, GeneratePositiveTag, true>(a);
   };
 
-  EXPECT_EQ(ToDouble(0x0000000000000000), 0.0);
-  EXPECT_EQ(ToDouble(0x0000000000000000), 0.0);
+  EXPECT_EQ(to_double(0x0000000000000000), 0.0);
+  EXPECT_EQ(to_double(0x0000000000000000), 0.0);
 
-  EXPECT_EQ(ToDouble(0x0000000000000001), 5.42101086242752217004e-20);
-  EXPECT_EQ(ToDouble(0x7fffffffffffffef), 0.499999999999999944489);
-  EXPECT_EQ(ToDouble(0x8000000000000000), 0.5);
+  EXPECT_EQ(to_double(0x0000000000000001), 5.42101086242752217004e-20);
+  EXPECT_EQ(to_double(0x7fffffffffffffef), 0.499999999999999944489);
+  EXPECT_EQ(to_double(0x8000000000000000), 0.5);
 
   // For values > 0.5, RandU64ToDouble discards up to 11 bits. (64-53).
-  EXPECT_EQ(ToDouble(0x8000000000000001), 0.5);
-  EXPECT_EQ(ToDouble(0x80000000000007FF), 0.5);
-  EXPECT_EQ(ToDouble(0xFFFFFFFFFFFFFFFF), 0.999999999999999888978);
-  EXPECT_NE(ToDouble(0x7FFFFFFFFFFFF800), ToDouble(0x7FFFFFFFFFFFF7FF));
+  EXPECT_EQ(to_double(0x8000000000000001), 0.5);
+  EXPECT_EQ(to_double(0x80000000000007FF), 0.5);
+  EXPECT_EQ(to_double(0xFFFFFFFFFFFFFFFF), 0.999999999999999888978);
+  EXPECT_NE(to_double(0x7FFFFFFFFFFFF800), to_double(0x7FFFFFFFFFFFF7FF));
 
-  EXPECT_LT(ToDouble(0xFFFFFFFFFFFFFFFF), 1.0);
-  EXPECT_EQ(ToDouble(0xFFFFFFFFFFFFFFFF), ToDouble(0xFFFFFFFFFFFFF800));
-  EXPECT_NE(ToDouble(0xFFFFFFFFFFFFFFFF), ToDouble(0xFFFFFFFFFFFFF7FF));
-  EXPECT_EQ(ToDouble(0x7FFFFFFFFFFFFFFF), ToDouble(0x7FFFFFFFFFFFFC00));
-  EXPECT_NE(ToDouble(0x7FFFFFFFFFFFFFFF), ToDouble(0x7FFFFFFFFFFFFBFF));
-  EXPECT_EQ(ToDouble(0x3FFFFFFFFFFFFFFF), ToDouble(0x3FFFFFFFFFFFFE00));
-  EXPECT_NE(ToDouble(0x3FFFFFFFFFFFFFFF), ToDouble(0x3FFFFFFFFFFFFDFF));
+  EXPECT_LT(to_double(0xFFFFFFFFFFFFFFFF), 1.0);
+  EXPECT_EQ(to_double(0xFFFFFFFFFFFFFFFF), to_double(0xFFFFFFFFFFFFF800));
+  EXPECT_NE(to_double(0xFFFFFFFFFFFFFFFF), to_double(0xFFFFFFFFFFFFF7FF));
+  EXPECT_EQ(to_double(0x7FFFFFFFFFFFFFFF), to_double(0x7FFFFFFFFFFFFC00));
+  EXPECT_NE(to_double(0x7FFFFFFFFFFFFFFF), to_double(0x7FFFFFFFFFFFFBFF));
+  EXPECT_EQ(to_double(0x3FFFFFFFFFFFFFFF), to_double(0x3FFFFFFFFFFFFE00));
+  EXPECT_NE(to_double(0x3FFFFFFFFFFFFFFF), to_double(0x3FFFFFFFFFFFFDFF));
 
-  EXPECT_EQ(ToDouble(0x1000000000000001), 0.0625);
-  EXPECT_EQ(ToDouble(0x2000000000000001), 0.125);
-  EXPECT_EQ(ToDouble(0x3000000000000001), 0.1875);
-  EXPECT_EQ(ToDouble(0x4000000000000001), 0.25);
-  EXPECT_EQ(ToDouble(0x5000000000000001), 0.3125);
-  EXPECT_EQ(ToDouble(0x6000000000000001), 0.375);
-  EXPECT_EQ(ToDouble(0x7000000000000001), 0.4375);
-  EXPECT_EQ(ToDouble(0x8000000000000001), 0.5);
-  EXPECT_EQ(ToDouble(0x9000000000000001), 0.5625);
-  EXPECT_EQ(ToDouble(0xa000000000000001), 0.625);
-  EXPECT_EQ(ToDouble(0xb000000000000001), 0.6875);
-  EXPECT_EQ(ToDouble(0xc000000000000001), 0.75);
-  EXPECT_EQ(ToDouble(0xd000000000000001), 0.8125);
-  EXPECT_EQ(ToDouble(0xe000000000000001), 0.875);
-  EXPECT_EQ(ToDouble(0xf000000000000001), 0.9375);
+  EXPECT_EQ(to_double(0x1000000000000001), 0.0625);
+  EXPECT_EQ(to_double(0x2000000000000001), 0.125);
+  EXPECT_EQ(to_double(0x3000000000000001), 0.1875);
+  EXPECT_EQ(to_double(0x4000000000000001), 0.25);
+  EXPECT_EQ(to_double(0x5000000000000001), 0.3125);
+  EXPECT_EQ(to_double(0x6000000000000001), 0.375);
+  EXPECT_EQ(to_double(0x7000000000000001), 0.4375);
+  EXPECT_EQ(to_double(0x8000000000000001), 0.5);
+  EXPECT_EQ(to_double(0x9000000000000001), 0.5625);
+  EXPECT_EQ(to_double(0xa000000000000001), 0.625);
+  EXPECT_EQ(to_double(0xb000000000000001), 0.6875);
+  EXPECT_EQ(to_double(0xc000000000000001), 0.75);
+  EXPECT_EQ(to_double(0xd000000000000001), 0.8125);
+  EXPECT_EQ(to_double(0xe000000000000001), 0.875);
+  EXPECT_EQ(to_double(0xf000000000000001), 0.9375);
 
   // Large powers of 2.
   int64_t two_to_53 = int64_t{1} << 53;
-  EXPECT_EQ(static_cast<int64_t>(ToDouble(0xFFFFFFFFFFFFFFFF) * two_to_53),
+  EXPECT_EQ(static_cast<int64_t>(to_double(0xFFFFFFFFFFFFFFFF) * two_to_53),
             two_to_53 - 1);
-  EXPECT_NE(static_cast<int64_t>(ToDouble(0xFFFFFFFFFFFFFFFF) * two_to_53 * 2),
+  EXPECT_NE(static_cast<int64_t>(to_double(0xFFFFFFFFFFFFFFFF) * two_to_53 * 2),
             two_to_53 * 2 - 1);
 
   // For values where every bit counts, the values scale as multiples of the
   // input.
   for (int i = 0; i < 100; ++i) {
-    EXPECT_EQ(i * ToDouble(0x0000000000000001), ToDouble(i));
+    EXPECT_EQ(i * to_double(0x0000000000000001), to_double(i));
   }
 
   // For each i: value generated from (1 << i).
@@ -319,104 +319,104 @@ TEST(GenerateRealTest, U64ToDoubleTest) {
   for (int i = 62; i >= 0; --i) exp_values[i] = 0.5 * exp_values[i + 1];
   constexpr uint64_t one = 1;
   for (int i = 0; i < 64; ++i) {
-    EXPECT_EQ(ToDouble(one << i), exp_values[i]);
+    EXPECT_EQ(to_double(one << i), exp_values[i]);
     for (int j = 1; j < DBL_MANT_DIG && i - j >= 0; ++j) {
       EXPECT_NE(exp_values[i] + exp_values[i - j], exp_values[i]);
-      EXPECT_EQ(ToDouble((one << i) + (one << (i - j))),
+      EXPECT_EQ(to_double((one << i) + (one << (i - j))),
                 exp_values[i] + exp_values[i - j]);
     }
     for (int j = DBL_MANT_DIG; i - j >= 0; ++j) {
       EXPECT_EQ(exp_values[i] + exp_values[i - j], exp_values[i]);
-      EXPECT_EQ(ToDouble((one << i) + (one << (i - j))), exp_values[i]);
+      EXPECT_EQ(to_double((one << i) + (one << (i - j))), exp_values[i]);
     }
   }
 }
 
 TEST(GenerateRealTest, U64ToDoubleSignedTest) {
-  auto ToDouble = [](uint64_t a) {
+  auto to_double = [](uint64_t a) {
     return GenerateRealFromBits<double, GenerateSignedTag, false>(a);
   };
 
-  EXPECT_EQ(ToDouble(0x0000000000000000), 5.42101086242752217004e-20);
-  EXPECT_EQ(ToDouble(0x0000000000000001), 1.084202172485504434e-19);
+  EXPECT_EQ(to_double(0x0000000000000000), 5.42101086242752217004e-20);
+  EXPECT_EQ(to_double(0x0000000000000001), 1.084202172485504434e-19);
 
-  EXPECT_EQ(ToDouble(0x8000000000000000), -5.42101086242752217004e-20);
-  EXPECT_EQ(ToDouble(0x8000000000000001), -1.084202172485504434e-19);
+  EXPECT_EQ(to_double(0x8000000000000000), -5.42101086242752217004e-20);
+  EXPECT_EQ(to_double(0x8000000000000001), -1.084202172485504434e-19);
 
-  const double e_plus = ToDouble(0x0000000000000001);
-  const double e_minus = ToDouble(0x8000000000000001);
+  const double e_plus = to_double(0x0000000000000001);
+  const double e_minus = to_double(0x8000000000000001);
   EXPECT_EQ(e_plus, 1.084202172485504434e-19);
   EXPECT_EQ(e_minus, -1.084202172485504434e-19);
 
-  EXPECT_EQ(ToDouble(0x3fffffffffffffef), 0.499999999999999944489);
-  EXPECT_EQ(ToDouble(0xbfffffffffffffef), -0.499999999999999944489);
+  EXPECT_EQ(to_double(0x3fffffffffffffef), 0.499999999999999944489);
+  EXPECT_EQ(to_double(0xbfffffffffffffef), -0.499999999999999944489);
 
   // For values > 0.5, RandU64ToDouble discards up to 10 bits. (63-53).
-  EXPECT_EQ(ToDouble(0x4000000000000000), 0.5);
-  EXPECT_EQ(ToDouble(0x4000000000000001), 0.5);
-  EXPECT_EQ(ToDouble(0x40000000000003FF), 0.5);
+  EXPECT_EQ(to_double(0x4000000000000000), 0.5);
+  EXPECT_EQ(to_double(0x4000000000000001), 0.5);
+  EXPECT_EQ(to_double(0x40000000000003FF), 0.5);
 
-  EXPECT_EQ(ToDouble(0xC000000000000000), -0.5);
-  EXPECT_EQ(ToDouble(0xC000000000000001), -0.5);
-  EXPECT_EQ(ToDouble(0xC0000000000003FF), -0.5);
+  EXPECT_EQ(to_double(0xC000000000000000), -0.5);
+  EXPECT_EQ(to_double(0xC000000000000001), -0.5);
+  EXPECT_EQ(to_double(0xC0000000000003FF), -0.5);
 
-  EXPECT_EQ(ToDouble(0x7FFFFFFFFFFFFFFe), 0.999999999999999888978);
-  EXPECT_EQ(ToDouble(0xFFFFFFFFFFFFFFFe), -0.999999999999999888978);
+  EXPECT_EQ(to_double(0x7FFFFFFFFFFFFFFe), 0.999999999999999888978);
+  EXPECT_EQ(to_double(0xFFFFFFFFFFFFFFFe), -0.999999999999999888978);
 
-  EXPECT_NE(ToDouble(0x7FFFFFFFFFFFF800), ToDouble(0x7FFFFFFFFFFFF7FF));
+  EXPECT_NE(to_double(0x7FFFFFFFFFFFF800), to_double(0x7FFFFFFFFFFFF7FF));
 
-  EXPECT_LT(ToDouble(0x7FFFFFFFFFFFFFFF), 1.0);
-  EXPECT_GT(ToDouble(0x7FFFFFFFFFFFFFFF), 0.9999999999);
+  EXPECT_LT(to_double(0x7FFFFFFFFFFFFFFF), 1.0);
+  EXPECT_GT(to_double(0x7FFFFFFFFFFFFFFF), 0.9999999999);
 
-  EXPECT_GT(ToDouble(0xFFFFFFFFFFFFFFFe), -1.0);
-  EXPECT_LT(ToDouble(0xFFFFFFFFFFFFFFFe), -0.999999999);
+  EXPECT_GT(to_double(0xFFFFFFFFFFFFFFFe), -1.0);
+  EXPECT_LT(to_double(0xFFFFFFFFFFFFFFFe), -0.999999999);
 
-  EXPECT_EQ(ToDouble(0xFFFFFFFFFFFFFFFe), ToDouble(0xFFFFFFFFFFFFFC00));
-  EXPECT_EQ(ToDouble(0x7FFFFFFFFFFFFFFF), ToDouble(0x7FFFFFFFFFFFFC00));
-  EXPECT_NE(ToDouble(0xFFFFFFFFFFFFFFFe), ToDouble(0xFFFFFFFFFFFFF3FF));
-  EXPECT_NE(ToDouble(0x7FFFFFFFFFFFFFFF), ToDouble(0x7FFFFFFFFFFFF3FF));
+  EXPECT_EQ(to_double(0xFFFFFFFFFFFFFFFe), to_double(0xFFFFFFFFFFFFFC00));
+  EXPECT_EQ(to_double(0x7FFFFFFFFFFFFFFF), to_double(0x7FFFFFFFFFFFFC00));
+  EXPECT_NE(to_double(0xFFFFFFFFFFFFFFFe), to_double(0xFFFFFFFFFFFFF3FF));
+  EXPECT_NE(to_double(0x7FFFFFFFFFFFFFFF), to_double(0x7FFFFFFFFFFFF3FF));
 
-  EXPECT_EQ(ToDouble(0x1000000000000001), 0.125);
-  EXPECT_EQ(ToDouble(0x2000000000000001), 0.25);
-  EXPECT_EQ(ToDouble(0x3000000000000001), 0.375);
-  EXPECT_EQ(ToDouble(0x4000000000000001), 0.5);
-  EXPECT_EQ(ToDouble(0x5000000000000001), 0.625);
-  EXPECT_EQ(ToDouble(0x6000000000000001), 0.75);
-  EXPECT_EQ(ToDouble(0x7000000000000001), 0.875);
-  EXPECT_EQ(ToDouble(0x7800000000000001), 0.9375);
-  EXPECT_EQ(ToDouble(0x7c00000000000001), 0.96875);
-  EXPECT_EQ(ToDouble(0x7e00000000000001), 0.984375);
-  EXPECT_EQ(ToDouble(0x7f00000000000001), 0.9921875);
+  EXPECT_EQ(to_double(0x1000000000000001), 0.125);
+  EXPECT_EQ(to_double(0x2000000000000001), 0.25);
+  EXPECT_EQ(to_double(0x3000000000000001), 0.375);
+  EXPECT_EQ(to_double(0x4000000000000001), 0.5);
+  EXPECT_EQ(to_double(0x5000000000000001), 0.625);
+  EXPECT_EQ(to_double(0x6000000000000001), 0.75);
+  EXPECT_EQ(to_double(0x7000000000000001), 0.875);
+  EXPECT_EQ(to_double(0x7800000000000001), 0.9375);
+  EXPECT_EQ(to_double(0x7c00000000000001), 0.96875);
+  EXPECT_EQ(to_double(0x7e00000000000001), 0.984375);
+  EXPECT_EQ(to_double(0x7f00000000000001), 0.9921875);
 
   // 0x8000000000000000 ~= 0
-  EXPECT_EQ(ToDouble(0x9000000000000001), -0.125);
-  EXPECT_EQ(ToDouble(0xa000000000000001), -0.25);
-  EXPECT_EQ(ToDouble(0xb000000000000001), -0.375);
-  EXPECT_EQ(ToDouble(0xc000000000000001), -0.5);
-  EXPECT_EQ(ToDouble(0xd000000000000001), -0.625);
-  EXPECT_EQ(ToDouble(0xe000000000000001), -0.75);
-  EXPECT_EQ(ToDouble(0xf000000000000001), -0.875);
+  EXPECT_EQ(to_double(0x9000000000000001), -0.125);
+  EXPECT_EQ(to_double(0xa000000000000001), -0.25);
+  EXPECT_EQ(to_double(0xb000000000000001), -0.375);
+  EXPECT_EQ(to_double(0xc000000000000001), -0.5);
+  EXPECT_EQ(to_double(0xd000000000000001), -0.625);
+  EXPECT_EQ(to_double(0xe000000000000001), -0.75);
+  EXPECT_EQ(to_double(0xf000000000000001), -0.875);
 
   // Large powers of 2.
   int64_t two_to_53 = int64_t{1} << 53;
-  EXPECT_EQ(static_cast<int64_t>(ToDouble(0x7FFFFFFFFFFFFFFF) * two_to_53),
+  EXPECT_EQ(static_cast<int64_t>(to_double(0x7FFFFFFFFFFFFFFF) * two_to_53),
             two_to_53 - 1);
-  EXPECT_EQ(static_cast<int64_t>(ToDouble(0xFFFFFFFFFFFFFFFF) * two_to_53),
+  EXPECT_EQ(static_cast<int64_t>(to_double(0xFFFFFFFFFFFFFFFF) * two_to_53),
             -(two_to_53 - 1));
 
-  EXPECT_NE(static_cast<int64_t>(ToDouble(0x7FFFFFFFFFFFFFFF) * two_to_53 * 2),
+  EXPECT_NE(static_cast<int64_t>(to_double(0x7FFFFFFFFFFFFFFF) * two_to_53 * 2),
             two_to_53 * 2 - 1);
 
   // For values where every bit counts, the values scale as multiples of the
   // input.
   for (int i = 1; i < 100; ++i) {
-    EXPECT_EQ(i * e_plus, ToDouble(i)) << i;
-    EXPECT_EQ(i * e_minus, ToDouble(0x8000000000000000 | i)) << i;
+    EXPECT_EQ(i * e_plus, to_double(i)) << i;
+    EXPECT_EQ(i * e_minus, to_double(0x8000000000000000 | i)) << i;
   }
 }
 
 TEST(GenerateRealTest, ExhaustiveFloat) {
-  auto ToFloat = [](uint64_t a) {
+  auto to_float = [](uint64_t a) {
     return GenerateRealFromBits<float, GeneratePositiveTag, true>(a);
   };
 
@@ -472,7 +472,7 @@ TEST(GenerateRealTest, ExhaustiveFloat) {
       chk = (~uint64_t(0)) >> (clz + 1);
     }
     for (; x > chk && limit > 0; x -= dec) {
-      count(ToFloat(x));
+      count(to_float(x));
       --limit;
     }
   }

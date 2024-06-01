@@ -20,7 +20,7 @@
 #include <cstring>
 
 #include <gtest/gtest.h>
-#include <turbo/base/internal/endian.h>
+#include <turbo/base/endian.h>
 #include <turbo/random/internal/randen_traits.h>
 
 namespace {

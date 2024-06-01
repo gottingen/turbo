@@ -21,7 +21,7 @@
 #include <cstdint>
 
 #include <turbo/base/config.h>
-#include <turbo/base/internal/endian.h>
+#include <turbo/base/endian.h>
 #include <turbo/base/optimization.h>
 #include <turbo/numeric/bits.h>
 #include <turbo/strings/ascii.h>
@@ -81,8 +81,8 @@ turbo::string_view find_longest_common_prefix(turbo::string_view a,
 
   if (TURBO_UNLIKELY(limit < 8)) {
     while (TURBO_LIKELY(count + 2 <= limit)) {
-      uint16_t xor_bytes = turbo::little_endian::Load16(pa + count) ^
-                           turbo::little_endian::Load16(pb + count);
+      uint16_t xor_bytes = turbo::little_endian::load16(pa + count) ^
+                           turbo::little_endian::load16(pb + count);
       if (TURBO_UNLIKELY(xor_bytes != 0)) {
         if (TURBO_LIKELY((xor_bytes & 0xff) == 0)) ++count;
         return turbo::string_view(pa, count);
@@ -96,8 +96,8 @@ turbo::string_view find_longest_common_prefix(turbo::string_view a,
   }
 
   do {
-    uint64_t xor_bytes = turbo::little_endian::Load64(pa + count) ^
-                         turbo::little_endian::Load64(pb + count);
+    uint64_t xor_bytes = turbo::little_endian::load64(pa + count) ^
+                         turbo::little_endian::load64(pb + count);
     if (TURBO_UNLIKELY(xor_bytes != 0)) {
       count += static_cast<uint64_t>(turbo::countr_zero(xor_bytes) >> 3);
       return turbo::string_view(pa, count);
@@ -106,8 +106,8 @@ turbo::string_view find_longest_common_prefix(turbo::string_view a,
   } while (TURBO_LIKELY(count + 8 < limit));
 
   count = limit - 8;
-  uint64_t xor_bytes = turbo::little_endian::Load64(pa + count) ^
-                       turbo::little_endian::Load64(pb + count);
+  uint64_t xor_bytes = turbo::little_endian::load64(pa + count) ^
+                       turbo::little_endian::load64(pb + count);
   if (TURBO_LIKELY(xor_bytes != 0)) {
     count += static_cast<uint64_t>(turbo::countr_zero(xor_bytes) >> 3);
     return turbo::string_view(pa, count);

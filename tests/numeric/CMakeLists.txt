@@ -61,3 +61,18 @@ carbin_cc_test(
         ${CARBIN_DEPS_LINK}
         CXXOPTS ${CARBIN_CXX_OPTIONS}
 )
+
+carbin_cc_test(
+        NAME float16_test
+        MODULE numeric
+        SOURCES float16_test.cc
+        DEPS
+        test_instance_tracker_static
+        LINKS
+        turbo::turbo
+        GTest::gtest
+        GTest::gmock
+        GTest::gmock_main
+        ${CARBIN_DEPS_LINK}
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)

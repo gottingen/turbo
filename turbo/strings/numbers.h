@@ -44,7 +44,7 @@
 #include <type_traits>
 
 #include <turbo/base/config.h>
-#include <turbo/base/internal/endian.h>
+#include <turbo/base/endian.h>
 #include <turbo/base/macros.h>
 #include <turbo/base/nullability.h>
 #include <turbo/base/port.h>
@@ -266,7 +266,7 @@ namespace turbo {
         // since 0 has one digit).
         inline size_t FastHexToBufferZeroPad16(uint64_t val, turbo::Nonnull<char *> out) {
 #ifdef TURBO_INTERNAL_HAVE_SSSE3
-            uint64_t be = turbo::big_endian::FromHost64(val);
+            uint64_t be = turbo::big_endian::from_host64(val);
             const auto kNibbleMask = _mm_set1_epi8(0xf);
             const auto kHexDigits = _mm_setr_epi8('0', '1', '2', '3', '4', '5', '6', '7',
                                                   '8', '9', 'a', 'b', 'c', 'd', 'e', 'f');

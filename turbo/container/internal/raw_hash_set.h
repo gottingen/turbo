@@ -203,7 +203,7 @@
 
 #include <turbo/base/attributes.h>
 #include <turbo/base/config.h>
-#include <turbo/base/internal/endian.h>
+#include <turbo/base/endian.h>
 #include <turbo/base/internal/raw_logging.h>
 #include <turbo/base/macros.h>
 #include <turbo/base/optimization.h>
@@ -833,7 +833,7 @@ struct GroupAArch64Impl {
     constexpr uint64_t midbs = 0x7e7e7e7e7e7e7e7eULL;
     auto x = slsbs & (mask >> 6);
     auto res = (x + midbs) | kMsbs8Bytes;
-    little_endian::Store64(dst, res);
+    little_endian::store64(dst, res);
   }
 
   uint8x8_t ctrl;
@@ -844,7 +844,7 @@ struct GroupPortableImpl {
   static constexpr size_t kWidth = 8;
 
   explicit GroupPortableImpl(const ctrl_t* pos)
-      : ctrl(little_endian::Load64(pos)) {}
+      : ctrl(little_endian::load64(pos)) {}
 
   BitMask<uint64_t, kWidth, 3> Match(h2_t hash) const {
     // For the technique, see:
@@ -901,7 +901,7 @@ struct GroupPortableImpl {
     constexpr uint64_t lsbs = 0x0101010101010101ULL;
     auto x = ctrl & kMsbs8Bytes;
     auto res = (~x + (x >> 7)) & ~lsbs;
-    little_endian::Store64(dst, res);
+    little_endian::store64(dst, res);
   }
 
   uint64_t ctrl;

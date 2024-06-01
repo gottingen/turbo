@@ -26,7 +26,7 @@
 #include <limits>
 #include <type_traits>
 
-#include <turbo/base/internal/endian.h>
+#include <turbo/base/endian.h>
 #include <turbo/meta/type_traits.h>
 #include <turbo/random/internal/iostream_state_saver.h>
 #include <turbo/random/internal/randen.h>
@@ -91,7 +91,7 @@ class alignas(8) randen_engine {
       next_ = kCapacityT;
       impl_.Generate(begin);
     }
-    return little_endian::ToHost(begin[next_++]);
+    return little_endian::to_host(begin[next_++]);
   }
 
   template <class SeedSequence>
@@ -139,7 +139,7 @@ class alignas(8) randen_engine {
       // Randen expects the seed buffer to be in Little Endian; reverse it on
       // Big Endian platforms.
       for (sequence_result_type& e : buffer) {
-        e = turbo::little_endian::FromHost(e);
+        e = turbo::little_endian::from_host(e);
       }
 #endif
       // The Randen paper suggests preferentially initializing even-numbered
@@ -205,7 +205,7 @@ class alignas(8) randen_engine {
       // In the case that `elem` is `uint8_t`, it must be cast to something
       // larger so that it prints as an integer rather than a character. For
       // simplicity, apply the cast all circumstances.
-      os << static_cast<numeric_type>(little_endian::FromHost(*it))
+      os << static_cast<numeric_type>(little_endian::from_host(*it))
          << os.fill();
     }
     os << engine.next_;
@@ -225,7 +225,7 @@ class alignas(8) randen_engine {
       // necessary to read a wider type and then cast it to uint8_t.
       numeric_type value;
       is >> value;
-      elem = little_endian::ToHost(static_cast<result_type>(value));
+      elem = little_endian::to_host(static_cast<result_type>(value));
     }
     is >> next;
     if (is.fail()) {
