@@ -139,8 +139,8 @@
 // for further information.
 // The MinGW compiler doesn't complain about the weak attribute until the link
 // step, presumably because Windows doesn't use ELF binaries.
-#if (TURBO_HAVE_ATTRIBUTE(weak) ||                                         \
-     (defined(__GNUC__) && !defined(__clang__))) &&                       \
+#if (TURBO_HAVE_ATTRIBUTE(weak) || \
+     (defined(__GNUC__) && !defined(__clang__))) && \
     (!defined(_WIN32) || (defined(__clang__) && __clang_major__ >= 9)) && \
     !defined(__MINGW32__)
 #undef TURBO_ATTRIBUTE_WEAK
@@ -309,7 +309,7 @@
 // a prerequisite. Labeled sections are not supported on Darwin/iOS.
 #ifdef TURBO_HAVE_ATTRIBUTE_SECTION
 #error TURBO_HAVE_ATTRIBUTE_SECTION cannot be directly set
-#elif (TURBO_HAVE_ATTRIBUTE(section) ||                \
+#elif (TURBO_HAVE_ATTRIBUTE(section) || \
        (defined(__GNUC__) && !defined(__clang__))) && \
     !defined(__APPLE__) && TURBO_HAVE_ATTRIBUTE_WEAK
 #define TURBO_HAVE_ATTRIBUTE_SECTION 1

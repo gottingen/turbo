@@ -50,6 +50,7 @@
 #ifndef TURBO_BASE_CONFIG_H_
 #define TURBO_BASE_CONFIG_H_
 
+#include <turbo/base/macros/visibility.h>
 // Included for the __GLIBC__ macro (or similar macros on other systems).
 #include <limits.h>
 
@@ -674,25 +675,6 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #define TURBO_INTERNAL_MANGLED_BACKREFERENCE "6"
 #endif
 #endif
-
-// TURBO_DLL
-//
-// When building Turbo as a DLL, this macro expands to `__declspec(dllexport)`
-// so we can annotate symbols appropriately as being exported. When used in
-// headers consuming a DLL, this macro expands to `__declspec(dllimport)` so
-// that consumers know the symbol is defined inside the DLL. In all other cases,
-// the macro expands to nothing.
-#if defined(_MSC_VER)
-#if defined(TURBO_BUILD_DLL)
-#define TURBO_DLL __declspec(dllexport)
-#elif defined(TURBO_CONSUME_DLL)
-#define TURBO_DLL __declspec(dllimport)
-#else
-#define TURBO_DLL
-#endif
-#else
-#define TURBO_DLL
-#endif  // defined(_MSC_VER)
 
 #if defined(_MSC_VER)
 #if defined(TURBO_BUILD_TEST_DLL)
