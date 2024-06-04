@@ -1,2 +1,9 @@
-google/googletest@v1.13.0 -DCMAKE_CXX_FLAGS="-std=c++17"
-google/benchmark@v1.8.3 -DBENCHMARK_ENABLE_TESTING=OFF
+############
+# ea recipes
+############
+gottingen/carbin-recipes@ea
+
+#########################
+# testing tools googlegtest benchmark
+testing
+

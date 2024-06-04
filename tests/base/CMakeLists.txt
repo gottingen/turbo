@@ -167,3 +167,15 @@ carbin_cc_test(
         ${CARBIN_DEPS_LINK}
         CXXOPTS ${CARBIN_CXX_OPTIONS}
 )
+carbin_cc_test(
+        NAME checked_cast_test
+        MODULE base
+        SOURCES checked_cast_test.cc
+        LINKS
+        turbo::turbo
+        GTest::gtest
+        GTest::gmock
+        GTest::gmock_main
+        ${CARBIN_DEPS_LINK}
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
