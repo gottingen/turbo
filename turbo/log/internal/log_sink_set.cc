@@ -40,7 +40,7 @@
 #include <turbo/base/log_severity.h>
 #include <turbo/base/no_destructor.h>
 #include <turbo/base/thread_annotations.h>
-#include <turbo/cleanup/cleanup.h>
+#include <turbo/bootstrap/cleanup.h>
 #include <turbo/log/globals.h>
 #include <turbo/log/internal/config.h>
 #include <turbo/log/internal/globals.h>

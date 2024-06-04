@@ -114,9 +114,9 @@
 namespace turbo {
 
     namespace strings_internal {
-// AlphaNumBuffer allows a way to pass a string to str_cat without having to do
-// memory allocation.  It is simply a pair of a fixed-size character array, and
-// a size.  Please don't use outside of turbo, yet.
+        // AlphaNumBuffer allows a way to pass a string to str_cat without having to do
+        // memory allocation.  It is simply a pair of a fixed-size character array, and
+        // a size.  Please don't use outside of turbo, yet.
         template<size_t max_size>
         struct AlphaNumBuffer {
             std::array<char, max_size> data;
@@ -125,10 +125,10 @@ namespace turbo {
 
     }  // namespace strings_internal
 
-// Enum that specifies the number of significant digits to return in a `Hex` or
-// `Dec` conversion and fill character to use. A `kZeroPad2` value, for example,
-// would produce hexadecimal strings such as "0a","0f" and a 'kSpacePad5' value
-// would produce hexadecimal strings such as "    a","    f".
+    // Enum that specifies the number of significant digits to return in a `Hex` or
+    // `Dec` conversion and fill character to use. A `kZeroPad2` value, for example,
+    // would produce hexadecimal strings such as "0a","0f" and a 'kSpacePad5' value
+    // would produce hexadecimal strings such as "    a","    f".
     enum PadSpec : uint8_t {
         kNoPad = 1,
         kZeroPad2,
@@ -172,12 +172,12 @@ namespace turbo {
         kSpacePad20,
     };
 
-// -----------------------------------------------------------------------------
-// Hex
-// -----------------------------------------------------------------------------
-//
-// `Hex` stores a set of hexadecimal string conversion parameters for use
-// within `AlphaNum` string conversions.
+    // -----------------------------------------------------------------------------
+    // Hex
+    // -----------------------------------------------------------------------------
+    //
+    // `Hex` stores a set of hexadecimal string conversion parameters for use
+    // within `AlphaNum` string conversions.
     struct Hex {
         uint64_t value;
         uint8_t width;

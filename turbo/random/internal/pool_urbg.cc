@@ -26,7 +26,7 @@
 #include <turbo/base/attributes.h>
 #include <turbo/base/call_once.h>
 #include <turbo/base/config.h>
-#include <turbo/base/internal/endian.h>
+#include <turbo/base/endian.h>
 #include <turbo/base/internal/raw_logging.h>
 #include <turbo/base/internal/spinlock.h>
 #include <turbo/base/internal/sysinfo.h>

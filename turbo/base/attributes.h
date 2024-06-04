@@ -139,8 +139,8 @@
 // for further information.
 // The MinGW compiler doesn't complain about the weak attribute until the link
 // step, presumably because Windows doesn't use ELF binaries.
-#if (TURBO_HAVE_ATTRIBUTE(weak) ||                                         \
-     (defined(__GNUC__) && !defined(__clang__))) &&                       \
+#if (TURBO_HAVE_ATTRIBUTE(weak) || \
+     (defined(__GNUC__) && !defined(__clang__))) && \
     (!defined(_WIN32) || (defined(__clang__) && __clang_major__ >= 9)) && \
     !defined(__MINGW32__)
 #undef TURBO_ATTRIBUTE_WEAK
@@ -309,7 +309,7 @@
 // a prerequisite. Labeled sections are not supported on Darwin/iOS.
 #ifdef TURBO_HAVE_ATTRIBUTE_SECTION
 #error TURBO_HAVE_ATTRIBUTE_SECTION cannot be directly set
-#elif (TURBO_HAVE_ATTRIBUTE(section) ||                \
+#elif (TURBO_HAVE_ATTRIBUTE(section) || \
        (defined(__GNUC__) && !defined(__clang__))) && \
     !defined(__APPLE__) && TURBO_HAVE_ATTRIBUTE_WEAK
 #define TURBO_HAVE_ATTRIBUTE_SECTION 1
@@ -562,6 +562,13 @@
 #define TURBO_ATTRIBUTE_UNUSED
 #endif
 
+#if TURBO_HAVE_ATTRIBUTE(used) || (defined(__GNUC__) && !defined(__clang__))
+#undef TURBO_ATTRIBUTE_USED
+#define TURBO_ATTRIBUTE_USED __attribute__((__used__))
+#else
+#define TURBO_ATTRIBUTE_USED
+#endif
+
 // TURBO_ATTRIBUTE_INITIAL_EXEC
 //
 // Tells the compiler to use "initial-exec" mode for a thread-local variable.
@@ -687,6 +694,13 @@
 #else
 #define TURBO_DEPRECATED(message)
 #endif
+/*
+#if defined(__clang__)
+#define TURBO_DEPRECATED(MSG, FIX) __attribute__((deprecated(MSG, FIX)))
+#else
+#define TURBO_DEPRECATED(MSG, FIX) [[deprecated(MSG)]]
+#endif
+*/
 
 // When deprecating Turbo code, it is sometimes necessary to turn off the
 // warning within Turbo, until the deprecated code is actually removed. The
@@ -950,6 +964,32 @@
 #define TURBO_ATTRIBUTE_WARN_UNUSED [[gnu::warn_unused]]
 #else
 #define TURBO_ATTRIBUTE_WARN_UNUSED
+#endif
+
+/// TURBO_GSL_OWNER - Apply this to owning classes like SmallVector to enable
+/// lifetime warnings.
+#if TURBO_HAVE_CPP_ATTRIBUTE(gsl::Owner)
+#define TURBO_GSL_OWNER [[gsl::Owner]]
+#else
+#define TURBO_GSL_OWNER
+#endif
+
+/// TURBO_GSL_POINTER - Apply this to non-owning classes like
+/// StringRef to enable lifetime warnings.
+#if TURBO_HAVE_CPP_ATTRIBUTE(gsl::Pointer)
+#define TURBO_GSL_POINTER [[gsl::Pointer]]
+#else
+#define TURBO_GSL_POINTER
+#endif
+
+/// \macro TURBO_ATTRIBUTE_RETURNS_NOALIAS Used to mark a function as returning a
+/// pointer that does not alias any other valid pointer.
+#ifdef __GNUC__
+#define TURBO_ATTRIBUTE_RETURNS_NOALIAS __attribute__((__malloc__))
+#elif defined(_MSC_VER)
+#define TURBO_ATTRIBUTE_RETURNS_NOALIAS __declspec(restrict)
+#else
+#define TURBO_ATTRIBUTE_RETURNS_NOALIAS
 #endif
 
 #endif  // TURBO_BASE_ATTRIBUTES_H_

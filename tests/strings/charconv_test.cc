@@ -166,13 +166,13 @@ TEST(FromChars, NearRoundingCases) {
 #undef FROM_CHARS_TEST_FLOAT
 #endif
 
-float ToFloat(turbo::string_view s) {
+float to_float(turbo::string_view s) {
   float f;
   turbo::from_chars(s.data(), s.data() + s.size(), f);
   return f;
 }
 
-double ToDouble(turbo::string_view s) {
+double to_double(turbo::string_view s) {
   double d;
   turbo::from_chars(s.data(), s.data() + s.size(), d);
   return d;
@@ -183,83 +183,83 @@ double ToDouble(turbo::string_view s) {
 // cases will work even on compilers that do not accurately round floating point
 // literals.
 TEST(FromChars, NearRoundingCasesExplicit) {
-  EXPECT_EQ(ToDouble("5.e125"), ldexp(6653062250012735, 365));
-  EXPECT_EQ(ToDouble("69.e267"), ldexp(4705683757438170, 841));
-  EXPECT_EQ(ToDouble("999.e-026"), ldexp(6798841691080350, -129));
-  EXPECT_EQ(ToDouble("7861.e-034"), ldexp(8975675289889240, -153));
-  EXPECT_EQ(ToDouble("75569.e-254"), ldexp(6091718967192243, -880));
-  EXPECT_EQ(ToDouble("928609.e-261"), ldexp(7849264900213743, -900));
-  EXPECT_EQ(ToDouble("9210917.e080"), ldexp(8341110837370930, 236));
-  EXPECT_EQ(ToDouble("84863171.e114"), ldexp(4625202867375927, 353));
-  EXPECT_EQ(ToDouble("653777767.e273"), ldexp(5068902999763073, 884));
-  EXPECT_EQ(ToDouble("5232604057.e-298"), ldexp(5741343011915040, -1010));
-  EXPECT_EQ(ToDouble("27235667517.e-109"), ldexp(6707124626673586, -380));
-  EXPECT_EQ(ToDouble("653532977297.e-123"), ldexp(7078246407265384, -422));
-  EXPECT_EQ(ToDouble("3142213164987.e-294"), ldexp(8219991337640559, -988));
-  EXPECT_EQ(ToDouble("46202199371337.e-072"), ldexp(5224462102115359, -246));
-  EXPECT_EQ(ToDouble("231010996856685.e-073"), ldexp(5224462102115359, -247));
-  EXPECT_EQ(ToDouble("9324754620109615.e212"), ldexp(5539753864394442, 705));
-  EXPECT_EQ(ToDouble("78459735791271921.e049"), ldexp(8388176519442766, 166));
-  EXPECT_EQ(ToDouble("272104041512242479.e200"), ldexp(5554409530847367, 670));
-  EXPECT_EQ(ToDouble("6802601037806061975.e198"), ldexp(5554409530847367, 668));
-  EXPECT_EQ(ToDouble("20505426358836677347.e-221"),
+  EXPECT_EQ(to_double("5.e125"), ldexp(6653062250012735, 365));
+  EXPECT_EQ(to_double("69.e267"), ldexp(4705683757438170, 841));
+  EXPECT_EQ(to_double("999.e-026"), ldexp(6798841691080350, -129));
+  EXPECT_EQ(to_double("7861.e-034"), ldexp(8975675289889240, -153));
+  EXPECT_EQ(to_double("75569.e-254"), ldexp(6091718967192243, -880));
+  EXPECT_EQ(to_double("928609.e-261"), ldexp(7849264900213743, -900));
+  EXPECT_EQ(to_double("9210917.e080"), ldexp(8341110837370930, 236));
+  EXPECT_EQ(to_double("84863171.e114"), ldexp(4625202867375927, 353));
+  EXPECT_EQ(to_double("653777767.e273"), ldexp(5068902999763073, 884));
+  EXPECT_EQ(to_double("5232604057.e-298"), ldexp(5741343011915040, -1010));
+  EXPECT_EQ(to_double("27235667517.e-109"), ldexp(6707124626673586, -380));
+  EXPECT_EQ(to_double("653532977297.e-123"), ldexp(7078246407265384, -422));
+  EXPECT_EQ(to_double("3142213164987.e-294"), ldexp(8219991337640559, -988));
+  EXPECT_EQ(to_double("46202199371337.e-072"), ldexp(5224462102115359, -246));
+  EXPECT_EQ(to_double("231010996856685.e-073"), ldexp(5224462102115359, -247));
+  EXPECT_EQ(to_double("9324754620109615.e212"), ldexp(5539753864394442, 705));
+  EXPECT_EQ(to_double("78459735791271921.e049"), ldexp(8388176519442766, 166));
+  EXPECT_EQ(to_double("272104041512242479.e200"), ldexp(5554409530847367, 670));
+  EXPECT_EQ(to_double("6802601037806061975.e198"), ldexp(5554409530847367, 668));
+  EXPECT_EQ(to_double("20505426358836677347.e-221"),
             ldexp(4524032052079546, -722));
-  EXPECT_EQ(ToDouble("836168422905420598437.e-234"),
+  EXPECT_EQ(to_double("836168422905420598437.e-234"),
             ldexp(5070963299887562, -760));
-  EXPECT_EQ(ToDouble("4891559871276714924261.e222"),
+  EXPECT_EQ(to_double("4891559871276714924261.e222"),
             ldexp(6452687840519111, 757));
-  EXPECT_EQ(ToFloat("5.e-20"), ldexpf(15474250, -88));
-  EXPECT_EQ(ToFloat("67.e14"), ldexpf(12479722, 29));
-  EXPECT_EQ(ToFloat("985.e15"), ldexpf(14333636, 36));
-  EXPECT_EQ(ToFloat("7693.e-42"), ldexpf(10979816, -150));
-  EXPECT_EQ(ToFloat("55895.e-16"), ldexpf(12888509, -61));
-  EXPECT_EQ(ToFloat("996622.e-44"), ldexpf(14224264, -150));
-  EXPECT_EQ(ToFloat("7038531.e-32"), ldexpf(11420669, -107));
-  EXPECT_EQ(ToFloat("60419369.e-46"), ldexpf(8623340, -150));
-  EXPECT_EQ(ToFloat("702990899.e-20"), ldexpf(16209866, -61));
-  EXPECT_EQ(ToFloat("6930161142.e-48"), ldexpf(9891056, -150));
-  EXPECT_EQ(ToFloat("25933168707.e-13"), ldexpf(11138211, -32));
-  EXPECT_EQ(ToFloat("596428896559.e20"), ldexpf(12333860, 82));
+  EXPECT_EQ(to_float("5.e-20"), ldexpf(15474250, -88));
+  EXPECT_EQ(to_float("67.e14"), ldexpf(12479722, 29));
+  EXPECT_EQ(to_float("985.e15"), ldexpf(14333636, 36));
+  EXPECT_EQ(to_float("7693.e-42"), ldexpf(10979816, -150));
+  EXPECT_EQ(to_float("55895.e-16"), ldexpf(12888509, -61));
+  EXPECT_EQ(to_float("996622.e-44"), ldexpf(14224264, -150));
+  EXPECT_EQ(to_float("7038531.e-32"), ldexpf(11420669, -107));
+  EXPECT_EQ(to_float("60419369.e-46"), ldexpf(8623340, -150));
+  EXPECT_EQ(to_float("702990899.e-20"), ldexpf(16209866, -61));
+  EXPECT_EQ(to_float("6930161142.e-48"), ldexpf(9891056, -150));
+  EXPECT_EQ(to_float("25933168707.e-13"), ldexpf(11138211, -32));
+  EXPECT_EQ(to_float("596428896559.e20"), ldexpf(12333860, 82));
 
 
-  EXPECT_EQ(ToDouble("9.e-265"), ldexp(8168427841980010, -930));
-  EXPECT_EQ(ToDouble("85.e-037"), ldexp(6360455125664090, -169));
-  EXPECT_EQ(ToDouble("623.e100"), ldexp(6263531988747231, 289));
-  EXPECT_EQ(ToDouble("3571.e263"), ldexp(6234526311072170, 833));
-  EXPECT_EQ(ToDouble("81661.e153"), ldexp(6696636728760206, 472));
-  EXPECT_EQ(ToDouble("920657.e-023"), ldexp(5975405561110124, -109));
-  EXPECT_EQ(ToDouble("4603285.e-024"), ldexp(5975405561110124, -110));
-  EXPECT_EQ(ToDouble("87575437.e-309"), ldexp(8452160731874668, -1053));
-  EXPECT_EQ(ToDouble("245540327.e122"), ldexp(4985336549131723, 381));
-  EXPECT_EQ(ToDouble("6138508175.e120"), ldexp(4985336549131723, 379));
-  EXPECT_EQ(ToDouble("83356057653.e193"), ldexp(5986732817132056, 625));
-  EXPECT_EQ(ToDouble("619534293513.e124"), ldexp(4798406992060657, 399));
-  EXPECT_EQ(ToDouble("2335141086879.e218"), ldexp(5419088166961646, 713));
-  EXPECT_EQ(ToDouble("36167929443327.e-159"), ldexp(8135819834632444, -536));
-  EXPECT_EQ(ToDouble("609610927149051.e-255"), ldexp(4576664294594737, -850));
-  EXPECT_EQ(ToDouble("3743626360493413.e-165"), ldexp(6898586531774201, -549));
-  EXPECT_EQ(ToDouble("94080055902682397.e-242"), ldexp(6273271706052298, -800));
-  EXPECT_EQ(ToDouble("899810892172646163.e283"), ldexp(7563892574477827, 947));
-  EXPECT_EQ(ToDouble("7120190517612959703.e120"), ldexp(5385467232557565, 409));
-  EXPECT_EQ(ToDouble("25188282901709339043.e-252"),
+  EXPECT_EQ(to_double("9.e-265"), ldexp(8168427841980010, -930));
+  EXPECT_EQ(to_double("85.e-037"), ldexp(6360455125664090, -169));
+  EXPECT_EQ(to_double("623.e100"), ldexp(6263531988747231, 289));
+  EXPECT_EQ(to_double("3571.e263"), ldexp(6234526311072170, 833));
+  EXPECT_EQ(to_double("81661.e153"), ldexp(6696636728760206, 472));
+  EXPECT_EQ(to_double("920657.e-023"), ldexp(5975405561110124, -109));
+  EXPECT_EQ(to_double("4603285.e-024"), ldexp(5975405561110124, -110));
+  EXPECT_EQ(to_double("87575437.e-309"), ldexp(8452160731874668, -1053));
+  EXPECT_EQ(to_double("245540327.e122"), ldexp(4985336549131723, 381));
+  EXPECT_EQ(to_double("6138508175.e120"), ldexp(4985336549131723, 379));
+  EXPECT_EQ(to_double("83356057653.e193"), ldexp(5986732817132056, 625));
+  EXPECT_EQ(to_double("619534293513.e124"), ldexp(4798406992060657, 399));
+  EXPECT_EQ(to_double("2335141086879.e218"), ldexp(5419088166961646, 713));
+  EXPECT_EQ(to_double("36167929443327.e-159"), ldexp(8135819834632444, -536));
+  EXPECT_EQ(to_double("609610927149051.e-255"), ldexp(4576664294594737, -850));
+  EXPECT_EQ(to_double("3743626360493413.e-165"), ldexp(6898586531774201, -549));
+  EXPECT_EQ(to_double("94080055902682397.e-242"), ldexp(6273271706052298, -800));
+  EXPECT_EQ(to_double("899810892172646163.e283"), ldexp(7563892574477827, 947));
+  EXPECT_EQ(to_double("7120190517612959703.e120"), ldexp(5385467232557565, 409));
+  EXPECT_EQ(to_double("25188282901709339043.e-252"),
             ldexp(5635662608542340, -825));
-  EXPECT_EQ(ToDouble("308984926168550152811.e-052"),
+  EXPECT_EQ(to_double("308984926168550152811.e-052"),
             ldexp(5644774693823803, -157));
-  EXPECT_EQ(ToDouble("6372891218502368041059.e064"),
+  EXPECT_EQ(to_double("6372891218502368041059.e064"),
             ldexp(4616868614322430, 233));
 
-  EXPECT_EQ(ToFloat("3.e-23"), ldexpf(9507380, -98));
-  EXPECT_EQ(ToFloat("57.e18"), ldexpf(12960300, 42));
-  EXPECT_EQ(ToFloat("789.e-35"), ldexpf(10739312, -130));
-  EXPECT_EQ(ToFloat("2539.e-18"), ldexpf(11990089, -72));
-  EXPECT_EQ(ToFloat("76173.e28"), ldexpf(9845130, 86));
-  EXPECT_EQ(ToFloat("887745.e-11"), ldexpf(9760860, -40));
-  EXPECT_EQ(ToFloat("5382571.e-37"), ldexpf(11447463, -124));
-  EXPECT_EQ(ToFloat("82381273.e-35"), ldexpf(8554961, -113));
-  EXPECT_EQ(ToFloat("750486563.e-38"), ldexpf(9975678, -120));
-  EXPECT_EQ(ToFloat("3752432815.e-39"), ldexpf(9975678, -121));
-  EXPECT_EQ(ToFloat("75224575729.e-45"), ldexpf(13105970, -137));
-  EXPECT_EQ(ToFloat("459926601011.e15"), ldexpf(12466336, 65));
+  EXPECT_EQ(to_float("3.e-23"), ldexpf(9507380, -98));
+  EXPECT_EQ(to_float("57.e18"), ldexpf(12960300, 42));
+  EXPECT_EQ(to_float("789.e-35"), ldexpf(10739312, -130));
+  EXPECT_EQ(to_float("2539.e-18"), ldexpf(11990089, -72));
+  EXPECT_EQ(to_float("76173.e28"), ldexpf(9845130, 86));
+  EXPECT_EQ(to_float("887745.e-11"), ldexpf(9760860, -40));
+  EXPECT_EQ(to_float("5382571.e-37"), ldexpf(11447463, -124));
+  EXPECT_EQ(to_float("82381273.e-35"), ldexpf(8554961, -113));
+  EXPECT_EQ(to_float("750486563.e-38"), ldexpf(9975678, -120));
+  EXPECT_EQ(to_float("3752432815.e-39"), ldexpf(9975678, -121));
+  EXPECT_EQ(to_float("75224575729.e-45"), ldexpf(13105970, -137));
+  EXPECT_EQ(to_float("459926601011.e15"), ldexpf(12466336, 65));
 }
 
 // Common test logic for converting a string which lies exactly halfway between

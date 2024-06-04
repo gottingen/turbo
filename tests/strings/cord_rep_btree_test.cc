@@ -27,7 +27,7 @@
 #include <gtest/gtest.h>
 #include <turbo/base/config.h>
 #include <turbo/base/internal/raw_logging.h>
-#include <turbo/cleanup/cleanup.h>
+#include <turbo/bootstrap/cleanup.h>
 #include <turbo/strings/internal/cord_data_edge.h>
 #include <turbo/strings/internal/cord_internal.h>
 #include <turbo/strings/internal/cord_rep_test_util.h>

@@ -16,8 +16,7 @@
 //
 //
 
-#ifndef TURBO_STRINGS_INTERNAL_MEMUTIL_H_
-#define TURBO_STRINGS_INTERNAL_MEMUTIL_H_
+#pragma once
 
 #include <cstddef>
 #include <cstring>
@@ -25,18 +24,12 @@
 #include <turbo/base/port.h>  // disable some warnings on Windows
 #include <turbo/strings/ascii.h>  // for turbo::ascii_tolower
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace strings_internal {
+namespace turbo::strings_internal {
 
-// Performs a byte-by-byte comparison of `len` bytes of the strings `s1` and
-// `s2`, ignoring the case of the characters. It returns an integer less than,
-// equal to, or greater than zero if `s1` is found, respectively, to be less
-// than, to match, or be greater than `s2`.
-int memcasecmp(const char* s1, const char* s2, size_t len);
+    // Performs a byte-by-byte comparison of `len` bytes of the strings `s1` and
+    // `s2`, ignoring the case of the characters. It returns an integer less than,
+    // equal to, or greater than zero if `s1` is found, respectively, to be less
+    // than, to match, or be greater than `s2`.
+    int memcasecmp(const char *s1, const char *s2, size_t len);
 
-}  // namespace strings_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
-
-#endif  // TURBO_STRINGS_INTERNAL_MEMUTIL_H_
+}  // namespace turbo::strings_internal

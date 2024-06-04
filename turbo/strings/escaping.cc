@@ -911,11 +911,11 @@ namespace turbo {
                 -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
                 -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
         };
-/* clang-format on */
+        /* clang-format on */
 
-// This is a templated function so that T can be either a char*
-// or a string.  This works because we use the [] operator to access
-// individual characters at a time.
+        // This is a templated function so that T can be either a char*
+        // or a string.  This works because we use the [] operator to access
+        // individual characters at a time.
         template<typename T>
         void HexStringToBytesInternal(turbo::Nullable<const char *> from, T to,
                                       size_t num) {
@@ -925,8 +925,8 @@ namespace turbo {
             }
         }
 
-// This is a templated function so that T can be either a char* or a
-// std::string.
+        // This is a templated function so that T can be either a char* or a
+        // std::string.
         template<typename T>
         void BytesToHexStringInternal(turbo::Nullable<const unsigned char *> src, T dest,
                                       size_t num) {
@@ -939,11 +939,11 @@ namespace turbo {
 
     }  // namespace
 
-// ----------------------------------------------------------------------
-// c_decode()
-//
-// See CUnescapeInternal() for implementation details.
-// ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // c_decode()
+    //
+    // See CUnescapeInternal() for implementation details.
+    // ----------------------------------------------------------------------
     bool c_decode(turbo::string_view source, turbo::Nonnull<std::string *> dest,
                   turbo::Nullable<std::string *> error) {
         return CUnescapeInternal(source, kUnescapeNulls, dest, error);
@@ -1042,8 +1042,7 @@ namespace turbo {
     std::string bytes_to_hex_string(turbo::string_view from) {
         std::string result;
         strings_internal::STLStringResizeUninitialized(&result, 2 * from.size());
-        turbo::BytesToHexStringInternal<std::string &>(
-                reinterpret_cast<const unsigned char *>(from.data()), result, from.size());
+        turbo::BytesToHexStringInternal<std::string &>(reinterpret_cast<const unsigned char *>(from.data()), result, from.size());
         return result;
     }
 

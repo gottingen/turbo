@@ -39,7 +39,7 @@
 #include <gtest/gtest.h>
 #include <turbo/base/attributes.h>
 #include <turbo/base/config.h>
-#include <turbo/base/internal/endian.h>
+#include <turbo/base/endian.h>
 #include <turbo/base/macros.h>
 #include <turbo/base/no_destructor.h>
 #include <turbo/base/options.h>

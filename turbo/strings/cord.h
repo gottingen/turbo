@@ -73,14 +73,14 @@
 
 #include <turbo/base/attributes.h>
 #include <turbo/base/config.h>
-#include <turbo/base/internal/endian.h>
+#include <turbo/base/endian.h>
 #include <turbo/base/internal/per_thread_tls.h>
 #include <turbo/base/macros.h>
 #include <turbo/base/nullability.h>
 #include <turbo/base/optimization.h>
 #include <turbo/base/port.h>
 #include <turbo/container/inlined_vector.h>
-#include <turbo/crc/internal/crc_cord_state.h>
+#include <turbo/crypto/internal/crc_cord_state.h>
 #include <turbo/functional/function_ref.h>
 #include <turbo/meta/type_traits.h>
 #include <turbo/strings/cord_analysis.h>

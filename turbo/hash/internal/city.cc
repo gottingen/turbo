@@ -28,7 +28,7 @@
 #include <algorithm>
 
 #include <turbo/base/config.h>
-#include <turbo/base/internal/endian.h>
+#include <turbo/base/endian.h>
 #include <turbo/base/internal/unaligned_access.h>
 #include <turbo/base/optimization.h>
 

@@ -28,6 +28,10 @@ carbin_cc_library(
         ${TURBO_SRC}
         CXXOPTS
         ${CARBIN_CXX_OPTIONS}
+        COPTS
+        "-fvisibility=hidden"
+        DEFINES
+        -DURI_STATIC_BUILD
         PLINKS
         ${CARBIN_DEPS_LINK}
         PUBLIC
