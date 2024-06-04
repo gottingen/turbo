@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/crc/internal/non_temporal_memcpy.h>
+#include <turbo/crypto/internal/non_temporal_memcpy.h>
 
 #include <algorithm>
 #include <cstdint>

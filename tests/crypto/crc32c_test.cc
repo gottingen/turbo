@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/crc/crc32c.h>
+#include <turbo/crypto/crc32c.h>
 
 #include <algorithm>
 #include <cstddef>
@@ -25,7 +25,7 @@
 #include <string>
 
 #include <gtest/gtest.h>
-#include <turbo/crc/internal/crc32c.h>
+#include <turbo/crypto/internal/crc32c.h>
 #include <turbo/strings/str_cat.h>
 #include <turbo/strings/str_format.h>
 #include <turbo/strings/string_view.h>
@@ -39,23 +39,23 @@ TEST(CRC32C, RFC3720) {
 
   // 32 bytes of ones.
   memset(data, 0, sizeof(data));
-  EXPECT_EQ(turbo::ComputeCrc32c(turbo::string_view(data, sizeof(data))),
-            turbo::crc32c_t{0x8a9136aa});
+  EXPECT_EQ(turbo::compute_crc32c(turbo::string_view(data, sizeof(data))),
+            turbo::CRC32C{0x8a9136aa});
 
   // 32 bytes of ones.
   memset(data, 0xff, sizeof(data));
-  EXPECT_EQ(turbo::ComputeCrc32c(turbo::string_view(data, sizeof(data))),
-            turbo::crc32c_t{0x62a8ab43});
+  EXPECT_EQ(turbo::compute_crc32c(turbo::string_view(data, sizeof(data))),
+            turbo::CRC32C{0x62a8ab43});
 
   // 32 incrementing bytes.
   for (int i = 0; i < 32; ++i) data[i] = static_cast<char>(i);
-  EXPECT_EQ(turbo::ComputeCrc32c(turbo::string_view(data, sizeof(data))),
-            turbo::crc32c_t{0x46dd794e});
+  EXPECT_EQ(turbo::compute_crc32c(turbo::string_view(data, sizeof(data))),
+            turbo::CRC32C{0x46dd794e});
 
   // 32 decrementing bytes.
   for (int i = 0; i < 32; ++i) data[i] = static_cast<char>(31 - i);
-  EXPECT_EQ(turbo::ComputeCrc32c(turbo::string_view(data, sizeof(data))),
-            turbo::crc32c_t{0x113fdb5c});
+  EXPECT_EQ(turbo::compute_crc32c(turbo::string_view(data, sizeof(data))),
+            turbo::CRC32C{0x113fdb5c});
 
   // An iSCSI - SCSI Read (10) Command PDU.
   constexpr uint8_t cmd[48] = {
@@ -64,9 +64,9 @@ TEST(CRC32C, RFC3720) {
       0x00, 0x00, 0x00, 0x14, 0x00, 0x00, 0x00, 0x18, 0x28, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   };
-  EXPECT_EQ(turbo::ComputeCrc32c(turbo::string_view(
+  EXPECT_EQ(turbo::compute_crc32c(turbo::string_view(
                 reinterpret_cast<const char*>(cmd), sizeof(cmd))),
-            turbo::crc32c_t{0xd9963a56});
+            turbo::CRC32C{0xd9963a56});
 }
 
 std::string TestString(size_t len) {
@@ -79,8 +79,8 @@ std::string TestString(size_t len) {
 }
 
 TEST(CRC32C, Compute) {
-  EXPECT_EQ(turbo::ComputeCrc32c(""), turbo::crc32c_t{0});
-  EXPECT_EQ(turbo::ComputeCrc32c("hello world"), turbo::crc32c_t{0xc99465aa});
+  EXPECT_EQ(turbo::compute_crc32c(""), turbo::CRC32C{0});
+  EXPECT_EQ(turbo::compute_crc32c("hello world"), turbo::CRC32C{0xc99465aa});
 }
 
 TEST(CRC32C, Extend) {
@@ -88,19 +88,19 @@ TEST(CRC32C, Extend) {
   std::string extension = "Extension String";
 
   EXPECT_EQ(
-      turbo::ExtendCrc32c(turbo::crc32c_t{base}, extension),
-      turbo::crc32c_t{0xD2F65090});  // CRC32C of "Hello WorldExtension String"
+      turbo::extend_crc32c(turbo::CRC32C{base}, extension),
+      turbo::CRC32C{0xD2F65090});  // CRC32C of "Hello WorldExtension String"
 }
 
 TEST(CRC32C, ExtendByZeroes) {
   std::string base = "hello world";
-  turbo::crc32c_t base_crc = turbo::crc32c_t{0xc99465aa};
+  turbo::CRC32C base_crc = turbo::CRC32C{0xc99465aa};
 
   constexpr size_t kExtendByValues[] = {100, 10000, 100000};
   for (const size_t extend_by : kExtendByValues) {
     SCOPED_TRACE(extend_by);
-    turbo::crc32c_t crc2 = turbo::ExtendCrc32cByZeroes(base_crc, extend_by);
-    EXPECT_EQ(crc2, turbo::ComputeCrc32c(base + std::string(extend_by, '\0')));
+    turbo::CRC32C crc2 = turbo::extend_crc32c_by_zeroes(base_crc, extend_by);
+    EXPECT_EQ(crc2, turbo::compute_crc32c(base + std::string(extend_by, '\0')));
   }
 }
 
@@ -108,7 +108,7 @@ TEST(CRC32C, UnextendByZeroes) {
   constexpr size_t kExtendByValues[] = {2, 200, 20000, 200000, 20000000};
   constexpr size_t kUnextendByValues[] = {0, 100, 10000, 100000, 10000000};
 
-  for (auto seed_crc : {turbo::crc32c_t{0}, turbo::crc32c_t{0xc99465aa}}) {
+  for (auto seed_crc : {turbo::CRC32C{0}, turbo::CRC32C{0xc99465aa}}) {
     SCOPED_TRACE(seed_crc);
     for (const size_t size_1 : kExtendByValues) {
       for (const size_t size_2 : kUnextendByValues) {
@@ -119,12 +119,12 @@ TEST(CRC32C, UnextendByZeroes) {
 
         // Extending by A zeroes an unextending by B<A zeros should be identical
         // to extending by A-B zeroes.
-        turbo::crc32c_t crc1 = seed_crc;
-        crc1 = turbo::ExtendCrc32cByZeroes(crc1, extend_size);
+        turbo::CRC32C crc1 = seed_crc;
+        crc1 = turbo::extend_crc32c_by_zeroes(crc1, extend_size);
         crc1 = turbo::crc_internal::UnextendCrc32cByZeroes(crc1, unextend_size);
 
-        turbo::crc32c_t crc2 = seed_crc;
-        crc2 = turbo::ExtendCrc32cByZeroes(crc2, extend_size - unextend_size);
+        turbo::CRC32C crc2 = seed_crc;
+        crc2 = turbo::extend_crc32c_by_zeroes(crc2, extend_size - unextend_size);
 
         EXPECT_EQ(crc1, crc2);
       }
@@ -137,8 +137,8 @@ TEST(CRC32C, UnextendByZeroes) {
     std::string string_before = TestString(size);
     std::string string_after = string_before + std::string(size, '\0');
 
-    turbo::crc32c_t crc_before = turbo::ComputeCrc32c(string_before);
-    turbo::crc32c_t crc_after = turbo::ComputeCrc32c(string_after);
+    turbo::CRC32C crc_before = turbo::compute_crc32c(string_before);
+    turbo::CRC32C crc_after = turbo::compute_crc32c(string_after);
 
     EXPECT_EQ(crc_before,
               turbo::crc_internal::UnextendCrc32cByZeroes(crc_after, size));
@@ -150,11 +150,11 @@ TEST(CRC32C, Concat) {
   std::string world = "world!";
   std::string hello_world = turbo::str_cat(hello, world);
 
-  turbo::crc32c_t crc_a = turbo::ComputeCrc32c(hello);
-  turbo::crc32c_t crc_b = turbo::ComputeCrc32c(world);
-  turbo::crc32c_t crc_ab = turbo::ComputeCrc32c(hello_world);
+  turbo::CRC32C crc_a = turbo::compute_crc32c(hello);
+  turbo::CRC32C crc_b = turbo::compute_crc32c(world);
+  turbo::CRC32C crc_ab = turbo::compute_crc32c(hello_world);
 
-  EXPECT_EQ(turbo::ConcatCrc32c(crc_a, crc_b, world.size()), crc_ab);
+  EXPECT_EQ(turbo::concat_crc32c(crc_a, crc_b, world.size()), crc_ab);
 }
 
 TEST(CRC32C, Memcpy) {
@@ -164,9 +164,9 @@ TEST(CRC32C, Memcpy) {
     std::string sample_string = TestString(bytes);
     std::string target_buffer = std::string(bytes, '\0');
 
-    turbo::crc32c_t memcpy_crc =
-        turbo::MemcpyCrc32c(&(target_buffer[0]), sample_string.data(), bytes);
-    turbo::crc32c_t compute_crc = turbo::ComputeCrc32c(sample_string);
+    turbo::CRC32C memcpy_crc =
+        turbo::memcpy_crc32c(&(target_buffer[0]), sample_string.data(), bytes);
+    turbo::CRC32C compute_crc = turbo::compute_crc32c(sample_string);
 
     EXPECT_EQ(memcpy_crc, compute_crc);
     EXPECT_EQ(sample_string, target_buffer);
@@ -178,11 +178,11 @@ TEST(CRC32C, RemovePrefix) {
   std::string world = "world!";
   std::string hello_world = turbo::str_cat(hello, world);
 
-  turbo::crc32c_t crc_a = turbo::ComputeCrc32c(hello);
-  turbo::crc32c_t crc_b = turbo::ComputeCrc32c(world);
-  turbo::crc32c_t crc_ab = turbo::ComputeCrc32c(hello_world);
+  turbo::CRC32C crc_a = turbo::compute_crc32c(hello);
+  turbo::CRC32C crc_b = turbo::compute_crc32c(world);
+  turbo::CRC32C crc_ab = turbo::compute_crc32c(hello_world);
 
-  EXPECT_EQ(turbo::RemoveCrc32cPrefix(crc_a, crc_ab, world.size()), crc_b);
+  EXPECT_EQ(turbo::remove_crc32c_prefix(crc_a, crc_ab, world.size()), crc_b);
 }
 
 TEST(CRC32C, RemoveSuffix) {
@@ -190,41 +190,41 @@ TEST(CRC32C, RemoveSuffix) {
   std::string world = "world!";
   std::string hello_world = turbo::str_cat(hello, world);
 
-  turbo::crc32c_t crc_a = turbo::ComputeCrc32c(hello);
-  turbo::crc32c_t crc_b = turbo::ComputeCrc32c(world);
-  turbo::crc32c_t crc_ab = turbo::ComputeCrc32c(hello_world);
+  turbo::CRC32C crc_a = turbo::compute_crc32c(hello);
+  turbo::CRC32C crc_b = turbo::compute_crc32c(world);
+  turbo::CRC32C crc_ab = turbo::compute_crc32c(hello_world);
 
-  EXPECT_EQ(turbo::RemoveCrc32cSuffix(crc_ab, crc_b, world.size()), crc_a);
+  EXPECT_EQ(turbo::remove_crc32c_suffix(crc_ab, crc_b, world.size()), crc_a);
 }
 
 TEST(CRC32C, InsertionOperator) {
   {
     std::ostringstream buf;
-    buf << turbo::crc32c_t{0xc99465aa};
+    buf << turbo::CRC32C{0xc99465aa};
     EXPECT_EQ(buf.str(), "c99465aa");
   }
   {
     std::ostringstream buf;
-    buf << turbo::crc32c_t{0};
+    buf << turbo::CRC32C{0};
     EXPECT_EQ(buf.str(), "00000000");
   }
   {
     std::ostringstream buf;
-    buf << turbo::crc32c_t{17};
+    buf << turbo::CRC32C{17};
     EXPECT_EQ(buf.str(), "00000011");
   }
 }
 
 TEST(CRC32C, turbo_stringify) {
   // str_format
-  EXPECT_EQ(turbo::str_format("%v", turbo::crc32c_t{0xc99465aa}), "c99465aa");
-  EXPECT_EQ(turbo::str_format("%v", turbo::crc32c_t{0}), "00000000");
-  EXPECT_EQ(turbo::str_format("%v", turbo::crc32c_t{17}), "00000011");
+  EXPECT_EQ(turbo::str_format("%v", turbo::CRC32C{0xc99465aa}), "c99465aa");
+  EXPECT_EQ(turbo::str_format("%v", turbo::CRC32C{0}), "00000000");
+  EXPECT_EQ(turbo::str_format("%v", turbo::CRC32C{17}), "00000011");
 
   // str_cat
-  EXPECT_EQ(turbo::str_cat(turbo::crc32c_t{0xc99465aa}), "c99465aa");
-  EXPECT_EQ(turbo::str_cat(turbo::crc32c_t{0}), "00000000");
-  EXPECT_EQ(turbo::str_cat(turbo::crc32c_t{17}), "00000011");
+  EXPECT_EQ(turbo::str_cat(turbo::CRC32C{0xc99465aa}), "c99465aa");
+  EXPECT_EQ(turbo::str_cat(turbo::CRC32C{0}), "00000000");
+  EXPECT_EQ(turbo::str_cat(turbo::CRC32C{17}), "00000011");
 }
 
 }  // namespace

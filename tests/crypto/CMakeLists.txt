@@ -16,17 +16,19 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-set(CRC_TEST_SRC
+set(CRYPTO_TEST_SRC
+        md5_test
         crc32c_test
         crc_cord_state_test
         crc_memcpy_test
         non_temporal_memcpy_test
+        sha256_test
 )
-foreach (test ${CRC_TEST_SRC})
+foreach (test ${CRYPTO_TEST_SRC})
 
     carbin_cc_test(
             NAME ${test}
-            MODULE crc
+            MODULE crypto
             SOURCES ${test}.cc
             LINKS
             turbo::turbo

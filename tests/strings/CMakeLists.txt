@@ -57,6 +57,7 @@ set(STRINGS_TEST_SRC
         parser_test
         pow10_helper_test
         resize_uninitialized_test
+        small_string_test
         str_cat_test
         str_format_test
         str_join_test

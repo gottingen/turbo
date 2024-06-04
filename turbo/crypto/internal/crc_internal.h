@@ -23,7 +23,7 @@
 #include <vector>
 
 #include <turbo/base/internal/raw_logging.h>
-#include <turbo/crc/internal/crc.h>
+#include <turbo/crypto/internal/crc.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

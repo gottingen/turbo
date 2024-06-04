@@ -59,23 +59,21 @@
 #include <turbo/base/config.h>
 #include <turbo/base/optimization.h>
 #include <turbo/base/prefetch.h>
-#include <turbo/crc/crc32c.h>
-#include <turbo/crc/internal/cpu_detect.h>
-#include <turbo/crc/internal/crc32_x86_arm_combined_simd.h>
-#include <turbo/crc/internal/crc_memcpy.h>
+#include <turbo/crypto/crc32c.h>
+#include <turbo/crypto/internal/cpu_detect.h>
+#include <turbo/crypto/internal/crc32_x86_arm_combined_simd.h>
+#include <turbo/crypto/internal/crc_memcpy.h>
 #include <turbo/strings/string_view.h>
 
 #if defined(TURBO_INTERNAL_HAVE_X86_64_ACCELERATED_CRC_MEMCPY_ENGINE) || \
     defined(TURBO_INTERNAL_HAVE_ARM_ACCELERATED_CRC_MEMCPY_ENGINE)
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace crc_internal {
+namespace turbo::crc_internal {
 
 namespace {
 
-inline crc32c_t ShortCrcCopy(char* dst, const char* src, std::size_t length,
-                             crc32c_t crc) {
+inline CRC32C ShortCrcCopy(char* dst, const char* src, std::size_t length,
+                             CRC32C crc) {
   // Small copy: just go 1 byte at a time: being nice to the branch predictor
   // is more important here than anything else
   uint32_t crc_uint32 = static_cast<uint32_t>(crc);
@@ -86,7 +84,7 @@ inline crc32c_t ShortCrcCopy(char* dst, const char* src, std::size_t length,
     ++src;
     ++dst;
   }
-  return crc32c_t{crc_uint32};
+  return CRC32C{crc_uint32};
 }
 
 constexpr size_t kIntLoadsPerVec = sizeof(V128) / sizeof(uint64_t);
@@ -95,7 +93,7 @@ constexpr size_t kIntLoadsPerVec = sizeof(V128) / sizeof(uint64_t);
 // Disable ubsan for benign unaligned access. See b/254108538.
 template <size_t vec_regions, size_t int_regions>
 TURBO_ATTRIBUTE_NO_SANITIZE_UNDEFINED inline void LargeTailCopy(
-    crc32c_t* crcs, char** dst, const char** src, size_t region_size,
+    CRC32C* crcs, char** dst, const char** src, size_t region_size,
     size_t copy_rounds) {
   std::array<V128, vec_regions> data;
   std::array<uint64_t, kIntLoadsPerVec * int_regions> int_data;
@@ -114,10 +112,10 @@ TURBO_ATTRIBUTE_NO_SANITIZE_UNDEFINED inline void LargeTailCopy(
       V128_Store(vdst, data[i]);
 
       // Compute the running CRC
-      crcs[region] = crc32c_t{static_cast<uint32_t>(
+      crcs[region] = CRC32C{static_cast<uint32_t>(
           CRC32_u64(static_cast<uint32_t>(crcs[region]),
                     static_cast<uint64_t>(V128_Extract64<0>(data[i]))))};
-      crcs[region] = crc32c_t{static_cast<uint32_t>(
+      crcs[region] = CRC32C{static_cast<uint32_t>(
           CRC32_u64(static_cast<uint32_t>(crcs[region]),
                     static_cast<uint64_t>(V128_Extract64<1>(data[i]))))};
     }
@@ -133,7 +131,7 @@ TURBO_ATTRIBUTE_NO_SANITIZE_UNDEFINED inline void LargeTailCopy(
         size_t data_index = i * kIntLoadsPerVec + j;
 
         int_data[data_index] = *(usrc + j);
-        crcs[region] = crc32c_t{CRC32_u64(static_cast<uint32_t>(crcs[region]),
+        crcs[region] = CRC32C{CRC32_u64(static_cast<uint32_t>(crcs[region]),
                                           int_data[data_index])};
 
         *(udst + j) = int_data[data_index];
@@ -157,16 +155,16 @@ class AcceleratedCrcMemcpyEngine : public CrcMemcpyEngine {
   AcceleratedCrcMemcpyEngine operator=(const AcceleratedCrcMemcpyEngine&) =
       delete;
 
-  crc32c_t Compute(void* __restrict dst, const void* __restrict src,
-                   std::size_t length, crc32c_t initial_crc) const override;
+  CRC32C Compute(void* __restrict dst, const void* __restrict src,
+                   std::size_t length, CRC32C initial_crc) const override;
 };
 
 // Disable ubsan for benign unaligned access. See b/254108538.
 template <size_t vec_regions, size_t int_regions>
-TURBO_ATTRIBUTE_NO_SANITIZE_UNDEFINED crc32c_t
+TURBO_ATTRIBUTE_NO_SANITIZE_UNDEFINED CRC32C
 AcceleratedCrcMemcpyEngine<vec_regions, int_regions>::Compute(
     void* __restrict dst, const void* __restrict src, std::size_t length,
-    crc32c_t initial_crc) const {
+    CRC32C initial_crc) const {
   constexpr std::size_t kRegions = vec_regions + int_regions;
   static_assert(kRegions > 0, "Must specify at least one region.");
   constexpr uint32_t kCrcDataXor = uint32_t{0xffffffff};
@@ -196,15 +194,15 @@ AcceleratedCrcMemcpyEngine<vec_regions, int_regions>::Compute(
 
   // Small-size CRC-memcpy : just do CRC + memcpy
   if (length < kCrcSmallSize) {
-    crc32c_t crc =
-        ExtendCrc32c(initial_crc, turbo::string_view(src_bytes, length));
+    CRC32C crc =
+        extend_crc32c(initial_crc, turbo::string_view(src_bytes, length));
     memcpy(dst, src, length);
     return crc;
   }
 
   // Start work on the CRC: undo the XOR from the previous calculation or set up
   // the initial value of the CRC.
-  initial_crc = crc32c_t{static_cast<uint32_t>(initial_crc) ^ kCrcDataXor};
+  initial_crc = CRC32C{static_cast<uint32_t>(initial_crc) ^ kCrcDataXor};
 
   // Do an initial alignment copy, so we can use aligned store instructions to
   // the destination pointer.  We align the destination pointer because the
@@ -230,10 +228,10 @@ AcceleratedCrcMemcpyEngine<vec_regions, int_regions>::Compute(
   // cache line per region at a time, in order to insert prefetches.
 
   // Initialize CRCs for kRegions regions.
-  crc32c_t crcs[kRegions];
+  CRC32C crcs[kRegions];
   crcs[0] = initial_crc;
   for (size_t i = 1; i < kRegions; i++) {
-    crcs[i] = crc32c_t{kCrcDataXor};
+    crcs[i] = CRC32C{kCrcDataXor};
   }
 
   // Find the number of rounds to copy and the region size.  Also compute the
@@ -274,10 +272,10 @@ AcceleratedCrcMemcpyEngine<vec_regions, int_regions>::Compute(
 
         // Load and CRC data.
         vec_data[j] = V128_LoadU(vsrc + i);
-        crcs[region] = crc32c_t{static_cast<uint32_t>(
+        crcs[region] = CRC32C{static_cast<uint32_t>(
             CRC32_u64(static_cast<uint32_t>(crcs[region]),
                       static_cast<uint64_t>(V128_Extract64<0>(vec_data[j]))))};
-        crcs[region] = crc32c_t{static_cast<uint32_t>(
+        crcs[region] = CRC32C{static_cast<uint32_t>(
             CRC32_u64(static_cast<uint32_t>(crcs[region]),
                       static_cast<uint64_t>(V128_Extract64<1>(vec_data[j]))))};
 
@@ -302,7 +300,7 @@ AcceleratedCrcMemcpyEngine<vec_regions, int_regions>::Compute(
 
           // Load and CRC the data.
           int_data[data_index] = *(usrc + i * kIntLoadsPerVec + k);
-          crcs[region] = crc32c_t{CRC32_u64(static_cast<uint32_t>(crcs[region]),
+          crcs[region] = CRC32C{CRC32_u64(static_cast<uint32_t>(crcs[region]),
                                             int_data[data_index])};
 
           // Store the data.
@@ -337,25 +335,25 @@ AcceleratedCrcMemcpyEngine<vec_regions, int_regions>::Compute(
 
   if (kRegions == 1) {
     // If there is only one region, finalize and return its CRC.
-    return crc32c_t{static_cast<uint32_t>(crcs[0]) ^ kCrcDataXor};
+    return CRC32C{static_cast<uint32_t>(crcs[0]) ^ kCrcDataXor};
   }
 
   // Finalize the first CRCs: XOR the internal CRCs by the XOR mask to undo the
   // XOR done before doing block copy + CRCs.
   for (size_t i = 0; i + 1 < kRegions; i++) {
-    crcs[i] = crc32c_t{static_cast<uint32_t>(crcs[i]) ^ kCrcDataXor};
+    crcs[i] = CRC32C{static_cast<uint32_t>(crcs[i]) ^ kCrcDataXor};
   }
 
   // Build a CRC of the first kRegions - 1 regions.
-  crc32c_t full_crc = crcs[0];
+  CRC32C full_crc = crcs[0];
   for (size_t i = 1; i + 1 < kRegions; i++) {
-    full_crc = ConcatCrc32c(full_crc, crcs[i], region_size);
+    full_crc = concat_crc32c(full_crc, crcs[i], region_size);
   }
 
   // Finalize and concatenate the final CRC, then return.
   crcs[kRegions - 1] =
-      crc32c_t{static_cast<uint32_t>(crcs[kRegions - 1]) ^ kCrcDataXor};
-  return ConcatCrc32c(full_crc, crcs[kRegions - 1], region_size + tail_size);
+      CRC32C{static_cast<uint32_t>(crcs[kRegions - 1]) ^ kCrcDataXor};
+  return concat_crc32c(full_crc, crcs[kRegions - 1], region_size + tail_size);
 }
 
 CrcMemcpy::ArchSpecificEngines CrcMemcpy::GetArchSpecificEngines() {
@@ -448,10 +446,7 @@ std::unique_ptr<CrcMemcpyEngine> CrcMemcpy::GetTestEngine(int vector,
   }
   return nullptr;
 }
-
-}  // namespace crc_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::crc_internal
 
 #endif  // TURBO_INTERNAL_HAVE_X86_64_ACCELERATED_CRC_MEMCPY_ENGINE ||
         // TURBO_INTERNAL_HAVE_ARM_ACCELERATED_CRC_MEMCPY_ENGINE

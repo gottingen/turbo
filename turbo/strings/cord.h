@@ -80,7 +80,7 @@
 #include <turbo/base/optimization.h>
 #include <turbo/base/port.h>
 #include <turbo/container/inlined_vector.h>
-#include <turbo/crc/internal/crc_cord_state.h>
+#include <turbo/crypto/internal/crc_cord_state.h>
 #include <turbo/functional/function_ref.h>
 #include <turbo/meta/type_traits.h>
 #include <turbo/strings/cord_analysis.h>

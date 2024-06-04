@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/crc/internal/crc_memcpy.h>
+#include <turbo/crypto/internal/crc_memcpy.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -26,7 +26,7 @@
 #include <utility>
 
 #include <gtest/gtest.h>
-#include <turbo/crc/crc32c.h>
+#include <turbo/crypto/crc32c.h>
 #include <turbo/memory/memory.h>
 #include <turbo/random/distributions.h>
 #include <turbo/random/random.h>
@@ -113,9 +113,9 @@ TEST_P(EngineParamTest, SmallCorrectnessCheckSourceAlignment) {
       SCOPED_TRACE(turbo::str_cat("engine=<", GetParam().vector_lanes, ",",
                                 GetParam().integer_lanes, ">, ", "size=", size,
                                 ", source_alignment=", source_alignment));
-      turbo::crc32c_t initial_crc =
-          turbo::crc32c_t{turbo::Uniform<uint32_t>(gen_)};
-      turbo::crc32c_t experiment_crc =
+      turbo::CRC32C initial_crc =
+          turbo::CRC32C{turbo::Uniform<uint32_t>(gen_)};
+      turbo::CRC32C experiment_crc =
           engine_->Compute(destination_.get(), source_.get() + source_alignment,
                            size, initial_crc);
       // Check the memory region to make sure it is the same
@@ -124,7 +124,7 @@ TEST_P(EngineParamTest, SmallCorrectnessCheckSourceAlignment) {
       SCOPED_TRACE(turbo::str_cat("Error in memcpy of size: ", size,
                                 " with source alignment: ", source_alignment));
       ASSERT_EQ(mem_comparison, 0);
-      turbo::crc32c_t baseline_crc = turbo::ExtendCrc32c(
+      turbo::CRC32C baseline_crc = turbo::extend_crc32c(
           initial_crc,
           turbo::string_view(
               static_cast<char*>(source_.get()) + source_alignment, size));
@@ -147,9 +147,9 @@ TEST_P(EngineParamTest, SmallCorrectnessCheckDestAlignment) {
       SCOPED_TRACE(turbo::str_cat("engine=<", GetParam().vector_lanes, ",",
                                 GetParam().integer_lanes, ">, ", "size=", size,
                                 ", destination_alignment=", dest_alignment));
-      turbo::crc32c_t initial_crc =
-          turbo::crc32c_t{turbo::Uniform<uint32_t>(gen_)};
-      turbo::crc32c_t experiment_crc =
+      turbo::CRC32C initial_crc =
+          turbo::CRC32C{turbo::Uniform<uint32_t>(gen_)};
+      turbo::CRC32C experiment_crc =
           engine_->Compute(destination_.get() + dest_alignment, source_.get(),
                            size, initial_crc);
       // Check the memory region to make sure it is the same
@@ -158,7 +158,7 @@ TEST_P(EngineParamTest, SmallCorrectnessCheckDestAlignment) {
       SCOPED_TRACE(turbo::str_cat("Error in memcpy of size: ", size,
                                 " with dest alignment: ", dest_alignment));
       ASSERT_EQ(mem_comparison, 0);
-      turbo::crc32c_t baseline_crc = turbo::ExtendCrc32c(
+      turbo::CRC32C baseline_crc = turbo::extend_crc32c(
           initial_crc,
           turbo::string_view(static_cast<char*>(source_.get()), size));
       ASSERT_EQ(baseline_crc, experiment_crc);

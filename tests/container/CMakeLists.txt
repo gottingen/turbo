@@ -221,3 +221,16 @@ carbin_cc_test(
         ${CARBIN_DEPS_LINK}
         CXXOPTS ${CARBIN_CXX_OPTIONS} "-DUNORDERED_SET_CXX17"
 )
+
+carbin_cc_test(
+        NAME small_vector_test
+        MODULE container
+        SOURCES small_vector_test.cc
+        LINKS
+        turbo::turbo
+        GTest::gtest
+        GTest::gmock
+        GTest::gmock_main
+        ${CARBIN_DEPS_LINK}
+        CXXOPTS ${CARBIN_CXX_OPTIONS} "-DUNORDERED_SET_CXX17"
+)

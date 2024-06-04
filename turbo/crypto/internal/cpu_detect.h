@@ -15,13 +15,11 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#ifndef TURBO_CRC_INTERNAL_CPU_DETECT_H_
-#define TURBO_CRC_INTERNAL_CPU_DETECT_H_
+#pragma once
 
 #include <turbo/base/config.h>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 namespace crc_internal {
 
 // Enumeration of architectures that we have special-case tuning parameters for.
@@ -60,7 +58,4 @@ CpuType GetCpuType();
 bool SupportsArmCRC32PMULL();
 
 }  // namespace crc_internal
-TURBO_NAMESPACE_END
 }  // namespace turbo
-
-#endif  // TURBO_CRC_INTERNAL_CPU_DETECT_H_

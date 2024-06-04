@@ -15,28 +15,21 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#ifndef TURBO_CRC_INTERNAL_CRC32C_H_
-#define TURBO_CRC_INTERNAL_CRC32C_H_
+#pragma once
 
 #include <turbo/base/config.h>
-#include <turbo/crc/crc32c.h>
+#include <turbo/crypto/crc32c.h>
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace crc_internal {
+namespace turbo::crc_internal {
 
-// Modifies a CRC32 value by removing `length` bytes with a value of 0 from
-// the end of the string.
-//
-// This is the inverse operation of ExtendCrc32cByZeroes().
-//
-// This operation has a runtime cost of O(log(`length`))
-//
-// Internal implementation detail, exposed for testing only.
-crc32c_t UnextendCrc32cByZeroes(crc32c_t initial_crc, size_t length);
+    // Modifies a CRC32 value by removing `length` bytes with a value of 0 from
+    // the end of the string.
+    //
+    // This is the inverse operation of extend_crc32c_by_zeroes().
+    //
+    // This operation has a runtime cost of O(log(`length`))
+    //
+    // Internal implementation detail, exposed for testing only.
+    CRC32C UnextendCrc32cByZeroes(CRC32C initial_crc, size_t length);
 
-}  // namespace crc_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
-
-#endif  // TURBO_CRC_INTERNAL_CRC32C_H_
+}  // namespace turbo::crc_internal

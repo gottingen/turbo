@@ -26,9 +26,9 @@
 #include <turbo/base/config.h>
 #include <turbo/base/endian.h>
 #include <turbo/base/prefetch.h>
-#include <turbo/crc/internal/cpu_detect.h>
-#include <turbo/crc/internal/crc32_x86_arm_combined_simd.h>
-#include <turbo/crc/internal/crc_internal.h>
+#include <turbo/crypto/internal/cpu_detect.h>
+#include <turbo/crypto/internal/crc32_x86_arm_combined_simd.h>
+#include <turbo/crypto/internal/crc_internal.h>
 #include <turbo/memory/memory.h>
 #include <turbo/numeric/bits.h>
 
@@ -37,9 +37,7 @@
 #define TURBO_INTERNAL_CAN_USE_SIMD_CRC32C
 #endif
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace crc_internal {
+namespace turbo::crc_internal {
 
 #if defined(TURBO_INTERNAL_CAN_USE_SIMD_CRC32C)
 
@@ -735,6 +733,4 @@ CRCImpl* TryNewCRC32AcceleratedX86ARMCombined() { return nullptr; }
 
 #endif
 
-}  // namespace crc_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::crc_internal

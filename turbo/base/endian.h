@@ -71,7 +71,7 @@ namespace turbo {
     }
 
 #ifdef TURBO_IS_LITTLE_ENDIAN
-
+    static constexpr bool is_little_endian() { return true; }
     // Portable definitions for htonl (host-to-network) and friends on little-endian
     // architectures.
     inline uint16_t ghtons(uint16_t x) { return gbswap_16(x); }
@@ -81,6 +81,7 @@ namespace turbo {
     inline uint64_t ghtonll(uint64_t x) { return gbswap_64(x); }
 
 #elif defined TURBO_IS_BIG_ENDIAN
+    static constexpr bool is_little_endian() { return false; }
 
     // Portable definitions for htonl (host-to-network) etc on big-endian
     // architectures. These definitions are simpler since the host byte order is the

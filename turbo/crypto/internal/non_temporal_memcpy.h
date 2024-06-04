@@ -28,7 +28,7 @@
 #endif
 
 #ifdef __aarch64__
-#include <turbo/crc/internal/non_temporal_arm_intrinsics.h>
+#include <turbo/crypto/internal/non_temporal_arm_intrinsics.h>
 #endif
 
 #include <algorithm>

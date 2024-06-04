@@ -42,8 +42,8 @@
 #include <turbo/base/optimization.h>
 #include <turbo/base/nullability.h>
 #include <turbo/container/inlined_vector.h>
-#include <turbo/crc/crc32c.h>
-#include <turbo/crc/internal/crc_cord_state.h>
+#include <turbo/crypto/crc32c.h>
+#include <turbo/crypto/internal/crc_cord_state.h>
 #include <turbo/functional/function_ref.h>
 #include <turbo/strings/cord_buffer.h>
 #include <turbo/strings/escaping.h>
@@ -882,7 +882,7 @@ namespace turbo {
         // Construct a CrcCordState with a single chunk.
         crc_internal::CrcCordState state;
         state.mutable_rep()->prefix_crc.push_back(
-                crc_internal::CrcCordState::PrefixCrc(size(), turbo::crc32c_t{crc}));
+                crc_internal::CrcCordState::PrefixCrc(size(), turbo::CRC32C{crc}));
         SetCrcCordState(std::move(state));
     }
 

@@ -63,3 +63,10 @@ carbin_cc_bm(
         LINKS turbo::turbo benchmark::benchmark benchmark::benchmark_main ${CARBIN_DEPS_LINK}
         CXXOPTS ${USER_CXX_FLAGS}
 )
+carbin_cc_bm(
+        NAME small_vector_benchmark
+        MODULE container
+        SOURCES small_vector_benchmark.cc
+        LINKS turbo::turbo benchmark::benchmark benchmark::benchmark_main ${CARBIN_DEPS_LINK}
+        CXXOPTS ${USER_CXX_FLAGS}
+)

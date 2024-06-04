@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/crc/internal/cpu_detect.h>
+#include <turbo/crypto/internal/cpu_detect.h>
 
 #include <cstdint>
 #include <string>

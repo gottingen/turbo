@@ -42,14 +42,14 @@
 // CRCs by appending zeroes until the data lengths agree then XORing
 // the CRCs.
 
-#include <turbo/crc/internal/crc.h>
+#include <turbo/crypto/internal/crc.h>
 
 #include <cstdint>
 
 #include <turbo/base/endian.h>
 #include <turbo/base/internal/raw_logging.h>
 #include <turbo/base/prefetch.h>
-#include <turbo/crc/internal/crc_internal.h>
+#include <turbo/crypto/internal/crc_internal.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
