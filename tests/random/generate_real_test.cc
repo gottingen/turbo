@@ -452,7 +452,7 @@ TEST(GenerateRealTest, ExhaustiveFloat) {
     }
   };
 
-  size_t limit = turbo::GetFlag(FLAGS_turbo_random_test_trials);
+  size_t limit = turbo::get_flag(FLAGS_turbo_random_test_trials);
 
   // Generate all uint64_t which have unique floating point values.
   // Counting down from 0xFFFFFFFFFFFFFFFFu ... 0x0u

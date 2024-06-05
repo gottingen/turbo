@@ -26,43 +26,39 @@
 #include <turbo/flags/internal/commandlineflag.h>
 #include <turbo/strings/string_view.h>
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace flags_internal {
+namespace turbo::flags_internal {
 
-FlagFastTypeId PrivateHandleAccessor::TypeId(const CommandLineFlag& flag) {
-  return flag.TypeId();
-}
+    FlagFastTypeId PrivateHandleAccessor::TypeId(const CommandLineFlag &flag) {
+        return flag.type_id();
+    }
 
-std::unique_ptr<FlagStateInterface> PrivateHandleAccessor::SaveState(
-    CommandLineFlag& flag) {
-  return flag.SaveState();
-}
+    std::unique_ptr<FlagStateInterface> PrivateHandleAccessor::SaveState(
+            CommandLineFlag &flag) {
+        return flag.SaveState();
+    }
 
-bool PrivateHandleAccessor::IsSpecifiedOnCommandLine(
-    const CommandLineFlag& flag) {
-  return flag.IsSpecifiedOnCommandLine();
-}
+    bool PrivateHandleAccessor::is_specified_on_commandLine(
+            const CommandLineFlag &flag) {
+        return flag.is_specified_on_commandLine();
+    }
 
-bool PrivateHandleAccessor::ValidateInputValue(const CommandLineFlag& flag,
-                                               turbo::string_view value) {
-  return flag.ValidateInputValue(value);
-}
+    bool PrivateHandleAccessor::validate_input_value(const CommandLineFlag &flag,
+                                                   turbo::string_view value) {
+        return flag.validate_input_value(value);
+    }
 
-void PrivateHandleAccessor::CheckDefaultValueParsingRoundtrip(
-    const CommandLineFlag& flag) {
-  flag.CheckDefaultValueParsingRoundtrip();
-}
+    void PrivateHandleAccessor::check_default_value_parsing_roundtrip(
+            const CommandLineFlag &flag) {
+        flag.check_default_value_parsing_roundtrip();
+    }
 
-bool PrivateHandleAccessor::ParseFrom(CommandLineFlag& flag,
-                                      turbo::string_view value,
-                                      flags_internal::FlagSettingMode set_mode,
-                                      flags_internal::ValueSource source,
-                                      std::string& error) {
-  return flag.ParseFrom(value, set_mode, source, error);
-}
+    bool PrivateHandleAccessor::parse_from(CommandLineFlag &flag,
+                                          turbo::string_view value,
+                                          flags_internal::FlagSettingMode set_mode,
+                                          flags_internal::ValueSource source,
+                                          std::string &error) {
+        return flag.parse_from(value, set_mode, source, error);
+    }
 
-}  // namespace flags_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::flags_internal
 

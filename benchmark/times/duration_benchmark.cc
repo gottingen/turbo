@@ -499,7 +499,7 @@ namespace {
     void BM_Duration_GetFlag(benchmark::State &state) {
         while (state.KeepRunning()) {
             benchmark::DoNotOptimize(
-                    turbo::GetFlag(FLAGS_turbo_duration_flag_for_benchmark));
+                    turbo::get_flag(FLAGS_turbo_duration_flag_for_benchmark));
         }
     }
 

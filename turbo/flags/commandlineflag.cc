@@ -25,13 +25,12 @@
 #include <turbo/strings/string_view.h>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 
-bool CommandLineFlag::IsRetired() const { return false; }
-bool CommandLineFlag::ParseFrom(turbo::string_view value, std::string* error) {
-  return ParseFrom(value, flags_internal::SET_FLAGS_VALUE,
-                   flags_internal::kProgrammaticChange, *error);
-}
+    bool CommandLineFlag::is_retired() const { return false; }
 
-TURBO_NAMESPACE_END
+    bool CommandLineFlag::parse_from(turbo::string_view value, std::string *error) {
+        return parse_from(value, flags_internal::SET_FLAGS_VALUE,
+                         flags_internal::kProgrammaticChange, *error);
+    }
+
 }  // namespace turbo

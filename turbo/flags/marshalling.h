@@ -81,7 +81,7 @@
 // Using `std::nullopt` as an optional flag's default value allows you to check
 // whether such a flag was ever specified on the command line:
 //
-//   if (turbo::GetFlag(FLAGS_foo).has_value()) {
+//   if (turbo::get_flag(FLAGS_foo).has_value()) {
 //     // flag was set on command line
 //   } else {
 //     // flag was not passed on command line
@@ -159,7 +159,7 @@
 // given type will be discovered via Argument-Dependent Lookup (ADL).
 //
 // `turbo_parse_flag()` may need, in turn, to parse simpler constituent types
-// using `turbo::ParseFlag()`. For example, a custom struct `MyFlagType`
+// using `turbo::parse_flag()`. For example, a custom struct `MyFlagType`
 // consisting of a `std::pair<int, std::string>` would add an `turbo_parse_flag()`
 // overload for its `MyFlagType` like so:
 //
@@ -177,29 +177,29 @@
 //   std::string turbo_unparse_flag(const MyFlagType&);
 //
 //   // Within the implementation, `turbo_parse_flag()` will, in turn invoke
-//   // `turbo::ParseFlag()` on its constituent `int` and `std::string` types
+//   // `turbo::parse_flag()` on its constituent `int` and `std::string` types
 //   // (which have built-in Turbo flag support).
 //
 //   bool turbo_parse_flag(turbo::string_view text, MyFlagType* flag,
 //                      std::string* err) {
 //     std::pair<turbo::string_view, turbo::string_view> tokens =
 //         turbo::str_split(text, ',');
-//     if (!turbo::ParseFlag(tokens.first, &flag->my_flag_data.first, err))
+//     if (!turbo::parse_flag(tokens.first, &flag->my_flag_data.first, err))
 //         return false;
-//     if (!turbo::ParseFlag(tokens.second, &flag->my_flag_data.second, err))
+//     if (!turbo::parse_flag(tokens.second, &flag->my_flag_data.second, err))
 //         return false;
 //     return true;
 //   }
 //
-//   // Similarly, for unparsing, we can simply invoke `turbo::UnparseFlag()` on
+//   // Similarly, for unparsing, we can simply invoke `turbo::unparse_flag()` on
 //   // the constituent types.
 //   std::string turbo_unparse_flag(const MyFlagType& flag) {
-//     return turbo::str_cat(turbo::UnparseFlag(flag.my_flag_data.first),
+//     return turbo::str_cat(turbo::unparse_flag(flag.my_flag_data.first),
 //                         ",",
-//                         turbo::UnparseFlag(flag.my_flag_data.second));
+//                         turbo::unparse_flag(flag.my_flag_data.second));
 //   }
-#ifndef TURBO_FLAGS_MARSHALLING_H_
-#define TURBO_FLAGS_MARSHALLING_H_
+
+#pragma once
 
 #include <turbo/base/config.h>
 #include <turbo/numeric/int128.h>
@@ -207,6 +207,7 @@
 #if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
 #include <optional>
 #endif
+
 #include <string>
 #include <vector>
 
@@ -214,150 +215,159 @@
 #include <turbo/types/optional.h>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 
-// Forward declaration to be used inside composable flag parse/unparse
-// implementations
-template <typename T>
-inline bool ParseFlag(turbo::string_view input, T* dst, std::string* error);
-template <typename T>
-inline std::string UnparseFlag(const T& v);
+    // Forward declaration to be used inside composable flag parse/unparse
+    // implementations
+    template<typename T>
+    inline bool parse_flag(turbo::string_view input, T *dst, std::string *error);
 
-namespace flags_internal {
+    template<typename T>
+    inline std::string unparse_flag(const T &v);
 
-// Overloads of `turbo_parse_flag()` and `turbo_unparse_flag()` for fundamental types.
-bool turbo_parse_flag(turbo::string_view, bool*, std::string*);
-bool turbo_parse_flag(turbo::string_view, short*, std::string*);           // NOLINT
-bool turbo_parse_flag(turbo::string_view, unsigned short*, std::string*);  // NOLINT
-bool turbo_parse_flag(turbo::string_view, int*, std::string*);             // NOLINT
-bool turbo_parse_flag(turbo::string_view, unsigned int*, std::string*);    // NOLINT
-bool turbo_parse_flag(turbo::string_view, long*, std::string*);            // NOLINT
-bool turbo_parse_flag(turbo::string_view, unsigned long*, std::string*);   // NOLINT
-bool turbo_parse_flag(turbo::string_view, long long*, std::string*);       // NOLINT
-bool turbo_parse_flag(turbo::string_view, unsigned long long*,             // NOLINT
-                   std::string*);
-bool turbo_parse_flag(turbo::string_view, turbo::int128*, std::string*);    // NOLINT
-bool turbo_parse_flag(turbo::string_view, turbo::uint128*, std::string*);   // NOLINT
-bool turbo_parse_flag(turbo::string_view, float*, std::string*);
-bool turbo_parse_flag(turbo::string_view, double*, std::string*);
-bool turbo_parse_flag(turbo::string_view, std::string*, std::string*);
-bool turbo_parse_flag(turbo::string_view, std::vector<std::string>*, std::string*);
+    namespace flags_internal {
 
-template <typename T>
-bool turbo_parse_flag(turbo::string_view text, turbo::optional<T>* f,
-                   std::string* err) {
-  if (text.empty()) {
-    *f = turbo::nullopt;
-    return true;
-  }
-  T value;
-  if (!turbo::ParseFlag(text, &value, err)) return false;
+        // Overloads of `turbo_parse_flag()` and `turbo_unparse_flag()` for fundamental types.
+        bool turbo_parse_flag(turbo::string_view, bool *, std::string *);
 
-  *f = std::move(value);
-  return true;
-}
+        bool turbo_parse_flag(turbo::string_view, short *, std::string *);           // NOLINT
+        bool turbo_parse_flag(turbo::string_view, unsigned short *, std::string *);  // NOLINT
+        bool turbo_parse_flag(turbo::string_view, int *, std::string *);             // NOLINT
+        bool turbo_parse_flag(turbo::string_view, unsigned int *, std::string *);    // NOLINT
+        bool turbo_parse_flag(turbo::string_view, long *, std::string *);            // NOLINT
+        bool turbo_parse_flag(turbo::string_view, unsigned long *, std::string *);   // NOLINT
+        bool turbo_parse_flag(turbo::string_view, long long *, std::string *);       // NOLINT
+        bool turbo_parse_flag(turbo::string_view, unsigned long long *,             // NOLINT
+                              std::string *);
 
-#if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
-template <typename T>
-bool turbo_parse_flag(turbo::string_view text, std::optional<T>* f,
-                   std::string* err) {
-  if (text.empty()) {
-    *f = std::nullopt;
-    return true;
-  }
-  T value;
-  if (!turbo::ParseFlag(text, &value, err)) return false;
+        bool turbo_parse_flag(turbo::string_view, turbo::int128 *, std::string *);    // NOLINT
+        bool turbo_parse_flag(turbo::string_view, turbo::uint128 *, std::string *);   // NOLINT
+        bool turbo_parse_flag(turbo::string_view, float *, std::string *);
 
-  *f = std::move(value);
-  return true;
-}
-#endif
+        bool turbo_parse_flag(turbo::string_view, double *, std::string *);
 
-template <typename T>
-bool InvokeParseFlag(turbo::string_view input, T* dst, std::string* err) {
-  // Comment on next line provides a good compiler error message if T
-  // does not have turbo_parse_flag(turbo::string_view, T*, std::string*).
-  return turbo_parse_flag(input, dst, err);  // Is T missing turbo_parse_flag?
-}
+        bool turbo_parse_flag(turbo::string_view, std::string *, std::string *);
 
-// Strings and std:: containers do not have the same overload resolution
-// considerations as fundamental types. Naming these 'turbo_unparse_flag' means we
-// can avoid the need for additional specializations of Unparse (below).
-std::string turbo_unparse_flag(turbo::string_view v);
-std::string turbo_unparse_flag(const std::vector<std::string>&);
+        bool turbo_parse_flag(turbo::string_view, std::vector<std::string> *, std::string *);
 
-template <typename T>
-std::string turbo_unparse_flag(const turbo::optional<T>& f) {
-  return f.has_value() ? turbo::UnparseFlag(*f) : "";
-}
+        template<typename T>
+        bool turbo_parse_flag(turbo::string_view text, turbo::optional<T> *f,
+                              std::string *err) {
+            if (text.empty()) {
+                *f = turbo::nullopt;
+                return true;
+            }
+            T value;
+            if (!turbo::parse_flag(text, &value, err)) return false;
+
+            *f = std::move(value);
+            return true;
+        }
 
 #if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
-template <typename T>
-std::string turbo_unparse_flag(const std::optional<T>& f) {
-  return f.has_value() ? turbo::UnparseFlag(*f) : "";
-}
+        template <typename T>
+        bool turbo_parse_flag(turbo::string_view text, std::optional<T>* f,
+                           std::string* err) {
+          if (text.empty()) {
+            *f = std::nullopt;
+            return true;
+          }
+          T value;
+          if (!turbo::parse_flag(text, &value, err)) return false;
+
+          *f = std::move(value);
+          return true;
+        }
 #endif
 
-template <typename T>
-std::string Unparse(const T& v) {
-  // Comment on next line provides a good compiler error message if T does not
-  // have UnparseFlag.
-  return turbo_unparse_flag(v);  // Is T missing turbo_unparse_flag?
-}
+        template<typename T>
+        bool InvokeParseFlag(turbo::string_view input, T *dst, std::string *err) {
+            // Comment on next line provides a good compiler error message if T
+            // does not have turbo_parse_flag(turbo::string_view, T*, std::string*).
+            return turbo_parse_flag(input, dst, err);  // Is T missing turbo_parse_flag?
+        }
 
-// Overloads for builtin types.
-std::string Unparse(bool v);
-std::string Unparse(short v);               // NOLINT
-std::string Unparse(unsigned short v);      // NOLINT
-std::string Unparse(int v);                 // NOLINT
-std::string Unparse(unsigned int v);        // NOLINT
-std::string Unparse(long v);                // NOLINT
-std::string Unparse(unsigned long v);       // NOLINT
-std::string Unparse(long long v);           // NOLINT
-std::string Unparse(unsigned long long v);  // NOLINT
-std::string Unparse(turbo::int128 v);
-std::string Unparse(turbo::uint128 v);
-std::string Unparse(float v);
-std::string Unparse(double v);
+        // Strings and std:: containers do not have the same overload resolution
+        // considerations as fundamental types. Naming these 'turbo_unparse_flag' means we
+        // can avoid the need for additional specializations of Unparse (below).
+        std::string turbo_unparse_flag(turbo::string_view v);
 
-}  // namespace flags_internal
+        std::string turbo_unparse_flag(const std::vector<std::string> &);
 
-// ParseFlag()
-//
-// Parses a string value into a flag value of type `T`. Do not add overloads of
-// this function for your type directly; instead, add an `turbo_parse_flag()`
-// free function as documented above.
-//
-// Some implementations of `turbo_parse_flag()` for types which consist of other,
-// constituent types which already have Turbo flag support, may need to call
-// `turbo::ParseFlag()` on those consituent string values. (See above.)
-template <typename T>
-inline bool ParseFlag(turbo::string_view input, T* dst, std::string* error) {
-  return flags_internal::InvokeParseFlag(input, dst, error);
-}
+        template<typename T>
+        std::string turbo_unparse_flag(const turbo::optional<T> &f) {
+            return f.has_value() ? turbo::unparse_flag(*f) : "";
+        }
 
-// UnparseFlag()
-//
-// Unparses a flag value of type `T` into a string value. Do not add overloads
-// of this function for your type directly; instead, add an `turbo_unparse_flag()`
-// free function as documented above.
-//
-// Some implementations of `turbo_unparse_flag()` for types which consist of other,
-// constituent types which already have Turbo flag support, may want to call
-// `turbo::UnparseFlag()` on those constituent types. (See above.)
-template <typename T>
-inline std::string UnparseFlag(const T& v) {
-  return flags_internal::Unparse(v);
-}
+#if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
+        template <typename T>
+        std::string turbo_unparse_flag(const std::optional<T>& f) {
+          return f.has_value() ? turbo::unparse_flag(*f) : "";
+        }
+#endif
 
-// Overloads for `turbo::LogSeverity` can't (easily) appear alongside that type's
-// definition because it is layered below flags.  See proper documentation in
-// base/log_severity.h.
-enum class LogSeverity : int;
-bool turbo_parse_flag(turbo::string_view, turbo::LogSeverity*, std::string*);
-std::string turbo_unparse_flag(turbo::LogSeverity);
+        template<typename T>
+        std::string Unparse(const T &v) {
+            // Comment on next line provides a good compiler error message if T does not
+            // have unparse_flag.
+            return turbo_unparse_flag(v);  // Is T missing turbo_unparse_flag?
+        }
 
-TURBO_NAMESPACE_END
+        // Overloads for builtin types.
+        std::string Unparse(bool v);
+
+        std::string Unparse(short v);               // NOLINT
+        std::string Unparse(unsigned short v);      // NOLINT
+        std::string Unparse(int v);                 // NOLINT
+        std::string Unparse(unsigned int v);        // NOLINT
+        std::string Unparse(long v);                // NOLINT
+        std::string Unparse(unsigned long v);       // NOLINT
+        std::string Unparse(long long v);           // NOLINT
+        std::string Unparse(unsigned long long v);  // NOLINT
+        std::string Unparse(turbo::int128 v);
+
+        std::string Unparse(turbo::uint128 v);
+
+        std::string Unparse(float v);
+
+        std::string Unparse(double v);
+
+    }  // namespace flags_internal
+
+    // parse_flag()
+    //
+    // Parses a string value into a flag value of type `T`. Do not add overloads of
+    // this function for your type directly; instead, add an `turbo_parse_flag()`
+    // free function as documented above.
+    //
+    // Some implementations of `turbo_parse_flag()` for types which consist of other,
+    // constituent types which already have Turbo flag support, may need to call
+    // `turbo::parse_flag()` on those consituent string values. (See above.)
+    template<typename T>
+    inline bool parse_flag(turbo::string_view input, T *dst, std::string *error) {
+        return flags_internal::InvokeParseFlag(input, dst, error);
+    }
+
+    // unparse_flag()
+    //
+    // Unparses a flag value of type `T` into a string value. Do not add overloads
+    // of this function for your type directly; instead, add an `turbo_unparse_flag()`
+    // free function as documented above.
+    //
+    // Some implementations of `turbo_unparse_flag()` for types which consist of other,
+    // constituent types which already have Turbo flag support, may want to call
+    // `turbo::unparse_flag()` on those constituent types. (See above.)
+    template<typename T>
+    inline std::string unparse_flag(const T &v) {
+        return flags_internal::Unparse(v);
+    }
+
+    // Overloads for `turbo::LogSeverity` can't (easily) appear alongside that type's
+    // definition because it is layered below flags.  See proper documentation in
+    // base/log_severity.h.
+    enum class LogSeverity : int;
+
+    bool turbo_parse_flag(turbo::string_view, turbo::LogSeverity *, std::string *);
+
+    std::string turbo_unparse_flag(turbo::LogSeverity);
+
 }  // namespace turbo
-
-#endif  // TURBO_FLAGS_MARSHALLING_H_

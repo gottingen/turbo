@@ -31,39 +31,37 @@
 #include <turbo/synchronization/mutex.h>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace flags_internal {
-namespace {
-TURBO_CONST_INIT turbo::Mutex usage_message_guard(turbo::kConstInit);
-TURBO_CONST_INIT std::string* program_usage_message
-    TURBO_GUARDED_BY(usage_message_guard) = nullptr;
-}  // namespace
-}  // namespace flags_internal
+    namespace flags_internal {
+        namespace {
+            TURBO_CONST_INIT turbo::Mutex usage_message_guard(turbo::kConstInit);
+            TURBO_CONST_INIT std::string *program_usage_message
+                    TURBO_GUARDED_BY(usage_message_guard) = nullptr;
+        }  // namespace
+    }  // namespace flags_internal
 
-// --------------------------------------------------------------------
-// Sets the "usage" message to be used by help reporting routines.
-void SetProgramUsageMessage(turbo::string_view new_usage_message) {
-  turbo::MutexLock l(&flags_internal::usage_message_guard);
+    // --------------------------------------------------------------------
+    // Sets the "usage" message to be used by help reporting routines.
+    void set_program_usage_message(turbo::string_view new_usage_message) {
+        turbo::MutexLock l(&flags_internal::usage_message_guard);
 
-  if (flags_internal::program_usage_message != nullptr) {
-    TURBO_INTERNAL_LOG(FATAL, "SetProgramUsageMessage() called twice.");
-    std::exit(1);
-  }
+        if (flags_internal::program_usage_message != nullptr) {
+            TURBO_INTERNAL_LOG(FATAL, "set_program_usage_message() called twice.");
+            std::exit(1);
+        }
 
-  flags_internal::program_usage_message = new std::string(new_usage_message);
-}
+        flags_internal::program_usage_message = new std::string(new_usage_message);
+    }
 
-// --------------------------------------------------------------------
-// Returns the usage message set by SetProgramUsageMessage().
-// Note: We able to return string_view here only because calling
-// SetProgramUsageMessage twice is prohibited.
-turbo::string_view ProgramUsageMessage() {
-  turbo::MutexLock l(&flags_internal::usage_message_guard);
+    // --------------------------------------------------------------------
+    // Returns the usage message set by set_program_usage_message().
+    // Note: We able to return string_view here only because calling
+    // set_program_usage_message twice is prohibited.
+    turbo::string_view program_usage_message() {
+        turbo::MutexLock l(&flags_internal::usage_message_guard);
 
-  return flags_internal::program_usage_message != nullptr
-             ? turbo::string_view(*flags_internal::program_usage_message)
-             : "Warning: SetProgramUsageMessage() never called";
-}
+        return flags_internal::program_usage_message != nullptr
+               ? turbo::string_view(*flags_internal::program_usage_message)
+               : "Warning: set_program_usage_message() never called";
+    }
 
-TURBO_NAMESPACE_END
 }  // namespace turbo

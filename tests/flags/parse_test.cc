@@ -264,7 +264,7 @@ flags::HelpMode InvokeParseTurboOnlyImpl(const char* (&in_argv)[N]) {
   std::vector<char*> positional_args;
   std::vector<turbo::UnrecognizedFlag> unrecognized_flags;
 
-  return flags::ParseTurboFlagsOnlyImpl(N, const_cast<char**>(in_argv),
+  return flags::parse_turbo_flags_only_impl(N, const_cast<char**>(in_argv),
                                          positional_args, unrecognized_flags,
                                          flags::UsageFlagsAction::kHandleUsage);
 }
@@ -276,7 +276,7 @@ void InvokeParseTurboOnly(const char* (&in_argv)[N]) {
   std::vector<char*> positional_args;
   std::vector<turbo::UnrecognizedFlag> unrecognized_flags;
 
-  turbo::ParseTurboFlagsOnly(2, const_cast<char**>(in_argv), positional_args,
+  turbo::parse_turbo_flags_only(2, const_cast<char**>(in_argv), positional_args,
                              unrecognized_flags);
 }
 
@@ -293,7 +293,7 @@ std::vector<char*> InvokeParseCommandLineImpl(const char* (&in_argv)[N]) {
 
 template <int N>
 std::vector<char*> InvokeParse(const char* (&in_argv)[N]) {
-  return turbo::ParseCommandLine(N, const_cast<char**>(in_argv));
+  return turbo::parse_command_line(N, const_cast<char**>(in_argv));
 }
 
 // --------------------------------------------------------------------
@@ -307,10 +307,10 @@ void TestParse(const char* (&in_argv)[N], int int_flag_value,
   EXPECT_EQ(out_args.size(), 1 + exp_position_args);
   EXPECT_STREQ(out_args[0], "testbin");
 
-  EXPECT_EQ(turbo::GetFlag(FLAGS_int_flag), int_flag_value);
-  EXPECT_NEAR(turbo::GetFlag(FLAGS_double_flag), double_flag_val, 0.0001);
-  EXPECT_EQ(turbo::GetFlag(FLAGS_string_flag), string_flag_val);
-  EXPECT_EQ(turbo::GetFlag(FLAGS_bool_flag), bool_flag_val);
+  EXPECT_EQ(turbo::get_flag(FLAGS_int_flag), int_flag_value);
+  EXPECT_NEAR(turbo::get_flag(FLAGS_double_flag), double_flag_val, 0.0001);
+  EXPECT_EQ(turbo::get_flag(FLAGS_string_flag), string_flag_val);
+  EXPECT_EQ(turbo::get_flag(FLAGS_bool_flag), bool_flag_val);
 }
 
 // --------------------------------------------------------------------
@@ -458,12 +458,12 @@ TEST_F(ParseTest, TestValidUDTArg) {
   };
   InvokeParse(in_args1);
 
-  EXPECT_EQ(turbo::GetFlag(FLAGS_udt_flag).value, 1);
+  EXPECT_EQ(turbo::get_flag(FLAGS_udt_flag).value, 1);
 
   const char* in_args2[] = {"testbin", "--udt_flag", "AAA"};
   InvokeParse(in_args2);
 
-  EXPECT_EQ(turbo::GetFlag(FLAGS_udt_flag).value, 10);
+  EXPECT_EQ(turbo::get_flag(FLAGS_udt_flag).value, 10);
 }
 
 // --------------------------------------------------------------------
@@ -912,7 +912,7 @@ TEST_F(ParseDeathTest, TestSimpleHelpFlagHandling) {
   };
 
   EXPECT_EQ(InvokeParseTurboOnlyImpl(in_args2), flags::HelpMode::kImportant);
-  EXPECT_EQ(turbo::GetFlag(FLAGS_int_flag), 3);
+  EXPECT_EQ(turbo::get_flag(FLAGS_int_flag), 3);
 
   const char* in_args3[] = {"testbin", "--help", "some_positional_arg"};
 
@@ -1000,7 +1000,7 @@ TEST_F(ParseTest, ParseTurboFlagsOnlySuccess) {
   std::vector<char*> positional_args;
   std::vector<turbo::UnrecognizedFlag> unrecognized_flags;
 
-  turbo::ParseTurboFlagsOnly(13, const_cast<char**>(in_args), positional_args,
+  turbo::parse_turbo_flags_only(13, const_cast<char**>(in_args), positional_args,
                              unrecognized_flags);
   EXPECT_THAT(positional_args,
               ElementsAreArray(
@@ -1040,7 +1040,7 @@ TEST_F(ParseTest, UndefOkFlagsAreIgnored) {
   std::vector<char*> positional_args;
   std::vector<turbo::UnrecognizedFlag> unrecognized_flags;
 
-  turbo::ParseTurboFlagsOnly(6, const_cast<char**>(in_args), positional_args,
+  turbo::parse_turbo_flags_only(6, const_cast<char**>(in_args), positional_args,
                              unrecognized_flags);
   EXPECT_THAT(positional_args, ElementsAreArray({turbo::string_view("testbin"),
                                                  turbo::string_view("value")}));
@@ -1069,7 +1069,7 @@ TEST_F(ParseTest, AllUndefOkFlagsAreIgnored) {
   std::vector<char*> positional_args;
   std::vector<turbo::UnrecognizedFlag> unrecognized_flags;
 
-  turbo::ParseTurboFlagsOnly(8, const_cast<char**>(in_args), positional_args,
+  turbo::parse_turbo_flags_only(8, const_cast<char**>(in_args), positional_args,
                              unrecognized_flags);
   EXPECT_THAT(positional_args,
               ElementsAreArray({turbo::string_view("testbin"),

@@ -93,7 +93,7 @@ class UsageReportingTest : public testing::Test {
     // Binary may install a custom config before tests are run.
     turbo::FlagsUsageConfig default_config;
     default_config.normalize_filename = &NormalizeFileName;
-    turbo::SetFlagsUsageConfig(default_config);
+    turbo::set_flags_usage_config(default_config);
   }
   ~UsageReportingTest() override {
     flags::SetFlagsHelpMode(flags::HelpMode::kNone);
@@ -117,23 +117,23 @@ using UsageReportingDeathTest = UsageReportingTest;
 TEST_F(UsageReportingDeathTest, TestSetProgramUsageMessage) {
 #if !defined(GTEST_HAS_ABSL) || !GTEST_HAS_ABSL
   // Check for kTestUsageMessage set in main() below.
-  EXPECT_EQ(turbo::ProgramUsageMessage(), kTestUsageMessage);
+  EXPECT_EQ(turbo::program_usage_message(), kTestUsageMessage);
 #else
   // Check for part of the usage message set by GoogleTest.
-  EXPECT_THAT(turbo::ProgramUsageMessage(),
+  EXPECT_THAT(turbo::program_usage_message(),
               ::testing::HasSubstr(
                   "This program contains tests written using Google Test"));
 #endif
 
   EXPECT_DEATH_IF_SUPPORTED(
-      turbo::SetProgramUsageMessage("custom usage message"),
-      ::testing::HasSubstr("SetProgramUsageMessage() called twice"));
+      turbo::set_program_usage_message("custom usage message"),
+      ::testing::HasSubstr("set_program_usage_message() called twice"));
 }
 
 // --------------------------------------------------------------------
 
 TEST_F(UsageReportingTest, TestFlagHelpHRF_on_flag_01) {
-  const auto* flag = turbo::FindCommandLineFlag("usage_reporting_test_flag_01");
+  const auto* flag = turbo::find_command_line_flag("usage_reporting_test_flag_01");
   std::stringstream test_buf;
 
   flags::FlagHelp(test_buf, *flag, flags::HelpFormat::kHumanReadable);
@@ -145,7 +145,7 @@ TEST_F(UsageReportingTest, TestFlagHelpHRF_on_flag_01) {
 }
 
 TEST_F(UsageReportingTest, TestFlagHelpHRF_on_flag_02) {
-  const auto* flag = turbo::FindCommandLineFlag("usage_reporting_test_flag_02");
+  const auto* flag = turbo::find_command_line_flag("usage_reporting_test_flag_02");
   std::stringstream test_buf;
 
   flags::FlagHelp(test_buf, *flag, flags::HelpFormat::kHumanReadable);
@@ -157,7 +157,7 @@ TEST_F(UsageReportingTest, TestFlagHelpHRF_on_flag_02) {
 }
 
 TEST_F(UsageReportingTest, TestFlagHelpHRF_on_flag_03) {
-  const auto* flag = turbo::FindCommandLineFlag("usage_reporting_test_flag_03");
+  const auto* flag = turbo::find_command_line_flag("usage_reporting_test_flag_03");
   std::stringstream test_buf;
 
   flags::FlagHelp(test_buf, *flag, flags::HelpFormat::kHumanReadable);
@@ -169,7 +169,7 @@ TEST_F(UsageReportingTest, TestFlagHelpHRF_on_flag_03) {
 }
 
 TEST_F(UsageReportingTest, TestFlagHelpHRF_on_flag_04) {
-  const auto* flag = turbo::FindCommandLineFlag("usage_reporting_test_flag_04");
+  const auto* flag = turbo::find_command_line_flag("usage_reporting_test_flag_04");
   std::stringstream test_buf;
 
   flags::FlagHelp(test_buf, *flag, flags::HelpFormat::kHumanReadable);
@@ -181,7 +181,7 @@ TEST_F(UsageReportingTest, TestFlagHelpHRF_on_flag_04) {
 }
 
 TEST_F(UsageReportingTest, TestFlagHelpHRF_on_flag_05) {
-  const auto* flag = turbo::FindCommandLineFlag("usage_reporting_test_flag_05");
+  const auto* flag = turbo::find_command_line_flag("usage_reporting_test_flag_05");
   std::stringstream test_buf;
 
   flags::FlagHelp(test_buf, *flag, flags::HelpFormat::kHumanReadable);
@@ -541,11 +541,11 @@ path.
 }  // namespace
 
 int main(int argc, char* argv[]) {
-  (void)turbo::GetFlag(FLAGS_undefok);  // Force linking of parse.cc
+  (void)turbo::get_flag(FLAGS_undefok);  // Force linking of parse.cc
   flags::SetProgramInvocationName("usage_test");
 #if !defined(GTEST_HAS_ABSL) || !GTEST_HAS_ABSL
-  // GoogleTest calls turbo::SetProgramUsageMessage() already.
-  turbo::SetProgramUsageMessage(kTestUsageMessage);
+  // GoogleTest calls turbo::set_program_usage_message() already.
+  turbo::set_program_usage_message(kTestUsageMessage);
 #endif
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

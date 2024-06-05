@@ -33,11 +33,11 @@ option(CONDA_ENV_ENABLE "enable conda auto env" OFF)
 
 option(CARBIN_USE_CXX11_ABI "use cxx11 abi or not" ON)
 
-option(CARBIN_BUILD_TEST "enable project test or not" ON)
+option(CARBIN_BUILD_TEST "enable project test or not" OFF)
 
-option(CARBIN_BUILD_BENCHMARK "enable project benchmark or not" ON)
+option(CARBIN_BUILD_BENCHMARK "enable project benchmark or not" OFF)
 
-option(CARBIN_BUILD_EXAMPLES "enable project examples or not" ON)
+option(CARBIN_BUILD_EXAMPLES "enable project examples or not" OFF)
 
 option(CARBIN_DEPS_ENABLE " " ON)
 
@@ -155,7 +155,8 @@ ENDMACRO()
 # platform info
 ################################################################################################
 cmake_host_system_information(RESULT CARBIN_PRETTY_NAME QUERY DISTRIB_PRETTY_NAME)
-
+string(TOLOWER ${CARBIN_PRETTY_NAME} LC_CARBIN_PRETTY_NAME)
+string(TOUPPER ${CARBIN_PRETTY_NAME} UP_CARBIN_PRETTY_NAME)
 carbin_print("${CARBIN_PRETTY_NAME}")
 
 cmake_host_system_information(RESULT CARBIN_DISTRO QUERY DISTRIB_INFO)

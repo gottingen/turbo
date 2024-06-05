@@ -1,0 +1,64 @@
+//
+// Copyright (C) 2024 EA group inc.
+// Author: Jeff.li lijippy@163.com
+// All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+//
+// Created by jeff on 24-6-6.
+//
+#pragma once
+
+// project name version
+#define @PROJECT_NAME_UP@_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+#define @PROJECT_NAME_UP@_VERSION_MINOR @PROJECT_VERSION_MINOR@
+#define @PROJECT_NAME_UP@_VERSION_PATCH @PROJECT_VERSION_PATCH@
+#define @PROJECT_NAME_UP@_VERSION ((PROJECT_VERSION_MAJOR * 1000) + PROJECT_VERSION_MINOR) * 1000 + PROJECT_VERSION_PATCH
+
+#define @PROJECT_NAME_UP@_VERSION_STRING "@PROJECT_VERSION@"
+
+// build system
+#define @PROJECT_NAME_UP@_BUILD_SYSTEM "@LC_CARBIN_PRETTY_NAME@"
+
+// build system version
+#define @PROJECT_NAME_UP@_BUILD_SYSTEM_VERSION "@CARBIN_DISTRO_VERSION_ID@"
+
+
+// compiler gnu or clang
+#define @PROJECT_NAME_UP@_CXX_COMPILER_ID "@CMAKE_CXX_COMPILER_ID@"
+
+// compiler version
+#define @PROJECT_NAME_UP@_CXX_COMPILER_VERSION "@CMAKE_CXX_COMPILER_VERSION@"
+
+// cmake cxx compiler flags
+#define @PROJECT_NAME_UP@_CMAKE_CXX_COMPILER_FLAGS "@CMAKE_CXX_COMPILER_FLAGS@"
+
+// user defined cxx compiler flags
+#define @PROJECT_NAME_UP@_CXX_COMPILER_FLAGS "@CARBIN_CXX_OPTIONS@"
+
+// cxx standard
+#define @PROJECT_NAME_UP@_CXX_STANDARD "@CMAKE_CXX_STANDARD@"
+
+// build type
+#define @PROJECT_NAME_UP@_BUILD_TYPE_STRING "@UPPERCASE_BUILD_TYPE@"
+
+// build type
+#define @PROJECT_NAME_UP@_BUILD_@UPPERCASE_BUILD_TYPE@
+
+// build type
+#if defined(@PROJECT_NAME_UP@_BUILD_DEBUG)
+    #define IS_@PROJECT_NAME_UP@_BUILD_TYPE_DEBUG 1
+#else
+    #define IS_@PROJECT_NAME_UP@_BUILD_TYPE_DEBUG 0
+#endif

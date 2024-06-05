@@ -33,7 +33,7 @@ class FlagsUsageConfigTest : public testing::Test {
     // Install Default config for the use on this unit test.
     // Binary may install a custom config before tests are run.
     turbo::FlagsUsageConfig default_config;
-    turbo::SetFlagsUsageConfig(default_config);
+    turbo::set_flags_usage_config(default_config);
   }
 };
 
@@ -74,7 +74,7 @@ TEST_F(FlagsUsageConfigTest, TestGetSetFlagsUsageConfig) {
   empty_config.contains_helppackage_flags = &TstContainsHelppackageFlags;
   empty_config.version_string = &TstVersionString;
   empty_config.normalize_filename = &TstNormalizeFilename;
-  turbo::SetFlagsUsageConfig(empty_config);
+  turbo::set_flags_usage_config(empty_config);
 
   EXPECT_TRUE(flags::GetUsageConfig().contains_helpshort_flags);
   EXPECT_TRUE(flags::GetUsageConfig().contains_help_flags);
@@ -101,7 +101,7 @@ TEST_F(FlagsUsageConfigTest, TestContainsHelpshortFlags) {
 
   turbo::FlagsUsageConfig empty_config;
   empty_config.contains_helpshort_flags = &TstContainsHelpshortFlags;
-  turbo::SetFlagsUsageConfig(empty_config);
+  turbo::set_flags_usage_config(empty_config);
 
   EXPECT_TRUE(
       flags::GetUsageConfig().contains_helpshort_flags("aaa/progname.cpp"));
@@ -124,7 +124,7 @@ TEST_F(FlagsUsageConfigTest, TestContainsHelpFlags) {
 
   turbo::FlagsUsageConfig empty_config;
   empty_config.contains_help_flags = &TstContainsHelpFlags;
-  turbo::SetFlagsUsageConfig(empty_config);
+  turbo::set_flags_usage_config(empty_config);
 
   EXPECT_TRUE(flags::GetUsageConfig().contains_help_flags("zzz/main-body.c"));
   EXPECT_FALSE(
@@ -146,7 +146,7 @@ TEST_F(FlagsUsageConfigTest, TestContainsHelppackageFlags) {
 
   turbo::FlagsUsageConfig empty_config;
   empty_config.contains_helppackage_flags = &TstContainsHelppackageFlags;
-  turbo::SetFlagsUsageConfig(empty_config);
+  turbo::set_flags_usage_config(empty_config);
 
   EXPECT_TRUE(
       flags::GetUsageConfig().contains_helppackage_flags("aaa/main-body.c"));
@@ -170,7 +170,7 @@ TEST_F(FlagsUsageConfigTest, TestVersionString) {
 
   turbo::FlagsUsageConfig empty_config;
   empty_config.version_string = &TstVersionString;
-  turbo::SetFlagsUsageConfig(empty_config);
+  turbo::set_flags_usage_config(empty_config);
 
   EXPECT_EQ(flags::GetUsageConfig().version_string(), "program 1.0.0");
 }
@@ -187,14 +187,14 @@ TEST_F(FlagsUsageConfigTest, TestNormalizeFilename) {
   // This tests that the custom implementation is called.
   turbo::FlagsUsageConfig empty_config;
   empty_config.normalize_filename = &TstNormalizeFilename;
-  turbo::SetFlagsUsageConfig(empty_config);
+  turbo::set_flags_usage_config(empty_config);
 
   EXPECT_EQ(flags::GetUsageConfig().normalize_filename("a/a.cc"), "a.cc");
   EXPECT_EQ(flags::GetUsageConfig().normalize_filename("aaa/a.cc"), "a/a.cc");
 
   // This tests that the default implementation is called.
   empty_config.normalize_filename = nullptr;
-  turbo::SetFlagsUsageConfig(empty_config);
+  turbo::set_flags_usage_config(empty_config);
 
   EXPECT_EQ(flags::GetUsageConfig().normalize_filename("a/a.cc"), "a/a.cc");
   EXPECT_EQ(flags::GetUsageConfig().normalize_filename("/a/a.cc"), "a/a.cc");

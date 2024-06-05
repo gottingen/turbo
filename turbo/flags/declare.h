@@ -24,28 +24,23 @@
 // declaration within the header file associated with the .cc file that defines
 // and owns the `Flag`.
 
-#ifndef TURBO_FLAGS_DECLARE_H_
-#define TURBO_FLAGS_DECLARE_H_
+#pragma once
 
 #include <turbo/base/config.h>
 
+namespace turbo::flags_internal {
+    // turbo::Flag<T> represents a flag of type 'T' created by TURBO_FLAG.
+    template<typename T>
+    class Flag;
+
+}  // namespace turbo::flags_internal
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace flags_internal {
+    // Flag
+    //
+    // Forward declaration of the `turbo::Flag` type for use in defining the macro.
+    template<typename T>
+    using Flag = flags_internal::Flag<T>;
 
-// turbo::Flag<T> represents a flag of type 'T' created by TURBO_FLAG.
-template <typename T>
-class Flag;
-
-}  // namespace flags_internal
-
-// Flag
-//
-// Forward declaration of the `turbo::Flag` type for use in defining the macro.
-template <typename T>
-using Flag = flags_internal::Flag<T>;
-
-TURBO_NAMESPACE_END
 }  // namespace turbo
 
 // TURBO_DECLARE_FLAG()
@@ -66,5 +61,3 @@ TURBO_NAMESPACE_END
   namespace turbo /* block flags in namespaces */ {}          \
   /* second redeclaration is to allow applying attributes */ \
   extern turbo::Flag<type> FLAGS_##name
-
-#endif  // TURBO_FLAGS_DECLARE_H_
