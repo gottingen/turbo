@@ -42,14 +42,14 @@ namespace turbo::flags_internal {
         return flag.is_specified_on_commandLine();
     }
 
-    bool PrivateHandleAccessor::ValidateInputValue(const CommandLineFlag &flag,
+    bool PrivateHandleAccessor::validate_input_value(const CommandLineFlag &flag,
                                                    turbo::string_view value) {
-        return flag.ValidateInputValue(value);
+        return flag.validate_input_value(value);
     }
 
-    void PrivateHandleAccessor::CheckDefaultValueParsingRoundtrip(
+    void PrivateHandleAccessor::check_default_value_parsing_roundtrip(
             const CommandLineFlag &flag) {
-        flag.CheckDefaultValueParsingRoundtrip();
+        flag.check_default_value_parsing_roundtrip();
     }
 
     bool PrivateHandleAccessor::parse_from(CommandLineFlag &flag,

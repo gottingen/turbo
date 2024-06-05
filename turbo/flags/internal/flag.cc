@@ -101,8 +101,8 @@ namespace turbo {
                       counter_(counter) {}
 
             ~FlagState() override {
-                if (flag_impl_.ValueStorageKind() != FlagValueStorageKind::kAlignedBuffer &&
-                    flag_impl_.ValueStorageKind() != FlagValueStorageKind::kSequenceLocked)
+                if (flag_impl_.value_storage_kind() != FlagValueStorageKind::kAlignedBuffer &&
+                    flag_impl_.value_storage_kind() != FlagValueStorageKind::kSequenceLocked)
                     return;
                 flags_internal::Delete(flag_impl_.op_, value_.heap_allocated);
             }
@@ -152,7 +152,7 @@ namespace turbo {
 
             auto def_kind = static_cast<FlagDefaultKind>(def_kind_);
 
-            switch (ValueStorageKind()) {
+            switch (value_storage_kind()) {
                 case FlagValueStorageKind::kValueAndInitBit:
                 case FlagValueStorageKind::kOneWordAtomic: {
                     alignas(int64_t) std::array<char, sizeof(int64_t)> buf{};
@@ -162,7 +162,7 @@ namespace turbo {
                         assert(def_kind != FlagDefaultKind::kDynamicValue);
                         std::memcpy(buf.data(), &default_value_, Sizeof(op_));
                     }
-                    if (ValueStorageKind() == FlagValueStorageKind::kValueAndInitBit) {
+                    if (value_storage_kind() == FlagValueStorageKind::kValueAndInitBit) {
                         // We presume here the memory layout of FlagValueAndInitBit struct.
                         uint8_t initialized = 1;
                         std::memcpy(buf.data() + Sizeof(op_), &initialized,
@@ -224,7 +224,7 @@ namespace turbo {
                                           "' is defined as one type and declared as another"));
         }
 
-        std::unique_ptr<void, DynValueDeleter> FlagImpl::MakeInitValue() const {
+        std::unique_ptr<void, DynValueDeleter> FlagImpl::make_init_value() const {
             void *res = nullptr;
             switch (DefaultKind()) {
                 case FlagDefaultKind::kDynamicValue:
@@ -242,7 +242,7 @@ namespace turbo {
         }
 
         void FlagImpl::StoreValue(const void *src) {
-            switch (ValueStorageKind()) {
+            switch (value_storage_kind()) {
                 case FlagValueStorageKind::kValueAndInitBit:
                 case FlagValueStorageKind::kOneWordAtomic: {
                     // Load the current value to avoid setting 'init' bit manually.
@@ -280,8 +280,8 @@ namespace turbo {
             return flags_internal::FastTypeId(op_);
         }
 
-        int64_t FlagImpl::ModificationCount() const {
-            return seq_lock_.ModificationCount();
+        int64_t FlagImpl::modification_count() const {
+            return seq_lock_.modification_count();
         }
 
         bool FlagImpl::is_specified_on_commandLine() const {
@@ -292,13 +292,13 @@ namespace turbo {
         std::string FlagImpl::default_value() const {
             turbo::MutexLock l(DataGuard());
 
-            auto obj = MakeInitValue();
+            auto obj = make_init_value();
             return flags_internal::Unparse(op_, obj.get());
         }
 
         std::string FlagImpl::current_value() const {
             auto *guard = DataGuard();  // Make sure flag initialized
-            switch (ValueStorageKind()) {
+            switch (value_storage_kind()) {
                 case FlagValueStorageKind::kValueAndInitBit:
                 case FlagValueStorageKind::kOneWordAtomic: {
                     const auto one_word_val =
@@ -309,7 +309,7 @@ namespace turbo {
                 case FlagValueStorageKind::kSequenceLocked: {
                     std::unique_ptr<void, DynValueDeleter> cloned(flags_internal::Alloc(op_),
                                                                   DynValueDeleter{op_});
-                    ReadSequenceLockedData(cloned.get());
+                    read_sequence_locked_data(cloned.get());
                     return flags_internal::Unparse(op_, cloned.get());
                 }
                 case FlagValueStorageKind::kAlignedBuffer: {
@@ -369,12 +369,12 @@ namespace turbo {
 
             bool modified = modified_;
             bool on_command_line = on_command_line_;
-            switch (ValueStorageKind()) {
+            switch (value_storage_kind()) {
                 case FlagValueStorageKind::kValueAndInitBit:
                 case FlagValueStorageKind::kOneWordAtomic: {
                     return turbo::make_unique<FlagState>(
                             *this, OneWordValue().load(std::memory_order_acquire), modified,
-                            on_command_line, ModificationCount());
+                            on_command_line, modification_count());
                 }
                 case FlagValueStorageKind::kSequenceLocked: {
                     void *cloned = flags_internal::Alloc(op_);
@@ -384,12 +384,12 @@ namespace turbo {
                     assert(success);
                     static_cast<void>(success);
                     return turbo::make_unique<FlagState>(*this, cloned, modified,
-                                                         on_command_line, ModificationCount());
+                                                         on_command_line, modification_count());
                 }
                 case FlagValueStorageKind::kAlignedBuffer: {
                     return turbo::make_unique<FlagState>(
                             *this, flags_internal::Clone(op_, AlignedBufferValue()), modified,
-                            on_command_line, ModificationCount());
+                            on_command_line, modification_count());
                 }
             }
             return nullptr;
@@ -397,11 +397,11 @@ namespace turbo {
 
         bool FlagImpl::RestoreState(const FlagState &flag_state) {
             turbo::MutexLock l(DataGuard());
-            if (flag_state.counter_ == ModificationCount()) {
+            if (flag_state.counter_ == modification_count()) {
                 return false;
             }
 
-            switch (ValueStorageKind()) {
+            switch (value_storage_kind()) {
                 case FlagValueStorageKind::kValueAndInitBit:
                 case FlagValueStorageKind::kOneWordAtomic:
                     StoreValue(&flag_state.value_.one_word);
@@ -428,18 +428,18 @@ namespace turbo {
         }
 
         void *FlagImpl::AlignedBufferValue() const {
-            assert(ValueStorageKind() == FlagValueStorageKind::kAlignedBuffer);
+            assert(value_storage_kind() == FlagValueStorageKind::kAlignedBuffer);
             return OffsetValue<void>();
         }
 
         std::atomic<uint64_t> *FlagImpl::AtomicBufferValue() const {
-            assert(ValueStorageKind() == FlagValueStorageKind::kSequenceLocked);
+            assert(value_storage_kind() == FlagValueStorageKind::kSequenceLocked);
             return OffsetValue<std::atomic<uint64_t>>();
         }
 
         std::atomic<int64_t> &FlagImpl::OneWordValue() const {
-            assert(ValueStorageKind() == FlagValueStorageKind::kOneWordAtomic ||
-                   ValueStorageKind() == FlagValueStorageKind::kValueAndInitBit);
+            assert(value_storage_kind() == FlagValueStorageKind::kOneWordAtomic ||
+                   value_storage_kind() == FlagValueStorageKind::kValueAndInitBit);
             return OffsetValue<FlagOneWordValue>()->value;
         }
 
@@ -449,7 +449,7 @@ namespace turbo {
         // message is stored in 'err'
         std::unique_ptr<void, DynValueDeleter> FlagImpl::TryParse(
                 turbo::string_view value, std::string &err) const {
-            std::unique_ptr<void, DynValueDeleter> tentative_value = MakeInitValue();
+            std::unique_ptr<void, DynValueDeleter> tentative_value = make_init_value();
 
             std::string parse_err;
             if (!flags_internal::Parse(op_, value, tentative_value.get(), &parse_err)) {
@@ -464,7 +464,7 @@ namespace turbo {
 
         void FlagImpl::Read(void *dst) const {
             auto *guard = DataGuard();  // Make sure flag initialized
-            switch (ValueStorageKind()) {
+            switch (value_storage_kind()) {
                 case FlagValueStorageKind::kValueAndInitBit:
                 case FlagValueStorageKind::kOneWordAtomic: {
                     const int64_t one_word_val =
@@ -473,7 +473,7 @@ namespace turbo {
                     break;
                 }
                 case FlagValueStorageKind::kSequenceLocked: {
-                    ReadSequenceLockedData(dst);
+                    read_sequence_locked_data(dst);
                     break;
                 }
                 case FlagValueStorageKind::kAlignedBuffer: {
@@ -485,15 +485,15 @@ namespace turbo {
         }
 
         int64_t FlagImpl::ReadOneWord() const {
-            assert(ValueStorageKind() == FlagValueStorageKind::kOneWordAtomic ||
-                   ValueStorageKind() == FlagValueStorageKind::kValueAndInitBit);
+            assert(value_storage_kind() == FlagValueStorageKind::kOneWordAtomic ||
+                   value_storage_kind() == FlagValueStorageKind::kValueAndInitBit);
             auto *guard = DataGuard();  // Make sure flag initialized
             (void) guard;
             return OneWordValue().load(std::memory_order_acquire);
         }
 
         bool FlagImpl::ReadOneBool() const {
-            assert(ValueStorageKind() == FlagValueStorageKind::kValueAndInitBit);
+            assert(value_storage_kind() == FlagValueStorageKind::kValueAndInitBit);
             auto *guard = DataGuard();  // Make sure flag initialized
             (void) guard;
             return turbo::bit_cast<FlagValueAndInitBit<bool>>(
@@ -501,7 +501,7 @@ namespace turbo {
                     .value;
         }
 
-        void FlagImpl::ReadSequenceLockedData(void *dst) const {
+        void FlagImpl::read_sequence_locked_data(void *dst) const {
             size_t size = Sizeof(op_);
             // Attempt to read using the sequence lock.
             if (TURBO_LIKELY(seq_lock_.TryRead(dst, AtomicBufferValue(), size))) {
@@ -625,12 +625,12 @@ namespace turbo {
             return true;
         }
 
-        void FlagImpl::CheckDefaultValueParsingRoundtrip() const {
+        void FlagImpl::check_default_value_parsing_roundtrip() const {
             std::string v = default_value();
 
             turbo::MutexLock lock(DataGuard());
 
-            auto dst = MakeInitValue();
+            auto dst = make_init_value();
             std::string error;
             if (!flags_internal::Parse(op_, v, dst.get(), &error)) {
                 TURBO_INTERNAL_LOG(
@@ -644,10 +644,10 @@ namespace turbo {
             // small changes, e.g., precision loss for floating point types.
         }
 
-        bool FlagImpl::ValidateInputValue(turbo::string_view value) const {
+        bool FlagImpl::validate_input_value(turbo::string_view value) const {
             turbo::MutexLock l(DataGuard());
 
-            auto obj = MakeInitValue();
+            auto obj = make_init_value();
             std::string ignored_error;
             return flags_internal::Parse(op_, value, obj.get(), &ignored_error);
         }

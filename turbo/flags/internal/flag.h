@@ -539,7 +539,7 @@ namespace turbo {
             TURBO_LOCK_RETURNED(reinterpret_cast<turbo::Mutex *>(data_guard_));
 
             // Returns heap allocated value of type T initialized with default value.
-            std::unique_ptr<void, DynValueDeleter> MakeInitValue() const
+            std::unique_ptr<void, DynValueDeleter> make_init_value() const
             TURBO_EXCLUSIVE_LOCKS_REQUIRED(*DataGuard());
 
             // Flag initialization called via turbo::call_once.
@@ -577,15 +577,15 @@ namespace turbo {
 
             // Copy the flag data, protected by `seq_lock_` into `dst`.
             //
-            // REQUIRES: ValueStorageKind() == kSequenceLocked.
-            void ReadSequenceLockedData(void *dst) const
+            // REQUIRES: value_storage_kind() == kSequenceLocked.
+            void read_sequence_locked_data(void *dst) const
             TURBO_LOCKS_EXCLUDED(*DataGuard());
 
             FlagHelpKind HelpSourceKind() const {
                 return static_cast<FlagHelpKind>(help_source_kind_);
             }
 
-            FlagValueStorageKind ValueStorageKind() const {
+            FlagValueStorageKind value_storage_kind() const {
                 return static_cast<FlagValueStorageKind>(value_storage_kind_);
             }
 
@@ -610,13 +610,13 @@ namespace turbo {
 
             std::string current_value() const override TURBO_LOCKS_EXCLUDED(*DataGuard());
 
-            bool ValidateInputValue(turbo::string_view value) const override
+            bool validate_input_value(turbo::string_view value) const override
             TURBO_LOCKS_EXCLUDED(*DataGuard());
 
-            void CheckDefaultValueParsingRoundtrip() const override
+            void check_default_value_parsing_roundtrip() const override
             TURBO_LOCKS_EXCLUDED(*DataGuard());
 
-            int64_t ModificationCount() const TURBO_EXCLUSIVE_LOCKS_REQUIRED(*DataGuard());
+            int64_t modification_count() const TURBO_EXCLUSIVE_LOCKS_REQUIRED(*DataGuard());
 
             // Interfaces to save and restore flags to/from persistent state.
             // Returns current flag state or nullptr if flag does not support

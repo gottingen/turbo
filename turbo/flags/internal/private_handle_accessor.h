@@ -43,12 +43,12 @@ namespace turbo::flags_internal {
         // Access to CommandLineFlag::is_specified_on_commandLine.
         static bool is_specified_on_commandLine(const CommandLineFlag &flag);
 
-        // Access to CommandLineFlag::ValidateInputValue.
-        static bool ValidateInputValue(const CommandLineFlag &flag,
+        // Access to CommandLineFlag::validate_input_value.
+        static bool validate_input_value(const CommandLineFlag &flag,
                                        turbo::string_view value);
 
-        // Access to CommandLineFlag::CheckDefaultValueParsingRoundtrip.
-        static void CheckDefaultValueParsingRoundtrip(const CommandLineFlag &flag);
+        // Access to CommandLineFlag::check_default_value_parsing_roundtrip.
+        static void check_default_value_parsing_roundtrip(const CommandLineFlag &flag);
 
         static bool parse_from(CommandLineFlag &flag, turbo::string_view value,
                               flags_internal::FlagSettingMode set_mode,

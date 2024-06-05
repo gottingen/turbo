@@ -272,7 +272,7 @@ namespace turbo::flags_internal {
             }
 
             // Any input is valid
-            bool ValidateInputValue(turbo::string_view) const override {
+            bool validate_input_value(turbo::string_view) const override {
                 OnAccess();
                 return true;
             }
@@ -287,7 +287,7 @@ namespace turbo::flags_internal {
                 return false;
             }
 
-            void CheckDefaultValueParsingRoundtrip() const override { OnAccess(); }
+            void check_default_value_parsing_roundtrip() const override { OnAccess(); }
 
             void Read(void *) const override { OnAccess(); }
 

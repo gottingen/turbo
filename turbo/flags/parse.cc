@@ -331,7 +331,7 @@ namespace turbo::flags_internal {
                 TURBO_FLAGS_INTERNAL_SUPPORTED_TYPES(TURBO_FLAGS_INTERNAL_IGNORE_TYPE)
 #undef TURBO_FLAGS_INTERNAL_IGNORE_TYPE
 
-                flags_internal::PrivateHandleAccessor::CheckDefaultValueParsingRoundtrip(
+                flags_internal::PrivateHandleAccessor::check_default_value_parsing_roundtrip(
                         flag);
             });
 #endif

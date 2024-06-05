@@ -209,11 +209,11 @@ namespace turbo {
         virtual bool is_specified_on_commandLine() const = 0;
 
         // Validates supplied value using validator or parseflag routine
-        virtual bool ValidateInputValue(turbo::string_view value) const = 0;
+        virtual bool validate_input_value(turbo::string_view value) const = 0;
 
         // Checks that flags default value can be converted to string and back to the
         // flag's value type.
-        virtual void CheckDefaultValueParsingRoundtrip() const = 0;
+        virtual void check_default_value_parsing_roundtrip() const = 0;
     };
 
 #if defined(__GNUC__) && !defined(__clang__)
