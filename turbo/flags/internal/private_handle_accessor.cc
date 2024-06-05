@@ -29,7 +29,7 @@
 namespace turbo::flags_internal {
 
     FlagFastTypeId PrivateHandleAccessor::TypeId(const CommandLineFlag &flag) {
-        return flag.TypeId();
+        return flag.type_id();
     }
 
     std::unique_ptr<FlagStateInterface> PrivateHandleAccessor::SaveState(
@@ -37,9 +37,9 @@ namespace turbo::flags_internal {
         return flag.SaveState();
     }
 
-    bool PrivateHandleAccessor::IsSpecifiedOnCommandLine(
+    bool PrivateHandleAccessor::is_specified_on_commandLine(
             const CommandLineFlag &flag) {
-        return flag.IsSpecifiedOnCommandLine();
+        return flag.is_specified_on_commandLine();
     }
 
     bool PrivateHandleAccessor::ValidateInputValue(const CommandLineFlag &flag,
@@ -52,12 +52,12 @@ namespace turbo::flags_internal {
         flag.CheckDefaultValueParsingRoundtrip();
     }
 
-    bool PrivateHandleAccessor::ParseFrom(CommandLineFlag &flag,
+    bool PrivateHandleAccessor::parse_from(CommandLineFlag &flag,
                                           turbo::string_view value,
                                           flags_internal::FlagSettingMode set_mode,
                                           flags_internal::ValueSource source,
                                           std::string &error) {
-        return flag.ParseFrom(value, set_mode, source, error);
+        return flag.parse_from(value, set_mode, source, error);
     }
 
 }  // namespace turbo::flags_internal

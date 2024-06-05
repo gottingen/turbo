@@ -43,7 +43,7 @@ namespace turbo::flags_internal {
         SET_FLAGS_DEFAULT
     };
 
-    // Options that control ParseFrom: Source of a value.
+    // Options that control parse_from: Source of a value.
     enum ValueSource {
         // Flag is being set by value specified on a command line.
         kCommandLine,

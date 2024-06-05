@@ -103,7 +103,7 @@ static void BM_VlogIsOnOverhead(benchmark::State& state) {
   // but thread_index is an int on some platforms (e.g. Android) and a
   // function returning an int on others. So we just do it on all threads.
   // TODO(b/152609127): set only if thread_index == 0.
-  turbo::SetFlag(&FLAGS_v, 0);
+  turbo::set_flag(&FLAGS_v, 0);
 
   while (state.KeepRunningBatch(10)) {
     benchmark::DoNotOptimize(VLOG_IS_ON(0));  // 1
@@ -125,7 +125,7 @@ static void BM_VlogIsNotOnOverhead(benchmark::State& state) {
   // but thread_index is an int on some platforms (e.g. Android) and a
   // function returning an int on others. So we just do it on all threads.
   // TODO(b/152609127): set only if thread_index == 0.
-  turbo::SetFlag(&FLAGS_v, 0);
+  turbo::set_flag(&FLAGS_v, 0);
 
   while (state.KeepRunningBatch(10)) {
     benchmark::DoNotOptimize(VLOG_IS_ON(1));  // 1

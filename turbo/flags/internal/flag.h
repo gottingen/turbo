@@ -58,16 +58,16 @@ namespace turbo {
     using Flag = flags_internal::Flag<T>;
 
     template<typename T>
-    TURBO_MUST_USE_RESULT T GetFlag(const turbo::Flag<T> &flag);
+    TURBO_MUST_USE_RESULT T get_flag(const turbo::Flag<T> &flag);
 
     template<typename T>
-    void SetFlag(turbo::Flag<T> *flag, const T &v);
+    void set_flag(turbo::Flag<T> *flag, const T &v);
 
     template<typename T, typename V>
-    void SetFlag(turbo::Flag<T> *flag, const V &v);
+    void set_flag(turbo::Flag<T> *flag, const V &v);
 
     template<typename U>
-    const CommandLineFlag &GetFlagReflectionHandle(const turbo::Flag<U> &f);
+    const CommandLineFlag &get_flag_reflection_handle(const turbo::Flag<U> &f);
 
     ///////////////////////////////////////////////////////////////////////////////
     // Flag value type operations, eg., parsing, copying, etc. are provided
@@ -420,13 +420,17 @@ namespace turbo {
         ///////////////////////////////////////////////////////////////////////////////
         // Flag callback auxiliary structs.
 
-        // Signature for the mutation callback used by watched Flags
-        // The callback is noexcept.
-        // TODO(rogeeff): add noexcept after C++17 support is added.
-        using FlagCallbackFunc = void (*)();
+        using FlagCallbackFunc = void (*)() noexcept;
 
         struct FlagCallback {
             FlagCallbackFunc func;
+            turbo::Mutex guard;  // Guard for concurrent callback invocations.
+        };
+
+        using FlagValidatorFunc = bool (*)(turbo::string_view,std::string*) noexcept;
+
+        struct FlagValidator {
+            FlagValidatorFunc func;
             turbo::Mutex guard;  // Guard for concurrent callback invocations.
         };
 
@@ -466,6 +470,7 @@ namespace turbo {
                       def_kind_(static_cast<uint8_t>(default_arg.kind)),
                       modified_(false),
                       on_command_line_(false),
+                      validator_(nullptr),
                       callback_(nullptr),
                       default_value_(default_arg.source),
                       data_guard_{} {}
@@ -502,19 +507,25 @@ namespace turbo {
             void Write(const void *src) TURBO_LOCKS_EXCLUDED(*DataGuard());
 
             // Interfaces to operate on callbacks.
-            void SetCallback(const FlagCallbackFunc mutation_callback)
+            void set_flag_callback(const FlagCallbackFunc mutation_callback)
             TURBO_LOCKS_EXCLUDED(*DataGuard());
 
-            void InvokeCallback() const TURBO_EXCLUSIVE_LOCKS_REQUIRED(*DataGuard());
+            void set_validator(const FlagValidatorFunc validator) TURBO_LOCKS_EXCLUDED(*DataGuard());
+
+            void invoke_callback() const TURBO_EXCLUSIVE_LOCKS_REQUIRED(*DataGuard());
 
             // Used in read/write operations to validate source/target has correct type.
             // For example if flag is declared as turbo::Flag<int> FLAGS_foo, a call to
-            // turbo::GetFlag(FLAGS_foo) validates that the type of FLAGS_foo is indeed
+            // turbo::get_flag(FLAGS_foo) validates that the type of FLAGS_foo is indeed
             // int. To do that we pass the "assumed" type id (which is deduced from type
             // int) as an argument `type_id`, which is in turn is validated against the
             // type id stored in flag object by flag definition statement.
-            void AssertValidType(FlagFastTypeId type_id,
+            void assert_valid_type(FlagFastTypeId type_id,
                                  const std::type_info *(*gen_rtti)()) const;
+
+            bool user_validate(turbo::string_view value , std::string *err) const override TURBO_LOCKS_EXCLUDED(*DataGuard());
+
+            bool has_user_validator() const override TURBO_LOCKS_EXCLUDED(*DataGuard());
 
         private:
             template<typename T>
@@ -584,20 +595,20 @@ namespace turbo {
             }
 
             // CommandLineFlag interface implementation
-            turbo::string_view Name() const override;
+            turbo::string_view name() const override;
 
-            std::string Filename() const override;
+            std::string filename() const override;
 
-            std::string Help() const override;
+            std::string help() const override;
 
-            FlagFastTypeId TypeId() const override;
+            FlagFastTypeId type_id() const override;
 
-            bool IsSpecifiedOnCommandLine() const override
+            bool is_specified_on_commandLine() const override
             TURBO_LOCKS_EXCLUDED(*DataGuard());
 
-            std::string DefaultValue() const override TURBO_LOCKS_EXCLUDED(*DataGuard());
+            std::string default_value() const override TURBO_LOCKS_EXCLUDED(*DataGuard());
 
-            std::string CurrentValue() const override TURBO_LOCKS_EXCLUDED(*DataGuard());
+            std::string current_value() const override TURBO_LOCKS_EXCLUDED(*DataGuard());
 
             bool ValidateInputValue(turbo::string_view value) const override
             TURBO_LOCKS_EXCLUDED(*DataGuard());
@@ -618,7 +629,7 @@ namespace turbo {
             bool RestoreState(const FlagState &flag_state)
             TURBO_LOCKS_EXCLUDED(*DataGuard());
 
-            bool ParseFrom(turbo::string_view value, FlagSettingMode set_mode,
+            bool parse_from(turbo::string_view value, FlagSettingMode set_mode,
                            ValueSource source, std::string &error) override
             TURBO_LOCKS_EXCLUDED(*DataGuard());
 
@@ -656,6 +667,8 @@ namespace turbo {
             // Sequence lock / mutation counter.
             flags_internal::SequenceLock seq_lock_;
 
+            // Optional flag's validator and turbo::Mutex to guard the invocations.
+            FlagValidator *validator_;
             // Optional flag's callback and turbo::Mutex to guard the invocations.
             FlagCallback *callback_ TURBO_GUARDED_BY(*DataGuard());
             // Either a pointer to the function generating the default value based on the
@@ -692,20 +705,20 @@ namespace turbo {
                       value_() {}
 
             // CommandLineFlag interface
-            turbo::string_view Name() const { return impl_.Name(); }
+            turbo::string_view name() const { return impl_.name(); }
 
-            std::string Filename() const { return impl_.Filename(); }
+            std::string filename() const { return impl_.filename(); }
 
-            std::string Help() const { return impl_.Help(); }
+            std::string help() const { return impl_.help(); }
 
             // Do not use. To be removed.
-            bool IsSpecifiedOnCommandLine() const {
-                return impl_.IsSpecifiedOnCommandLine();
+            bool is_specified_on_commandLine() const {
+                return impl_.is_specified_on_commandLine();
             }
 
-            std::string DefaultValue() const { return impl_.DefaultValue(); }
+            std::string default_value() const { return impl_.default_value(); }
 
-            std::string CurrentValue() const { return impl_.CurrentValue(); }
+            std::string current_value() const { return impl_.current_value(); }
 
         private:
             template<typename, bool>
@@ -726,7 +739,7 @@ namespace turbo {
                 U u;
 
 #if !defined(NDEBUG)
-                impl_.AssertValidType(base_internal::FastTypeId<T>(), &GenRuntimeTypeId<T>);
+                impl_.assert_valid_type(base_internal::FastTypeId<T>(), &GenRuntimeTypeId<T>);
 #endif
 
                 if (TURBO_UNLIKELY(!value_.Get(impl_.seq_lock_, u.value))) {
@@ -736,7 +749,7 @@ namespace turbo {
             }
 
             void Set(const T &v) {
-                impl_.AssertValidType(base_internal::FastTypeId<T>(), &GenRuntimeTypeId<T>);
+                impl_.assert_valid_type(base_internal::FastTypeId<T>(), &GenRuntimeTypeId<T>);
                 impl_.Write(&v);
             }
 
@@ -804,7 +817,7 @@ namespace turbo {
                     // Initialize the temporary instance of type T based on current value in
                     // destination (which is going to be flag's default value).
                     T temp(*static_cast<T *>(v2));
-                    if (!turbo::ParseFlag<T>(*static_cast<const turbo::string_view *>(v1), &temp,
+                    if (!turbo::parse_flag<T>(*static_cast<const turbo::string_view *>(v1), &temp,
                                              static_cast<std::string *>(v3))) {
                         return nullptr;
                     }
@@ -813,7 +826,7 @@ namespace turbo {
                 }
                 case FlagOp::kUnparse:
                     *static_cast<std::string *>(v2) =
-                            turbo::UnparseFlag<T>(*static_cast<const T *>(v1));
+                            turbo::unparse_flag<T>(*static_cast<const T *>(v1));
                     return nullptr;
                 case FlagOp::kValueOffset: {
                     // Round sizeof(FlagImp) to a multiple of alignof(FlagValue<T>) to get the
@@ -829,7 +842,7 @@ namespace turbo {
         ///////////////////////////////////////////////////////////////////////////////
         // This class facilitates Flag object registration and tail expression-based
         // flag definition, for example:
-        // TURBO_FLAG(int, foo, 42, "Foo help").OnUpdate(NotifyFooWatcher);
+        // TURBO_FLAG(int, foo, 42, "Foo help").on_update(NotifyFooWatcher);
         struct FlagRegistrarEmpty {
         };
 
@@ -842,8 +855,13 @@ namespace turbo {
                     flags_internal::RegisterCommandLineFlag(flag_.impl_, filename);
             }
 
-            FlagRegistrar OnUpdate(FlagCallbackFunc cb) &&{
-                flag_.impl_.SetCallback(cb);
+            FlagRegistrar on_update(FlagCallbackFunc cb) &&{
+                flag_.impl_.set_flag_callback(cb);
+                return *this;
+            }
+
+            FlagRegistrar on_validate(FlagValidatorFunc cb) &&{
+                flag_.impl_.set_validator(cb);
                 return *this;
             }
 

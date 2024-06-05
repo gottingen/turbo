@@ -81,7 +81,7 @@
 // Using `std::nullopt` as an optional flag's default value allows you to check
 // whether such a flag was ever specified on the command line:
 //
-//   if (turbo::GetFlag(FLAGS_foo).has_value()) {
+//   if (turbo::get_flag(FLAGS_foo).has_value()) {
 //     // flag was set on command line
 //   } else {
 //     // flag was not passed on command line
@@ -159,7 +159,7 @@
 // given type will be discovered via Argument-Dependent Lookup (ADL).
 //
 // `turbo_parse_flag()` may need, in turn, to parse simpler constituent types
-// using `turbo::ParseFlag()`. For example, a custom struct `MyFlagType`
+// using `turbo::parse_flag()`. For example, a custom struct `MyFlagType`
 // consisting of a `std::pair<int, std::string>` would add an `turbo_parse_flag()`
 // overload for its `MyFlagType` like so:
 //
@@ -177,26 +177,26 @@
 //   std::string turbo_unparse_flag(const MyFlagType&);
 //
 //   // Within the implementation, `turbo_parse_flag()` will, in turn invoke
-//   // `turbo::ParseFlag()` on its constituent `int` and `std::string` types
+//   // `turbo::parse_flag()` on its constituent `int` and `std::string` types
 //   // (which have built-in Turbo flag support).
 //
 //   bool turbo_parse_flag(turbo::string_view text, MyFlagType* flag,
 //                      std::string* err) {
 //     std::pair<turbo::string_view, turbo::string_view> tokens =
 //         turbo::str_split(text, ',');
-//     if (!turbo::ParseFlag(tokens.first, &flag->my_flag_data.first, err))
+//     if (!turbo::parse_flag(tokens.first, &flag->my_flag_data.first, err))
 //         return false;
-//     if (!turbo::ParseFlag(tokens.second, &flag->my_flag_data.second, err))
+//     if (!turbo::parse_flag(tokens.second, &flag->my_flag_data.second, err))
 //         return false;
 //     return true;
 //   }
 //
-//   // Similarly, for unparsing, we can simply invoke `turbo::UnparseFlag()` on
+//   // Similarly, for unparsing, we can simply invoke `turbo::unparse_flag()` on
 //   // the constituent types.
 //   std::string turbo_unparse_flag(const MyFlagType& flag) {
-//     return turbo::str_cat(turbo::UnparseFlag(flag.my_flag_data.first),
+//     return turbo::str_cat(turbo::unparse_flag(flag.my_flag_data.first),
 //                         ",",
-//                         turbo::UnparseFlag(flag.my_flag_data.second));
+//                         turbo::unparse_flag(flag.my_flag_data.second));
 //   }
 
 #pragma once
@@ -219,10 +219,10 @@ namespace turbo {
     // Forward declaration to be used inside composable flag parse/unparse
     // implementations
     template<typename T>
-    inline bool ParseFlag(turbo::string_view input, T *dst, std::string *error);
+    inline bool parse_flag(turbo::string_view input, T *dst, std::string *error);
 
     template<typename T>
-    inline std::string UnparseFlag(const T &v);
+    inline std::string unparse_flag(const T &v);
 
     namespace flags_internal {
 
@@ -257,7 +257,7 @@ namespace turbo {
                 return true;
             }
             T value;
-            if (!turbo::ParseFlag(text, &value, err)) return false;
+            if (!turbo::parse_flag(text, &value, err)) return false;
 
             *f = std::move(value);
             return true;
@@ -272,7 +272,7 @@ namespace turbo {
             return true;
           }
           T value;
-          if (!turbo::ParseFlag(text, &value, err)) return false;
+          if (!turbo::parse_flag(text, &value, err)) return false;
 
           *f = std::move(value);
           return true;
@@ -295,20 +295,20 @@ namespace turbo {
 
         template<typename T>
         std::string turbo_unparse_flag(const turbo::optional<T> &f) {
-            return f.has_value() ? turbo::UnparseFlag(*f) : "";
+            return f.has_value() ? turbo::unparse_flag(*f) : "";
         }
 
 #if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
         template <typename T>
         std::string turbo_unparse_flag(const std::optional<T>& f) {
-          return f.has_value() ? turbo::UnparseFlag(*f) : "";
+          return f.has_value() ? turbo::unparse_flag(*f) : "";
         }
 #endif
 
         template<typename T>
         std::string Unparse(const T &v) {
             // Comment on next line provides a good compiler error message if T does not
-            // have UnparseFlag.
+            // have unparse_flag.
             return turbo_unparse_flag(v);  // Is T missing turbo_unparse_flag?
         }
 
@@ -333,7 +333,7 @@ namespace turbo {
 
     }  // namespace flags_internal
 
-    // ParseFlag()
+    // parse_flag()
     //
     // Parses a string value into a flag value of type `T`. Do not add overloads of
     // this function for your type directly; instead, add an `turbo_parse_flag()`
@@ -341,13 +341,13 @@ namespace turbo {
     //
     // Some implementations of `turbo_parse_flag()` for types which consist of other,
     // constituent types which already have Turbo flag support, may need to call
-    // `turbo::ParseFlag()` on those consituent string values. (See above.)
+    // `turbo::parse_flag()` on those consituent string values. (See above.)
     template<typename T>
-    inline bool ParseFlag(turbo::string_view input, T *dst, std::string *error) {
+    inline bool parse_flag(turbo::string_view input, T *dst, std::string *error) {
         return flags_internal::InvokeParseFlag(input, dst, error);
     }
 
-    // UnparseFlag()
+    // unparse_flag()
     //
     // Unparses a flag value of type `T` into a string value. Do not add overloads
     // of this function for your type directly; instead, add an `turbo_unparse_flag()`
@@ -355,9 +355,9 @@ namespace turbo {
     //
     // Some implementations of `turbo_unparse_flag()` for types which consist of other,
     // constituent types which already have Turbo flag support, may want to call
-    // `turbo::UnparseFlag()` on those constituent types. (See above.)
+    // `turbo::unparse_flag()` on those constituent types. (See above.)
     template<typename T>
-    inline std::string UnparseFlag(const T &v) {
+    inline std::string unparse_flag(const T &v) {
         return flags_internal::Unparse(v);
     }
 

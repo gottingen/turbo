@@ -115,8 +115,8 @@ namespace turbo {
                 if (!flag_impl_.RestoreState(*this)) return;
 
                 TURBO_INTERNAL_LOG(INFO,
-                                   turbo::str_cat("Restore saved value of ", flag_impl_.Name(),
-                                                  " to: ", flag_impl_.CurrentValue()));
+                                   turbo::str_cat("Restore saved value of ", flag_impl_.name(),
+                                                  " to: ", flag_impl_.current_value()));
             }
 
             // Flag and saved flag data.
@@ -199,7 +199,7 @@ namespace turbo {
             return reinterpret_cast<turbo::Mutex *>(&data_guard_);
         }
 
-        void FlagImpl::AssertValidType(FlagFastTypeId rhs_type_id,
+        void FlagImpl::assert_valid_type(FlagFastTypeId rhs_type_id,
                                        const std::type_info *(*gen_rtti)()) const {
             FlagFastTypeId lhs_type_id = flags_internal::FastTypeId(op_);
 
@@ -220,7 +220,7 @@ namespace turbo {
 #endif
 
             TURBO_INTERNAL_LOG(
-                    FATAL, turbo::str_cat("Flag '", Name(),
+                    FATAL, turbo::str_cat("Flag '", name(),
                                           "' is defined as one type and declared as another"));
         }
 
@@ -262,21 +262,21 @@ namespace turbo {
                     break;
             }
             modified_ = true;
-            InvokeCallback();
+            invoke_callback();
         }
 
-        turbo::string_view FlagImpl::Name() const { return name_; }
+        turbo::string_view FlagImpl::name() const { return name_; }
 
-        std::string FlagImpl::Filename() const {
+        std::string FlagImpl::filename() const {
             return flags_internal::GetUsageConfig().normalize_filename(filename_);
         }
 
-        std::string FlagImpl::Help() const {
+        std::string FlagImpl::help() const {
             return HelpSourceKind() == FlagHelpKind::kLiteral ? help_.literal
                                                               : help_.gen_func();
         }
 
-        FlagFastTypeId FlagImpl::TypeId() const {
+        FlagFastTypeId FlagImpl::type_id() const {
             return flags_internal::FastTypeId(op_);
         }
 
@@ -284,19 +284,19 @@ namespace turbo {
             return seq_lock_.ModificationCount();
         }
 
-        bool FlagImpl::IsSpecifiedOnCommandLine() const {
+        bool FlagImpl::is_specified_on_commandLine() const {
             turbo::MutexLock l(DataGuard());
             return on_command_line_;
         }
 
-        std::string FlagImpl::DefaultValue() const {
+        std::string FlagImpl::default_value() const {
             turbo::MutexLock l(DataGuard());
 
             auto obj = MakeInitValue();
             return flags_internal::Unparse(op_, obj.get());
         }
 
-        std::string FlagImpl::CurrentValue() const {
+        std::string FlagImpl::current_value() const {
             auto *guard = DataGuard();  // Make sure flag initialized
             switch (ValueStorageKind()) {
                 case FlagValueStorageKind::kValueAndInitBit:
@@ -321,7 +321,7 @@ namespace turbo {
             return "";
         }
 
-        void FlagImpl::SetCallback(const FlagCallbackFunc mutation_callback) {
+        void FlagImpl::set_flag_callback(const FlagCallbackFunc mutation_callback) {
             turbo::MutexLock l(DataGuard());
 
             if (callback_ == nullptr) {
@@ -329,10 +329,19 @@ namespace turbo {
             }
             callback_->func = mutation_callback;
 
-            InvokeCallback();
+            invoke_callback();
         }
 
-        void FlagImpl::InvokeCallback() const {
+        void FlagImpl::set_validator(const FlagValidatorFunc mutation_callback) {
+            turbo::MutexLock l(DataGuard());
+
+            if (validator_ == nullptr) {
+                validator_ = new FlagValidator;
+            }
+            validator_->func = mutation_callback;
+        }
+
+        void FlagImpl::invoke_callback() const {
             if (!callback_) return;
 
             // Make a copy of the C-style function pointer that we are about to invoke
@@ -446,7 +455,7 @@ namespace turbo {
             if (!flags_internal::Parse(op_, value, tentative_value.get(), &parse_err)) {
                 turbo::string_view err_sep = parse_err.empty() ? "" : "; ";
                 err = turbo::str_cat("Illegal value '", value, "' specified for flag '",
-                                     Name(), "'", err_sep, parse_err);
+                                     name(), "'", err_sep, parse_err);
                 return nullptr;
             }
 
@@ -515,12 +524,38 @@ namespace turbo {
                 std::string ignored_error;
                 std::string src_as_str = flags_internal::Unparse(op_, src);
                 if (!flags_internal::Parse(op_, src_as_str, obj.get(), &ignored_error)) {
-                    TURBO_INTERNAL_LOG(ERROR, turbo::str_cat("Attempt to set flag '", Name(),
+                    TURBO_INTERNAL_LOG(ERROR, turbo::str_cat("Attempt to set flag '", name(),
                                                              "' to invalid value ", src_as_str));
                 }
             }
 
             StoreValue(src);
+        }
+        bool FlagImpl::user_validate(turbo::string_view value, std::string *err) const {
+            if (validator_ == nullptr) return true;
+
+            // Make a copy of the C-style function pointer that we are about to invoke
+            FlagValidatorFunc cb = validator_->func;
+
+            // If the flag has a mutation callback this function invokes it. While the
+            // callback is being invoked the primary flag's mutex is unlocked and it is
+            // re-locked back after call to callback is completed. Callback invocation is
+            // guarded by flag's secondary mutex instead which prevents concurrent
+            // callback invocation. Note that it is possible for other thread to grab the
+            // primary lock and update flag's value at any time during the callback
+            // invocation. This is by design. Callback can get a value of the flag if
+            // necessary, but it might be different from the value initiated the callback
+            // and it also can be different by the time the callback invocation is
+            // completed. Requires that *primary_lock be held in exclusive mode; it may be
+            // released and reacquired by the implementation.
+            ReaderMutexLock dl(DataGuard());
+            MutexLock ulock(&validator_->guard);
+            auto r = cb(value, err);
+            return r;
+        }
+
+        bool FlagImpl::has_user_validator() const  {
+            return validator_ != nullptr;
         }
 
         // Sets the value of the flag based on specified string `value`. If the flag
@@ -531,7 +566,7 @@ namespace turbo {
         //  * Update the flag's default value
         //  * Update the current flag value if it was never set before
         // The mode is selected based on 'set_mode' parameter.
-        bool FlagImpl::ParseFrom(turbo::string_view value, FlagSettingMode set_mode,
+        bool FlagImpl::parse_from(turbo::string_view value, FlagSettingMode set_mode,
                                  ValueSource source, std::string &err) {
             turbo::MutexLock l(DataGuard());
 
@@ -555,7 +590,7 @@ namespace turbo {
                         // in this case if flag is modified. This is misleading since the flag's
                         // value is not updated even though we return true.
                         // *err = turbo::str_cat(Name(), " is already set to ",
-                        //                     CurrentValue(), "\n");
+                        //                     current_value(), "\n");
                         // return false;
                         return true;
                     }
@@ -591,7 +626,7 @@ namespace turbo {
         }
 
         void FlagImpl::CheckDefaultValueParsingRoundtrip() const {
-            std::string v = DefaultValue();
+            std::string v = default_value();
 
             turbo::MutexLock lock(DataGuard());
 
@@ -600,7 +635,7 @@ namespace turbo {
             if (!flags_internal::Parse(op_, v, dst.get(), &error)) {
                 TURBO_INTERNAL_LOG(
                         FATAL,
-                        turbo::str_cat("Flag ", Name(), " (from ", Filename(),
+                        turbo::str_cat("Flag ", name(), " (from ", filename(),
                                        "): string form of default value '", v,
                                        "' could not be parsed; error=", error));
             }

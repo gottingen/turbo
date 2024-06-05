@@ -57,7 +57,6 @@
 //     Shows help on modules whose name contains the specified substring
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     namespace flags_internal {
         using FlagKindFilter = std::function<bool(turbo::string_view)>;
@@ -122,7 +121,6 @@ namespace turbo {
         void ReportUsageError(turbo::string_view msg, bool is_fatal);
 
     }  // namespace flags_internal
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 extern "C" {

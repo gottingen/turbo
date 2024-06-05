@@ -40,8 +40,8 @@ namespace turbo::flags_internal {
         // Access to CommandLineFlag::SaveState.
         static std::unique_ptr<FlagStateInterface> SaveState(CommandLineFlag &flag);
 
-        // Access to CommandLineFlag::IsSpecifiedOnCommandLine.
-        static bool IsSpecifiedOnCommandLine(const CommandLineFlag &flag);
+        // Access to CommandLineFlag::is_specified_on_commandLine.
+        static bool is_specified_on_commandLine(const CommandLineFlag &flag);
 
         // Access to CommandLineFlag::ValidateInputValue.
         static bool ValidateInputValue(const CommandLineFlag &flag,
@@ -50,7 +50,7 @@ namespace turbo::flags_internal {
         // Access to CommandLineFlag::CheckDefaultValueParsingRoundtrip.
         static void CheckDefaultValueParsingRoundtrip(const CommandLineFlag &flag);
 
-        static bool ParseFrom(CommandLineFlag &flag, turbo::string_view value,
+        static bool parse_from(CommandLineFlag &flag, turbo::string_view value,
                               flags_internal::FlagSettingMode set_mode,
                               flags_internal::ValueSource source, std::string &error);
     };

@@ -85,15 +85,15 @@ namespace turbo::flags_internal {
 
         struct SpecifiedFlagsCompare {
             bool operator()(const CommandLineFlag *a, const CommandLineFlag *b) const {
-                return a->Name() < b->Name();
+                return a->name() < b->name();
             }
 
             bool operator()(const CommandLineFlag *a, turbo::string_view b) const {
-                return a->Name() < b;
+                return a->name() < b;
             }
 
             bool operator()(turbo::string_view a, const CommandLineFlag *b) const {
-                return a < b->Name();
+                return a < b->name();
             }
         };
 
@@ -104,8 +104,8 @@ namespace turbo::flags_internal {
 // to be set on the command line.  Avoid reading or setting them from C++ code.
 TURBO_FLAG(std::vector<std::string>, flagfile, {},
            "comma-separated list of files to load flags from")
-.OnUpdate([]() {
-    if (turbo::GetFlag(FLAGS_flagfile).empty()) return;
+.on_update([]() noexcept {
+    if (turbo::get_flag(FLAGS_flagfile).empty()) return;
 
     turbo::MutexLock l(&turbo::flags_internal::processing_checks_guard);
 
@@ -120,8 +120,8 @@ TURBO_FLAG(std::vector<std::string>, flagfile, {},
 TURBO_FLAG(std::vector<std::string>, fromenv, {},
            "comma-separated list of flags to set from the environment"
            " [use 'export FLAGS_flag1=value']")
-.OnUpdate([]() {
-    if (turbo::GetFlag(FLAGS_fromenv).empty()) return;
+.on_update([]() noexcept {
+    if (turbo::get_flag(FLAGS_fromenv).empty()) return;
 
     turbo::MutexLock l(&turbo::flags_internal::processing_checks_guard);
 
@@ -136,8 +136,8 @@ TURBO_FLAG(std::vector<std::string>, fromenv, {},
 TURBO_FLAG(std::vector<std::string>, tryfromenv, {},
            "comma-separated list of flags to try to set from the environment if "
            "present")
-.OnUpdate([]() {
-    if (turbo::GetFlag(FLAGS_tryfromenv).empty()) return;
+.on_update([]() noexcept {
+    if (turbo::get_flag(FLAGS_tryfromenv).empty()) return;
 
     turbo::MutexLock l(&turbo::flags_internal::processing_checks_guard);
 
@@ -323,10 +323,10 @@ namespace turbo::flags_internal {
         void CheckDefaultValuesParsingRoundtrip() {
 #ifndef NDEBUG
             flags_internal::ForEachFlag([&](CommandLineFlag &flag) {
-                if (flag.IsRetired()) return;
+                if (flag.is_retired()) return;
 
 #define TURBO_FLAGS_INTERNAL_IGNORE_TYPE(T, _) \
-  if (flag.IsOfType<T>()) return;
+  if (flag.is_of_type<T>()) return;
 
                 TURBO_FLAGS_INTERNAL_SUPPORTED_TYPES(TURBO_FLAGS_INTERNAL_IGNORE_TYPE)
 #undef TURBO_FLAGS_INTERNAL_IGNORE_TYPE
@@ -434,7 +434,7 @@ namespace turbo::flags_internal {
             // multiple times. We are collecting them all into a single list and set
             // the value of FLAGS_flagfile to that value at the end of the parsing.
             if (flags_internal::flagfile_needs_processing) {
-                auto flagfiles = turbo::GetFlag(FLAGS_flagfile);
+                auto flagfiles = turbo::get_flag(FLAGS_flagfile);
 
                 if (input_args.size() == 1) {
                     flagfile_value.insert(flagfile_value.end(), flagfiles.begin(),
@@ -450,7 +450,7 @@ namespace turbo::flags_internal {
             // programmatically and at runtime on a command line. Unlike flagfile these
             // can't be recursive.
             if (flags_internal::fromenv_needs_processing) {
-                auto flags_list = turbo::GetFlag(FLAGS_fromenv);
+                auto flags_list = turbo::get_flag(FLAGS_fromenv);
 
                 success &= ReadFlagsFromEnv(flags_list, input_args, true);
 
@@ -458,7 +458,7 @@ namespace turbo::flags_internal {
             }
 
             if (flags_internal::tryfromenv_needs_processing) {
-                auto flags_list = turbo::GetFlag(FLAGS_tryfromenv);
+                auto flags_list = turbo::get_flag(FLAGS_tryfromenv);
 
                 success &= ReadFlagsFromEnv(flags_list, input_args, false);
 
@@ -475,17 +475,17 @@ namespace turbo::flags_internal {
             // --flagfile=f1 --flagfile=f2 the final value of the FLAGS_flagfile flag is
             // going to be {"f1", "f2"}
             if (!flagfile_value.empty()) {
-                turbo::SetFlag(&FLAGS_flagfile, flagfile_value);
+                turbo::set_flag(&FLAGS_flagfile, flagfile_value);
                 turbo::MutexLock l(&flags_internal::processing_checks_guard);
                 flags_internal::flagfile_needs_processing = false;
             }
 
             // fromenv/tryfromenv are set to <undefined> value.
-            if (!turbo::GetFlag(FLAGS_fromenv).empty()) {
-                turbo::SetFlag(&FLAGS_fromenv, {});
+            if (!turbo::get_flag(FLAGS_fromenv).empty()) {
+                turbo::set_flag(&FLAGS_fromenv, {});
             }
-            if (!turbo::GetFlag(FLAGS_tryfromenv).empty()) {
-                turbo::SetFlag(&FLAGS_tryfromenv, {});
+            if (!turbo::get_flag(FLAGS_tryfromenv).empty()) {
+                turbo::set_flag(&FLAGS_tryfromenv, {});
             }
 
             turbo::MutexLock l(&flags_internal::processing_checks_guard);
@@ -520,14 +520,14 @@ namespace turbo::flags_internal {
             // --foo <value>
             // --nofoo is not supported
 
-            if (flag.IsOfType<bool>()) {
+            if (flag.is_of_type<bool>()) {
                 if (value.empty()) {
                     if (is_empty_value) {
                         // "--bool_flag=" case
                         flags_internal::ReportUsageError(
                                 turbo::str_cat(
                                         "Missing the value after assignment for the boolean flag '",
-                                        flag.Name(), "'"),
+                                        flag.name(), "'"),
                                 true);
                         return std::make_tuple(false, "");
                     }
@@ -539,14 +539,14 @@ namespace turbo::flags_internal {
                     flags_internal::ReportUsageError(
                             turbo::str_cat("Negative form with assignment is not valid for the "
                                            "boolean flag '",
-                                           flag.Name(), "'"),
+                                           flag.name(), "'"),
                             true);
                     return std::make_tuple(false, "");
                 }
             } else if (is_negative) {
                 // "--noint_flag=1" case
                 flags_internal::ReportUsageError(
-                        turbo::str_cat("Negative form is not valid for the flag '", flag.Name(),
+                        turbo::str_cat("Negative form is not valid for the flag '", flag.name(),
                                        "'"),
                         true);
                 return std::make_tuple(false, "");
@@ -554,7 +554,7 @@ namespace turbo::flags_internal {
                 if (curr_list->Size() == 1) {
                     // "--int_flag" case
                     flags_internal::ReportUsageError(
-                            turbo::str_cat("Missing the value for the flag '", flag.Name(), "'"),
+                            turbo::str_cat("Missing the value for the flag '", flag.name(), "'"),
                             true);
                     return std::make_tuple(false, "");
                 }
@@ -568,7 +568,7 @@ namespace turbo::flags_internal {
                 // --my_string_var --foo=bar
                 // We look for a flag of string type, whose value begins with a
                 // dash and corresponds to known flag or standalone --.
-                if (!value.empty() && value[0] == '-' && flag.IsOfType<std::string>()) {
+                if (!value.empty() && value[0] == '-' && flag.is_of_type<std::string>()) {
                     auto maybe_flag_name = std::get<0>(SplitNameAndValue(value.substr(1)));
 
                     if (maybe_flag_name.empty() ||
@@ -576,7 +576,7 @@ namespace turbo::flags_internal {
                         // "--string_flag" "--known_flag" case
                         TURBO_INTERNAL_LOG(
                                 WARNING,
-                                turbo::str_cat("Did you really mean to set flag '", flag.Name(),
+                                turbo::str_cat("Did you really mean to set flag '", flag.name(),
                                                "' to the value '", value, "'?"));
                     }
                 }
@@ -587,7 +587,7 @@ namespace turbo::flags_internal {
 
 
         bool CanIgnoreUndefinedFlag(turbo::string_view flag_name) {
-            auto undefok = turbo::GetFlag(FLAGS_undefok);
+            auto undefok = turbo::get_flag(FLAGS_undefok);
             if (std::find(undefok.begin(), undefok.end(), flag_name) != undefok.end()) {
                 return true;
             }
@@ -665,16 +665,16 @@ namespace turbo::flags_internal {
     // the given flag.
     std::vector<std::string> GetMisspellingHints(const turbo::string_view flag) {
         const size_t maxCutoff = std::min(flag.size() / 2 + 1, kMaxDistance);
-        auto undefok = turbo::GetFlag(FLAGS_undefok);
+        auto undefok = turbo::get_flag(FLAGS_undefok);
         BestHints best_hints(static_cast<uint8_t>(maxCutoff));
         flags_internal::ForEachFlag([&](const CommandLineFlag &f) {
             if (best_hints.hints.size() >= kMaxHints) return;
             uint8_t distance = strings_internal::CappedDamerauLevenshteinDistance(
-                    flag, f.Name(), best_hints.best_distance);
-            best_hints.AddHint(f.Name(), distance);
+                    flag, f.name(), best_hints.best_distance);
+            best_hints.AddHint(f.name(), distance);
             // For boolean flags, also calculate distance to the negated form.
-            if (f.IsOfType<bool>()) {
-                const std::string negated_flag = turbo::str_cat("no", f.Name());
+            if (f.is_of_type<bool>()) {
+                const std::string negated_flag = turbo::str_cat("no", f.name());
                 distance = strings_internal::CappedDamerauLevenshteinDistance(
                         flag, negated_flag, best_hints.best_distance);
                 best_hints.AddHint(negated_flag, distance);
@@ -854,10 +854,10 @@ namespace turbo::flags_internal {
             // retired flag fails, but we ignoring it here while also reporting access
             // to retired flag.
             std::string error;
-            if (!flags_internal::PrivateHandleAccessor::ParseFrom(
+            if (!flags_internal::PrivateHandleAccessor::parse_from(
                     *flag, value, flags_internal::SET_FLAGS_VALUE,
                     flags_internal::kCommandLine, error)) {
-                if (flag->IsRetired()) continue;
+                if (flag->is_retired()) continue;
 
                 flags_internal::ReportUsageError(error, true);
                 success = false;

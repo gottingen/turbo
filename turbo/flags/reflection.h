@@ -65,7 +65,7 @@ namespace turbo {
     //   void MyFunc() {
     //    turbo::FlagSaver fs;
     //    ...
-    //    turbo::SetFlag(&FLAGS_myFlag, otherValue);
+    //    turbo::set_flag(&FLAGS_myFlag, otherValue);
     //    ...
     //  } // scope of FlagSaver left, flags return to previous state
     //

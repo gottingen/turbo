@@ -63,7 +63,7 @@ namespace {
         new(dst) T{};
     }
 
-    void TestCallback() {}
+    void TestCallback() noexcept {}
 
     struct UDT {
         UDT() = default;
@@ -188,16 +188,16 @@ namespace {
 
     template<typename T>
     bool TestConstructionFor(const turbo::Flag<T> &f1, turbo::Flag<T> &f2) {
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(f1).Name(), "f1");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(f1).Help(), "literal help");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(f1).Filename(), "file");
+        EXPECT_EQ(turbo::get_flag_reflection_handle(f1).name(), "f1");
+        EXPECT_EQ(turbo::get_flag_reflection_handle(f1).help(), "literal help");
+        EXPECT_EQ(turbo::get_flag_reflection_handle(f1).filename(), "file");
 
         flags::FlagRegistrar<T, false>(TURBO_FLAG_IMPL_FLAG_PTR(f2), nullptr)
-                .OnUpdate(TestCallback);
+                .on_update(TestCallback);
 
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(f2).Name(), "f2");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(f2).Help(), "dynamic help");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(f2).Filename(), "file");
+        EXPECT_EQ(turbo::get_flag_reflection_handle(f2).name(), "f2");
+        EXPECT_EQ(turbo::get_flag_reflection_handle(f2).help(), "dynamic help");
+        EXPECT_EQ(turbo::get_flag_reflection_handle(f2).filename(), "file");
 
         return true;
     }
@@ -246,33 +246,33 @@ namespace {
         GTEST_SKIP() << "This test requires flag names to be present";
 #endif
         // test that we can access flag objects.
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_01).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_01).name(),
                   "test_flag_01");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_02).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_02).name(),
                   "test_flag_02");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_03).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_03).name(),
                   "test_flag_03");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_04).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_04).name(),
                   "test_flag_04");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_05).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_05).name(),
                   "test_flag_05");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_06).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_06).name(),
                   "test_flag_06");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_07).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_07).name(),
                   "test_flag_07");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_08).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_08).name(),
                   "test_flag_08");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_09).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_09).name(),
                   "test_flag_09");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_10).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_10).name(),
                   "test_flag_10");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_11).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_11).name(),
                   "test_flag_11");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_12).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_12).name(),
                   "test_flag_12");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_13).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_13).name(),
                   "test_flag_13");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_14).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_14).name(),
                   "test_flag_14");
     }
 
@@ -281,7 +281,7 @@ namespace {
 #if TURBO_FLAGS_STRIP_NAMES
 // The intent of this helper struct and an expression below is to make sure that
 // in the configuration where TURBO_FLAGS_STRIP_NAMES=1 registrar construction
-// (in cases of of no Tail calls like OnUpdate) is constexpr and thus can and
+// (in cases of of no Tail calls like on_update) is constexpr and thus can and
 // should be completely optimized away, thus avoiding the cost/overhead of
 // static initializers.
 struct VerifyConsteval {
@@ -320,208 +320,208 @@ namespace {
 #endif
         turbo::string_view expected_file_name = "tests/flags/flag_test.cc";
 
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_01).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_01).name(),
                   "test_flag_01");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_01).Help(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_01).help(),
                   "test flag 01");
         EXPECT_TRUE(turbo::ends_with(
-                turbo::GetFlagReflectionHandle(FLAGS_test_flag_01).Filename(),
+                turbo::get_flag_reflection_handle(FLAGS_test_flag_01).filename(),
                 expected_file_name))
-                            << turbo::GetFlagReflectionHandle(FLAGS_test_flag_01).Filename();
+                            << turbo::get_flag_reflection_handle(FLAGS_test_flag_01).filename();
 
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_02).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_02).name(),
                   "test_flag_02");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_02).Help(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_02).help(),
                   "test flag 02");
         EXPECT_TRUE(turbo::ends_with(
-                turbo::GetFlagReflectionHandle(FLAGS_test_flag_02).Filename(),
+                turbo::get_flag_reflection_handle(FLAGS_test_flag_02).filename(),
                 expected_file_name))
-                            << turbo::GetFlagReflectionHandle(FLAGS_test_flag_02).Filename();
+                            << turbo::get_flag_reflection_handle(FLAGS_test_flag_02).filename();
 
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_03).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_03).name(),
                   "test_flag_03");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_03).Help(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_03).help(),
                   "test flag 03");
         EXPECT_TRUE(turbo::ends_with(
-                turbo::GetFlagReflectionHandle(FLAGS_test_flag_03).Filename(),
+                turbo::get_flag_reflection_handle(FLAGS_test_flag_03).filename(),
                 expected_file_name))
-                            << turbo::GetFlagReflectionHandle(FLAGS_test_flag_03).Filename();
+                            << turbo::get_flag_reflection_handle(FLAGS_test_flag_03).filename();
 
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_04).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_04).name(),
                   "test_flag_04");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_04).Help(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_04).help(),
                   "test flag 04");
         EXPECT_TRUE(turbo::ends_with(
-                turbo::GetFlagReflectionHandle(FLAGS_test_flag_04).Filename(),
+                turbo::get_flag_reflection_handle(FLAGS_test_flag_04).filename(),
                 expected_file_name))
-                            << turbo::GetFlagReflectionHandle(FLAGS_test_flag_04).Filename();
+                            << turbo::get_flag_reflection_handle(FLAGS_test_flag_04).filename();
 
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_05).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_05).name(),
                   "test_flag_05");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_05).Help(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_05).help(),
                   "test flag 05");
         EXPECT_TRUE(turbo::ends_with(
-                turbo::GetFlagReflectionHandle(FLAGS_test_flag_05).Filename(),
+                turbo::get_flag_reflection_handle(FLAGS_test_flag_05).filename(),
                 expected_file_name))
-                            << turbo::GetFlagReflectionHandle(FLAGS_test_flag_05).Filename();
+                            << turbo::get_flag_reflection_handle(FLAGS_test_flag_05).filename();
 
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_06).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_06).name(),
                   "test_flag_06");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_06).Help(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_06).help(),
                   "test flag 06");
         EXPECT_TRUE(turbo::ends_with(
-                turbo::GetFlagReflectionHandle(FLAGS_test_flag_06).Filename(),
+                turbo::get_flag_reflection_handle(FLAGS_test_flag_06).filename(),
                 expected_file_name))
-                            << turbo::GetFlagReflectionHandle(FLAGS_test_flag_06).Filename();
+                            << turbo::get_flag_reflection_handle(FLAGS_test_flag_06).filename();
 
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_07).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_07).name(),
                   "test_flag_07");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_07).Help(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_07).help(),
                   "test flag 07");
         EXPECT_TRUE(turbo::ends_with(
-                turbo::GetFlagReflectionHandle(FLAGS_test_flag_07).Filename(),
+                turbo::get_flag_reflection_handle(FLAGS_test_flag_07).filename(),
                 expected_file_name))
-                            << turbo::GetFlagReflectionHandle(FLAGS_test_flag_07).Filename();
+                            << turbo::get_flag_reflection_handle(FLAGS_test_flag_07).filename();
 
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_08).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_08).name(),
                   "test_flag_08");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_08).Help(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_08).help(),
                   "test flag 08");
         EXPECT_TRUE(turbo::ends_with(
-                turbo::GetFlagReflectionHandle(FLAGS_test_flag_08).Filename(),
+                turbo::get_flag_reflection_handle(FLAGS_test_flag_08).filename(),
                 expected_file_name))
-                            << turbo::GetFlagReflectionHandle(FLAGS_test_flag_08).Filename();
+                            << turbo::get_flag_reflection_handle(FLAGS_test_flag_08).filename();
 
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_09).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_09).name(),
                   "test_flag_09");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_09).Help(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_09).help(),
                   "test flag 09");
         EXPECT_TRUE(turbo::ends_with(
-                turbo::GetFlagReflectionHandle(FLAGS_test_flag_09).Filename(),
+                turbo::get_flag_reflection_handle(FLAGS_test_flag_09).filename(),
                 expected_file_name))
-                            << turbo::GetFlagReflectionHandle(FLAGS_test_flag_09).Filename();
+                            << turbo::get_flag_reflection_handle(FLAGS_test_flag_09).filename();
 
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_10).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_10).name(),
                   "test_flag_10");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_10).Help(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_10).help(),
                   "test flag 10");
         EXPECT_TRUE(turbo::ends_with(
-                turbo::GetFlagReflectionHandle(FLAGS_test_flag_10).Filename(),
+                turbo::get_flag_reflection_handle(FLAGS_test_flag_10).filename(),
                 expected_file_name))
-                            << turbo::GetFlagReflectionHandle(FLAGS_test_flag_10).Filename();
+                            << turbo::get_flag_reflection_handle(FLAGS_test_flag_10).filename();
 
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_11).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_11).name(),
                   "test_flag_11");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_11).Help(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_11).help(),
                   "test flag 11");
         EXPECT_TRUE(turbo::ends_with(
-                turbo::GetFlagReflectionHandle(FLAGS_test_flag_11).Filename(),
+                turbo::get_flag_reflection_handle(FLAGS_test_flag_11).filename(),
                 expected_file_name))
-                            << turbo::GetFlagReflectionHandle(FLAGS_test_flag_11).Filename();
+                            << turbo::get_flag_reflection_handle(FLAGS_test_flag_11).filename();
 
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_12).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_12).name(),
                   "test_flag_12");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_12).Help(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_12).help(),
                   "test flag 12");
         EXPECT_TRUE(turbo::ends_with(
-                turbo::GetFlagReflectionHandle(FLAGS_test_flag_12).Filename(),
+                turbo::get_flag_reflection_handle(FLAGS_test_flag_12).filename(),
                 expected_file_name))
-                            << turbo::GetFlagReflectionHandle(FLAGS_test_flag_12).Filename();
+                            << turbo::get_flag_reflection_handle(FLAGS_test_flag_12).filename();
 
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_13).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_13).name(),
                   "test_flag_13");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_13).Help(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_13).help(),
                   "test flag 13");
         EXPECT_TRUE(turbo::ends_with(
-                turbo::GetFlagReflectionHandle(FLAGS_test_flag_13).Filename(),
+                turbo::get_flag_reflection_handle(FLAGS_test_flag_13).filename(),
                 expected_file_name))
-                            << turbo::GetFlagReflectionHandle(FLAGS_test_flag_13).Filename();
+                            << turbo::get_flag_reflection_handle(FLAGS_test_flag_13).filename();
 
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_14).Name(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_14).name(),
                   "test_flag_14");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_14).Help(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_14).help(),
                   "test flag 14");
         EXPECT_TRUE(turbo::ends_with(
-                turbo::GetFlagReflectionHandle(FLAGS_test_flag_14).Filename(),
+                turbo::get_flag_reflection_handle(FLAGS_test_flag_14).filename(),
                 expected_file_name))
-                            << turbo::GetFlagReflectionHandle(FLAGS_test_flag_14).Filename();
+                            << turbo::get_flag_reflection_handle(FLAGS_test_flag_14).filename();
     }
 
 // --------------------------------------------------------------------
 
     TEST_F(FlagTest, TestDefault) {
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_01).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_01).default_value(),
                   "true");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_02).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_02).default_value(),
                   "1234");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_03).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_03).default_value(),
                   "-34");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_04).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_04).default_value(),
                   "189");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_05).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_05).default_value(),
                   "10765");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_06).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_06).default_value(),
                   "40000");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_07).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_07).default_value(),
                   "-1234567");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_08).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_08).default_value(),
                   "9876543");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_09).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_09).default_value(),
                   "-9.876e-50");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_10).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_10).default_value(),
                   "1.234e+12");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_11).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_11).default_value(),
                   "");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_12).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_12).default_value(),
                   "10m");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_13).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_13).default_value(),
                   "-18446744073709551616");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_14).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_14).default_value(),
                   "1152827684197027293");
 
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_01).CurrentValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_01).current_value(),
                   "true");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_02).CurrentValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_02).current_value(),
                   "1234");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_03).CurrentValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_03).current_value(),
                   "-34");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_04).CurrentValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_04).current_value(),
                   "189");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_05).CurrentValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_05).current_value(),
                   "10765");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_06).CurrentValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_06).current_value(),
                   "40000");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_07).CurrentValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_07).current_value(),
                   "-1234567");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_08).CurrentValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_08).current_value(),
                   "9876543");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_09).CurrentValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_09).current_value(),
                   "-9.876e-50");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_10).CurrentValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_10).current_value(),
                   "1.234e+12");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_11).CurrentValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_11).current_value(),
                   "");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_12).CurrentValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_12).current_value(),
                   "10m");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_13).CurrentValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_13).current_value(),
                   "-18446744073709551616");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_14).CurrentValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_14).current_value(),
                   "1152827684197027293");
 
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_01), true);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_02), 1234);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_03), -34);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_04), 189);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_05), 10765);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_06), 40000);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_07), -1234567);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_08), 9876543);
-        EXPECT_NEAR(turbo::GetFlag(FLAGS_test_flag_09), -9.876e-50, 1e-55);
-        EXPECT_NEAR(turbo::GetFlag(FLAGS_test_flag_10), 1.234e12f, 1e5f);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_11), "");
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_12), turbo::Duration::minutes(10));
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_13), turbo::MakeInt128(-1, 0));
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_14),
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_01), true);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_02), 1234);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_03), -34);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_04), 189);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_05), 10765);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_06), 40000);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_07), -1234567);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_08), 9876543);
+        EXPECT_NEAR(turbo::get_flag(FLAGS_test_flag_09), -9.876e-50, 1e-55);
+        EXPECT_NEAR(turbo::get_flag(FLAGS_test_flag_10), 1.234e12f, 1e5f);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_11), "");
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_12), turbo::Duration::minutes(10));
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_13), turbo::MakeInt128(-1, 0));
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_14),
                   turbo::MakeUint128(0, 0xFFFAAABBBCCCDDD));
     }
 
@@ -544,7 +544,7 @@ namespace {
 
     bool turbo_parse_flag(turbo::string_view src, NonTriviallyCopyableAggregate *f,
                           std::string *e) {
-        return turbo::ParseFlag(src, &f->value, e);
+        return turbo::parse_flag(src, &f->value, e);
     }
 
     std::string turbo_unparse_flag(const NonTriviallyCopyableAggregate &ntc) {
@@ -568,72 +568,72 @@ TURBO_FLAG(NonTriviallyCopyableAggregate, test_flag_eb_06, {}, "");
 namespace {
 
     TEST_F(FlagTest, TestEmptyBracesDefault) {
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_eb_01).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_eb_01).default_value(),
                   "false");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_eb_02).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_eb_02).default_value(),
                   "0");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_eb_03).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_eb_03).default_value(),
                   "0");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_eb_04).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_eb_04).default_value(),
                   "0");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_eb_05).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_eb_05).default_value(),
                   "");
-        EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_eb_06).DefaultValue(),
+        EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_eb_06).default_value(),
                   "0");
 
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_eb_01), false);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_eb_02), 0);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_eb_03), 0);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_eb_04), 0.0);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_eb_05), "");
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_eb_06),
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_eb_01), false);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_eb_02), 0);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_eb_03), 0);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_eb_04), 0.0);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_eb_05), "");
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_eb_06),
                   NonTriviallyCopyableAggregate{});
     }
 
 // --------------------------------------------------------------------
 
     TEST_F(FlagTest, TestGetSet) {
-        turbo::SetFlag(&FLAGS_test_flag_01, false);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_01), false);
+        turbo::set_flag(&FLAGS_test_flag_01, false);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_01), false);
 
-        turbo::SetFlag(&FLAGS_test_flag_02, 321);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_02), 321);
+        turbo::set_flag(&FLAGS_test_flag_02, 321);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_02), 321);
 
-        turbo::SetFlag(&FLAGS_test_flag_03, 67);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_03), 67);
+        turbo::set_flag(&FLAGS_test_flag_03, 67);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_03), 67);
 
-        turbo::SetFlag(&FLAGS_test_flag_04, 1);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_04), 1);
+        turbo::set_flag(&FLAGS_test_flag_04, 1);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_04), 1);
 
-        turbo::SetFlag(&FLAGS_test_flag_05, -908);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_05), -908);
+        turbo::set_flag(&FLAGS_test_flag_05, -908);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_05), -908);
 
-        turbo::SetFlag(&FLAGS_test_flag_06, 4001);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_06), 4001);
+        turbo::set_flag(&FLAGS_test_flag_06, 4001);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_06), 4001);
 
-        turbo::SetFlag(&FLAGS_test_flag_07, -23456);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_07), -23456);
+        turbo::set_flag(&FLAGS_test_flag_07, -23456);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_07), -23456);
 
-        turbo::SetFlag(&FLAGS_test_flag_08, 975310);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_08), 975310);
+        turbo::set_flag(&FLAGS_test_flag_08, 975310);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_08), 975310);
 
-        turbo::SetFlag(&FLAGS_test_flag_09, 1.00001);
-        EXPECT_NEAR(turbo::GetFlag(FLAGS_test_flag_09), 1.00001, 1e-10);
+        turbo::set_flag(&FLAGS_test_flag_09, 1.00001);
+        EXPECT_NEAR(turbo::get_flag(FLAGS_test_flag_09), 1.00001, 1e-10);
 
-        turbo::SetFlag(&FLAGS_test_flag_10, -3.54f);
-        EXPECT_NEAR(turbo::GetFlag(FLAGS_test_flag_10), -3.54f, 1e-6f);
+        turbo::set_flag(&FLAGS_test_flag_10, -3.54f);
+        EXPECT_NEAR(turbo::get_flag(FLAGS_test_flag_10), -3.54f, 1e-6f);
 
-        turbo::SetFlag(&FLAGS_test_flag_11, "asdf");
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_11), "asdf");
+        turbo::set_flag(&FLAGS_test_flag_11, "asdf");
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_11), "asdf");
 
-        turbo::SetFlag(&FLAGS_test_flag_12, turbo::Duration::seconds(110));
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_12), turbo::Duration::seconds(110));
+        turbo::set_flag(&FLAGS_test_flag_12, turbo::Duration::seconds(110));
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_12), turbo::Duration::seconds(110));
 
-        turbo::SetFlag(&FLAGS_test_flag_13, turbo::MakeInt128(-1, 0));
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_13), turbo::MakeInt128(-1, 0));
+        turbo::set_flag(&FLAGS_test_flag_13, turbo::MakeInt128(-1, 0));
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_13), turbo::MakeInt128(-1, 0));
 
-        turbo::SetFlag(&FLAGS_test_flag_14, turbo::MakeUint128(0, 0xFFFAAABBBCCCDDD));
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_14),
+        turbo::set_flag(&FLAGS_test_flag_14, turbo::MakeUint128(0, 0xFFFAAABBBCCCDDD));
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_14),
                   turbo::MakeUint128(0, 0xFFFAAABBBCCCDDD));
     }
 
@@ -644,33 +644,33 @@ namespace {
         GTEST_SKIP() << "This test requires flag names to be present";
 #endif
         auto *handle = turbo::find_command_line_flag("test_flag_01");
-        EXPECT_EQ(*handle->TryGet<bool>(), true);
+        EXPECT_EQ(*handle->try_get<bool>(), true);
         handle = turbo::find_command_line_flag("test_flag_02");
-        EXPECT_EQ(*handle->TryGet<int>(), 1234);
+        EXPECT_EQ(*handle->try_get<int>(), 1234);
         handle = turbo::find_command_line_flag("test_flag_03");
-        EXPECT_EQ(*handle->TryGet<int16_t>(), -34);
+        EXPECT_EQ(*handle->try_get<int16_t>(), -34);
         handle = turbo::find_command_line_flag("test_flag_04");
-        EXPECT_EQ(*handle->TryGet<uint16_t>(), 189);
+        EXPECT_EQ(*handle->try_get<uint16_t>(), 189);
         handle = turbo::find_command_line_flag("test_flag_05");
-        EXPECT_EQ(*handle->TryGet<int32_t>(), 10765);
+        EXPECT_EQ(*handle->try_get<int32_t>(), 10765);
         handle = turbo::find_command_line_flag("test_flag_06");
-        EXPECT_EQ(*handle->TryGet<uint32_t>(), 40000);
+        EXPECT_EQ(*handle->try_get<uint32_t>(), 40000);
         handle = turbo::find_command_line_flag("test_flag_07");
-        EXPECT_EQ(*handle->TryGet<int64_t>(), -1234567);
+        EXPECT_EQ(*handle->try_get<int64_t>(), -1234567);
         handle = turbo::find_command_line_flag("test_flag_08");
-        EXPECT_EQ(*handle->TryGet<uint64_t>(), 9876543);
+        EXPECT_EQ(*handle->try_get<uint64_t>(), 9876543);
         handle = turbo::find_command_line_flag("test_flag_09");
-        EXPECT_NEAR(*handle->TryGet<double>(), -9.876e-50, 1e-55);
+        EXPECT_NEAR(*handle->try_get<double>(), -9.876e-50, 1e-55);
         handle = turbo::find_command_line_flag("test_flag_10");
-        EXPECT_NEAR(*handle->TryGet<float>(), 1.234e12f, 1e5f);
+        EXPECT_NEAR(*handle->try_get<float>(), 1.234e12f, 1e5f);
         handle = turbo::find_command_line_flag("test_flag_11");
-        EXPECT_EQ(*handle->TryGet<std::string>(), "");
+        EXPECT_EQ(*handle->try_get<std::string>(), "");
         handle = turbo::find_command_line_flag("test_flag_12");
-        EXPECT_EQ(*handle->TryGet<turbo::Duration>(), turbo::Duration::minutes(10));
+        EXPECT_EQ(*handle->try_get<turbo::Duration>(), turbo::Duration::minutes(10));
         handle = turbo::find_command_line_flag("test_flag_13");
-        EXPECT_EQ(*handle->TryGet<turbo::int128>(), turbo::MakeInt128(-1, 0));
+        EXPECT_EQ(*handle->try_get<turbo::int128>(), turbo::MakeInt128(-1, 0));
         handle = turbo::find_command_line_flag("test_flag_14");
-        EXPECT_EQ(*handle->TryGet<turbo::uint128>(),
+        EXPECT_EQ(*handle->try_get<turbo::uint128>(),
                   turbo::MakeUint128(0, 0xFFFAAABBBCCCDDD));
     }
 
@@ -687,7 +687,7 @@ namespace {
         static const turbo::Duration kValidDurations[] = {
                 turbo::Duration::seconds(int64_t{0x6cebf47a9b68c802}) + turbo::Duration::nanoseconds(229702057),
                 turbo::Duration::seconds(int64_t{0x23fec0307e4e9d3}) + turbo::Duration::nanoseconds(44555374)};
-        turbo::SetFlag(&FLAGS_test_flag_12, kValidDurations[0]);
+        turbo::set_flag(&FLAGS_test_flag_12, kValidDurations[0]);
 
         std::atomic<bool> stop{false};
         std::vector<std::thread> threads;
@@ -697,9 +697,9 @@ namespace {
                 while (!stop.load(std::memory_order_relaxed)) {
                     // Try loading the flag both directly and via a reflection
                     // handle.
-                    turbo::Duration v = turbo::GetFlag(FLAGS_test_flag_12);
+                    turbo::Duration v = turbo::get_flag(FLAGS_test_flag_12);
                     EXPECT_TRUE(v == kValidDurations[0] || v == kValidDurations[1]);
-                    v = *handle->TryGet<turbo::Duration>();
+                    v = *handle->try_get<turbo::Duration>();
                     EXPECT_TRUE(v == kValidDurations[0] || v == kValidDurations[1]);
                 }
             });
@@ -707,7 +707,7 @@ namespace {
         turbo::Time end_time = turbo::Time::current_time() + turbo::Duration::seconds(1);
         int i = 0;
         while (turbo::Time::current_time() < end_time) {
-            turbo::SetFlag(&FLAGS_test_flag_12,
+            turbo::set_flag(&FLAGS_test_flag_12,
                            kValidDurations[i++ % TURBO_ARRAYSIZE(kValidDurations)]);
         }
         stop.store(true, std::memory_order_relaxed);
@@ -728,8 +728,8 @@ TURBO_FLAG(std::string, test_string_flag_with_non_const_default,
 namespace {
 
     TEST_F(FlagTest, TestNonConstexprDefault) {
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_int_flag_with_non_const_default), 1);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_string_flag_with_non_const_default),
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_int_flag_with_non_const_default), 1);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_string_flag_with_non_const_default),
                   "AAABBB");
     }
 
@@ -745,7 +745,7 @@ namespace {
 #if !TURBO_FLAGS_STRIP_HELP
     TEST_F(FlagTest, TestNonConstexprHelp) {
         EXPECT_EQ(
-                turbo::GetFlagReflectionHandle(FLAGS_test_flag_with_non_const_help).Help(),
+                turbo::get_flag_reflection_handle(FLAGS_test_flag_with_non_const_help).help(),
                 "test flag non const help");
     }
 
@@ -755,31 +755,31 @@ namespace {
 
     int cb_test_value = -1;
 
-    void TestFlagCB();
+    void TestFlagCB() noexcept ;
 
 }  // namespace
 
-TURBO_FLAG(int, test_flag_with_cb, 100, "").OnUpdate(TestFlagCB);
+TURBO_FLAG(int, test_flag_with_cb, 100, "").on_update(TestFlagCB);
 
-TURBO_FLAG(int, test_flag_with_lambda_cb, 200, "").OnUpdate([]() {
-    cb_test_value = turbo::GetFlag(FLAGS_test_flag_with_lambda_cb) +
-                    turbo::GetFlag(FLAGS_test_flag_with_cb);
+TURBO_FLAG(int, test_flag_with_lambda_cb, 200, "").on_update([]() noexcept  {
+    cb_test_value = turbo::get_flag(FLAGS_test_flag_with_lambda_cb) +
+                    turbo::get_flag(FLAGS_test_flag_with_cb);
 });
 
 namespace {
 
-    void TestFlagCB() { cb_test_value = turbo::GetFlag(FLAGS_test_flag_with_cb); }
+    void TestFlagCB() noexcept { cb_test_value = turbo::get_flag(FLAGS_test_flag_with_cb); }
 
     // Tests side-effects of callback invocation.
     TEST_F(FlagTest, CallbackInvocation) {
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_with_cb), 100);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_with_lambda_cb), 200);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_with_cb), 100);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_with_lambda_cb), 200);
         EXPECT_EQ(cb_test_value, 300);
 
-        turbo::SetFlag(&FLAGS_test_flag_with_cb, 1);
+        turbo::set_flag(&FLAGS_test_flag_with_cb, 1);
         EXPECT_EQ(cb_test_value, 1);
 
-        turbo::SetFlag(&FLAGS_test_flag_with_lambda_cb, 3);
+        turbo::set_flag(&FLAGS_test_flag_with_lambda_cb, 3);
         EXPECT_EQ(cb_test_value, 4);
     }
 
@@ -824,9 +824,9 @@ namespace {
     TEST_F(FlagTest, TestCustomUDT) {
         EXPECT_EQ(flags::StorageKind<CustomUDT>(),
                   flags::FlagValueStorageKind::kOneWordAtomic);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_custom_udt), CustomUDT(1, 1));
-        turbo::SetFlag(&FLAGS_test_flag_custom_udt, CustomUDT(2, 3));
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_custom_udt), CustomUDT(2, 3));
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_custom_udt), CustomUDT(1, 1));
+        turbo::set_flag(&FLAGS_test_flag_custom_udt, CustomUDT(2, 3));
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_custom_udt), CustomUDT(2, 3));
     }
 
 // MSVC produces link error on the type mismatch.
@@ -840,21 +840,21 @@ namespace {
 #endif
 #if !defined(NDEBUG)
         EXPECT_DEATH_IF_SUPPORTED(
-                static_cast<void>(turbo::GetFlag(FLAGS_mistyped_int_flag)),
+                static_cast<void>(turbo::get_flag(FLAGS_mistyped_int_flag)),
                 "Flag 'mistyped_int_flag' is defined as one type and declared "
                 "as another");
         EXPECT_DEATH_IF_SUPPORTED(
-                static_cast<void>(turbo::GetFlag(FLAGS_mistyped_string_flag)),
+                static_cast<void>(turbo::get_flag(FLAGS_mistyped_string_flag)),
                 "Flag 'mistyped_string_flag' is defined as one type and "
                 "declared as another");
 #endif
 
         EXPECT_DEATH_IF_SUPPORTED(
-                turbo::SetFlag(&FLAGS_mistyped_int_flag, 1),
+                turbo::set_flag(&FLAGS_mistyped_int_flag, 1),
                 "Flag 'mistyped_int_flag' is defined as one type and declared "
                 "as another");
         EXPECT_DEATH_IF_SUPPORTED(
-                turbo::SetFlag(&FLAGS_mistyped_string_flag, std::vector<std::string>{}),
+                turbo::set_flag(&FLAGS_mistyped_string_flag, std::vector<std::string>{}),
                 "Flag 'mistyped_string_flag' is defined as one type and declared as "
                 "another");
     }
@@ -903,10 +903,10 @@ TURBO_FLAG(ConversionTestVal, test_flag_implicit_conv,
 namespace {
 
     TEST_F(FlagTest, CanSetViaImplicitConversion) {
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_implicit_conv).a, 10);
-        turbo::SetFlag(&FLAGS_test_flag_implicit_conv,
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_implicit_conv).a, 10);
+        turbo::set_flag(&FLAGS_test_flag_implicit_conv,
                        ConversionTestVal::ViaImplicitConv::kEleven);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_test_flag_implicit_conv).a, 11);
+        EXPECT_EQ(turbo::get_flag(FLAGS_test_flag_implicit_conv).a, 11);
     }
 
 // --------------------------------------------------------------------
@@ -942,14 +942,14 @@ TURBO_FLAG(NonDfltConstructible, ndc_flag2, 0,
 namespace {
 
     TEST_F(FlagTest, TestNonDefaultConstructibleType) {
-        EXPECT_EQ(turbo::GetFlag(FLAGS_ndc_flag1).value, '1' + 100);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_ndc_flag2).value, 0);
+        EXPECT_EQ(turbo::get_flag(FLAGS_ndc_flag1).value, '1' + 100);
+        EXPECT_EQ(turbo::get_flag(FLAGS_ndc_flag2).value, 0);
 
-        turbo::SetFlag(&FLAGS_ndc_flag1, NonDfltConstructible('A'));
-        turbo::SetFlag(&FLAGS_ndc_flag2, 25);
+        turbo::set_flag(&FLAGS_ndc_flag1, NonDfltConstructible('A'));
+        turbo::set_flag(&FLAGS_ndc_flag2, 25);
 
-        EXPECT_EQ(turbo::GetFlag(FLAGS_ndc_flag1).value, 'A' + 100);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_ndc_flag2).value, 25);
+        EXPECT_EQ(turbo::get_flag(FLAGS_ndc_flag1).value, 'A' + 100);
+        EXPECT_EQ(turbo::get_flag(FLAGS_ndc_flag2).value, 25);
     }
 
 }  // namespace
@@ -968,21 +968,21 @@ namespace {
         auto *handle1 = turbo::find_command_line_flag("flag_on_separate_file");
         auto *handle2 = turbo::find_command_line_flag("retired_flag_on_separate_file");
         if (handle1 != nullptr && handle2 != nullptr) {
-            return handle1->Name() == handle2->Name();
+            return handle1->name() == handle2->name();
         }
         return true;
     }();
 
     TEST_F(FlagTest, TestRetiredFlagRegistration) {
         auto *handle = turbo::find_command_line_flag("old_bool_flag");
-        EXPECT_TRUE(handle->IsOfType<bool>());
-        EXPECT_TRUE(handle->IsRetired());
+        EXPECT_TRUE(handle->is_of_type<bool>());
+        EXPECT_TRUE(handle->is_retired());
         handle = turbo::find_command_line_flag("old_int_flag");
-        EXPECT_TRUE(handle->IsOfType<int>());
-        EXPECT_TRUE(handle->IsRetired());
+        EXPECT_TRUE(handle->is_of_type<int>());
+        EXPECT_TRUE(handle->is_retired());
         handle = turbo::find_command_line_flag("old_str_flag");
-        EXPECT_TRUE(handle->IsOfType<std::string>());
-        EXPECT_TRUE(handle->IsRetired());
+        EXPECT_TRUE(handle->is_of_type<std::string>());
+        EXPECT_TRUE(handle->is_retired());
     }
 
 }  // namespace
@@ -1034,25 +1034,25 @@ TURBO_FLAG(NonTriviallyCopyableUDT, test_flag_ntc_udt, {}, "help");
 namespace {
 
     TEST_F(FlagTest, TestSmallAlignUDT) {
-        SmallAlignUDT value = turbo::GetFlag(FLAGS_test_flag_sa_udt);
+        SmallAlignUDT value = turbo::get_flag(FLAGS_test_flag_sa_udt);
         EXPECT_EQ(value.c, 'A');
         EXPECT_EQ(value.s, 12);
 
         value.c = 'B';
         value.s = 45;
-        turbo::SetFlag(&FLAGS_test_flag_sa_udt, value);
-        value = turbo::GetFlag(FLAGS_test_flag_sa_udt);
+        turbo::set_flag(&FLAGS_test_flag_sa_udt, value);
+        value = turbo::get_flag(FLAGS_test_flag_sa_udt);
         EXPECT_EQ(value.c, 'B');
         EXPECT_EQ(value.s, 45);
     }
 
     TEST_F(FlagTest, TestNonTriviallyCopyableUDT) {
-        NonTriviallyCopyableUDT value = turbo::GetFlag(FLAGS_test_flag_ntc_udt);
+        NonTriviallyCopyableUDT value = turbo::get_flag(FLAGS_test_flag_ntc_udt);
         EXPECT_EQ(value.c, 'A');
 
         value.c = 'B';
-        turbo::SetFlag(&FLAGS_test_flag_ntc_udt, value);
-        value = turbo::GetFlag(FLAGS_test_flag_ntc_udt);
+        turbo::set_flag(&FLAGS_test_flag_ntc_udt, value);
+        value = turbo::get_flag(FLAGS_test_flag_ntc_udt);
         EXPECT_EQ(value.c, 'B');
     }
 
@@ -1083,12 +1083,12 @@ namespace {
 TURBO_FLAG(EnumWrapper, test_enum_wrapper_flag, {}, "help");
 
 TEST_F(FlagTest, TesTypeWrappingEnum) {
-    EnumWrapper value = turbo::GetFlag(FLAGS_test_enum_wrapper_flag);
+    EnumWrapper value = turbo::get_flag(FLAGS_test_enum_wrapper_flag);
     EXPECT_EQ(value.e, A);
 
     value.e = B;
-    turbo::SetFlag(&FLAGS_test_enum_wrapper_flag, value);
-    value = turbo::GetFlag(FLAGS_test_enum_wrapper_flag);
+    turbo::set_flag(&FLAGS_test_enum_wrapper_flag, value);
+    value = turbo::get_flag(FLAGS_test_enum_wrapper_flag);
     EXPECT_EQ(value.e, B);
 }
 
@@ -1100,9 +1100,9 @@ TURBO_FLAG(int, FLAG_NAME_MACRO(test_macro_named_flag), 0,
            "Testing macro expansion within TURBO_FLAG");
 
 TEST_F(FlagTest, MacroWithinTurboFlag) {
-    EXPECT_EQ(turbo::GetFlag(FLAGS_prefix_test_macro_named_flag), 0);
-    turbo::SetFlag(&FLAGS_prefix_test_macro_named_flag, 1);
-    EXPECT_EQ(turbo::GetFlag(FLAGS_prefix_test_macro_named_flag), 1);
+    EXPECT_EQ(turbo::get_flag(FLAGS_prefix_test_macro_named_flag), 0);
+    turbo::set_flag(&FLAGS_prefix_test_macro_named_flag, 1);
+    EXPECT_EQ(turbo::get_flag(FLAGS_prefix_test_macro_named_flag), 1);
 }
 
 // --------------------------------------------------------------------
@@ -1122,126 +1122,126 @@ TURBO_FLAG(std::optional<int64_t>, std_optional_int64, std::nullopt, "help");
 namespace {
 
     TEST_F(FlagTest, TestOptionalBool) {
-        EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_bool).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_bool), turbo::nullopt);
+        EXPECT_FALSE(turbo::get_flag(FLAGS_optional_bool).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_bool), turbo::nullopt);
 
-        turbo::SetFlag(&FLAGS_optional_bool, false);
-        EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_bool).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_bool), false);
+        turbo::set_flag(&FLAGS_optional_bool, false);
+        EXPECT_TRUE(turbo::get_flag(FLAGS_optional_bool).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_bool), false);
 
-        turbo::SetFlag(&FLAGS_optional_bool, true);
-        EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_bool).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_bool), true);
+        turbo::set_flag(&FLAGS_optional_bool, true);
+        EXPECT_TRUE(turbo::get_flag(FLAGS_optional_bool).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_bool), true);
 
-        turbo::SetFlag(&FLAGS_optional_bool, turbo::nullopt);
-        EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_bool).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_bool), turbo::nullopt);
+        turbo::set_flag(&FLAGS_optional_bool, turbo::nullopt);
+        EXPECT_FALSE(turbo::get_flag(FLAGS_optional_bool).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_bool), turbo::nullopt);
     }
 
 // --------------------------------------------------------------------
 
     TEST_F(FlagTest, TestOptionalInt) {
-        EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_int).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_int), turbo::nullopt);
+        EXPECT_FALSE(turbo::get_flag(FLAGS_optional_int).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_int), turbo::nullopt);
 
-        turbo::SetFlag(&FLAGS_optional_int, 0);
-        EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_int).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_int), 0);
+        turbo::set_flag(&FLAGS_optional_int, 0);
+        EXPECT_TRUE(turbo::get_flag(FLAGS_optional_int).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_int), 0);
 
-        turbo::SetFlag(&FLAGS_optional_int, 10);
-        EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_int).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_int), 10);
+        turbo::set_flag(&FLAGS_optional_int, 10);
+        EXPECT_TRUE(turbo::get_flag(FLAGS_optional_int).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_int), 10);
 
-        turbo::SetFlag(&FLAGS_optional_int, turbo::nullopt);
-        EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_int).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_int), turbo::nullopt);
+        turbo::set_flag(&FLAGS_optional_int, turbo::nullopt);
+        EXPECT_FALSE(turbo::get_flag(FLAGS_optional_int).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_int), turbo::nullopt);
     }
 
 // --------------------------------------------------------------------
 
     TEST_F(FlagTest, TestOptionalDouble) {
-        EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_double).has_value());
-        EXPECT_DOUBLE_EQ(*turbo::GetFlag(FLAGS_optional_double), 9.3);
+        EXPECT_TRUE(turbo::get_flag(FLAGS_optional_double).has_value());
+        EXPECT_DOUBLE_EQ(*turbo::get_flag(FLAGS_optional_double), 9.3);
 
-        turbo::SetFlag(&FLAGS_optional_double, 0.0);
-        EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_double).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_double), 0.0);
+        turbo::set_flag(&FLAGS_optional_double, 0.0);
+        EXPECT_TRUE(turbo::get_flag(FLAGS_optional_double).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_double), 0.0);
 
-        turbo::SetFlag(&FLAGS_optional_double, 1.234);
-        EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_double).has_value());
-        EXPECT_DOUBLE_EQ(*turbo::GetFlag(FLAGS_optional_double), 1.234);
+        turbo::set_flag(&FLAGS_optional_double, 1.234);
+        EXPECT_TRUE(turbo::get_flag(FLAGS_optional_double).has_value());
+        EXPECT_DOUBLE_EQ(*turbo::get_flag(FLAGS_optional_double), 1.234);
 
-        turbo::SetFlag(&FLAGS_optional_double, turbo::nullopt);
-        EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_double).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_double), turbo::nullopt);
+        turbo::set_flag(&FLAGS_optional_double, turbo::nullopt);
+        EXPECT_FALSE(turbo::get_flag(FLAGS_optional_double).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_double), turbo::nullopt);
     }
 
 // --------------------------------------------------------------------
 
     TEST_F(FlagTest, TestOptionalString) {
-        EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_string).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_string), turbo::nullopt);
+        EXPECT_FALSE(turbo::get_flag(FLAGS_optional_string).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_string), turbo::nullopt);
 
         // Setting optional string to "" leads to undefined behavior.
 
-        turbo::SetFlag(&FLAGS_optional_string, " ");
-        EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_string).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_string), " ");
+        turbo::set_flag(&FLAGS_optional_string, " ");
+        EXPECT_TRUE(turbo::get_flag(FLAGS_optional_string).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_string), " ");
 
-        turbo::SetFlag(&FLAGS_optional_string, "QWERTY");
-        EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_string).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_string), "QWERTY");
+        turbo::set_flag(&FLAGS_optional_string, "QWERTY");
+        EXPECT_TRUE(turbo::get_flag(FLAGS_optional_string).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_string), "QWERTY");
 
-        turbo::SetFlag(&FLAGS_optional_string, turbo::nullopt);
-        EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_string).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_string), turbo::nullopt);
+        turbo::set_flag(&FLAGS_optional_string, turbo::nullopt);
+        EXPECT_FALSE(turbo::get_flag(FLAGS_optional_string).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_string), turbo::nullopt);
     }
 
 // --------------------------------------------------------------------
 
     TEST_F(FlagTest, TestOptionalDuration) {
-        EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_duration).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_duration), turbo::nullopt);
+        EXPECT_FALSE(turbo::get_flag(FLAGS_optional_duration).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_duration), turbo::nullopt);
 
-        turbo::SetFlag(&FLAGS_optional_duration, turbo::Duration::zero());
-        EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_duration).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_duration), turbo::Duration::seconds(0));
+        turbo::set_flag(&FLAGS_optional_duration, turbo::Duration::zero());
+        EXPECT_TRUE(turbo::get_flag(FLAGS_optional_duration).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_duration), turbo::Duration::seconds(0));
 
-        turbo::SetFlag(&FLAGS_optional_duration, turbo::Duration::hours(3));
-        EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_duration).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_duration), turbo::Duration::hours(3));
+        turbo::set_flag(&FLAGS_optional_duration, turbo::Duration::hours(3));
+        EXPECT_TRUE(turbo::get_flag(FLAGS_optional_duration).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_duration), turbo::Duration::hours(3));
 
-        turbo::SetFlag(&FLAGS_optional_duration, turbo::nullopt);
-        EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_duration).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_duration), turbo::nullopt);
+        turbo::set_flag(&FLAGS_optional_duration, turbo::nullopt);
+        EXPECT_FALSE(turbo::get_flag(FLAGS_optional_duration).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_duration), turbo::nullopt);
     }
 
 // --------------------------------------------------------------------
 
     TEST_F(FlagTest, TestOptionalOptional) {
-        EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_optional_int).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), turbo::nullopt);
+        EXPECT_FALSE(turbo::get_flag(FLAGS_optional_optional_int).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_optional_int), turbo::nullopt);
 
         turbo::optional<int> nullint{turbo::nullopt};
 
-        turbo::SetFlag(&FLAGS_optional_optional_int, nullint);
-        EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_optional_int).has_value());
-        EXPECT_NE(turbo::GetFlag(FLAGS_optional_optional_int), nullint);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int),
+        turbo::set_flag(&FLAGS_optional_optional_int, nullint);
+        EXPECT_TRUE(turbo::get_flag(FLAGS_optional_optional_int).has_value());
+        EXPECT_NE(turbo::get_flag(FLAGS_optional_optional_int), nullint);
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_optional_int),
                   turbo::optional<turbo::optional<int>>{nullint});
 
-        turbo::SetFlag(&FLAGS_optional_optional_int, 0);
-        EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_optional_int).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), 0);
+        turbo::set_flag(&FLAGS_optional_optional_int, 0);
+        EXPECT_TRUE(turbo::get_flag(FLAGS_optional_optional_int).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_optional_int), 0);
 
-        turbo::SetFlag(&FLAGS_optional_optional_int, turbo::optional<int>{0});
-        EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_optional_int).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), 0);
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), turbo::optional<int>{0});
+        turbo::set_flag(&FLAGS_optional_optional_int, turbo::optional<int>{0});
+        EXPECT_TRUE(turbo::get_flag(FLAGS_optional_optional_int).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_optional_int), 0);
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_optional_int), turbo::optional<int>{0});
 
-        turbo::SetFlag(&FLAGS_optional_optional_int, turbo::nullopt);
-        EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_optional_int).has_value());
-        EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), turbo::nullopt);
+        turbo::set_flag(&FLAGS_optional_optional_int, turbo::nullopt);
+        EXPECT_FALSE(turbo::get_flag(FLAGS_optional_optional_int).has_value());
+        EXPECT_EQ(turbo::get_flag(FLAGS_optional_optional_int), turbo::nullopt);
     }
 
 // --------------------------------------------------------------------
@@ -1249,20 +1249,20 @@ namespace {
 #if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
 
     TEST_F(FlagTest, TestStdOptional) {
-      EXPECT_FALSE(turbo::GetFlag(FLAGS_std_optional_int64).has_value());
-      EXPECT_EQ(turbo::GetFlag(FLAGS_std_optional_int64), std::nullopt);
+      EXPECT_FALSE(turbo::get_flag(FLAGS_std_optional_int64).has_value());
+      EXPECT_EQ(turbo::get_flag(FLAGS_std_optional_int64), std::nullopt);
 
-      turbo::SetFlag(&FLAGS_std_optional_int64, 0);
-      EXPECT_TRUE(turbo::GetFlag(FLAGS_std_optional_int64).has_value());
-      EXPECT_EQ(turbo::GetFlag(FLAGS_std_optional_int64), 0);
+      turbo::set_flag(&FLAGS_std_optional_int64, 0);
+      EXPECT_TRUE(turbo::get_flag(FLAGS_std_optional_int64).has_value());
+      EXPECT_EQ(turbo::get_flag(FLAGS_std_optional_int64), 0);
 
-      turbo::SetFlag(&FLAGS_std_optional_int64, 0xFFFFFFFFFF16);
-      EXPECT_TRUE(turbo::GetFlag(FLAGS_std_optional_int64).has_value());
-      EXPECT_EQ(turbo::GetFlag(FLAGS_std_optional_int64), 0xFFFFFFFFFF16);
+      turbo::set_flag(&FLAGS_std_optional_int64, 0xFFFFFFFFFF16);
+      EXPECT_TRUE(turbo::get_flag(FLAGS_std_optional_int64).has_value());
+      EXPECT_EQ(turbo::get_flag(FLAGS_std_optional_int64), 0xFFFFFFFFFF16);
 
-      turbo::SetFlag(&FLAGS_std_optional_int64, std::nullopt);
-      EXPECT_FALSE(turbo::GetFlag(FLAGS_std_optional_int64).has_value());
-      EXPECT_EQ(turbo::GetFlag(FLAGS_std_optional_int64), std::nullopt);
+      turbo::set_flag(&FLAGS_std_optional_int64, std::nullopt);
+      EXPECT_FALSE(turbo::get_flag(FLAGS_std_optional_int64).has_value());
+      EXPECT_EQ(turbo::get_flag(FLAGS_std_optional_int64), std::nullopt);
     }
 
     // --------------------------------------------------------------------

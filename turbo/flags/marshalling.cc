@@ -232,7 +232,7 @@ namespace turbo::flags_internal {
 
         T roundtrip_val = 0;
         std::string err;
-        if (turbo::ParseFlag(digit10_str, &roundtrip_val, &err) &&
+        if (turbo::parse_flag(digit10_str, &roundtrip_val, &err) &&
             roundtrip_val == v) {
             return digit10_str;
         }
@@ -287,7 +287,7 @@ namespace turbo {
             return true;
         }
         std::underlying_type<turbo::LogSeverity>::type numeric_value;
-        if (turbo::ParseFlag(text, &numeric_value, err)) {
+        if (turbo::parse_flag(text, &numeric_value, err)) {
             *dst = static_cast<turbo::LogSeverity>(numeric_value);
             return true;
         }
@@ -298,7 +298,7 @@ namespace turbo {
 
     std::string turbo_unparse_flag(turbo::LogSeverity v) {
         if (v == turbo::NormalizeLogSeverity(v)) return turbo::LogSeverityName(v);
-        return turbo::UnparseFlag(static_cast<int>(v));
+        return turbo::unparse_flag(static_cast<int>(v));
     }
 
 }  // namespace turbo

@@ -96,13 +96,13 @@ namespace turbo {
 
         void Invoke() &&{
             TURBO_HARDENING_ASSERT(storage_.IsCallbackEngaged());
-            storage_.InvokeCallback();
+            storage_.invoke_callback();
             storage_.DestroyCallback();
         }
 
         ~Cleanup() {
             if (storage_.IsCallbackEngaged()) {
-                storage_.InvokeCallback();
+                storage_.invoke_callback();
                 storage_.DestroyCallback();
             }
         }

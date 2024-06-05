@@ -107,12 +107,12 @@ namespace turbo::flags_internal {
 
     CommandLineFlag *FlagRegistry::FindFlag(turbo::string_view name) {
         if (finalized_flags_.load(std::memory_order_acquire)) {
-            // We could save some gcus here if we make `Name()` be non-virtual.
+            // We could save some gcus here if we make `name()` be non-virtual.
             // We could move the `const char*` name to the base class.
             auto it = std::partition_point(
                     flat_flags_.begin(), flat_flags_.end(),
-                    [=](CommandLineFlag *f) { return f->Name() < name; });
-            if (it != flat_flags_.end() && (*it)->Name() == name) return *it;
+                    [=](CommandLineFlag *f) { return f->name() < name; });
+            if (it != flat_flags_.end() && (*it)->name() == name) return *it;
         }
 
         FlagRegistryLock frl(*this);
@@ -122,14 +122,14 @@ namespace turbo::flags_internal {
 
     void FlagRegistry::RegisterFlag(CommandLineFlag &flag, const char *filename) {
         if (filename != nullptr &&
-            flag.Filename() != GetUsageConfig().normalize_filename(filename)) {
+            flag.filename() != GetUsageConfig().normalize_filename(filename)) {
             flags_internal::ReportUsageError(
                     turbo::str_cat(
                             "Inconsistency between flag object and registration for flag '",
-                            flag.Name(),
+                            flag.name(),
                             "', likely due to duplicate flags or an ODR violation. Relevant "
                             "files: ",
-                            flag.Filename(), " and ", filename),
+                            flag.filename(), " and ", filename),
                     true);
             std::exit(1);
         }
@@ -137,37 +137,37 @@ namespace turbo::flags_internal {
         FlagRegistryLock registry_lock(*this);
 
         std::pair<FlagIterator, bool> ins =
-                flags_.insert(FlagMap::value_type(flag.Name(), &flag));
+                flags_.insert(FlagMap::value_type(flag.name(), &flag));
         if (ins.second == false) {  // means the name was already in the map
             CommandLineFlag &old_flag = *ins.first->second;
-            if (flag.IsRetired() != old_flag.IsRetired()) {
+            if (flag.is_retired() != old_flag.is_retired()) {
                 // All registrations must agree on the 'retired' flag.
                 flags_internal::ReportUsageError(
                         turbo::str_cat(
-                                "Retired flag '", flag.Name(), "' was defined normally in file '",
-                                (flag.IsRetired() ? old_flag.Filename() : flag.Filename()), "'."),
+                                "Retired flag '", flag.name(), "' was defined normally in file '",
+                                (flag.is_retired() ? old_flag.filename() : flag.filename()), "'."),
                         true);
             } else if (flags_internal::PrivateHandleAccessor::TypeId(flag) !=
                        flags_internal::PrivateHandleAccessor::TypeId(old_flag)) {
                 flags_internal::ReportUsageError(
-                        turbo::str_cat("Flag '", flag.Name(),
+                        turbo::str_cat("Flag '", flag.name(),
                                        "' was defined more than once but with "
                                        "differing types. Defined in files '",
-                                       old_flag.Filename(), "' and '", flag.Filename(), "'."),
+                                       old_flag.filename(), "' and '", flag.filename(), "'."),
                         true);
-            } else if (old_flag.IsRetired()) {
+            } else if (old_flag.is_retired()) {
                 return;
-            } else if (old_flag.Filename() != flag.Filename()) {
+            } else if (old_flag.filename() != flag.filename()) {
                 flags_internal::ReportUsageError(
-                        turbo::str_cat("Flag '", flag.Name(),
+                        turbo::str_cat("Flag '", flag.name(),
                                        "' was defined more than once (in files '",
-                                       old_flag.Filename(), "' and '", flag.Filename(), "')."),
+                                       old_flag.filename(), "' and '", flag.filename(), "')."),
                         true);
             } else {
                 flags_internal::ReportUsageError(
                         turbo::str_cat(
-                                "Something is wrong with flag '", flag.Name(), "' in file '",
-                                flag.Filename(), "'. One possibility: file '", flag.Filename(),
+                                "Something is wrong with flag '", flag.name(), "' in file '",
+                                flag.filename(), "'. One possibility: file '", flag.filename(),
                                 "' is being linked both statically and dynamically into this "
                                 "executable. e.g. some files listed as srcs to a test and also "
                                 "listed as srcs of some shared lib deps of the same test."),
@@ -216,7 +216,7 @@ namespace turbo::flags_internal {
         }
         std::sort(std::begin(registry.flat_flags_), std::end(registry.flat_flags_),
                   [](const CommandLineFlag *lhs, const CommandLineFlag *rhs) {
-                      return lhs->Name() < rhs->Name();
+                      return lhs->name() < rhs->name();
                   });
         registry.flags_.clear();
         registry.finalized_flags_.store(true, std::memory_order_release);
@@ -240,33 +240,33 @@ namespace turbo::flags_internal {
                     : name_(name), type_id_(type_id) {}
 
         private:
-            turbo::string_view Name() const override { return name_; }
+            turbo::string_view name() const override { return name_; }
 
-            std::string Filename() const override {
+            std::string filename() const override {
                 OnAccess();
                 return "RETIRED";
             }
 
-            FlagFastTypeId TypeId() const override { return type_id_; }
+            FlagFastTypeId type_id() const override { return type_id_; }
 
-            std::string Help() const override {
+            std::string help() const override {
                 OnAccess();
                 return "";
             }
 
-            bool IsRetired() const override { return true; }
+            bool is_retired() const override { return true; }
 
-            bool IsSpecifiedOnCommandLine() const override {
+            bool is_specified_on_commandLine() const override {
                 OnAccess();
                 return false;
             }
 
-            std::string DefaultValue() const override {
+            std::string default_value() const override {
                 OnAccess();
                 return "";
             }
 
-            std::string CurrentValue() const override {
+            std::string current_value() const override {
                 OnAccess();
                 return "";
             }
@@ -281,7 +281,7 @@ namespace turbo::flags_internal {
                 return nullptr;
             }
 
-            bool ParseFrom(turbo::string_view, flags_internal::FlagSettingMode,
+            bool parse_from(turbo::string_view, flags_internal::FlagSettingMode,
                            flags_internal::ValueSource, std::string &) override {
                 OnAccess();
                 return false;
@@ -376,7 +376,7 @@ namespace turbo {
     turbo::flat_hash_map<turbo::string_view, turbo::CommandLineFlag *> get_all_flags() {
         turbo::flat_hash_map<turbo::string_view, turbo::CommandLineFlag *> res;
         flags_internal::ForEachFlag([&](CommandLineFlag &flag) {
-            if (!flag.IsRetired()) res.insert({flag.Name(), &flag});
+            if (!flag.is_retired()) res.insert({flag.name(), &flag});
         });
         return res;
     }

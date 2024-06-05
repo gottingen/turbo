@@ -79,46 +79,46 @@ namespace {
         auto *flag_01 = turbo::find_command_line_flag("int_flag");
 
         ASSERT_TRUE(flag_01);
-        EXPECT_EQ(flag_01->Name(), "int_flag");
-        EXPECT_EQ(flag_01->Help(), "int_flag help");
-        EXPECT_TRUE(!flag_01->IsRetired());
-        EXPECT_TRUE(flag_01->IsOfType<int>());
-        EXPECT_TRUE(!flag_01->IsOfType<bool>());
-        EXPECT_TRUE(!flag_01->IsOfType<std::string>());
-        EXPECT_TRUE(turbo::ends_with(flag_01->Filename(),
+        EXPECT_EQ(flag_01->name(), "int_flag");
+        EXPECT_EQ(flag_01->help(), "int_flag help");
+        EXPECT_TRUE(!flag_01->is_retired());
+        EXPECT_TRUE(flag_01->is_of_type<int>());
+        EXPECT_TRUE(!flag_01->is_of_type<bool>());
+        EXPECT_TRUE(!flag_01->is_of_type<std::string>());
+        EXPECT_TRUE(turbo::ends_with(flag_01->filename(),
                                      "tests/flags/commandlineflag_test.cc"))
-                            << flag_01->Filename();
+                            << flag_01->filename();
 
         auto *flag_02 = turbo::find_command_line_flag("string_flag");
 
         ASSERT_TRUE(flag_02);
-        EXPECT_EQ(flag_02->Name(), "string_flag");
-        EXPECT_EQ(flag_02->Help(), "string_flag help");
-        EXPECT_TRUE(!flag_02->IsRetired());
-        EXPECT_TRUE(flag_02->IsOfType<std::string>());
-        EXPECT_TRUE(!flag_02->IsOfType<bool>());
-        EXPECT_TRUE(!flag_02->IsOfType<int>());
-        EXPECT_TRUE(turbo::ends_with(flag_02->Filename(),
+        EXPECT_EQ(flag_02->name(), "string_flag");
+        EXPECT_EQ(flag_02->help(), "string_flag help");
+        EXPECT_TRUE(!flag_02->is_retired());
+        EXPECT_TRUE(flag_02->is_of_type<std::string>());
+        EXPECT_TRUE(!flag_02->is_of_type<bool>());
+        EXPECT_TRUE(!flag_02->is_of_type<int>());
+        EXPECT_TRUE(turbo::ends_with(flag_02->filename(),
                                      "tests/flags/commandlineflag_test.cc"))
-                            << flag_02->Filename();
+                            << flag_02->filename();
     }
 
 // --------------------------------------------------------------------
 
     TEST_F(CommandLineFlagTest, TestValueAccessMethods) {
-        turbo::SetFlag(&FLAGS_int_flag2, 301);
+        turbo::set_flag(&FLAGS_int_flag2, 301);
         auto *flag_01 = turbo::find_command_line_flag("int_flag2");
 
         ASSERT_TRUE(flag_01);
-        EXPECT_EQ(flag_01->CurrentValue(), "301");
-        EXPECT_EQ(flag_01->DefaultValue(), "201");
+        EXPECT_EQ(flag_01->current_value(), "301");
+        EXPECT_EQ(flag_01->default_value(), "201");
 
-        turbo::SetFlag(&FLAGS_string_flag2, "new_str_value");
+        turbo::set_flag(&FLAGS_string_flag2, "new_str_value");
         auto *flag_02 = turbo::find_command_line_flag("string_flag2");
 
         ASSERT_TRUE(flag_02);
-        EXPECT_EQ(flag_02->CurrentValue(), "new_str_value");
-        EXPECT_EQ(flag_02->DefaultValue(), "dflt");
+        EXPECT_EQ(flag_02->current_value(), "new_str_value");
+        EXPECT_EQ(flag_02->default_value(), "dflt");
     }
 
 // --------------------------------------------------------------------
@@ -128,61 +128,61 @@ namespace {
 
         auto *flag_01 = turbo::find_command_line_flag("int_flag");
         EXPECT_FALSE(
-                flags::PrivateHandleAccessor::IsSpecifiedOnCommandLine(*flag_01));
+                flags::PrivateHandleAccessor::is_specified_on_commandLine(*flag_01));
 
-        EXPECT_TRUE(flags::PrivateHandleAccessor::ParseFrom(
+        EXPECT_TRUE(flags::PrivateHandleAccessor::parse_from(
                 *flag_01, "11", flags::SET_FLAGS_VALUE, flags::kProgrammaticChange, err));
-        EXPECT_EQ(turbo::GetFlag(FLAGS_int_flag), 11);
+        EXPECT_EQ(turbo::get_flag(FLAGS_int_flag), 11);
         EXPECT_FALSE(
-                flags::PrivateHandleAccessor::IsSpecifiedOnCommandLine(*flag_01));
+                flags::PrivateHandleAccessor::is_specified_on_commandLine(*flag_01));
 
-        EXPECT_TRUE(flags::PrivateHandleAccessor::ParseFrom(
+        EXPECT_TRUE(flags::PrivateHandleAccessor::parse_from(
                 *flag_01, "-123", flags::SET_FLAGS_VALUE, flags::kProgrammaticChange,
                 err));
-        EXPECT_EQ(turbo::GetFlag(FLAGS_int_flag), -123);
+        EXPECT_EQ(turbo::get_flag(FLAGS_int_flag), -123);
         EXPECT_FALSE(
-                flags::PrivateHandleAccessor::IsSpecifiedOnCommandLine(*flag_01));
+                flags::PrivateHandleAccessor::is_specified_on_commandLine(*flag_01));
 
-        EXPECT_TRUE(!flags::PrivateHandleAccessor::ParseFrom(
+        EXPECT_TRUE(!flags::PrivateHandleAccessor::parse_from(
                 *flag_01, "xyz", flags::SET_FLAGS_VALUE, flags::kProgrammaticChange,
                 err));
-        EXPECT_EQ(turbo::GetFlag(FLAGS_int_flag), -123);
+        EXPECT_EQ(turbo::get_flag(FLAGS_int_flag), -123);
         EXPECT_EQ(err, "Illegal value 'xyz' specified for flag 'int_flag'");
         EXPECT_FALSE(
-                flags::PrivateHandleAccessor::IsSpecifiedOnCommandLine(*flag_01));
+                flags::PrivateHandleAccessor::is_specified_on_commandLine(*flag_01));
 
-        EXPECT_TRUE(!flags::PrivateHandleAccessor::ParseFrom(
+        EXPECT_TRUE(!flags::PrivateHandleAccessor::parse_from(
                 *flag_01, "A1", flags::SET_FLAGS_VALUE, flags::kProgrammaticChange, err));
-        EXPECT_EQ(turbo::GetFlag(FLAGS_int_flag), -123);
+        EXPECT_EQ(turbo::get_flag(FLAGS_int_flag), -123);
         EXPECT_EQ(err, "Illegal value 'A1' specified for flag 'int_flag'");
         EXPECT_FALSE(
-                flags::PrivateHandleAccessor::IsSpecifiedOnCommandLine(*flag_01));
+                flags::PrivateHandleAccessor::is_specified_on_commandLine(*flag_01));
 
-        EXPECT_TRUE(flags::PrivateHandleAccessor::ParseFrom(
+        EXPECT_TRUE(flags::PrivateHandleAccessor::parse_from(
                 *flag_01, "0x10", flags::SET_FLAGS_VALUE, flags::kProgrammaticChange,
                 err));
-        EXPECT_EQ(turbo::GetFlag(FLAGS_int_flag), 16);
+        EXPECT_EQ(turbo::get_flag(FLAGS_int_flag), 16);
         EXPECT_FALSE(
-                flags::PrivateHandleAccessor::IsSpecifiedOnCommandLine(*flag_01));
+                flags::PrivateHandleAccessor::is_specified_on_commandLine(*flag_01));
 
-        EXPECT_TRUE(flags::PrivateHandleAccessor::ParseFrom(
+        EXPECT_TRUE(flags::PrivateHandleAccessor::parse_from(
                 *flag_01, "011", flags::SET_FLAGS_VALUE, flags::kCommandLine, err));
-        EXPECT_EQ(turbo::GetFlag(FLAGS_int_flag), 11);
-        EXPECT_TRUE(flags::PrivateHandleAccessor::IsSpecifiedOnCommandLine(*flag_01));
+        EXPECT_EQ(turbo::get_flag(FLAGS_int_flag), 11);
+        EXPECT_TRUE(flags::PrivateHandleAccessor::is_specified_on_commandLine(*flag_01));
 
-        EXPECT_TRUE(!flags::PrivateHandleAccessor::ParseFrom(
+        EXPECT_TRUE(!flags::PrivateHandleAccessor::parse_from(
                 *flag_01, "", flags::SET_FLAGS_VALUE, flags::kProgrammaticChange, err));
         EXPECT_EQ(err, "Illegal value '' specified for flag 'int_flag'");
 
         auto *flag_02 = turbo::find_command_line_flag("string_flag");
-        EXPECT_TRUE(flags::PrivateHandleAccessor::ParseFrom(
+        EXPECT_TRUE(flags::PrivateHandleAccessor::parse_from(
                 *flag_02, "xyz", flags::SET_FLAGS_VALUE, flags::kProgrammaticChange,
                 err));
-        EXPECT_EQ(turbo::GetFlag(FLAGS_string_flag), "xyz");
+        EXPECT_EQ(turbo::get_flag(FLAGS_string_flag), "xyz");
 
-        EXPECT_TRUE(flags::PrivateHandleAccessor::ParseFrom(
+        EXPECT_TRUE(flags::PrivateHandleAccessor::parse_from(
                 *flag_02, "", flags::SET_FLAGS_VALUE, flags::kProgrammaticChange, err));
-        EXPECT_EQ(turbo::GetFlag(FLAGS_string_flag), "");
+        EXPECT_EQ(turbo::get_flag(FLAGS_string_flag), "");
     }
 
 // --------------------------------------------------------------------
@@ -192,17 +192,17 @@ namespace {
 
         auto *flag_01 = turbo::find_command_line_flag("int_flag");
 
-        EXPECT_TRUE(flags::PrivateHandleAccessor::ParseFrom(
+        EXPECT_TRUE(flags::PrivateHandleAccessor::parse_from(
                 *flag_01, "111", flags::SET_FLAGS_DEFAULT, flags::kProgrammaticChange,
                 err));
-        EXPECT_EQ(flag_01->DefaultValue(), "111");
+        EXPECT_EQ(flag_01->default_value(), "111");
 
         auto *flag_02 = turbo::find_command_line_flag("string_flag");
 
-        EXPECT_TRUE(flags::PrivateHandleAccessor::ParseFrom(
+        EXPECT_TRUE(flags::PrivateHandleAccessor::parse_from(
                 *flag_02, "abc", flags::SET_FLAGS_DEFAULT, flags::kProgrammaticChange,
                 err));
-        EXPECT_EQ(flag_02->DefaultValue(), "abc");
+        EXPECT_EQ(flag_02->default_value(), "abc");
     }
 
 // --------------------------------------------------------------------
@@ -212,27 +212,27 @@ namespace {
 
         auto *flag_01 = turbo::find_command_line_flag("int_flag");
 
-        EXPECT_TRUE(flags::PrivateHandleAccessor::ParseFrom(
+        EXPECT_TRUE(flags::PrivateHandleAccessor::parse_from(
                 *flag_01, "22", flags::SET_FLAG_IF_DEFAULT, flags::kProgrammaticChange,
                 err))
                             << err;
-        EXPECT_EQ(turbo::GetFlag(FLAGS_int_flag), 22);
+        EXPECT_EQ(turbo::get_flag(FLAGS_int_flag), 22);
 
-        EXPECT_TRUE(flags::PrivateHandleAccessor::ParseFrom(
+        EXPECT_TRUE(flags::PrivateHandleAccessor::parse_from(
                 *flag_01, "33", flags::SET_FLAG_IF_DEFAULT, flags::kProgrammaticChange,
                 err));
-        EXPECT_EQ(turbo::GetFlag(FLAGS_int_flag), 22);
+        EXPECT_EQ(turbo::get_flag(FLAGS_int_flag), 22);
         // EXPECT_EQ(err, "ERROR: int_flag is already set to 22");
 
         // Reset back to default value
-        EXPECT_TRUE(flags::PrivateHandleAccessor::ParseFrom(
+        EXPECT_TRUE(flags::PrivateHandleAccessor::parse_from(
                 *flag_01, "201", flags::SET_FLAGS_VALUE, flags::kProgrammaticChange,
                 err));
 
-        EXPECT_TRUE(flags::PrivateHandleAccessor::ParseFrom(
+        EXPECT_TRUE(flags::PrivateHandleAccessor::parse_from(
                 *flag_01, "33", flags::SET_FLAG_IF_DEFAULT, flags::kProgrammaticChange,
                 err));
-        EXPECT_EQ(turbo::GetFlag(FLAGS_int_flag), 201);
+        EXPECT_EQ(turbo::get_flag(FLAGS_int_flag), 201);
         // EXPECT_EQ(err, "ERROR: int_flag is already set to 201");
     }
 

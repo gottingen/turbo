@@ -48,13 +48,13 @@ bool turbo_parse_flag(turbo::string_view src, OptionalInt* flag,
   int val;
   if (src.empty())
     flag->reset();
-  else if (!turbo::ParseFlag(src, &val, error))
+  else if (!turbo::parse_flag(src, &val, error))
     return false;
   *flag = val;
   return true;
 }
 std::string turbo_unparse_flag(const OptionalInt& flag) {
-  return !flag ? "" : turbo::UnparseFlag(*flag);
+  return !flag ? "" : turbo::unparse_flag(*flag);
 }
 
 using TurboOptionalString = turbo::optional<std::string>;
@@ -67,13 +67,13 @@ bool turbo_parse_flag(turbo::string_view src, OptionalString* flag,
   std::string val;
   if (src.empty())
     flag->reset();
-  else if (!turbo::ParseFlag(src, &val, error))
+  else if (!turbo::parse_flag(src, &val, error))
     return false;
   *flag = val;
   return true;
 }
 std::string turbo_unparse_flag(const OptionalString& flag) {
-  return !flag ? "" : turbo::UnparseFlag(*flag);
+  return !flag ? "" : turbo::unparse_flag(*flag);
 }
 
 struct UDT {
@@ -168,7 +168,7 @@ BENCHMARKED_TYPES(FLAG_PTR_ARR)
 #define BM_SingleGetFlag(T)                                    \
   void BM_SingleGetFlag_##T(benchmark::State& state) {         \
     for (auto _ : state) {                                     \
-      benchmark::DoNotOptimize(turbo::GetFlag(SINGLE_FLAG(T))); \
+      benchmark::DoNotOptimize(turbo::get_flag(SINGLE_FLAG(T))); \
     }                                                          \
   }                                                            \
   BENCHMARK(BM_SingleGetFlag_##T)->ThreadRange(1, 16);
@@ -218,7 +218,7 @@ void Accumulate(bool& a, const UDT& f) {
     Accumulator<T>::type res = {};                   \
     while (state.KeepRunningBatch(kNumFlags)) {      \
       for (auto* flag_ptr : FlagPtrs_##T) {          \
-        Accumulate(res, turbo::GetFlag(*flag_ptr));   \
+        Accumulate(res, turbo::get_flag(*flag_ptr));   \
       }                                              \
     }                                                \
     benchmark::DoNotOptimize(res);                   \
@@ -236,7 +236,7 @@ void BM_ThreadedFindCommandLineFlag(benchmark::State& state) {
 
   while (state.KeepRunningBatch(kNumFlags)) {
     for (auto* flag_ptr : FlagPtrs_bool) {
-      benchmark::DoNotOptimize(turbo::find_command_line_flag(flag_ptr->Name()));
+      benchmark::DoNotOptimize(turbo::find_command_line_flag(flag_ptr->name()));
     }
   }
 }
@@ -247,7 +247,7 @@ BENCHMARK(BM_ThreadedFindCommandLineFlag)->ThreadRange(1, 16);
 #ifdef __llvm__
 // To view disassembly use: gdb ${BINARY}  -batch -ex "disassemble /s $FUNC"
 #define InvokeGetFlag(T)                                             \
-  T TurboInvokeGetFlag##T() { return turbo::GetFlag(SINGLE_FLAG(T)); } \
+  T TurboInvokeGetFlag##T() { return turbo::get_flag(SINGLE_FLAG(T)); } \
   int odr##T = (benchmark::DoNotOptimize(TurboInvokeGetFlag##T), 1);
 
 BENCHMARKED_TYPES(InvokeGetFlag)

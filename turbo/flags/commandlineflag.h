@@ -79,21 +79,21 @@ namespace turbo {
 
         CommandLineFlag &operator=(const CommandLineFlag &) = delete;
 
-        // turbo::CommandLineFlag::IsOfType()
+        // turbo::CommandLineFlag::is_of_type()
         //
         // Return true iff flag has type T.
         template<typename T>
-        inline bool IsOfType() const {
-            return TypeId() == base_internal::FastTypeId<T>();
+        inline bool is_of_type() const {
+            return type_id() == base_internal::FastTypeId<T>();
         }
 
-        // turbo::CommandLineFlag::TryGet()
+        // turbo::CommandLineFlag::try_get()
         //
         // Attempts to retrieve the flag value. Returns value on success,
         // turbo::nullopt otherwise.
         template<typename T>
-        turbo::optional<T> TryGet() const {
-            if (IsRetired() || !IsOfType<T>()) {
+        turbo::optional<T> try_get() const {
+            if (is_retired() || !is_of_type<T>()) {
                 return turbo::nullopt;
             }
 
@@ -123,7 +123,7 @@ namespace turbo {
 
             Read(&u.value);
             // allow retired flags to be "read", so we can report invalid access.
-            if (IsRetired()) {
+            if (is_retired()) {
                 return turbo::nullopt;
             }
             return std::move(u.value);
@@ -132,39 +132,47 @@ namespace turbo {
         // turbo::CommandLineFlag::Name()
         //
         // Returns name of this flag.
-        virtual turbo::string_view Name() const = 0;
+        virtual turbo::string_view name() const = 0;
 
         // turbo::CommandLineFlag::Filename()
         //
         // Returns name of the file where this flag is defined.
-        virtual std::string Filename() const = 0;
+        virtual std::string filename() const = 0;
 
         // turbo::CommandLineFlag::Help()
         //
         // Returns help message associated with this flag.
-        virtual std::string Help() const = 0;
+        virtual std::string help() const = 0;
 
-        // turbo::CommandLineFlag::IsRetired()
+        // turbo::CommandLineFlag::is_retired()
         //
         // Returns true iff this object corresponds to retired flag.
-        virtual bool IsRetired() const;
+        virtual bool is_retired() const;
 
-        // turbo::CommandLineFlag::DefaultValue()
+        // turbo::CommandLineFlag::default_value()
         //
         // Returns the default value for this flag.
-        virtual std::string DefaultValue() const = 0;
+        virtual std::string default_value() const = 0;
 
-        // turbo::CommandLineFlag::CurrentValue()
+        // turbo::CommandLineFlag::current_value()
         //
         // Returns the current value for this flag.
-        virtual std::string CurrentValue() const = 0;
+        virtual std::string current_value() const = 0;
 
-        // turbo::CommandLineFlag::ParseFrom()
+        virtual bool user_validate(turbo::string_view value, std::string *err) const {
+            return true;
+        }
+
+        virtual bool has_user_validator() const {
+            return false;
+        }
+
+        // turbo::CommandLineFlag::parse_from()
         //
         // Sets the value of the flag based on specified string `value`. If the flag
         // was successfully set to new value, it returns true. Otherwise, sets `error`
         // to indicate the error, leaves the flag unchanged, and returns false.
-        bool ParseFrom(turbo::string_view value, std::string *error);
+        bool parse_from(turbo::string_view value, std::string *error);
 
     protected:
         ~CommandLineFlag() = default;
@@ -180,13 +188,13 @@ namespace turbo {
         //  * Update the flag's default value
         //  * Update the current flag value if it was never set before
         // The mode is selected based on `set_mode` parameter.
-        virtual bool ParseFrom(turbo::string_view value,
+        virtual bool parse_from(turbo::string_view value,
                                flags_internal::FlagSettingMode set_mode,
                                flags_internal::ValueSource source,
                                std::string &error) = 0;
 
         // Returns id of the flag's value type.
-        virtual flags_internal::FlagFastTypeId TypeId() const = 0;
+        virtual flags_internal::FlagFastTypeId type_id() const = 0;
 
         // Interface to save flag to some persistent state. Returns current flag state
         // or nullptr if flag does not support saving and restoring a state.
@@ -198,7 +206,7 @@ namespace turbo {
 
         // To be deleted. Used to return true if flag's current value originated from
         // command line.
-        virtual bool IsSpecifiedOnCommandLine() const = 0;
+        virtual bool is_specified_on_commandLine() const = 0;
 
         // Validates supplied value using validator or parseflag routine
         virtual bool ValidateInputValue(turbo::string_view value) const = 0;

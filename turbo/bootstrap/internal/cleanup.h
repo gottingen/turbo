@@ -85,7 +85,7 @@ namespace turbo {
                 GetCallback().~Callback();
             }
 
-            void InvokeCallback() TURBO_NO_THREAD_SAFETY_ANALYSIS {
+            void invoke_callback() TURBO_NO_THREAD_SAFETY_ANALYSIS {
                 std::move(GetCallback())();
             }
 

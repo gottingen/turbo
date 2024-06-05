@@ -28,6 +28,7 @@ set(FLAGS_TEST_SRC
         sequence_lock_test
         usage_test
         usage_config_test
+        flags_validate_test
 )
 foreach (test ${FLAGS_TEST_SRC})
 

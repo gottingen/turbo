@@ -213,26 +213,26 @@ namespace turbo::flags_internal {
             FlagHelpPrettyPrinter printer(kHrfMaxLineLength, 4, 2, out);
 
             // Flag name.
-            printer.Write(turbo::str_cat("--", flag.Name()));
+            printer.Write(turbo::str_cat("--", flag.name()));
 
             // Flag help.
-            printer.Write(turbo::str_cat("(", flag.Help(), ");"), /*wrap_line=*/true);
+            printer.Write(turbo::str_cat("(", flag.help(), ");"), /*wrap_line=*/true);
 
             // The listed default value will be the actual default from the flag
             // definition in the originating source file, unless the value has
             // subsequently been modified using SetCommandLineOption() with mode
             // SET_FLAGS_DEFAULT.
-            std::string dflt_val = flag.DefaultValue();
-            std::string curr_val = flag.CurrentValue();
+            std::string dflt_val = flag.default_value();
+            std::string curr_val = flag.current_value();
             bool is_modified = curr_val != dflt_val;
 
-            if (flag.IsOfType<std::string>()) {
+            if (flag.is_of_type<std::string>()) {
                 dflt_val = turbo::str_cat("\"", dflt_val, "\"");
             }
             printer.Write(turbo::str_cat("default: ", dflt_val, ";"));
 
             if (is_modified) {
-                if (flag.IsOfType<std::string>()) {
+                if (flag.is_of_type<std::string>()) {
                     curr_val = turbo::str_cat("\"", curr_val, "\"");
                 }
                 printer.Write(turbo::str_cat("currently: ", curr_val, ";"));
@@ -276,15 +276,15 @@ namespace turbo::flags_internal {
 
             flags_internal::ForEachFlag([&](turbo::CommandLineFlag &flag) {
                 // Ignore retired flags.
-                if (flag.IsRetired()) return;
+                if (flag.is_retired()) return;
 
                 // If the flag has been stripped, pretend that it doesn't exist.
-                if (flag.Help() == flags_internal::kStrippedFlagHelp) return;
+                if (flag.help() == flags_internal::kStrippedFlagHelp) return;
 
                 // Make sure flag satisfies the filter
                 if (!filter_cb(flag)) return;
 
-                std::string flag_filename = flag.Filename();
+                std::string flag_filename = flag.filename();
 
                 matching_flags[std::string(flags_internal::Package(flag_filename))]
                 [flag_filename]
@@ -310,7 +310,7 @@ namespace turbo::flags_internal {
                     std::sort(std::begin(flags_in_file.second),
                               std::end(flags_in_file.second),
                               [](const CommandLineFlag *lhs, const CommandLineFlag *rhs) {
-                                  return lhs->Name() < rhs->Name();
+                                  return lhs->name() < rhs->name();
                               });
 
                     for (const auto *flag: flags_in_file.second) {
@@ -343,7 +343,7 @@ namespace turbo::flags_internal {
             FlagsHelpImpl(
                     out,
                     [&](const turbo::CommandLineFlag &flag) {
-                        return filename_filter_cb && filename_filter_cb(flag.Filename());
+                        return filename_filter_cb && filename_filter_cb(flag.filename());
                     },
                     format, program_usage_message);
         }
@@ -408,9 +408,9 @@ namespace turbo::flags_internal {
                                               program_usage_message);
                 } else {
                     auto filter_cb = [&substr](const turbo::CommandLineFlag &flag) {
-                        if (turbo::str_contains(flag.Name(), substr)) return true;
-                        if (turbo::str_contains(flag.Filename(), substr)) return true;
-                        if (turbo::str_contains(flag.Help(), substr)) return true;
+                        if (turbo::str_contains(flag.name(), substr)) return true;
+                        if (turbo::str_contains(flag.filename(), substr)) return true;
+                        if (turbo::str_contains(flag.help(), substr)) return true;
 
                         return false;
                     };

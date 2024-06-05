@@ -307,10 +307,10 @@ void TestParse(const char* (&in_argv)[N], int int_flag_value,
   EXPECT_EQ(out_args.size(), 1 + exp_position_args);
   EXPECT_STREQ(out_args[0], "testbin");
 
-  EXPECT_EQ(turbo::GetFlag(FLAGS_int_flag), int_flag_value);
-  EXPECT_NEAR(turbo::GetFlag(FLAGS_double_flag), double_flag_val, 0.0001);
-  EXPECT_EQ(turbo::GetFlag(FLAGS_string_flag), string_flag_val);
-  EXPECT_EQ(turbo::GetFlag(FLAGS_bool_flag), bool_flag_val);
+  EXPECT_EQ(turbo::get_flag(FLAGS_int_flag), int_flag_value);
+  EXPECT_NEAR(turbo::get_flag(FLAGS_double_flag), double_flag_val, 0.0001);
+  EXPECT_EQ(turbo::get_flag(FLAGS_string_flag), string_flag_val);
+  EXPECT_EQ(turbo::get_flag(FLAGS_bool_flag), bool_flag_val);
 }
 
 // --------------------------------------------------------------------
@@ -458,12 +458,12 @@ TEST_F(ParseTest, TestValidUDTArg) {
   };
   InvokeParse(in_args1);
 
-  EXPECT_EQ(turbo::GetFlag(FLAGS_udt_flag).value, 1);
+  EXPECT_EQ(turbo::get_flag(FLAGS_udt_flag).value, 1);
 
   const char* in_args2[] = {"testbin", "--udt_flag", "AAA"};
   InvokeParse(in_args2);
 
-  EXPECT_EQ(turbo::GetFlag(FLAGS_udt_flag).value, 10);
+  EXPECT_EQ(turbo::get_flag(FLAGS_udt_flag).value, 10);
 }
 
 // --------------------------------------------------------------------
@@ -912,7 +912,7 @@ TEST_F(ParseDeathTest, TestSimpleHelpFlagHandling) {
   };
 
   EXPECT_EQ(InvokeParseTurboOnlyImpl(in_args2), flags::HelpMode::kImportant);
-  EXPECT_EQ(turbo::GetFlag(FLAGS_int_flag), 3);
+  EXPECT_EQ(turbo::get_flag(FLAGS_int_flag), 3);
 
   const char* in_args3[] = {"testbin", "--help", "some_positional_arg"};
 
