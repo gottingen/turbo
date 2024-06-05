@@ -232,11 +232,11 @@ void BM_ThreadedFindCommandLineFlag(benchmark::State& state) {
   char* argv[] = {dummy};
   // We need to ensure that flags have been parsed. That is where the registry
   // is finalized.
-  turbo::ParseCommandLine(1, argv);
+  turbo::parse_command_line(1, argv);
 
   while (state.KeepRunningBatch(kNumFlags)) {
     for (auto* flag_ptr : FlagPtrs_bool) {
-      benchmark::DoNotOptimize(turbo::FindCommandLineFlag(flag_ptr->Name()));
+      benchmark::DoNotOptimize(turbo::find_command_line_flag(flag_ptr->Name()));
     }
   }
 }

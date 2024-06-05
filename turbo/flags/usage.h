@@ -15,8 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#ifndef TURBO_FLAGS_USAGE_H_
-#define TURBO_FLAGS_USAGE_H_
+#pragma once
 
 #include <turbo/base/config.h>
 #include <turbo/strings/string_view.h>
@@ -25,21 +24,18 @@
 // Usage reporting interfaces
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 
-// Sets the "usage" message to be used by help reporting routines.
-// For example:
-//  turbo::SetProgramUsageMessage(
-//      turbo::str_cat("This program does nothing.  Sample usage:\n", argv[0],
-//                   " <uselessarg1> <uselessarg2>"));
-// Do not include commandline flags in the usage: we do that for you!
-// Note: Calling SetProgramUsageMessage twice will trigger a call to std::exit.
-void SetProgramUsageMessage(turbo::string_view new_usage_message);
+    // Sets the "usage" message to be used by help reporting routines.
+    // For example:
+    //  turbo::set_program_usage_message(
+    //      turbo::str_cat("This program does nothing.  Sample usage:\n", argv[0],
+    //                   " <uselessarg1> <uselessarg2>"));
+    // Do not include commandline flags in the usage: we do that for you!
+    // Note: Calling set_program_usage_message twice will trigger a call to std::exit.
+    void set_program_usage_message(turbo::string_view new_usage_message);
 
-// Returns the usage message set by SetProgramUsageMessage().
-turbo::string_view ProgramUsageMessage();
+    // Returns the usage message set by set_program_usage_message().
+    turbo::string_view program_usage_message();
 
-TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_FLAGS_USAGE_H_

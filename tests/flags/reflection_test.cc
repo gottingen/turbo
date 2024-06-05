@@ -51,35 +51,35 @@ class ReflectionTest : public testing::Test {
 // --------------------------------------------------------------------
 
 TEST_F(ReflectionTest, TestFindCommandLineFlag) {
-  auto* handle = turbo::FindCommandLineFlag("some_flag");
+  auto* handle = turbo::find_command_line_flag("some_flag");
   EXPECT_EQ(handle, nullptr);
 
-  handle = turbo::FindCommandLineFlag("int_flag");
+  handle = turbo::find_command_line_flag("int_flag");
   EXPECT_NE(handle, nullptr);
 
-  handle = turbo::FindCommandLineFlag("string_flag");
+  handle = turbo::find_command_line_flag("string_flag");
   EXPECT_NE(handle, nullptr);
 
-  handle = turbo::FindCommandLineFlag("bool_retired_flag");
+  handle = turbo::find_command_line_flag("bool_retired_flag");
   EXPECT_NE(handle, nullptr);
 }
 
 // --------------------------------------------------------------------
 
 TEST_F(ReflectionTest, TestGetAllFlags) {
-  auto all_flags = turbo::GetAllFlags();
+  auto all_flags = turbo::get_all_flags();
   EXPECT_NE(all_flags.find("int_flag"), all_flags.end());
   EXPECT_EQ(all_flags.find("bool_retired_flag"), all_flags.end());
   EXPECT_EQ(all_flags.find("some_undefined_flag"), all_flags.end());
 
   std::vector<turbo::string_view> flag_names_first_attempt;
-  auto all_flags_1 = turbo::GetAllFlags();
+  auto all_flags_1 = turbo::get_all_flags();
   for (auto f : all_flags_1) {
     flag_names_first_attempt.push_back(f.first);
   }
 
   std::vector<turbo::string_view> flag_names_second_attempt;
-  auto all_flags_2 = turbo::GetAllFlags();
+  auto all_flags_2 = turbo::get_all_flags();
   for (auto f : all_flags_2) {
     flag_names_second_attempt.push_back(f.first);
   }
@@ -191,46 +191,46 @@ TEST_F(ReflectionTest, TestFlagSaverVsUpdateViaReflection) {
     counter = 0;
     std::string error;
     EXPECT_TRUE(
-        turbo::FindCommandLineFlag("test_flag_01")->ParseFrom("false", &error))
+        turbo::find_command_line_flag("test_flag_01")->ParseFrom("false", &error))
         << error;
     EXPECT_TRUE(
-        turbo::FindCommandLineFlag("test_flag_02")->ParseFrom("-4536", &error))
+        turbo::find_command_line_flag("test_flag_02")->ParseFrom("-4536", &error))
         << error;
     EXPECT_TRUE(
-        turbo::FindCommandLineFlag("test_flag_03")->ParseFrom("111", &error))
+        turbo::find_command_line_flag("test_flag_03")->ParseFrom("111", &error))
         << error;
     EXPECT_TRUE(
-        turbo::FindCommandLineFlag("test_flag_04")->ParseFrom("909", &error))
+        turbo::find_command_line_flag("test_flag_04")->ParseFrom("909", &error))
         << error;
     EXPECT_TRUE(
-        turbo::FindCommandLineFlag("test_flag_05")->ParseFrom("-2004", &error))
+        turbo::find_command_line_flag("test_flag_05")->ParseFrom("-2004", &error))
         << error;
     EXPECT_TRUE(
-        turbo::FindCommandLineFlag("test_flag_06")->ParseFrom("1000023", &error))
+        turbo::find_command_line_flag("test_flag_06")->ParseFrom("1000023", &error))
         << error;
     EXPECT_TRUE(
-        turbo::FindCommandLineFlag("test_flag_07")->ParseFrom("69305", &error))
+        turbo::find_command_line_flag("test_flag_07")->ParseFrom("69305", &error))
         << error;
-    EXPECT_TRUE(turbo::FindCommandLineFlag("test_flag_08")
+    EXPECT_TRUE(turbo::find_command_line_flag("test_flag_08")
                     ->ParseFrom("1000000001", &error))
         << error;
     EXPECT_TRUE(
-        turbo::FindCommandLineFlag("test_flag_09")->ParseFrom("2.09021", &error))
+        turbo::find_command_line_flag("test_flag_09")->ParseFrom("2.09021", &error))
         << error;
     EXPECT_TRUE(
-        turbo::FindCommandLineFlag("test_flag_10")->ParseFrom("-33.1", &error))
+        turbo::find_command_line_flag("test_flag_10")->ParseFrom("-33.1", &error))
         << error;
     EXPECT_TRUE(
-        turbo::FindCommandLineFlag("test_flag_11")->ParseFrom("ADD_FOO", &error))
+        turbo::find_command_line_flag("test_flag_11")->ParseFrom("ADD_FOO", &error))
         << error;
-    EXPECT_TRUE(turbo::FindCommandLineFlag("test_flag_12")
+    EXPECT_TRUE(turbo::find_command_line_flag("test_flag_12")
                     ->ParseFrom("3h11m16s", &error))
         << error;
     EXPECT_TRUE(
-        turbo::FindCommandLineFlag("test_flag_13")->ParseFrom("0", &error))
+        turbo::find_command_line_flag("test_flag_13")->ParseFrom("0", &error))
         << error;
     EXPECT_TRUE(
-        turbo::FindCommandLineFlag("test_flag_14")->ParseFrom("10:1", &error))
+        turbo::find_command_line_flag("test_flag_14")->ParseFrom("10:1", &error))
         << error;
   }
 

@@ -16,8 +16,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#ifndef TURBO_FLAGS_INTERNAL_PRIVATE_HANDLE_ACCESSOR_H_
-#define TURBO_FLAGS_INTERNAL_PRIVATE_HANDLE_ACCESSOR_H_
+#pragma once
 
 #include <memory>
 #include <string>
@@ -27,38 +26,33 @@
 #include <turbo/flags/internal/commandlineflag.h>
 #include <turbo/strings/string_view.h>
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace flags_internal {
+namespace turbo::flags_internal {
 
-// This class serves as a trampoline to access private methods of
-// CommandLineFlag. This class is intended for use exclusively internally inside
-// of the Turbo Flags implementation.
-class PrivateHandleAccessor {
- public:
-  // Access to CommandLineFlag::TypeId.
-  static FlagFastTypeId TypeId(const CommandLineFlag& flag);
 
-  // Access to CommandLineFlag::SaveState.
-  static std::unique_ptr<FlagStateInterface> SaveState(CommandLineFlag& flag);
+    // This class serves as a trampoline to access private methods of
+    // CommandLineFlag. This class is intended for use exclusively internally inside
+    // of the Turbo Flags implementation.
+    class PrivateHandleAccessor {
+    public:
+        // Access to CommandLineFlag::TypeId.
+        static FlagFastTypeId TypeId(const CommandLineFlag &flag);
 
-  // Access to CommandLineFlag::IsSpecifiedOnCommandLine.
-  static bool IsSpecifiedOnCommandLine(const CommandLineFlag& flag);
+        // Access to CommandLineFlag::SaveState.
+        static std::unique_ptr<FlagStateInterface> SaveState(CommandLineFlag &flag);
 
-  // Access to CommandLineFlag::ValidateInputValue.
-  static bool ValidateInputValue(const CommandLineFlag& flag,
-                                 turbo::string_view value);
+        // Access to CommandLineFlag::IsSpecifiedOnCommandLine.
+        static bool IsSpecifiedOnCommandLine(const CommandLineFlag &flag);
 
-  // Access to CommandLineFlag::CheckDefaultValueParsingRoundtrip.
-  static void CheckDefaultValueParsingRoundtrip(const CommandLineFlag& flag);
+        // Access to CommandLineFlag::ValidateInputValue.
+        static bool ValidateInputValue(const CommandLineFlag &flag,
+                                       turbo::string_view value);
 
-  static bool ParseFrom(CommandLineFlag& flag, turbo::string_view value,
-                        flags_internal::FlagSettingMode set_mode,
-                        flags_internal::ValueSource source, std::string& error);
-};
+        // Access to CommandLineFlag::CheckDefaultValueParsingRoundtrip.
+        static void CheckDefaultValueParsingRoundtrip(const CommandLineFlag &flag);
 
-}  // namespace flags_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+        static bool ParseFrom(CommandLineFlag &flag, turbo::string_view value,
+                              flags_internal::FlagSettingMode set_mode,
+                              flags_internal::ValueSource source, std::string &error);
+    };
 
-#endif  // TURBO_FLAGS_INTERNAL_PRIVATE_HANDLE_ACCESSOR_H_
+}  // namespace turbo::flags_internal

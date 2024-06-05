@@ -15,8 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#ifndef TURBO_FLAGS_CONFIG_H_
-#define TURBO_FLAGS_CONFIG_H_
+#pragma once
 
 // Determine if we should strip string literals from the Flag objects.
 // By default we strip string literals on mobile platforms.
@@ -66,5 +65,3 @@
   TURBO_FLAGS_INTERNAL_BUILTIN_TYPES(A)         \
   A(std::string, std_string)                   \
   A(std::vector<std::string>, std_vector_of_string)
-
-#endif  // TURBO_FLAGS_CONFIG_H_

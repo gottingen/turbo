@@ -18,12 +18,8 @@
 
 #include <turbo/flags/internal/commandlineflag.h>
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace flags_internal {
+namespace turbo::flags_internal {
 
-FlagStateInterface::~FlagStateInterface() = default;
+    FlagStateInterface::~FlagStateInterface() = default;
 
-}  // namespace flags_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::flags_internal

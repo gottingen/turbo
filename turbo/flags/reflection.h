@@ -23,8 +23,7 @@
 // This file defines the routines to access and operate on an Turbo Flag's
 // reflection handle.
 
-#ifndef TURBO_FLAGS_REFLECTION_H_
-#define TURBO_FLAGS_REFLECTION_H_
+#pragma once
 
 #include <string>
 
@@ -34,60 +33,57 @@
 #include <turbo/flags/internal/commandlineflag.h>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace flags_internal {
-class FlagSaverImpl;
-}  // namespace flags_internal
+    namespace flags_internal {
+        class FlagSaverImpl;
+    }  // namespace flags_internal
 
-// FindCommandLineFlag()
-//
-// Returns the reflection handle of an Turbo flag of the specified name, or
-// `nullptr` if not found. This function will emit a warning if the name of a
-// 'retired' flag is specified.
-turbo::CommandLineFlag* FindCommandLineFlag(turbo::string_view name);
+    // find_command_line_flag()
+    //
+    // Returns the reflection handle of an Turbo flag of the specified name, or
+    // `nullptr` if not found. This function will emit a warning if the name of a
+    // 'retired' flag is specified.
+    turbo::CommandLineFlag *find_command_line_flag(turbo::string_view name);
 
-// Returns current state of the Flags registry in a form of mapping from flag
-// name to a flag reflection handle.
-turbo::flat_hash_map<turbo::string_view, turbo::CommandLineFlag*> GetAllFlags();
+    // Returns current state of the Flags registry in a form of mapping from flag
+    // name to a flag reflection handle.
+    turbo::flat_hash_map<turbo::string_view, turbo::CommandLineFlag *> get_all_flags();
 
-//------------------------------------------------------------------------------
-// FlagSaver
-//------------------------------------------------------------------------------
-//
-// A FlagSaver object stores the state of flags in the scope where the FlagSaver
-// is defined, allowing modification of those flags within that scope and
-// automatic restoration of the flags to their previous state upon leaving the
-// scope.
-//
-// A FlagSaver can be used within tests to temporarily change the test
-// environment and restore the test case to its previous state.
-//
-// Example:
-//
-//   void MyFunc() {
-//    turbo::FlagSaver fs;
-//    ...
-//    turbo::SetFlag(&FLAGS_myFlag, otherValue);
-//    ...
-//  } // scope of FlagSaver left, flags return to previous state
-//
-// This class is thread-safe.
+    //------------------------------------------------------------------------------
+    // FlagSaver
+    //------------------------------------------------------------------------------
+    //
+    // A FlagSaver object stores the state of flags in the scope where the FlagSaver
+    // is defined, allowing modification of those flags within that scope and
+    // automatic restoration of the flags to their previous state upon leaving the
+    // scope.
+    //
+    // A FlagSaver can be used within tests to temporarily change the test
+    // environment and restore the test case to its previous state.
+    //
+    // Example:
+    //
+    //   void MyFunc() {
+    //    turbo::FlagSaver fs;
+    //    ...
+    //    turbo::SetFlag(&FLAGS_myFlag, otherValue);
+    //    ...
+    //  } // scope of FlagSaver left, flags return to previous state
+    //
+    // This class is thread-safe.
 
-class FlagSaver {
- public:
-  FlagSaver();
-  ~FlagSaver();
+    class FlagSaver {
+    public:
+        FlagSaver();
 
-  FlagSaver(const FlagSaver&) = delete;
-  void operator=(const FlagSaver&) = delete;
+        ~FlagSaver();
 
- private:
-  flags_internal::FlagSaverImpl* impl_;
-};
+        FlagSaver(const FlagSaver &) = delete;
 
-//-----------------------------------------------------------------------------
+        void operator=(const FlagSaver &) = delete;
 
-TURBO_NAMESPACE_END
+    private:
+        flags_internal::FlagSaverImpl *impl_;
+    };
+
+
 }  // namespace turbo
-
-#endif  // TURBO_FLAGS_REFLECTION_H_

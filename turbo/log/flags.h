@@ -36,7 +36,7 @@
 // Emit a backtrace (stack trace) when logging at file:linenum.
 //
 // To use these commandline flags, the //turbo/log:flags library must be
-// explicitly linked, and turbo::ParseCommandLine() must be called before the
+// explicitly linked, and turbo::parse_command_line() must be called before the
 // call to turbo::initialize_log().
 //
 // To configure the Log library programmatically, use the interfaces defined in

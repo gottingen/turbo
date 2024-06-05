@@ -16,8 +16,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#ifndef TURBO_FLAGS_INTERNAL_PARSE_H_
-#define TURBO_FLAGS_INTERNAL_PARSE_H_
+#pragma once
 
 #include <iostream>
 #include <ostream>
@@ -34,40 +33,36 @@ TURBO_DECLARE_FLAG(std::vector<std::string>, fromenv);
 TURBO_DECLARE_FLAG(std::vector<std::string>, tryfromenv);
 TURBO_DECLARE_FLAG(std::vector<std::string>, undefok);
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace flags_internal {
+namespace turbo::flags_internal {
 
-enum class UsageFlagsAction { kHandleUsage, kIgnoreUsage };
-enum class OnUndefinedFlag {
-  kIgnoreUndefined,
-  kReportUndefined,
-  kAbortIfUndefined
-};
+    enum class UsageFlagsAction {
+        kHandleUsage, kIgnoreUsage
+    };
+    enum class OnUndefinedFlag {
+        kIgnoreUndefined,
+        kReportUndefined,
+        kAbortIfUndefined
+    };
 
-// This is not a public interface. This interface exists to expose the ability
-// to change help output stream in case of parsing errors. This is used by
-// internal unit tests to validate expected outputs.
-// When this was written, `EXPECT_EXIT` only supported matchers on stderr,
-// but not on stdout.
-std::vector<char*> ParseCommandLineImpl(
-    int argc, char* argv[], UsageFlagsAction usage_flag_action,
-    OnUndefinedFlag undef_flag_action,
-    std::ostream& error_help_output = std::cout);
+    // This is not a public interface. This interface exists to expose the ability
+    // to change help output stream in case of parsing errors. This is used by
+    // internal unit tests to validate expected outputs.
+    // When this was written, `EXPECT_EXIT` only supported matchers on stderr,
+    // but not on stdout.
+    std::vector<char *> ParseCommandLineImpl(
+            int argc, char *argv[], UsageFlagsAction usage_flag_action,
+            OnUndefinedFlag undef_flag_action,
+            std::ostream &error_help_output = std::cout);
 
-// --------------------------------------------------------------------
-// Inspect original command line
+    // --------------------------------------------------------------------
+    // Inspect original command line
 
-// Returns true if flag with specified name was either present on the original
-// command line or specified in flag file present on the original command line.
-bool WasPresentOnCommandLine(turbo::string_view flag_name);
+    // Returns true if flag with specified name was either present on the original
+    // command line or specified in flag file present on the original command line.
+    bool WasPresentOnCommandLine(turbo::string_view flag_name);
 
-// Return existing flags similar to the parameter, in order to help in case of
-// misspellings.
-std::vector<std::string> GetMisspellingHints(turbo::string_view flag);
+    // Return existing flags similar to the parameter, in order to help in case of
+    // misspellings.
+    std::vector<std::string> GetMisspellingHints(turbo::string_view flag);
 
-}  // namespace flags_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
-
-#endif  // TURBO_FLAGS_INTERNAL_PARSE_H_
+}  // namespace turbo::flags_internal
