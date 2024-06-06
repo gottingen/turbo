@@ -94,7 +94,7 @@ bool ShouldRehashForBugDetection(const ctrl_t* ctrl, size_t capacity) {
   // `min(1, RehashProbabilityConstant() / capacity())`. In order to do this,
   // we probe based on a random hash and see if the offset is less than
   // RehashProbabilityConstant().
-  return probe(ctrl, capacity, turbo::HashOf(RandomSeed())).offset() <
+  return probe(ctrl, capacity, turbo::hash_of(RandomSeed())).offset() <
          RehashProbabilityConstant();
 }
 

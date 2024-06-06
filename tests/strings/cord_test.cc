@@ -3179,8 +3179,8 @@ TEST_P(CordTest, ExpectedChecksum) {
 
       EXPECT_EQ(cc3[0], 'a');
       EXPECT_EQ(cc3[4], 'e');
-      EXPECT_EQ(turbo::HashOf(cc3), turbo::HashOf(base_value));
-      EXPECT_EQ(turbo::HashOf(cc3), turbo::HashOf(base_value_as_string));
+      EXPECT_EQ(turbo::hash_of(cc3), turbo::hash_of(base_value));
+      EXPECT_EQ(turbo::hash_of(cc3), turbo::hash_of(base_value_as_string));
     }
   }
 }
@@ -3276,8 +3276,8 @@ TEST_P(CordTest, ChecksummedEmptyCord) {
   EXPECT_TRUE(cc3.char_begin() == cc3.char_end());
 
   EXPECT_EQ(cc3.TryFlat(), "");
-  EXPECT_EQ(turbo::HashOf(c3), turbo::HashOf(turbo::Cord()));
-  EXPECT_EQ(turbo::HashOf(c3), turbo::HashOf(turbo::string_view()));
+  EXPECT_EQ(turbo::hash_of(c3), turbo::hash_of(turbo::Cord()));
+  EXPECT_EQ(turbo::hash_of(c3), turbo::hash_of(turbo::string_view()));
 }
 
 TEST(CrcCordTest, ChecksummedEmptyCordEstimateMemoryUsage) {

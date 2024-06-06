@@ -56,7 +56,7 @@ namespace turbo {
                 logging_globals_listener;
 
         size_t HashSiteForLogBacktraceAt(turbo::string_view file, int line) {
-            return turbo::HashOf(file, line);
+            return turbo::hash_of(file, line);
         }
 
         void TriggerLoggingGlobalsListener() {

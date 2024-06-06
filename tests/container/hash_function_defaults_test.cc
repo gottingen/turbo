@@ -507,11 +507,11 @@ struct TypeWithTurboContainerHash {
     using is_transparent = void;
 
     size_t operator()(const TypeWithTurboContainerHash& foo) const {
-      return turbo::HashOf(foo.value);
+      return turbo::hash_of(foo.value);
     }
 
     // Extra overload to test that heterogeneity works for this hasher.
-    size_t operator()(int value) const { return turbo::HashOf(value); }
+    size_t operator()(int value) const { return turbo::hash_of(value); }
   };
 
   friend bool operator==(const TypeWithTurboContainerHash& lhs,
@@ -532,11 +532,11 @@ struct TypeWithTurboContainerHashAndEq {
     using is_transparent = void;
 
     size_t operator()(const TypeWithTurboContainerHashAndEq& foo) const {
-      return turbo::HashOf(foo.value);
+      return turbo::hash_of(foo.value);
     }
 
     // Extra overload to test that heterogeneity works for this hasher.
-    size_t operator()(int value) const { return turbo::HashOf(value); }
+    size_t operator()(int value) const { return turbo::hash_of(value); }
   };
 
   struct turbo_container_eq {
@@ -575,8 +575,8 @@ TYPED_TEST(TurboContainerHashTest, HasherWorks) {
   TypeParam foo1_copy{/*value=*/1, /*noise=*/20};
   TypeParam foo2{/*value=*/2, /*noise=*/100};
 
-  EXPECT_EQ(hasher(foo1), turbo::HashOf(1));
-  EXPECT_EQ(hasher(foo2), turbo::HashOf(2));
+  EXPECT_EQ(hasher(foo1), turbo::hash_of(1));
+  EXPECT_EQ(hasher(foo2), turbo::hash_of(2));
   EXPECT_EQ(hasher(foo1), hasher(foo1_copy));
 
   // Heterogeneity works.
