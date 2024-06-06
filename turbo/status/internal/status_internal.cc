@@ -34,7 +34,7 @@
 #include <turbo/debugging/stacktrace.h>
 #include <turbo/debugging/symbolize.h>
 #include <turbo/memory/memory.h>
-#include <turbo/status/status.h>
+#include <turbo/status/status_impl.h>
 #include <turbo/status/status_payload_printer.h>
 #include <turbo/strings/cord.h>
 #include <turbo/strings/escaping.h>

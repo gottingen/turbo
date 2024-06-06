@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/status/status.h>
+#include <turbo/status/status_impl.h>
 
 #include <errno.h>
 
@@ -561,20 +561,20 @@ TEST(Status, Swap) {
   test_swap(with_payload, no_payload);
 }
 
-TEST(StatusErrno, ErrnoToStatusCode) {
-  EXPECT_EQ(turbo::ErrnoToStatusCode(0), turbo::StatusCode::kOk);
+TEST(StatusErrno, errno_to_status_code) {
+  EXPECT_EQ(turbo::errno_to_status_code(0), turbo::StatusCode::kOk);
 
   // Spot-check a few errno values.
-  EXPECT_EQ(turbo::ErrnoToStatusCode(EINVAL),
+  EXPECT_EQ(turbo::errno_to_status_code(EINVAL),
             turbo::StatusCode::kInvalidArgument);
-  EXPECT_EQ(turbo::ErrnoToStatusCode(ENOENT), turbo::StatusCode::kNotFound);
+  EXPECT_EQ(turbo::errno_to_status_code(ENOENT), turbo::StatusCode::kNotFound);
 
   // We'll pick a very large number so it hopefully doesn't collide to errno.
-  EXPECT_EQ(turbo::ErrnoToStatusCode(19980927), turbo::StatusCode::kUnknown);
+  EXPECT_EQ(turbo::errno_to_status_code(19980927), turbo::StatusCode::kUnknown);
 }
 
-TEST(StatusErrno, ErrnoToStatus) {
-  turbo::Status status = turbo::ErrnoToStatus(ENOENT, "Cannot open 'path'");
+TEST(StatusErrno, errno_to_status) {
+  turbo::Status status = turbo::errno_to_status(ENOENT, "Cannot open 'path'");
   EXPECT_EQ(status.code(), turbo::StatusCode::kNotFound);
   EXPECT_EQ(status.message(), "Cannot open 'path': No such file or directory");
 }

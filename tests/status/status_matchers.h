@@ -25,8 +25,8 @@
 
 #include <gmock/gmock.h>  // gmock_for_status_matchers.h
 #include <turbo/base/config.h>
-#include <turbo/status/status.h>
-#include <turbo/status/result.h>
+#include <turbo/status/status_impl.h>
+#include <turbo/status/result_impl.h>
 #include <turbo/strings/string_view.h>
 
 namespace turbo_testing {

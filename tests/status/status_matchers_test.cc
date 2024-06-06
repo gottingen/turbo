@@ -23,8 +23,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest-spi.h>
 #include <gtest/gtest.h>
-#include <turbo/status/status.h>
-#include <turbo/status/result.h>
+#include <turbo/status/status_impl.h>
+#include <turbo/status/result_impl.h>
 #include <turbo/strings/string_view.h>
 
 namespace {

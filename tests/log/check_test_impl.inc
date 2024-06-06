@@ -33,7 +33,7 @@
 #include <turbo/base/attributes.h>
 #include <turbo/base/config.h>
 #include <tests/log/test_helpers.h>
-#include <turbo/status/status.h>
+#include <turbo/status/status_impl.h>
 #include <turbo/strings/string_view.h>
 #include <turbo/strings/substitute.h>
 

@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/status/result.h>
+#include <turbo/status/result_impl.h>
 
 #include <array>
 #include <cstddef>
@@ -33,7 +33,7 @@
 #include <gtest/gtest.h>
 #include <turbo/base/casts.h>
 #include <turbo/memory/memory.h>
-#include <turbo/status/status.h>
+#include <turbo/status/status_impl.h>
 #include <tests/status/status_matchers_api.h>
 #include <turbo/strings/str_cat.h>
 #include <turbo/strings/string_view.h>

@@ -19,7 +19,7 @@
 // Created by jeff on 24-5-31.
 //
 
-#include <turbo/status/result.h>
+#include <turbo/status/status.h>
 
 turbo::Result<int> not_ok() {
     return turbo::internal_error("not ok");
@@ -30,22 +30,38 @@ turbo::Result<int> ok() {
 }
 
 turbo::Status call_ok() {
-    TURBO_ASSIGN_OR_RETURN(auto r, ok());
-    (void)r;
+    RESULT_ASSIGN_OR_RETURN(auto r, ok());
     std::cout << "this should be 1: " << r << std::endl;
     return turbo::OkStatus();
 }
 
 turbo::Status call_not_ok() {
-    TURBO_ASSIGN_OR_RETURN(auto r, not_ok());
+    RESULT_ASSIGN_OR_RETURN(auto r, not_ok());
+    (void)r;
+    std::cout << "this should not be printed" << std::endl;
+    return turbo::OkStatus();
+}
+
+turbo::Status call_not_ok1() {
+    STATUS_RETURN_IF_ERROR(call_not_ok())<<" stream message call_not_ok1";
+    std::cout << "this should not be printed" << std::endl;
+    return turbo::OkStatus();
+}
+
+turbo::Status call_not_ok2() {
+    STATUS_RETURN_IF_ERROR(call_not_ok1())<<" stream message call_not_ok2";
     std::cout << "this should not be printed" << std::endl;
     return turbo::OkStatus();
 }
 
 int main() {
     auto r = call_ok();
-    (void)r;
+    std::cout << "this should be ok: " << r << std::endl;
     r = call_not_ok();
-    (void)r;
+    std::cout << "this should be printed: " << r << std::endl;
+    r = call_not_ok1();
+    std::cout << "this should be printed: " << r << std::endl;
+    r = call_not_ok2();
+    std::cout << "this should be printed: " << r << std::endl;
     return 0;
 }
