@@ -1103,7 +1103,7 @@ TEST(HashTest, DoesNotUseImplicitConversionsToBool) {
             turbo::Hash<ValueWithBoolConversion>()(ValueWithBoolConversion{1}));
 }
 
-TEST(HashOf, MatchesHashForSingleArgument) {
+TEST(hash_of, MatchesHashForSingleArgument) {
   std::string s = "forty two";
   double d = 42.0;
   std::tuple<int, int> t{4, 2};
@@ -1114,29 +1114,29 @@ TEST(HashOf, MatchesHashForSingleArgument) {
   int8_t i8 = 42;
   int8_t neg_i8 = -42;
 
-  EXPECT_EQ(turbo::HashOf(s), turbo::Hash<std::string>{}(s));
-  EXPECT_EQ(turbo::HashOf(d), turbo::Hash<double>{}(d));
-  EXPECT_EQ(turbo::HashOf(t), (turbo::Hash<std::tuple<int, int>>{}(t)));
-  EXPECT_EQ(turbo::HashOf(i), turbo::Hash<int>{}(i));
-  EXPECT_EQ(turbo::HashOf(neg_i), turbo::Hash<int>{}(neg_i));
-  EXPECT_EQ(turbo::HashOf(i16), turbo::Hash<int16_t>{}(i16));
-  EXPECT_EQ(turbo::HashOf(neg_i16), turbo::Hash<int16_t>{}(neg_i16));
-  EXPECT_EQ(turbo::HashOf(i8), turbo::Hash<int8_t>{}(i8));
-  EXPECT_EQ(turbo::HashOf(neg_i8), turbo::Hash<int8_t>{}(neg_i8));
+  EXPECT_EQ(turbo::hash_of(s), turbo::Hash<std::string>{}(s));
+  EXPECT_EQ(turbo::hash_of(d), turbo::Hash<double>{}(d));
+  EXPECT_EQ(turbo::hash_of(t), (turbo::Hash<std::tuple<int, int>>{}(t)));
+  EXPECT_EQ(turbo::hash_of(i), turbo::Hash<int>{}(i));
+  EXPECT_EQ(turbo::hash_of(neg_i), turbo::Hash<int>{}(neg_i));
+  EXPECT_EQ(turbo::hash_of(i16), turbo::Hash<int16_t>{}(i16));
+  EXPECT_EQ(turbo::hash_of(neg_i16), turbo::Hash<int16_t>{}(neg_i16));
+  EXPECT_EQ(turbo::hash_of(i8), turbo::Hash<int8_t>{}(i8));
+  EXPECT_EQ(turbo::hash_of(neg_i8), turbo::Hash<int8_t>{}(neg_i8));
 }
 
-TEST(HashOf, MatchesHashOfTupleForMultipleArguments) {
+TEST(hash_of, MatchesHashOfTupleForMultipleArguments) {
   std::string hello = "hello";
   std::string world = "world";
 
-  EXPECT_EQ(turbo::HashOf(), turbo::HashOf(std::make_tuple()));
-  EXPECT_EQ(turbo::HashOf(hello), turbo::HashOf(std::make_tuple(hello)));
-  EXPECT_EQ(turbo::HashOf(hello, world),
-            turbo::HashOf(std::make_tuple(hello, world)));
+  EXPECT_EQ(turbo::hash_of(), turbo::hash_of(std::make_tuple()));
+  EXPECT_EQ(turbo::hash_of(hello), turbo::hash_of(std::make_tuple(hello)));
+  EXPECT_EQ(turbo::hash_of(hello, world),
+            turbo::hash_of(std::make_tuple(hello, world)));
 }
 
 template <typename T>
-std::true_type HashOfExplicitParameter(decltype(turbo::HashOf<T>(0))) {
+std::true_type HashOfExplicitParameter(decltype(turbo::hash_of<T>(0))) {
   return {};
 }
 template <typename T>
@@ -1144,7 +1144,7 @@ std::false_type HashOfExplicitParameter(size_t) {
   return {};
 }
 
-TEST(HashOf, CantPassExplicitTemplateParameters) {
+TEST(hash_of, CantPassExplicitTemplateParameters) {
   EXPECT_FALSE(HashOfExplicitParameter<int>(0));
 }
 
