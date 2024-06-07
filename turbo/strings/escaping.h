@@ -71,11 +71,11 @@ namespace turbo {
     //     ...
     //   }
     //   EXPECT_EQ(unescaped_s, "foo\rbar\nbaz\t");
-    bool c_decode(turbo::string_view source, turbo::Nonnull<std::string *> dest,
+    bool c_decode(std::string_view source, turbo::Nonnull<std::string *> dest,
                    turbo::Nullable<std::string *> error);
 
     // Overload of `c_decode()` with no error reporting.
-    inline bool c_decode(turbo::string_view source,
+    inline bool c_decode(std::string_view source,
                           turbo::Nonnull<std::string *> dest) {
         return c_decode(source, dest, nullptr);
     }
@@ -91,7 +91,7 @@ namespace turbo {
     //   std::string s = "foo\rbar\tbaz\010\011\012\013\014\x0d\n";
     //   std::string escaped_s = turbo::c_encode(s);
     //   EXPECT_EQ(escaped_s, "foo\\rbar\\tbaz\\010\\t\\n\\013\\014\\r\\n");
-    std::string c_encode(turbo::string_view src);
+    std::string c_encode(std::string_view src);
 
     // c_hex_encode()
     //
@@ -104,7 +104,7 @@ namespace turbo {
     //   std::string s = "foo\rbar\tbaz\010\011\012\013\014\x0d\n";
     //   std::string escaped_s = turbo::c_hex_encode(s);
     //   EXPECT_EQ(escaped_s, "foo\\rbar\\tbaz\\x08\\t\\n\\x0b\\x0c\\r\\n");
-        std::string c_hex_encode(turbo::string_view src);
+        std::string c_hex_encode(std::string_view src);
 
     // utf8_safe_encode()
     //
@@ -112,33 +112,33 @@ namespace turbo {
     // octal sequences, and passing through UTF-8 characters without conversion.
     // I.e., when encountering any bytes with their high bit set, this function
     // will not escape those values, whether or not they are valid UTF-8.
-    std::string utf8_safe_encode(turbo::string_view src);
+    std::string utf8_safe_encode(std::string_view src);
 
     // utf8_safe_hex_encode()
     //
     // Escapes a 'src' string using C-style escape sequences, escaping bytes as
     // hexadecimal sequences, and passing through UTF-8 characters without
     // conversion.
-    std::string utf8_safe_hex_encode(turbo::string_view src);
+    std::string utf8_safe_hex_encode(std::string_view src);
 
     // base64_encode()
     //
     // Encodes a `src` string into a base64-encoded 'dest' string with padding
     // characters. This function conforms with RFC 4648 section 4 (base64) and RFC
     // 2045.
-    void base64_encode(turbo::string_view src, turbo::Nonnull<std::string *> dest);
+    void base64_encode(std::string_view src, turbo::Nonnull<std::string *> dest);
 
-    std::string base64_encode(turbo::string_view src);
+    std::string base64_encode(std::string_view src);
 
     // web_safe_base64_encode()
     //
     // Encodes a `src` string into a base64 string, like base64_encode() does, but
     // outputs '-' instead of '+' and '_' instead of '/', and does not pad 'dest'.
     // This function conforms with RFC 4648 section 5 (base64url).
-    void web_safe_base64_encode(turbo::string_view src,
+    void web_safe_base64_encode(std::string_view src,
                              turbo::Nonnull<std::string *> dest);
 
-    std::string web_safe_base64_encode(turbo::string_view src);
+    std::string web_safe_base64_encode(std::string_view src);
 
     // base64_decode()
     //
@@ -147,7 +147,7 @@ namespace turbo {
     // `src` contains invalid characters, `dest` is cleared and returns `false`.
     // If padding is included (note that `base64_encode()` does produce it), it must
     // be correct. In the padding, '=' and '.' are treated identically.
-    bool base64_decode(turbo::string_view src, turbo::Nonnull<std::string *> dest);
+    bool base64_decode(std::string_view src, turbo::Nonnull<std::string *> dest);
 
     // web_safe_base64_decode()
     //
@@ -156,7 +156,7 @@ namespace turbo {
     // invalid characters, `dest` is cleared and returns `false`. If padding is
     // included (note that `web_safe_base64_encode()` does not produce it), it must be
     // correct. In the padding, '=' and '.' are treated identically.
-    bool web_safe_base64_decode(turbo::string_view src,
+    bool web_safe_base64_decode(std::string_view src,
                                turbo::Nonnull<std::string *> dest);
 
     // hex_string_to_bytes()
@@ -165,7 +165,7 @@ namespace turbo {
     // output string.  If `hex` does not consist of valid hexadecimal data, this
     // function returns false and leaves `bytes` in an unspecified state. Returns
     // true on success.
-    TURBO_MUST_USE_RESULT bool hex_string_to_bytes(turbo::string_view hex,
+    TURBO_MUST_USE_RESULT bool hex_string_to_bytes(std::string_view hex,
                                                 turbo::Nonnull<std::string *> bytes);
 
     // hex_string_to_bytes()
@@ -175,12 +175,12 @@ namespace turbo {
     // return value is unspecified.
     //TURBO_DEPRECATED("Use the hex_string_to_bytes() that returns a bool")
 
-    //std::string hex_string_to_bytes(turbo::string_view from);
+    //std::string hex_string_to_bytes(std::string_view from);
 
     // bytes_to_hex_string()
     //
     // Converts binary data into an ASCII text string, returning a string of size
     // `2*from.size()`.
-    std::string bytes_to_hex_string(turbo::string_view from);
+    std::string bytes_to_hex_string(std::string_view from);
 
 }  // namespace turbo

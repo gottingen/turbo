@@ -48,7 +48,7 @@ namespace turbo {
         // Called by `turbo::extend_crc32c()` on strings with size > 64 or when hardware
         // CRC32C support is missing.
         CRC32C extend_crc32c_internal(CRC32C initial_crc,
-                                        turbo::string_view buf_to_add) {
+                                        std::string_view buf_to_add) {
             uint32_t crc = static_cast<uint32_t>(initial_crc) ^ kCRC32Xor;
             CrcEngine()->Extend(&crc, buf_to_add.data(), buf_to_add.size());
             return static_cast<CRC32C>(crc ^ kCRC32Xor);
@@ -56,7 +56,7 @@ namespace turbo {
 
     }  // namespace crc_internal
 
-    CRC32C compute_crc32c(turbo::string_view buf) {
+    CRC32C compute_crc32c(std::string_view buf) {
         return extend_crc32c(CRC32C{0}, buf);
     }
 

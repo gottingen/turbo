@@ -67,7 +67,7 @@ namespace turbo {
         // Reference-counted representation of Status data.
         class StatusRep {
         public:
-            StatusRep(turbo::StatusCode code_arg, turbo::string_view message_arg,
+            StatusRep(turbo::StatusCode code_arg, std::string_view message_arg,
                       std::unique_ptr<status_internal::Payloads> payloads_arg)
                     : ref_(int32_t{1}),
                       code_(code_arg),
@@ -85,19 +85,19 @@ namespace turbo {
             void Unref() const;
 
             // Payload methods correspond to the same methods in turbo::Status.
-            std::optional<turbo::Cord> get_payload(turbo::string_view type_url) const;
+            std::optional<turbo::Cord> get_payload(std::string_view type_url) const;
 
-            void set_payload(turbo::string_view type_url, turbo::Cord payload);
+            void set_payload(std::string_view type_url, turbo::Cord payload);
 
             struct EraseResult {
                 bool erased;
                 uintptr_t new_rep;
             };
 
-            EraseResult erase_payload(turbo::string_view type_url);
+            EraseResult erase_payload(std::string_view type_url);
 
             void for_each_payload(
-                    turbo::FunctionRef<void(turbo::string_view, const turbo::Cord &)> visitor)
+                    turbo::FunctionRef<void(std::string_view, const turbo::Cord &)> visitor)
             const;
 
             std::string ToString(StatusToStringMode mode) const;

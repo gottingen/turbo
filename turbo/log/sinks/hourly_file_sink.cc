@@ -46,7 +46,7 @@ namespace turbo {
         return fname;
     }
 
-    HourlyFileSink::HourlyFileSink(turbo::string_view base_filename,
+    HourlyFileSink::HourlyFileSink(std::string_view base_filename,
                                  int rotation_minute,
                                  int check_interval_s,
                                  bool truncate,

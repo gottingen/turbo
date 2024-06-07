@@ -150,7 +150,7 @@ class StatusIsMatcherCommonImpl {
  public:
   StatusIsMatcherCommonImpl(
       ::testing::Matcher<StatusCode> code_matcher,
-      ::testing::Matcher<turbo::string_view> message_matcher)
+      ::testing::Matcher<std::string_view> message_matcher)
       : code_matcher_(std::move(code_matcher)),
         message_matcher_(std::move(message_matcher)) {}
 
@@ -163,7 +163,7 @@ class StatusIsMatcherCommonImpl {
 
  private:
   const ::testing::Matcher<StatusCode> code_matcher_;
-  const ::testing::Matcher<turbo::string_view> message_matcher_;
+  const ::testing::Matcher<std::string_view> message_matcher_;
 };
 
 // Monomorphic implementation of matcher StatusIs() for a given type
@@ -201,7 +201,7 @@ class StatusIsMatcher {
                   StatusMessageMatcher&& message_matcher)
       : common_impl_(::testing::MatcherCast<StatusCode>(
                          std::forward<StatusCodeMatcher>(code_matcher)),
-                     ::testing::MatcherCast<turbo::string_view>(
+                     ::testing::MatcherCast<std::string_view>(
                          std::forward<StatusMessageMatcher>(message_matcher))) {
   }
 

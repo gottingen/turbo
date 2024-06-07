@@ -118,7 +118,7 @@ class VLogSite final {
   TURBO_ATTRIBUTE_NOINLINE bool SlowIsEnabled4(int stale_v);
   TURBO_ATTRIBUTE_NOINLINE bool SlowIsEnabled5(int stale_v);
 
-  // This object is too size-sensitive to use turbo::string_view.
+  // This object is too size-sensitive to use std::string_view.
   const char* const file_;
   std::atomic<int> v_;
   std::atomic<VLogSite*> next_;
@@ -128,7 +128,7 @@ static_assert(std::is_trivially_destructible<VLogSite>::value,
 
 // Returns the current verbose log level of `file`.
 // Does not allocate memory.
-int VLogLevel(turbo::string_view file);
+int VLogLevel(std::string_view file);
 
 // Registers a site `v` to get updated as `vmodule` and `v` change.  Also
 // initializes the site based on their current values, and returns that result.
@@ -140,7 +140,7 @@ void UpdateVLogSites();
 
 // Completely overwrites the saved value of `vmodule`.
 // Allocates memory.
-void UpdateVModule(turbo::string_view vmodule);
+void UpdateVModule(std::string_view vmodule);
 
 // Updates the global verbosity level to `v` and returns the prior value.
 // Allocates memory.
@@ -150,7 +150,7 @@ int UpdateGlobalVLogLevel(int v);
 // Returns the prior value for `module_pattern` if there was an exact match and
 // `global_v` otherwise.
 // Allocates memory.
-int PrependVModule(turbo::string_view module_pattern, int log_level);
+int PrependVModule(std::string_view module_pattern, int log_level);
 
 // Registers `on_update` to be called whenever `v` or `vmodule` change.
 // Allocates memory.

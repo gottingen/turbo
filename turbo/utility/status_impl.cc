@@ -107,7 +107,7 @@ namespace turbo {
         return kMovedFrom.get();
     }
 
-    Status::Status(turbo::StatusCode code, turbo::string_view msg)
+    Status::Status(turbo::StatusCode code, std::string_view msg)
             : rep_(CodeToInlinedRep(code)) {
         if (code != turbo::StatusCode::kOk && !msg.empty()) {
             rep_ = PointerToRep(new status_internal::StatusRep(code, msg, nullptr));
@@ -118,7 +118,7 @@ namespace turbo {
             uintptr_t rep) {
         if (IsInlined(rep)) {
             return new status_internal::StatusRep(InlinedRepToCode(rep),
-                                                  turbo::string_view(), nullptr);
+                                                  std::string_view(), nullptr);
         }
         return RepToPointer(rep)->CloneAndUnref();
     }
@@ -135,67 +135,67 @@ namespace turbo {
         return os;
     }
 
-    Status aborted_error(turbo::string_view message) {
+    Status aborted_error(std::string_view message) {
         return Status(turbo::StatusCode::kAborted, message);
     }
 
-    Status already_exists_error(turbo::string_view message) {
+    Status already_exists_error(std::string_view message) {
         return Status(turbo::StatusCode::kAlreadyExists, message);
     }
 
-    Status cancelled_error(turbo::string_view message) {
+    Status cancelled_error(std::string_view message) {
         return Status(turbo::StatusCode::kCancelled, message);
     }
 
-    Status data_loss_error(turbo::string_view message) {
+    Status data_loss_error(std::string_view message) {
         return Status(turbo::StatusCode::kDataLoss, message);
     }
 
-    Status deadline_exceeded_error(turbo::string_view message) {
+    Status deadline_exceeded_error(std::string_view message) {
         return Status(turbo::StatusCode::kDeadlineExceeded, message);
     }
 
-    Status failed_precondition_error(turbo::string_view message) {
+    Status failed_precondition_error(std::string_view message) {
         return Status(turbo::StatusCode::kFailedPrecondition, message);
     }
 
-    Status internal_error(turbo::string_view message) {
+    Status internal_error(std::string_view message) {
         return Status(turbo::StatusCode::kInternal, message);
     }
 
-    Status invalid_argument_error(turbo::string_view message) {
+    Status invalid_argument_error(std::string_view message) {
         return Status(turbo::StatusCode::kInvalidArgument, message);
     }
 
-    Status not_found_error(turbo::string_view message) {
+    Status not_found_error(std::string_view message) {
         return Status(turbo::StatusCode::kNotFound, message);
     }
 
-    Status out_of_range_error(turbo::string_view message) {
+    Status out_of_range_error(std::string_view message) {
         return Status(turbo::StatusCode::kOutOfRange, message);
     }
 
-    Status permission_denied_error(turbo::string_view message) {
+    Status permission_denied_error(std::string_view message) {
         return Status(turbo::StatusCode::kPermissionDenied, message);
     }
 
-    Status resource_exhausted_error(turbo::string_view message) {
+    Status resource_exhausted_error(std::string_view message) {
         return Status(turbo::StatusCode::kResourceExhausted, message);
     }
 
-    Status unauthenticated_error(turbo::string_view message) {
+    Status unauthenticated_error(std::string_view message) {
         return Status(turbo::StatusCode::kUnauthenticated, message);
     }
 
-    Status unavailable_error(turbo::string_view message) {
+    Status unavailable_error(std::string_view message) {
         return Status(turbo::StatusCode::kUnavailable, message);
     }
 
-    Status unimplemented_error(turbo::string_view message) {
+    Status unimplemented_error(std::string_view message) {
         return Status(turbo::StatusCode::kUnimplemented, message);
     }
 
-    Status unknown_error(turbo::string_view message) {
+    Status unknown_error(std::string_view message) {
         return Status(turbo::StatusCode::kUnknown, message);
     }
 
@@ -401,13 +401,13 @@ namespace turbo {
 
     namespace {
         std::string MessageForErrnoToStatus(int error_number,
-                                            turbo::string_view message) {
+                                            std::string_view message) {
             return turbo::str_cat(message, ": ",
                                   turbo::base_internal::StrError(error_number));
         }
     }  // namespace
 
-    Status errno_to_status(int error_number, turbo::string_view message) {
+    Status errno_to_status(int error_number, std::string_view message) {
         return Status(errno_to_status_code(error_number),
                       MessageForErrnoToStatus(error_number, message));
     }

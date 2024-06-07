@@ -32,7 +32,7 @@ namespace turbo {
 
     class DailyFileSink : public LogSink {
     public:
-        DailyFileSink(turbo::string_view base_filename,
+        DailyFileSink(std::string_view base_filename,
                       int rotation_hour = 0,
                       int rotation_minute = 0,
                       int check_interval_s = 60,

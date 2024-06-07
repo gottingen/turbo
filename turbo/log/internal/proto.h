@@ -153,7 +153,7 @@ namespace turbo::log_internal {
     // it fits.
     // Used for string, bytes, message, and packed-repeated field type.
     // Consumes up to kMaxVarintSize * 2 + value.size() bytes (20 + value.size()).
-    inline bool EncodeString(uint64_t tag, turbo::string_view value,
+    inline bool EncodeString(uint64_t tag, std::string_view value,
                              turbo::Span<char> *buf) {
         return EncodeBytes(tag, value, buf);
     }
@@ -163,7 +163,7 @@ namespace turbo::log_internal {
     // fits.
     // Used for string, bytes, message, and packed-repeated field type.
     // Consumes up to kMaxVarintSize * 2 + value.size() bytes (20 + value.size()).
-    inline bool EncodeStringTruncate(uint64_t tag, turbo::string_view value,
+    inline bool EncodeStringTruncate(uint64_t tag, std::string_view value,
                                      turbo::Span<char> *buf) {
         return EncodeBytesTruncate(tag, value, buf);
     }
@@ -284,9 +284,9 @@ namespace turbo::log_internal {
         // `DecodeNextField(field.BytesValue())`.
         turbo::Span<const char> bytes_value() const { return data_; }
 
-        turbo::string_view string_value() const {
+        std::string_view string_value() const {
             const auto data = bytes_value();
-            return turbo::string_view(data.data(), data.size());
+            return std::string_view(data.data(), data.size());
         }
 
         // Returns the encoded length of a length-delimited field.  This equals

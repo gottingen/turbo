@@ -106,7 +106,7 @@ namespace turbo {
     class CordTestPeer;
 
     template<typename Releaser>
-    Cord MakeCordFromExternal(turbo::string_view, Releaser &&);
+    Cord MakeCordFromExternal(std::string_view, Releaser &&);
 
     void CopyCordToString(const Cord &src, turbo::Nonnull<std::string *> dst);
 
@@ -199,14 +199,14 @@ namespace turbo {
 
         // Creates a Cord from a `src` string. This constructor is marked explicit to
         // prevent implicit Cord constructions from arguments convertible to an
-        // `turbo::string_view`.
-        explicit Cord(turbo::string_view src);
+        // `std::string_view`.
+        explicit Cord(std::string_view src);
 
-        Cord &operator=(turbo::string_view src);
+        Cord &operator=(std::string_view src);
 
         // Creates a Cord from a `std::string&&` rvalue. These constructors are
         // templated to avoid ambiguities for types that are convertible to both
-        // `turbo::string_view` and `std::string`, such as `const char*`.
+        // `std::string_view` and `std::string`, such as `const char*`.
         template<typename T, EnableIfString<T> = 0>
         explicit Cord(T &&src);
 
@@ -233,7 +233,7 @@ namespace turbo {
         // remain live until the releaser is invoked. The callable releaser also must:
         //
         //   * be move constructible
-        //   * support `void operator()(turbo::string_view) const` or `void operator()`
+        //   * support `void operator()(std::string_view) const` or `void operator()`
         //
         // Example:
         //
@@ -242,7 +242,7 @@ namespace turbo {
         //   FillBlock(block);
         //   return turbo::MakeCordFromExternal(
         //       block->ToStringView(),
-        //       [pool, block](turbo::string_view v) {
+        //       [pool, block](std::string_view v) {
         //         pool->FreeBlock(block, v);
         //       });
         // }
@@ -251,8 +251,8 @@ namespace turbo {
         // releaser doesn't do anything. For example, consider the following:
         //
         // void Foo(const char* buffer, int len) {
-        //   auto c = turbo::MakeCordFromExternal(turbo::string_view(buffer, len),
-        //                                       [](turbo::string_view) {});
+        //   auto c = turbo::MakeCordFromExternal(std::string_view(buffer, len),
+        //                                       [](std::string_view) {});
         //
         //   // BUG: If Bar() copies its cord for any reason, including keeping a
         //   // substring of it, the lifetime of buffer might be extended beyond
@@ -260,7 +260,7 @@ namespace turbo {
         //   Bar(c);
         // }
         template<typename Releaser>
-        friend Cord MakeCordFromExternal(turbo::string_view data, Releaser &&releaser);
+        friend Cord MakeCordFromExternal(std::string_view data, Releaser &&releaser);
 
         // Cord::Clear()
         //
@@ -276,7 +276,7 @@ namespace turbo {
 
         void Append(Cord &&src);
 
-        void Append(turbo::string_view src);
+        void Append(std::string_view src);
 
         template<typename T, EnableIfString<T> = 0>
         void Append(T &&src);
@@ -339,7 +339,7 @@ namespace turbo {
         // data.
         void Prepend(const Cord &src);
 
-        void Prepend(turbo::string_view src);
+        void Prepend(std::string_view src);
 
         template<typename T, EnableIfString<T> = 0>
         void Prepend(T &&src);
@@ -399,7 +399,7 @@ namespace turbo {
         //   -1  'this' Cord is smaller
         //    0  two Cords are equal
         //    1  'this' Cord is larger
-        int Compare(turbo::string_view rhs) const;
+        int Compare(std::string_view rhs) const;
 
         int Compare(const Cord &rhs) const;
 
@@ -408,19 +408,19 @@ namespace turbo {
         // Determines whether the Cord starts with the passed string data `rhs`.
         bool starts_with(const Cord &rhs) const;
 
-        bool starts_with(turbo::string_view rhs) const;
+        bool starts_with(std::string_view rhs) const;
 
         // Cord::ends_with()
         //
         // Determines whether the Cord ends with the passed string data `rhs`.
-        bool ends_with(turbo::string_view rhs) const;
+        bool ends_with(std::string_view rhs) const;
 
         bool ends_with(const Cord &rhs) const;
 
         // Cord::Contains()
         //
         // Determines whether the Cord contains the passed string data `rhs`.
-        bool Contains(turbo::string_view rhs) const;
+        bool Contains(std::string_view rhs) const;
 
         bool Contains(const Cord &rhs) const;
 
@@ -487,7 +487,7 @@ namespace turbo {
         class ChunkIterator {
         public:
             using iterator_category = std::input_iterator_tag;
-            using value_type = turbo::string_view;
+            using value_type = std::string_view;
             using difference_type = ptrdiff_t;
             using pointer = turbo::Nonnull<const value_type *>;
             using reference = value_type;
@@ -539,7 +539,7 @@ namespace turbo {
 
             // A view into bytes of the current `CordRep`. It may only be a view to a
             // suffix of bytes if this is being used by `CharIterator`.
-            turbo::string_view current_chunk_;
+            std::string_view current_chunk_;
             // The current leaf, or `nullptr` if the iterator points to short data.
             // If the current chunk is a substring node, current_leaf_ points to the
             // underlying flat or external node.
@@ -562,7 +562,7 @@ namespace turbo {
         // Example:
         //
         //   turbo::Cord::ChunkIterator FindAsChunk(const turbo::Cord& c,
-        //                                         turbo::string_view s) {
+        //                                         std::string_view s) {
         //     return std::find(c.chunk_begin(), c.chunk_end(), s);
         //   }
         ChunkIterator chunk_begin() const TURBO_ATTRIBUTE_LIFETIME_BOUND;
@@ -594,7 +594,7 @@ namespace turbo {
             // These (partial) container type definitions allow ChunkRange to be used
             // in various utilities expecting a subset of [container.requirements].
             // For example, the below enables using `::testing::ElementsAre(...)`
-            using value_type = turbo::string_view;
+            using value_type = std::string_view;
             using reference = value_type &;
             using const_reference = const value_type &;
             using iterator = ChunkIterator;
@@ -619,13 +619,13 @@ namespace turbo {
         // Example:
         //
         //   void ProcessChunks(const Cord& cord) {
-        //     for (turbo::string_view chunk : cord.Chunks()) { ... }
+        //     for (std::string_view chunk : cord.Chunks()) { ... }
         //   }
         //
         // Note that the ordinary caveats of temporary lifetime extension apply:
         //
         //   void Process() {
-        //     for (turbo::string_view chunk : CordFactory().Chunks()) {
+        //     for (std::string_view chunk : CordFactory().Chunks()) {
         //       // The temporary Cord returned by CordFactory has been destroyed!
         //     }
         //   }
@@ -706,7 +706,7 @@ namespace turbo {
         // Returns the longest contiguous view starting at the iterator's position.
         //
         // `it` must be dereferenceable.
-        static turbo::string_view ChunkRemaining(const CharIterator &it);
+        static std::string_view ChunkRemaining(const CharIterator &it);
 
         // Cord::char_begin()
         //
@@ -795,7 +795,7 @@ namespace turbo {
         //
         // If this cord's representation is a single flat array, returns a
         // string_view referencing that array.  Otherwise returns nullopt.
-        std::optional<turbo::string_view> TryFlat() const
+        std::optional<std::string_view> TryFlat() const
         TURBO_ATTRIBUTE_LIFETIME_BOUND;
 
         // Cord::Flatten()
@@ -803,27 +803,27 @@ namespace turbo {
         // Flattens the cord into a single array and returns a view of the data.
         //
         // If the cord was already flat, the contents are not modified.
-        turbo::string_view Flatten() TURBO_ATTRIBUTE_LIFETIME_BOUND;
+        std::string_view Flatten() TURBO_ATTRIBUTE_LIFETIME_BOUND;
 
         // Cord::Find()
         //
         // Returns an iterator to the first occurrance of the substring `needle`.
         //
         // If the substring `needle` does not occur, `Cord::char_end()` is returned.
-        CharIterator Find(turbo::string_view needle) const;
+        CharIterator Find(std::string_view needle) const;
 
         CharIterator Find(const turbo::Cord &needle) const;
 
         // Supports turbo::Cord as a sink object for turbo::format().
         friend void TurboFormatFlush(turbo::Nonnull<turbo::Cord *> cord,
-                                     turbo::string_view part) {
+                                     std::string_view part) {
             cord->Append(part);
         }
 
         // Support automatic stringification with turbo::str_cat and turbo::str_format.
         template<typename Sink>
         friend void turbo_stringify(Sink &sink, const turbo::Cord &cord) {
-            for (turbo::string_view chunk: cord.Chunks()) {
+            for (std::string_view chunk: cord.Chunks()) {
                 sink.Append(chunk);
             }
         }
@@ -853,7 +853,7 @@ namespace turbo {
 
         template<typename H>
         friend H turbo_hash_value(H hash_state, const turbo::Cord &c) {
-            std::optional<turbo::string_view> maybe_flat = c.TryFlat();
+            std::optional<std::string_view> maybe_flat = c.TryFlat();
             if (maybe_flat.has_value()) {
                 return H::combine(std::move(hash_state), *maybe_flat);
             }
@@ -880,24 +880,24 @@ namespace turbo {
 
         // Creates a cord instance with `method` representing the originating
         // public API call causing the cord to be created.
-        explicit Cord(turbo::string_view src, MethodIdentifier method);
+        explicit Cord(std::string_view src, MethodIdentifier method);
 
         friend class CordTestPeer;
 
         friend bool operator==(const Cord &lhs, const Cord &rhs);
 
-        friend bool operator==(const Cord &lhs, turbo::string_view rhs);
+        friend bool operator==(const Cord &lhs, std::string_view rhs);
 
         friend turbo::Nullable<const CordzInfo *> GetCordzInfoForTesting(
                 const Cord &cord);
 
         // Calls the provided function once for each cord chunk, in order.  Unlike
         // Chunks(), this API will not allocate memory.
-        void ForEachChunk(turbo::FunctionRef<void(turbo::string_view)>) const;
+        void ForEachChunk(turbo::FunctionRef<void(std::string_view)>) const;
 
         // Allocates new contiguous storage for the contents of the cord. This is
         // called by Flatten() when the cord was not already flat.
-        turbo::string_view FlattenSlowPath();
+        std::string_view FlattenSlowPath();
 
         // Actual cord contents are hidden inside the following simple
         // class so that we can isolate the bulk of cord.cc from changes
@@ -921,7 +921,7 @@ namespace turbo {
 
             InlineRep &operator=(InlineRep &&src) noexcept;
 
-            explicit constexpr InlineRep(turbo::string_view sv,
+            explicit constexpr InlineRep(std::string_view sv,
                                          turbo::Nullable<CordRep *> rep);
 
             void Swap(turbo::Nonnull<InlineRep *> rhs);
@@ -948,9 +948,9 @@ namespace turbo {
             // Converts to pointer if necessary.
             void reduce_size(size_t n);    // REQUIRES: holding data
             void remove_prefix(size_t n);  // REQUIRES: holding data
-            void AppendArray(turbo::string_view src, MethodIdentifier method);
+            void AppendArray(std::string_view src, MethodIdentifier method);
 
-            turbo::string_view FindFlatStartPiece() const;
+            std::string_view FindFlatStartPiece() const;
 
             // Creates a CordRepFlat instance from the current inlined data with `extra'
             // bytes of desired additional capacity.
@@ -1070,12 +1070,12 @@ namespace turbo {
 
         // Helper for GetFlat() and TryFlat().
         static bool GetFlatAux(turbo::Nonnull<turbo::cord_internal::CordRep *> rep,
-                               turbo::Nonnull<turbo::string_view *> fragment);
+                               turbo::Nonnull<std::string_view *> fragment);
 
         // Helper for ForEachChunk().
         static void ForEachChunkAux(
                 turbo::Nonnull<turbo::cord_internal::CordRep *> rep,
-                turbo::FunctionRef<void(turbo::string_view)> callback);
+                turbo::FunctionRef<void(std::string_view)> callback);
 
         // The destructor for non-empty Cords.
         void DestroyCordSlow();
@@ -1083,13 +1083,13 @@ namespace turbo {
         // Out-of-line implementation of slower parts of logic.
         void CopyToArraySlowPath(turbo::Nonnull<char *> dst) const;
 
-        int CompareSlowPath(turbo::string_view rhs, size_t compared_size,
+        int CompareSlowPath(std::string_view rhs, size_t compared_size,
                             size_t size_to_compare) const;
 
         int CompareSlowPath(const Cord &rhs, size_t compared_size,
                             size_t size_to_compare) const;
 
-        bool EqualsImpl(turbo::string_view rhs, size_t size_to_compare) const;
+        bool EqualsImpl(std::string_view rhs, size_t size_to_compare) const;
 
         bool EqualsImpl(const Cord &rhs, size_t size_to_compare) const;
 
@@ -1099,9 +1099,9 @@ namespace turbo {
         friend ResultType GenericCompare(const Cord &lhs, const RHS &rhs,
                                          size_t size_to_compare);
 
-        static turbo::string_view GetFirstChunk(const Cord &c);
+        static std::string_view GetFirstChunk(const Cord &c);
 
-        static turbo::string_view GetFirstChunk(turbo::string_view sv);
+        static std::string_view GetFirstChunk(std::string_view sv);
 
         // Returns a new reference to contents_.tree(), or steals an existing
         // reference if called on an rvalue.
@@ -1117,16 +1117,16 @@ namespace turbo {
         // This method does explicitly not attempt to use any spare capacity
         // in any pending last added private owned flat.
         // Requires `src` to be <= kMaxFlatLength.
-        void AppendPrecise(turbo::string_view src, MethodIdentifier method);
+        void AppendPrecise(std::string_view src, MethodIdentifier method);
 
-        void PrependPrecise(turbo::string_view src, MethodIdentifier method);
+        void PrependPrecise(std::string_view src, MethodIdentifier method);
 
         CordBuffer GetAppendBufferSlowPath(size_t block_size, size_t capacity,
                                            size_t min_capacity);
 
         // Prepends the provided data to this instance. `method` contains the public
         // API method for this action which is tracked for Cordz sampling purposes.
-        void PrependArray(turbo::string_view src, MethodIdentifier method);
+        void PrependArray(std::string_view src, MethodIdentifier method);
 
         // Assigns the value in 'src' to this instance, 'stealing' its contents.
         // Requires src.length() > kMaxBytesToCopy.
@@ -1136,7 +1136,7 @@ namespace turbo {
         template<typename H>
         H HashFragmented(H hash_state) const {
             typename H::TurboInternalPiecewiseCombiner combiner;
-            ForEachChunk([&combiner, &hash_state](turbo::string_view chunk) {
+            ForEachChunk([&combiner, &hash_state](std::string_view chunk) {
                 hash_state = combiner.add_buffer(std::move(hash_state), chunk.data(),
                                                  chunk.size());
             });
@@ -1150,7 +1150,7 @@ namespace turbo {
         turbo::Nullable<const crc_internal::CrcCordState *> MaybeGetCrcCordState()
         const;
 
-        CharIterator FindImpl(CharIterator it, turbo::string_view needle) const;
+        CharIterator FindImpl(CharIterator it, std::string_view needle) const;
 
         void CopyToArrayImpl(turbo::Nonnull<char *> dst) const;
     };
@@ -1171,14 +1171,14 @@ namespace turbo {
 
 // Does non-template-specific `CordRepExternal` initialization.
 // Requires `data` to be non-empty.
-        void InitializeCordRepExternal(turbo::string_view data,
+        void InitializeCordRepExternal(std::string_view data,
                                        turbo::Nonnull<CordRepExternal *> rep);
 
 // Creates a new `CordRep` that owns `data` and `releaser` and returns a pointer
 // to it. Requires `data` to be non-empty.
         template<typename Releaser>
 // NOLINTNEXTLINE - suppress clang-tidy raw pointer return.
-        turbo::Nonnull<CordRep *> NewExternalRep(turbo::string_view data,
+        turbo::Nonnull<CordRep *> NewExternalRep(std::string_view data,
                                                  Releaser &&releaser) {
             assert(!data.empty());
             using ReleaserType = turbo::decay_t<Releaser>;
@@ -1192,14 +1192,14 @@ namespace turbo {
 // pointer because there are no `alignof()` or `sizeof()` a function reference.
 // NOLINTNEXTLINE - suppress clang-tidy raw pointer return.
         inline turbo::Nonnull<CordRep *> NewExternalRep(
-                turbo::string_view data, void (&releaser)(turbo::string_view)) {
+                std::string_view data, void (&releaser)(std::string_view)) {
             return NewExternalRep(data, &releaser);
         }
 
     }  // namespace cord_internal
 
     template<typename Releaser>
-    Cord MakeCordFromExternal(turbo::string_view data, Releaser &&releaser) {
+    Cord MakeCordFromExternal(std::string_view data, Releaser &&releaser) {
         Cord cord;
         if (TURBO_LIKELY(!data.empty())) {
             cord.contents_.EmplaceTree(::turbo::cord_internal::NewExternalRep(
@@ -1214,7 +1214,7 @@ namespace turbo {
         return cord;
     }
 
-    constexpr Cord::InlineRep::InlineRep(turbo::string_view sv,
+    constexpr Cord::InlineRep::InlineRep(std::string_view sv,
                                          turbo::Nullable<CordRep *> rep)
             : data_(sv, rep) {}
 
@@ -1374,7 +1374,7 @@ namespace turbo {
 
     constexpr inline Cord::Cord() noexcept {}
 
-    inline Cord::Cord(turbo::string_view src)
+    inline Cord::Cord(std::string_view src)
             : Cord(src, CordzUpdateTracker::kConstructorString) {}
 
     template<typename T>
@@ -1394,7 +1394,7 @@ namespace turbo {
     template<typename T, Cord::EnableIfString<T>>
     Cord &Cord::operator=(T &&src) {
         if (src.size() <= cord_internal::kMaxBytesToCopy) {
-            return operator=(turbo::string_view(src));
+            return operator=(std::string_view(src));
         } else {
             return AssignLargeString(std::forward<T>(src));
         }
@@ -1441,25 +1441,25 @@ namespace turbo {
         return result;
     }
 
-    inline std::optional<turbo::string_view> Cord::TryFlat() const
+    inline std::optional<std::string_view> Cord::TryFlat() const
     TURBO_ATTRIBUTE_LIFETIME_BOUND {
         turbo::cord_internal::CordRep *rep = contents_.tree();
         if (rep == nullptr) {
-            return turbo::string_view(contents_.data(), contents_.size());
+            return std::string_view(contents_.data(), contents_.size());
         }
-        turbo::string_view fragment;
+        std::string_view fragment;
         if (GetFlatAux(rep, &fragment)) {
             return fragment;
         }
         return std::nullopt;
     }
 
-    inline turbo::string_view Cord::Flatten() TURBO_ATTRIBUTE_LIFETIME_BOUND {
+    inline std::string_view Cord::Flatten() TURBO_ATTRIBUTE_LIFETIME_BOUND {
         turbo::cord_internal::CordRep *rep = contents_.tree();
         if (rep == nullptr) {
-            return turbo::string_view(contents_.data(), contents_.size());
+            return std::string_view(contents_.data(), contents_.size());
         } else {
-            turbo::string_view already_flat_contents;
+            std::string_view already_flat_contents;
             if (GetFlatAux(rep, &already_flat_contents)) {
                 return already_flat_contents;
             }
@@ -1467,18 +1467,18 @@ namespace turbo {
         return FlattenSlowPath();
     }
 
-    inline void Cord::Append(turbo::string_view src) {
+    inline void Cord::Append(std::string_view src) {
         contents_.AppendArray(src, CordzUpdateTracker::kAppendString);
     }
 
-    inline void Cord::Prepend(turbo::string_view src) {
+    inline void Cord::Prepend(std::string_view src) {
         PrependArray(src, CordzUpdateTracker::kPrependString);
     }
 
     inline void Cord::Append(CordBuffer buffer) {
         if (TURBO_UNLIKELY(buffer.length() == 0)) return;
         contents_.MaybeRemoveEmptyCrcNode();
-        turbo::string_view short_value;
+        std::string_view short_value;
         if (CordRep * rep = buffer.ConsumeValue(short_value)) {
             contents_.AppendTree(rep, CordzUpdateTracker::kAppendCordBuffer);
         } else {
@@ -1489,7 +1489,7 @@ namespace turbo {
     inline void Cord::Prepend(CordBuffer buffer) {
         if (TURBO_UNLIKELY(buffer.length() == 0)) return;
         contents_.MaybeRemoveEmptyCrcNode();
-        turbo::string_view short_value;
+        std::string_view short_value;
         if (CordRep * rep = buffer.ConsumeValue(short_value)) {
             contents_.PrependTree(rep, CordzUpdateTracker::kPrependCordBuffer);
         } else {
@@ -1532,7 +1532,7 @@ namespace turbo {
         return EqualsImpl(rhs, rhs_size);
     }
 
-    inline bool Cord::starts_with(turbo::string_view rhs) const {
+    inline bool Cord::starts_with(std::string_view rhs) const {
         size_t rhs_size = rhs.size();
         if (size() < rhs_size) return false;
         return EqualsImpl(rhs, rhs_size);
@@ -1714,7 +1714,7 @@ namespace turbo {
         it->chunk_iterator_.AdvanceBytes(n_bytes);
     }
 
-    inline turbo::string_view Cord::ChunkRemaining(const CharIterator &it) {
+    inline std::string_view Cord::ChunkRemaining(const CharIterator &it) {
         return *it.chunk_iterator_;
     }
 
@@ -1735,10 +1735,10 @@ namespace turbo {
     inline Cord::CharRange Cord::Chars() const { return CharRange(this); }
 
     inline void Cord::ForEachChunk(
-            turbo::FunctionRef<void(turbo::string_view)> callback) const {
+            turbo::FunctionRef<void(std::string_view)> callback) const {
         turbo::cord_internal::CordRep *rep = contents_.tree();
         if (rep == nullptr) {
-            callback(turbo::string_view(contents_.data(), contents_.size()));
+            callback(std::string_view(contents_.data(), contents_.size()));
         } else {
             ForEachChunkAux(rep, callback);
         }
@@ -1766,42 +1766,42 @@ namespace turbo {
         return x.Compare(y) >= 0;
     }
 
-    // Nonmember Cord-to-turbo::string_view relational operators.
+    // Nonmember Cord-to-std::string_view relational operators.
     //
     // Due to implicit conversions, these also enable comparisons of Cord with
     // std::string and const char*.
-    inline bool operator==(const Cord &lhs, turbo::string_view rhs) {
+    inline bool operator==(const Cord &lhs, std::string_view rhs) {
         size_t lhs_size = lhs.size();
         size_t rhs_size = rhs.size();
         if (lhs_size != rhs_size) return false;
         return lhs.EqualsImpl(rhs, rhs_size);
     }
 
-    inline bool operator==(turbo::string_view x, const Cord &y) { return y == x; }
+    inline bool operator==(std::string_view x, const Cord &y) { return y == x; }
 
-    inline bool operator!=(const Cord &x, turbo::string_view y) { return !(x == y); }
+    inline bool operator!=(const Cord &x, std::string_view y) { return !(x == y); }
 
-    inline bool operator!=(turbo::string_view x, const Cord &y) { return !(x == y); }
+    inline bool operator!=(std::string_view x, const Cord &y) { return !(x == y); }
 
-    inline bool operator<(const Cord &x, turbo::string_view y) {
+    inline bool operator<(const Cord &x, std::string_view y) {
         return x.Compare(y) < 0;
     }
 
-    inline bool operator<(turbo::string_view x, const Cord &y) {
+    inline bool operator<(std::string_view x, const Cord &y) {
         return y.Compare(x) > 0;
     }
 
-    inline bool operator>(const Cord &x, turbo::string_view y) { return y < x; }
+    inline bool operator>(const Cord &x, std::string_view y) { return y < x; }
 
-    inline bool operator>(turbo::string_view x, const Cord &y) { return y < x; }
+    inline bool operator>(std::string_view x, const Cord &y) { return y < x; }
 
-    inline bool operator<=(const Cord &x, turbo::string_view y) { return !(y < x); }
+    inline bool operator<=(const Cord &x, std::string_view y) { return !(y < x); }
 
-    inline bool operator<=(turbo::string_view x, const Cord &y) { return !(y < x); }
+    inline bool operator<=(std::string_view x, const Cord &y) { return !(y < x); }
 
-    inline bool operator>=(const Cord &x, turbo::string_view y) { return !(x < y); }
+    inline bool operator>=(const Cord &x, std::string_view y) { return !(x < y); }
 
-    inline bool operator>=(turbo::string_view x, const Cord &y) { return !(x < y); }
+    inline bool operator>=(std::string_view x, const Cord &y) { return !(x < y); }
 
         // Some internals exposed to test code.
     namespace strings_internal {

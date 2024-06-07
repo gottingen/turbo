@@ -32,10 +32,10 @@ namespace turbo {
     //                   " <uselessarg1> <uselessarg2>"));
     // Do not include commandline flags in the usage: we do that for you!
     // Note: Calling set_program_usage_message twice will trigger a call to std::exit.
-    void set_program_usage_message(turbo::string_view new_usage_message);
+    void set_program_usage_message(std::string_view new_usage_message);
 
     // Returns the usage message set by set_program_usage_message().
-    turbo::string_view program_usage_message();
+    std::string_view program_usage_message();
 
 }  // namespace turbo
 

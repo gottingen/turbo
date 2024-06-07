@@ -36,7 +36,7 @@ namespace turbo {
         return fname;
     }
 
-    RotatingFileSink::RotatingFileSink(turbo::string_view base_filename,std::size_t max_size,
+    RotatingFileSink::RotatingFileSink(std::string_view base_filename,std::size_t max_size,
             std::size_t max_files,int check_interval_s) : _base_filename(base_filename), max_size_(max_size), max_files_(max_files), _check_interval_s(check_interval_s), _next_check_time(turbo::Time::current_time() + turbo::Duration::seconds(check_interval_s)) {
         _file_writer = std::make_unique<log_internal::AppendFile>();
         _file_writer->initialize(_base_filename);

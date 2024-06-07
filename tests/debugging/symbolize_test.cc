@@ -449,7 +449,7 @@ TEST(Symbolize, ForEachSection) {
 
   std::vector<std::string> sections;
   ASSERT_TRUE(turbo::debugging_internal::ForEachSection(
-      fd, [&sections](const turbo::string_view name, const ElfW(Shdr) &) {
+      fd, [&sections](const std::string_view name, const ElfW(Shdr) &) {
         sections.emplace_back(name);
         return true;
       }));

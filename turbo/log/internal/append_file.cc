@@ -32,7 +32,7 @@ namespace turbo::log_internal {
         }
     }
 
-    int AppendFile::initialize(turbo::string_view path) {
+    int AppendFile::initialize(std::string_view path) {
         close();
         _path.assign(path.data(), path.size());
         create_dir(dir_name(_path));
@@ -60,7 +60,7 @@ namespace turbo::log_internal {
         return 0;
     }
 
-    ssize_t AppendFile::write(turbo::string_view message) {
+    ssize_t AppendFile::write(std::string_view message) {
         if (_file == nullptr) {
             return -1;
         }

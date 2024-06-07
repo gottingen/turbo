@@ -25,36 +25,36 @@
 #include <turbo/strings/string_view.h>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+    TURBO_NAMESPACE_BEGIN
 
-namespace strings_internal {
-class StringifySink {
- public:
-  void Append(size_t count, char ch);
+    namespace strings_internal {
+        class StringifySink {
+        public:
+            void Append(size_t count, char ch);
 
-  void Append(string_view v);
+            void Append(std::string_view v);
 
-  // Support `turbo::format(&sink, format, args...)`.
-  friend void TurboFormatFlush(StringifySink* sink, turbo::string_view v) {
-    sink->Append(v);
-  }
+            // Support `turbo::format(&sink, format, args...)`.
+            friend void TurboFormatFlush(StringifySink *sink, std::string_view v) {
+                sink->Append(v);
+            }
 
- private:
-  template <typename T>
-  friend string_view ExtractStringification(StringifySink& sink, const T& v);
+        private:
+            template<typename T>
+            friend std::string_view ExtractStringification(StringifySink &sink, const T &v);
 
-  std::string buffer_;
-};
+            std::string buffer_;
+        };
 
-template <typename T>
-string_view ExtractStringification(StringifySink& sink, const T& v) {
-  turbo_stringify(sink, v);
-  return sink.buffer_;
-}
+        template<typename T>
+        std::string_view ExtractStringification(StringifySink &sink, const T &v) {
+            turbo_stringify(sink, v);
+            return sink.buffer_;
+        }
 
-}  // namespace strings_internal
+    }  // namespace strings_internal
 
-TURBO_NAMESPACE_END
+    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_INTERNAL_STRINGIFY_SINK_H_

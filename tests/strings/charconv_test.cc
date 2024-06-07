@@ -47,7 +47,7 @@ using turbo::strings_internal::Pow10;
 
 // Tests that the given string is accepted by turbo::from_chars, and that it
 // converts exactly equal to the given number.
-void TestDoubleParse(turbo::string_view str, double expected_number) {
+void TestDoubleParse(std::string_view str, double expected_number) {
   SCOPED_TRACE(str);
   double actual_number = 0.0;
   turbo::from_chars_result result =
@@ -57,7 +57,7 @@ void TestDoubleParse(turbo::string_view str, double expected_number) {
   EXPECT_EQ(actual_number, expected_number);
 }
 
-void TestFloatParse(turbo::string_view str, float expected_number) {
+void TestFloatParse(std::string_view str, float expected_number) {
   SCOPED_TRACE(str);
   float actual_number = 0.0;
   turbo::from_chars_result result =
@@ -166,13 +166,13 @@ TEST(FromChars, NearRoundingCases) {
 #undef FROM_CHARS_TEST_FLOAT
 #endif
 
-float to_float(turbo::string_view s) {
+float to_float(std::string_view s) {
   float f;
   turbo::from_chars(s.data(), s.data() + s.size(), f);
   return f;
 }
 
-double to_double(turbo::string_view s) {
+double to_double(std::string_view s) {
   double d;
   turbo::from_chars(s.data(), s.data() + s.size(), d);
   return d;
@@ -520,7 +520,7 @@ TEST(FromChars, Overflow) {
 }
 
 TEST(FromChars, RegressionTestsFromFuzzer) {
-  turbo::string_view src = "0x21900000p00000000099";
+  std::string_view src = "0x21900000p00000000099";
   float f;
   auto result = turbo::from_chars(src.data(), src.data() + src.size(), f);
   EXPECT_EQ(result.ec, std::errc::result_out_of_range);

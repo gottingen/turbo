@@ -43,7 +43,7 @@ struct OptionalInt : TurboOptionalInt {
   using TurboOptionalInt::TurboOptionalInt;
 };
 // Next two functions represent Turbo Flags marshalling for OptionalInt.
-bool turbo_parse_flag(turbo::string_view src, OptionalInt* flag,
+bool turbo_parse_flag(std::string_view src, OptionalInt* flag,
                    std::string* error) {
   int val;
   if (src.empty())
@@ -62,7 +62,7 @@ struct OptionalString : TurboOptionalString {
   using TurboOptionalString::TurboOptionalString;
 };
 // Next two functions represent Turbo Flags marshalling for OptionalString.
-bool turbo_parse_flag(turbo::string_view src, OptionalString* flag,
+bool turbo_parse_flag(std::string_view src, OptionalString* flag,
                    std::string* error) {
   std::string val;
   if (src.empty())
@@ -82,7 +82,7 @@ struct UDT {
   UDT& operator=(const UDT&) { return *this; }
 };
 // Next two functions represent Turbo Flags marshalling for UDT.
-bool turbo_parse_flag(turbo::string_view, UDT*, std::string*) { return true; }
+bool turbo_parse_flag(std::string_view, UDT*, std::string*) { return true; }
 std::string turbo_unparse_flag(const UDT&) { return ""; }
 
 }  // namespace

@@ -49,7 +49,7 @@ TURBO_LOGGING_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING(double);
 TURBO_LOGGING_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING(char);
 TURBO_LOGGING_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING(unsigned char);
 TURBO_LOGGING_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING(const std::string&);
-TURBO_LOGGING_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING(const turbo::string_view&);
+TURBO_LOGGING_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING(const std::string_view&);
 TURBO_LOGGING_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING(const char*);
 TURBO_LOGGING_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING(const signed char*);
 TURBO_LOGGING_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING(const unsigned char*);
@@ -124,13 +124,13 @@ namespace detect_specialization {
 
 StringifySink::StringifySink(std::ostream& os) : os_(os) {}
 
-void StringifySink::Append(turbo::string_view text) { os_ << text; }
+void StringifySink::Append(std::string_view text) { os_ << text; }
 
 void StringifySink::Append(size_t length, char ch) {
   for (size_t i = 0; i < length; ++i) os_.put(ch);
 }
 
-void TurboFormatFlush(StringifySink* sink, turbo::string_view text) {
+void TurboFormatFlush(StringifySink* sink, std::string_view text) {
   sink->Append(text);
 }
 

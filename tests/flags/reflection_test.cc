@@ -73,21 +73,21 @@ namespace {
         EXPECT_EQ(all_flags.find("bool_retired_flag"), all_flags.end());
         EXPECT_EQ(all_flags.find("some_undefined_flag"), all_flags.end());
 
-        std::vector<turbo::string_view> flag_names_first_attempt;
+        std::vector<std::string_view> flag_names_first_attempt;
         auto all_flags_1 = turbo::get_all_flags();
         for (auto f: all_flags_1) {
             flag_names_first_attempt.push_back(f.first);
         }
 
-        std::vector<turbo::string_view> flag_names_second_attempt;
+        std::vector<std::string_view> flag_names_second_attempt;
         auto all_flags_2 = turbo::get_all_flags();
         for (auto f: all_flags_2) {
             flag_names_second_attempt.push_back(f.first);
         }
 
-        std::set<turbo::string_view> flag_names_set(flag_names_first_attempt.begin(),
+        std::set<std::string_view> flag_names_set(flag_names_first_attempt.begin(),
                                                     flag_names_first_attempt.end());
-        std::set<turbo::string_view> flag_names_set_2(flag_names_second_attempt.begin(),
+        std::set<std::string_view> flag_names_set_2(flag_names_second_attempt.begin(),
                                                       flag_names_second_attempt.end());
 
         EXPECT_EQ(flag_names_set, flag_names_set_2);
@@ -111,8 +111,8 @@ namespace {
         int b;
     };
 
-    bool turbo_parse_flag(turbo::string_view in, CustomUDT *f, std::string *) {
-        std::vector<turbo::string_view> parts =
+    bool turbo_parse_flag(std::string_view in, CustomUDT *f, std::string *) {
+        std::vector<std::string_view> parts =
                 turbo::str_split(in, ':', turbo::SkipWhitespace());
 
         if (parts.size() != 2) return false;

@@ -62,7 +62,7 @@ carbin install gottingen/turbo
     * TaskFlow
   * simd simd instructions abstraction to batch processing -- **good performance**
   * flags cmd line tools help to parse cmd line
-  * strings strings and string_view processing
+  * strings strings and std::string_view processing
   * concurrent threading and lock options
     * Barrier
     * CallOnce

@@ -30,7 +30,7 @@ namespace log_internal {
 // * only supports * and ? wildcards and not bracket expressions [...]
 // * wildcards may match /
 // * no backslash-escaping
-bool FNMatch(turbo::string_view pattern, turbo::string_view str);
+bool FNMatch(std::string_view pattern, std::string_view str);
 }  // namespace log_internal
 TURBO_NAMESPACE_END
 }  // namespace turbo

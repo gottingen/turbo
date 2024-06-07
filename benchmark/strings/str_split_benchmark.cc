@@ -42,13 +42,13 @@ std::string MakeTestString(int desired_length) {
 void BM_Split2StringView(benchmark::State& state) {
   std::string test = MakeTestString(state.range(0));
   for (auto _ : state) {
-    std::vector<turbo::string_view> result = turbo::str_split(test, ';');
+    std::vector<std::string_view> result = turbo::str_split(test, ';');
     benchmark::DoNotOptimize(result);
   }
 }
 BENCHMARK_RANGE(BM_Split2StringView, 0, 1 << 20);
 
-static const turbo::string_view kDelimiters = ";:,.";
+static const std::string_view kDelimiters = ";:,.";
 
 std::string MakeMultiDelimiterTestString(int desired_length) {
   static const int kAverageValueLen = 25;
@@ -64,7 +64,7 @@ std::string MakeMultiDelimiterTestString(int desired_length) {
 void BM_Split2StringViewByAnyChar(benchmark::State& state) {
   std::string test = MakeMultiDelimiterTestString(state.range(0));
   for (auto _ : state) {
-    std::vector<turbo::string_view> result =
+    std::vector<std::string_view> result =
         turbo::str_split(test, turbo::ByAnyChar(kDelimiters));
     benchmark::DoNotOptimize(result);
   }
@@ -73,7 +73,7 @@ BENCHMARK_RANGE(BM_Split2StringViewByAnyChar, 0, 1 << 20);
 
 void BM_Split2StringViewLifted(benchmark::State& state) {
   std::string test = MakeTestString(state.range(0));
-  std::vector<turbo::string_view> result;
+  std::vector<std::string_view> result;
   for (auto _ : state) {
     result = turbo::str_split(test, ';');
   }
@@ -155,7 +155,7 @@ struct OneCharStringLiteral {
 template <typename DelimiterFactory>
 void BM_SplitStringWithOneChar(benchmark::State& state) {
   const auto delimiter = DelimiterFactory()();
-  std::vector<turbo::string_view> pieces;
+  std::vector<std::string_view> pieces;
   size_t v = 0;
   for (auto _ : state) {
     pieces = turbo::str_split("The quick brown fox jumps over the lazy dog",

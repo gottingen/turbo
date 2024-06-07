@@ -24,7 +24,7 @@
 #include <turbo/flags/reflection.h>
 #include <gtest/gtest.h>
 
-TURBO_FLAG(int, test_validate_flag, 0, "test validate flag").on_validate([](turbo::string_view intvalue, std::string* error) noexcept ->bool {
+TURBO_FLAG(int, test_validate_flag, 0, "test validate flag").on_validate([](std::string_view intvalue, std::string* error) noexcept ->bool {
     int val;
     auto r = turbo::parse_flag(intvalue, &val, error);
     if (!r) {

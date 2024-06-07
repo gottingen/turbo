@@ -80,7 +80,7 @@ double beta(double p, double q);
 double InverseNormalSurvival(double x);
 
 // Returns whether actual is "near" expected, based on the bound.
-bool Near(turbo::string_view msg, double actual, double expected, double bound);
+bool Near(std::string_view msg, double actual, double expected, double bound);
 
 // Implements the incomplete regularized beta function, AS63, BETAIN.
 //    https://www.jstor.org/stable/2346797

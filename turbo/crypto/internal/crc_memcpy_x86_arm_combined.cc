@@ -195,7 +195,7 @@ AcceleratedCrcMemcpyEngine<vec_regions, int_regions>::Compute(
   // Small-size CRC-memcpy : just do CRC + memcpy
   if (length < kCrcSmallSize) {
     CRC32C crc =
-        extend_crc32c(initial_crc, turbo::string_view(src_bytes, length));
+        extend_crc32c(initial_crc, std::string_view(src_bytes, length));
     memcpy(dst, src, length);
     return crc;
   }

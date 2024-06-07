@@ -39,22 +39,22 @@ TEST(CRC32C, RFC3720) {
 
   // 32 bytes of ones.
   memset(data, 0, sizeof(data));
-  EXPECT_EQ(turbo::compute_crc32c(turbo::string_view(data, sizeof(data))),
+  EXPECT_EQ(turbo::compute_crc32c(std::string_view(data, sizeof(data))),
             turbo::CRC32C{0x8a9136aa});
 
   // 32 bytes of ones.
   memset(data, 0xff, sizeof(data));
-  EXPECT_EQ(turbo::compute_crc32c(turbo::string_view(data, sizeof(data))),
+  EXPECT_EQ(turbo::compute_crc32c(std::string_view(data, sizeof(data))),
             turbo::CRC32C{0x62a8ab43});
 
   // 32 incrementing bytes.
   for (int i = 0; i < 32; ++i) data[i] = static_cast<char>(i);
-  EXPECT_EQ(turbo::compute_crc32c(turbo::string_view(data, sizeof(data))),
+  EXPECT_EQ(turbo::compute_crc32c(std::string_view(data, sizeof(data))),
             turbo::CRC32C{0x46dd794e});
 
   // 32 decrementing bytes.
   for (int i = 0; i < 32; ++i) data[i] = static_cast<char>(31 - i);
-  EXPECT_EQ(turbo::compute_crc32c(turbo::string_view(data, sizeof(data))),
+  EXPECT_EQ(turbo::compute_crc32c(std::string_view(data, sizeof(data))),
             turbo::CRC32C{0x113fdb5c});
 
   // An iSCSI - SCSI Read (10) Command PDU.
@@ -64,7 +64,7 @@ TEST(CRC32C, RFC3720) {
       0x00, 0x00, 0x00, 0x14, 0x00, 0x00, 0x00, 0x18, 0x28, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   };
-  EXPECT_EQ(turbo::compute_crc32c(turbo::string_view(
+  EXPECT_EQ(turbo::compute_crc32c(std::string_view(
                 reinterpret_cast<const char*>(cmd), sizeof(cmd))),
             turbo::CRC32C{0xd9963a56});
 }

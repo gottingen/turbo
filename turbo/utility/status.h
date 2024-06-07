@@ -118,9 +118,9 @@ namespace turbo {
 
     StatusBuilder unknown_error_builder();
 
-    turbo::Status annotate_status(const turbo::Status &s, turbo::string_view msg);
+    turbo::Status annotate_status(const turbo::Status &s, std::string_view msg);
 
-    StatusBuilder ret_check_fail(turbo::string_view msg);
+    StatusBuilder ret_check_fail(std::string_view msg);
 }  // namespace turbo
 
 #ifndef STATUS_MACROS_IMPL

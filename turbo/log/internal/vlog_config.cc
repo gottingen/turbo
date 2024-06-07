@@ -48,7 +48,7 @@ TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 
 namespace {
-bool ModuleIsPath(turbo::string_view module_pattern) {
+bool ModuleIsPath(std::string_view module_pattern) {
 #ifdef _WIN32
   return module_pattern.find_first_of("/\\") != module_pattern.npos;
 #else
@@ -82,7 +82,7 @@ struct VModuleInfo final {
   int vlog_level;
 
   // Allocates memory.
-  VModuleInfo(turbo::string_view module_pattern_arg, bool module_is_path_arg,
+  VModuleInfo(std::string_view module_pattern_arg, bool module_is_path_arg,
               int vlog_level_arg)
       : module_pattern(std::string(module_pattern_arg)),
         module_is_path(module_is_path_arg),
@@ -126,14 +126,14 @@ std::vector<VModuleInfo>& get_vmodule_info()
 }
 
 // Does not allocate or take locks.
-int VLogLevel(turbo::string_view file, const std::vector<VModuleInfo>* infos,
+int VLogLevel(std::string_view file, const std::vector<VModuleInfo>* infos,
               int current_global_v) {
   // `infos` is null during a call to `VLOG` prior to setting `vmodule` (e.g. by
   // parsing flags).  We can't allocate in `VLOG`, so we treat null as empty
   // here and press on.
   if (!infos || infos->empty()) return current_global_v;
   // Get basename for file
-  turbo::string_view basename = file;
+  std::string_view basename = file;
   {
     const size_t sep = basename.rfind('/');
     if (sep != basename.npos) {
@@ -146,7 +146,7 @@ int VLogLevel(turbo::string_view file, const std::vector<VModuleInfo>* infos,
     }
   }
 
-  turbo::string_view stem = file, stem_basename = basename;
+  std::string_view stem = file, stem_basename = basename;
   {
     const size_t sep = stem_basename.find('.');
     if (sep != stem_basename.npos) {
@@ -154,7 +154,7 @@ int VLogLevel(turbo::string_view file, const std::vector<VModuleInfo>* infos,
       stem_basename.remove_suffix(stem_basename.size() - sep);
     }
     if (turbo::consume_suffix(&stem_basename, "-inl")) {
-      stem.remove_suffix(turbo::string_view("-inl").size());
+      stem.remove_suffix(std::string_view("-inl").size());
     }
   }
   for (const auto& info : *infos) {
@@ -173,7 +173,7 @@ int VLogLevel(turbo::string_view file, const std::vector<VModuleInfo>* infos,
 }
 
 // Allocates memory.
-int AppendVModuleLocked(turbo::string_view module_pattern, int log_level)
+int AppendVModuleLocked(std::string_view module_pattern, int log_level)
     TURBO_EXCLUSIVE_LOCKS_REQUIRED(mutex) {
   for (const auto& info : get_vmodule_info()) {
     if (FNMatch(info.module_pattern, module_pattern)) {
@@ -190,7 +190,7 @@ int AppendVModuleLocked(turbo::string_view module_pattern, int log_level)
 }
 
 // Allocates memory.
-int PrependVModuleLocked(turbo::string_view module_pattern, int log_level)
+int PrependVModuleLocked(std::string_view module_pattern, int log_level)
     TURBO_EXCLUSIVE_LOCKS_REQUIRED(mutex) {
   std::optional<int> old_log_level;
   for (const auto& info : get_vmodule_info()) {
@@ -217,7 +217,7 @@ int PrependVModuleLocked(turbo::string_view module_pattern, int log_level)
 }
 }  // namespace
 
-int VLogLevel(turbo::string_view file) TURBO_LOCKS_EXCLUDED(mutex) {
+int VLogLevel(std::string_view file) TURBO_LOCKS_EXCLUDED(mutex) {
   turbo::base_internal::SpinLockHolder l(&mutex);
   return VLogLevel(file, vmodule_info, global_v);
 }
@@ -284,13 +284,13 @@ void UpdateVLogSites() TURBO_UNLOCK_FUNCTION(mutex)
   }
 }
 
-void UpdateVModule(turbo::string_view vmodule)
+void UpdateVModule(std::string_view vmodule)
     TURBO_LOCKS_EXCLUDED(mutex, GetUpdateSitesMutex()) {
-  std::vector<std::pair<turbo::string_view, int>> glob_levels;
-  for (turbo::string_view glob_level : turbo::str_split(vmodule, ',')) {
+  std::vector<std::pair<std::string_view, int>> glob_levels;
+  for (std::string_view glob_level : turbo::str_split(vmodule, ',')) {
     const size_t eq = glob_level.rfind('=');
     if (eq == glob_level.npos) continue;
-    const turbo::string_view glob = glob_level.substr(0, eq);
+    const std::string_view glob = glob_level.substr(0, eq);
     int level;
     if (!turbo::simple_atoi(glob_level.substr(eq + 1), &level)) continue;
     glob_levels.emplace_back(glob, level);
@@ -298,7 +298,7 @@ void UpdateVModule(turbo::string_view vmodule)
   mutex.Lock();  // Unlocked by UpdateVLogSites().
   get_vmodule_info().clear();
   for (const auto& it : glob_levels) {
-    const turbo::string_view glob = it.first;
+    const std::string_view glob = it.first;
     const int level = it.second;
     AppendVModuleLocked(glob, level);
   }
@@ -318,7 +318,7 @@ int UpdateGlobalVLogLevel(int v)
   return old_global_v;
 }
 
-int PrependVModule(turbo::string_view module_pattern, int log_level)
+int PrependVModule(std::string_view module_pattern, int log_level)
     TURBO_LOCKS_EXCLUDED(mutex, GetUpdateSitesMutex()) {
   mutex.Lock();  // Unlocked by UpdateVLogSites().
   int old_v = PrependVModuleLocked(module_pattern, log_level);

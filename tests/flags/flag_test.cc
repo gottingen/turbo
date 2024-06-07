@@ -73,7 +73,7 @@ namespace {
         UDT &operator=(const UDT &) = default;
     };
 
-    bool turbo_parse_flag(turbo::string_view, UDT *, std::string *) { return true; }
+    bool turbo_parse_flag(std::string_view, UDT *, std::string *) { return true; }
 
     std::string turbo_unparse_flag(const UDT &) { return ""; }
 
@@ -87,7 +87,7 @@ namespace {
         }
 
     private:
-        static std::string NormalizeFileName(turbo::string_view fname) {
+        static std::string NormalizeFileName(std::string_view fname) {
 #ifdef _WIN32
             std::string normalized(fname);
             std::replace(normalized.begin(), normalized.end(), '\\', '/');
@@ -318,7 +318,7 @@ namespace {
 #if TURBO_FLAGS_STRIP_NAMES
         GTEST_SKIP() << "This test requires flag names to be present";
 #endif
-        turbo::string_view expected_file_name = "tests/flags/flag_test.cc";
+        std::string_view expected_file_name = "tests/flags/flag_test.cc";
 
         EXPECT_EQ(turbo::get_flag_reflection_handle(FLAGS_test_flag_01).name(),
                   "test_flag_01");
@@ -542,7 +542,7 @@ namespace {
         int value;
     };
 
-    bool turbo_parse_flag(turbo::string_view src, NonTriviallyCopyableAggregate *f,
+    bool turbo_parse_flag(std::string_view src, NonTriviallyCopyableAggregate *f,
                           std::string *e) {
         return turbo::parse_flag(src, &f->value, e);
     }
@@ -798,8 +798,8 @@ namespace {
         int b;
     };
 
-    bool turbo_parse_flag(turbo::string_view in, CustomUDT *f, std::string *) {
-        std::vector<turbo::string_view> parts =
+    bool turbo_parse_flag(std::string_view in, CustomUDT *f, std::string *) {
+        std::vector<std::string_view> parts =
                 turbo::str_split(in, ':', turbo::SkipWhitespace());
 
         if (parts.size() != 2) return false;
@@ -880,7 +880,7 @@ namespace {
         int a;
     };
 
-    bool turbo_parse_flag(turbo::string_view in, ConversionTestVal *val_out,
+    bool turbo_parse_flag(std::string_view in, ConversionTestVal *val_out,
                           std::string *) {
         if (!turbo::simple_atoi(in, &val_out->a)) {
             return false;
@@ -923,7 +923,7 @@ namespace {
         int value;
     };
 
-    bool turbo_parse_flag(turbo::string_view in, NonDfltConstructible *ndc_out,
+    bool turbo_parse_flag(std::string_view in, NonDfltConstructible *ndc_out,
                           std::string *) {
         return turbo::simple_atoi(in, &ndc_out->value);
     }
@@ -1000,7 +1000,7 @@ namespace {
         char bytes[14];
     };
 
-    bool turbo_parse_flag(turbo::string_view, SmallAlignUDT *, std::string *) {
+    bool turbo_parse_flag(std::string_view, SmallAlignUDT *, std::string *) {
         return true;
     }
 
@@ -1020,7 +1020,7 @@ namespace {
         char c;
     };
 
-    bool turbo_parse_flag(turbo::string_view, NonTriviallyCopyableUDT *, std::string *) {
+    bool turbo_parse_flag(std::string_view, NonTriviallyCopyableUDT *, std::string *) {
         return true;
     }
 
@@ -1072,7 +1072,7 @@ namespace {
         TestE e;
     };
 
-    bool turbo_parse_flag(turbo::string_view, EnumWrapper *, std::string *) {
+    bool turbo_parse_flag(std::string_view, EnumWrapper *, std::string *) {
         return true;
     }
 

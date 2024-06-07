@@ -502,7 +502,7 @@ namespace turbo {
             }
 
         public:
-            static inline turbo::string_view OpenBrackets() {
+            static inline std::string_view OpenBrackets() {
                 switch (RandomBraces()) {
                     case kBareParens:
                         return "(";
@@ -516,7 +516,7 @@ namespace turbo {
                 return "(";
             }
 
-            static inline turbo::string_view CloseBrackets() {
+            static inline std::string_view CloseBrackets() {
                 switch (RandomBraces()) {
                     case kBareParens:
                         return ")";

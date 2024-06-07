@@ -188,9 +188,9 @@ void BM_StrAppend(benchmark::State& state, Array&& table) {
 }
 
 void BM_StrAppendStr(benchmark::State& state) {
-  using T = turbo::string_view;
+  using T = std::string_view;
   using Row = std::tuple<T, T, T, T, T, T, T, T>;
-  constexpr turbo::string_view kChunk = "0123456789";
+  constexpr std::string_view kChunk = "0123456789";
   Row row = {kChunk, kChunk, kChunk, kChunk, kChunk, kChunk, kChunk, kChunk};
   return BM_StrAppend(state, std::array<Row, 1>({row}));
 }
@@ -236,7 +236,7 @@ void BM_StrCatImpl(benchmark::State& state,
 
 void BM_StrCat(benchmark::State& state) {
   const int chunks_at_a_time = state.range(0);
-  const turbo::string_view kChunk = "0123456789";
+  const std::string_view kChunk = "0123456789";
 
   switch (chunks_at_a_time) {
     case 1:

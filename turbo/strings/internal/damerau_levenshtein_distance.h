@@ -27,8 +27,8 @@ TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 // Calculate DamerauLevenshtein distance between two strings.
 // When the distance is larger than cutoff, the code just returns cutoff + 1.
-uint8_t CappedDamerauLevenshteinDistance(turbo::string_view s1,
-                                         turbo::string_view s2, uint8_t cutoff);
+uint8_t CappedDamerauLevenshteinDistance(std::string_view s1,
+                                         std::string_view s2, uint8_t cutoff);
 
 }  // namespace strings_internal
 TURBO_NAMESPACE_END

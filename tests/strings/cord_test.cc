@@ -134,18 +134,18 @@ static std::string RandomLowercaseString(RandomEngine* rng, size_t length) {
   return result;
 }
 
-static void DoNothing(turbo::string_view /* data */, void* /* arg */) {}
+static void DoNothing(std::string_view /* data */, void* /* arg */) {}
 
-static void DeleteExternalString(turbo::string_view data, void* arg) {
+static void DeleteExternalString(std::string_view data, void* arg) {
   std::string* s = reinterpret_cast<std::string*>(arg);
   EXPECT_EQ(data, *s);
   delete s;
 }
 
 // Add "s" to *dst via `MakeCordFromExternal`
-static void AddExternalMemory(turbo::string_view s, turbo::Cord* dst) {
+static void AddExternalMemory(std::string_view s, turbo::Cord* dst) {
   std::string* str = new std::string(s.data(), s.size());
-  dst->Append(turbo::MakeCordFromExternal(*str, [str](turbo::string_view data) {
+  dst->Append(turbo::MakeCordFromExternal(*str, [str](std::string_view data) {
     DeleteExternalString(data, str);
   }));
 }
@@ -154,7 +154,7 @@ static void DumpGrowth() {
   turbo::Cord str;
   for (int i = 0; i < 1000; i++) {
     char c = 'a' + i % 26;
-    str.Append(turbo::string_view(&c, 1));
+    str.Append(std::string_view(&c, 1));
   }
 }
 
@@ -177,9 +177,9 @@ static size_t AppendWithFragments(const std::string& s, RandomEngine* rng,
     std::bernoulli_distribution coin_flip(0.5);
     if (coin_flip(*rng)) {
       // Grow by adding an external-memory.
-      AddExternalMemory(turbo::string_view(s.data() + j, N), cord);
+      AddExternalMemory(std::string_view(s.data() + j, N), cord);
     } else {
-      cord->Append(turbo::string_view(s.data() + j, N));
+      cord->Append(std::string_view(s.data() + j, N));
     }
     j += N;
   }
@@ -191,8 +191,8 @@ static void AddNewStringBlock(const std::string& str, turbo::Cord* dst) {
   char* data = new char[str.size()];
   memcpy(data, str.data(), str.size());
   dst->Append(turbo::MakeCordFromExternal(
-      turbo::string_view(data, str.size()),
-      [](turbo::string_view s) { delete[] s.data(); }));
+      std::string_view(data, str.size()),
+      [](std::string_view s) { delete[] s.data(); }));
 }
 
 // Make a Cord out of many different types of nodes.
@@ -221,7 +221,7 @@ TURBO_NAMESPACE_BEGIN
 class CordTestPeer {
  public:
   static void ForEachChunk(
-      const Cord& c, turbo::FunctionRef<void(turbo::string_view)> callback) {
+      const Cord& c, turbo::FunctionRef<void(std::string_view)> callback) {
     c.ForEachChunk(callback);
   }
 
@@ -372,8 +372,8 @@ TEST_P(CordTest, GigabyteCordFromExternal) {
   size_t length = 128 * 1024;
   char* data = new char[length];
   turbo::Cord from = turbo::MakeCordFromExternal(
-      turbo::string_view(data, length),
-      [](turbo::string_view sv) { delete[] sv.data(); });
+      std::string_view(data, length),
+      [](std::string_view sv) { delete[] sv.data(); });
 
   // This loop may seem odd due to its combination of exponential doubling of
   // size and incremental size increases.  We do it incrementally to be sure the
@@ -404,8 +404,8 @@ static turbo::Cord MakeExternalCord(int size) {
   memset(buffer, 'x', size);
   turbo::Cord cord;
   cord.Append(turbo::MakeCordFromExternal(
-      turbo::string_view(buffer, size),
-      [](turbo::string_view s) { delete[] s.data(); }));
+      std::string_view(buffer, size),
+      [](std::string_view s) { delete[] s.data(); }));
   return cord;
 }
 
@@ -415,7 +415,7 @@ extern bool my_unique_true_boolean;
 bool my_unique_true_boolean = true;
 
 TEST_P(CordTest, Assignment) {
-  turbo::Cord x(turbo::string_view("hi there"));
+  turbo::Cord x(std::string_view("hi there"));
   turbo::Cord y(x);
   MaybeHarden(y);
   ASSERT_EQ(x.ExpectedChecksum(), std::nullopt);
@@ -425,7 +425,7 @@ TEST_P(CordTest, Assignment) {
   ASSERT_TRUE(x <= y);
   ASSERT_TRUE(y <= x);
 
-  x = turbo::string_view("foo");
+  x = std::string_view("foo");
   ASSERT_EQ(std::string(x), "foo");
   ASSERT_EQ(std::string(y), "hi there");
   ASSERT_TRUE(x < y);
@@ -438,12 +438,12 @@ TEST_P(CordTest, Assignment) {
   ASSERT_EQ(x, "foo");
 
   // Test that going from inline rep to tree we don't leak memory.
-  std::vector<std::pair<turbo::string_view, turbo::string_view>>
+  std::vector<std::pair<std::string_view, std::string_view>>
       test_string_pairs = {{"hi there", "foo"},
                            {"loooooong coooooord", "short cord"},
                            {"short cord", "loooooong coooooord"},
                            {"loooooong coooooord1", "loooooong coooooord2"}};
-  for (std::pair<turbo::string_view, turbo::string_view> test_strings :
+  for (std::pair<std::string_view, std::string_view> test_strings :
        test_string_pairs) {
     turbo::Cord tmp(test_strings.first);
     turbo::Cord z(std::move(tmp));
@@ -471,7 +471,7 @@ TEST_P(CordTest, Assignment) {
 }
 
 TEST_P(CordTest, StartsEndsWith) {
-  turbo::Cord x(turbo::string_view("abcde"));
+  turbo::Cord x(std::string_view("abcde"));
   MaybeHarden(x);
   turbo::Cord empty("");
 
@@ -616,7 +616,7 @@ TEST_P(CordTest, Subcord) {
     for (size_t end_pos : positions) {
       if (end_pos < pos || end_pos > a.size()) continue;
       turbo::Cord sa = a.Subcord(pos, end_pos - pos);
-      ASSERT_EQ(turbo::string_view(s).substr(pos, end_pos - pos),
+      ASSERT_EQ(std::string_view(s).substr(pos, end_pos - pos),
                 std::string(sa))
           << a;
       if (pos != 0 || end_pos != a.size()) {
@@ -657,8 +657,8 @@ TEST_P(CordTest, Subcord) {
 }
 
 TEST_P(CordTest, Swap) {
-  turbo::string_view a("Dexter");
-  turbo::string_view b("Mandark");
+  std::string_view a("Dexter");
+  std::string_view b("Mandark");
   turbo::Cord x(a);
   turbo::Cord y(b);
   MaybeHarden(x);
@@ -710,7 +710,7 @@ static void VerifyAppendCordToString(const turbo::Cord& cord) {
   turbo::AppendCordToString(cord, &initially_empty);
   EXPECT_EQ(initially_empty, cord);
 
-  const turbo::string_view kInitialContents = "initial contents.";
+  const std::string_view kInitialContents = "initial contents.";
   std::string expected_after_append =
       turbo::str_cat(kInitialContents, std::string(cord));
 
@@ -917,7 +917,7 @@ TEST_P(CordAppendBufferTest, GetAppendBufferOnInlinedCord) {
     turbo::CordBuffer buffer = GetAppendBuffer(cord, size, 1);
     EXPECT_GE(buffer.capacity(), 3 + size);
     EXPECT_EQ(buffer.length(), 3);
-    EXPECT_EQ(turbo::string_view(buffer.data(), buffer.length()), "Abc");
+    EXPECT_EQ(std::string_view(buffer.data(), buffer.length()), "Abc");
     EXPECT_TRUE(cord.empty());
   }
 }
@@ -933,7 +933,7 @@ TEST_P(CordAppendBufferTest, GetAppendBufferOnInlinedCordCapacityCloseToMax) {
     turbo::CordBuffer buffer = GetAppendBuffer(cord, size, 1);
     EXPECT_GE(buffer.capacity(), maximum_payload());
     EXPECT_EQ(buffer.length(), 3);
-    EXPECT_EQ(turbo::string_view(buffer.data(), buffer.length()), "Abc");
+    EXPECT_EQ(std::string_view(buffer.data(), buffer.length()), "Abc");
     EXPECT_TRUE(cord.empty());
   }
 }
@@ -950,7 +950,7 @@ TEST_P(CordAppendBufferTest, GetAppendBufferOnFlat) {
   buffer = GetAppendBuffer(cord, 6);
   EXPECT_EQ(buffer.capacity(), expected_capacity);
   EXPECT_EQ(buffer.length(), 3);
-  EXPECT_EQ(turbo::string_view(buffer.data(), buffer.length()), "Abc");
+  EXPECT_EQ(std::string_view(buffer.data(), buffer.length()), "Abc");
   EXPECT_TRUE(cord.empty());
 }
 
@@ -986,7 +986,7 @@ TEST_P(CordAppendBufferTest, GetAppendBufferOnTree) {
     turbo::CordBuffer buffer = GetAppendBuffer(cord, 6);
     EXPECT_GE(buffer.capacity(), 500);
     EXPECT_EQ(buffer.length(), 10);
-    EXPECT_EQ(turbo::string_view(buffer.data(), buffer.length()), last);
+    EXPECT_EQ(std::string_view(buffer.data(), buffer.length()), last);
     EXPECT_EQ(cord, prefix);
   }
 }
@@ -1078,13 +1078,13 @@ TEST_P(CordTest, TryFlatConcat) {
 }
 
 TEST_P(CordTest, TryFlatExternal) {
-  turbo::Cord c = turbo::MakeCordFromExternal("hell", [](turbo::string_view) {});
+  turbo::Cord c = turbo::MakeCordFromExternal("hell", [](std::string_view) {});
   MaybeHarden(c);
   EXPECT_EQ(c.TryFlat(), "hell");
 }
 
 TEST_P(CordTest, TryFlatSubstrExternal) {
-  turbo::Cord c = turbo::MakeCordFromExternal("hell", [](turbo::string_view) {});
+  turbo::Cord c = turbo::MakeCordFromExternal("hell", [](std::string_view) {});
   turbo::Cord sub = turbo::CordTestPeer::MakeSubstring(c, 1, c.size() - 1);
   MaybeHarden(sub);
   EXPECT_EQ(sub.TryFlat(), "ell");
@@ -1094,7 +1094,7 @@ TEST_P(CordTest, TryFlatCommonlyAssumedInvariants) {
   // The behavior tested below is not part of the API contract of Cord, but it's
   // something we intend to be true in our current implementation.  This test
   // exists to detect and prevent accidental breakage of the implementation.
-  turbo::string_view fragments[] = {"A fragmented test",
+  std::string_view fragments[] = {"A fragmented test",
                                    " cord",
                                    " to test subcords",
                                    " of ",
@@ -1108,8 +1108,8 @@ TEST_P(CordTest, TryFlatCommonlyAssumedInvariants) {
   int fragment = 0;
   int offset = 0;
   turbo::Cord::CharIterator itc = c.char_begin();
-  for (turbo::string_view sv : c.Chunks()) {
-    turbo::string_view expected = fragments[fragment];
+  for (std::string_view sv : c.Chunks()) {
+    std::string_view expected = fragments[fragment];
     turbo::Cord subcord1 = c.Subcord(offset, sv.length());
     turbo::Cord subcord2 = turbo::Cord::AdvanceAndRead(&itc, sv.size());
     EXPECT_EQ(subcord1.TryFlat(), expected);
@@ -1125,12 +1125,12 @@ static bool IsFlat(const turbo::Cord& c) {
 
 static void VerifyFlatten(turbo::Cord c) {
   std::string old_contents(c);
-  turbo::string_view old_flat;
+  std::string_view old_flat;
   bool already_flat_and_non_empty = IsFlat(c) && !c.empty();
   if (already_flat_and_non_empty) {
     old_flat = *c.chunk_begin();
   }
-  turbo::string_view new_flat = c.Flatten();
+  std::string_view new_flat = c.Flatten();
 
   // Verify that the contents of the flattened Cord are correct.
   EXPECT_EQ(new_flat, old_contents);
@@ -1215,7 +1215,7 @@ TEST_P(CordTest, MultipleLengths) {
       EXPECT_EQ(a, std::string(x)) << "'" << a << "'";
     }
 
-    {  // Construct from turbo::string_view
+    {  // Construct from std::string_view
       turbo::Cord x(a);
       MaybeHarden(x);
       EXPECT_EQ(a, std::string(x)) << "'" << a << "'";
@@ -1247,7 +1247,7 @@ TEST_P(CordTest, MultipleLengths) {
         EXPECT_EQ(b, std::string(x)) << "'" << a << "' + '" << b << "'";
       }
 
-      {  // CopyFrom turbo::string_view
+      {  // CopyFrom std::string_view
         turbo::Cord x(a);
         MaybeHarden(x);
         x = b;
@@ -1262,7 +1262,7 @@ TEST_P(CordTest, MultipleLengths) {
         EXPECT_EQ(a + b, std::string(x)) << "'" << a << "' + '" << b << "'";
       }
 
-      {  // Cord::Append(turbo::string_view)
+      {  // Cord::Append(std::string_view)
         turbo::Cord x(a);
         MaybeHarden(x);
         x.Append(b);
@@ -1277,7 +1277,7 @@ TEST_P(CordTest, MultipleLengths) {
         EXPECT_EQ(b + a, std::string(x)) << "'" << b << "' + '" << a << "'";
       }
 
-      {  // Cord::Prepend(turbo::string_view)
+      {  // Cord::Prepend(std::string_view)
         turbo::Cord x(a);
         MaybeHarden(x);
         x.Prepend(b);
@@ -1291,7 +1291,7 @@ namespace {
 
 TEST_P(CordTest, RemoveSuffixWithExternalOrSubstring) {
   turbo::Cord cord = turbo::MakeCordFromExternal(
-      "foo bar baz", [](turbo::string_view s) { DoNothing(s, nullptr); });
+      "foo bar baz", [](std::string_view s) { DoNothing(s, nullptr); });
   EXPECT_EQ("foo bar baz", std::string(cord));
 
   MaybeHarden(cord);
@@ -1329,8 +1329,8 @@ turbo::Cord CordWithZedBlock(size_t size) {
     memset(data, 'z', size);
   }
   turbo::Cord cord = turbo::MakeCordFromExternal(
-      turbo::string_view(data, size),
-      [](turbo::string_view s) { delete[] s.data(); });
+      std::string_view(data, size),
+      [](std::string_view s) { delete[] s.data(); });
   return cord;
 }
 
@@ -1629,11 +1629,11 @@ TEST_P(CordTest, ComparisonOperators_Cord_Cord) {
 }
 
 TEST_P(CordTest, ComparisonOperators_Cord_StringPiece) {
-  CompareOperators<turbo::Cord, turbo::string_view>();
+  CompareOperators<turbo::Cord, std::string_view>();
 }
 
 TEST_P(CordTest, ComparisonOperators_StringPiece_Cord) {
-  CompareOperators<turbo::string_view, turbo::Cord>();
+  CompareOperators<std::string_view, turbo::Cord>();
 }
 
 TEST_P(CordTest, ComparisonOperators_Cord_string) {
@@ -1664,7 +1664,7 @@ TEST_P(CordTest, ConstructFromExternalReleaserInvoked) {
   // Empty external memory means the releaser should be called immediately.
   {
     bool invoked = false;
-    auto releaser = [&invoked](turbo::string_view) { invoked = true; };
+    auto releaser = [&invoked](std::string_view) { invoked = true; };
     {
       auto c = turbo::MakeCordFromExternal("", releaser);
       EXPECT_TRUE(invoked);
@@ -1678,7 +1678,7 @@ TEST_P(CordTest, ConstructFromExternalReleaserInvoked) {
   std::string large_dummy(2048, 'c');
   {
     bool invoked = false;
-    auto releaser = [&invoked](turbo::string_view) { invoked = true; };
+    auto releaser = [&invoked](std::string_view) { invoked = true; };
     {
       auto c = turbo::MakeCordFromExternal(large_dummy, releaser);
       EXPECT_FALSE(invoked);
@@ -1688,7 +1688,7 @@ TEST_P(CordTest, ConstructFromExternalReleaserInvoked) {
 
   {
     bool invoked = false;
-    auto releaser = [&invoked](turbo::string_view) { invoked = true; };
+    auto releaser = [&invoked](std::string_view) { invoked = true; };
     {
       turbo::Cord copy;
       {
@@ -1709,7 +1709,7 @@ TEST_P(CordTest, ConstructFromExternalCompareContents) {
     std::string data = RandomLowercaseString(&rng, length);
     auto* external = new std::string(data);
     auto cord =
-        turbo::MakeCordFromExternal(*external, [external](turbo::string_view sv) {
+        turbo::MakeCordFromExternal(*external, [external](std::string_view sv) {
           EXPECT_EQ(external->data(), sv.data());
           EXPECT_EQ(external->size(), sv.size());
           delete external;
@@ -1726,8 +1726,8 @@ TEST_P(CordTest, ConstructFromExternalLargeReleaser) {
   std::array<char, kLength> data_array;
   for (size_t i = 0; i < kLength; ++i) data_array[i] = data[i];
   bool invoked = false;
-  auto releaser = [data_array, &invoked](turbo::string_view data) {
-    EXPECT_EQ(data, turbo::string_view(data_array.data(), data_array.size()));
+  auto releaser = [data_array, &invoked](std::string_view data) {
+    EXPECT_EQ(data, std::string_view(data_array.data(), data_array.size()));
     invoked = true;
   };
   (void)MaybeHardened(turbo::MakeCordFromExternal(data, releaser));
@@ -1735,10 +1735,10 @@ TEST_P(CordTest, ConstructFromExternalLargeReleaser) {
 }
 
 TEST_P(CordTest, ConstructFromExternalFunctionPointerReleaser) {
-  static turbo::string_view data("hello world");
+  static std::string_view data("hello world");
   static bool invoked;
   auto* releaser =
-      static_cast<void (*)(turbo::string_view)>([](turbo::string_view sv) {
+      static_cast<void (*)(std::string_view)>([](std::string_view sv) {
         EXPECT_EQ(data, sv);
         invoked = true;
       });
@@ -1755,7 +1755,7 @@ TEST_P(CordTest, ConstructFromExternalMoveOnlyReleaser) {
   struct Releaser {
     explicit Releaser(bool* invoked) : invoked(invoked) {}
     Releaser(Releaser&& other) noexcept : invoked(other.invoked) {}
-    void operator()(turbo::string_view) const { *invoked = true; }
+    void operator()(std::string_view) const { *invoked = true; }
 
     bool* invoked;
   };
@@ -1775,7 +1775,7 @@ TEST_P(CordTest, ConstructFromExternalNoArgLambda) {
 TEST_P(CordTest, ConstructFromExternalStringViewArgLambda) {
   bool invoked = false;
   (void)MaybeHardened(turbo::MakeCordFromExternal(
-      "dummy", [&invoked](turbo::string_view) { invoked = true; }));
+      "dummy", [&invoked](std::string_view) { invoked = true; }));
   EXPECT_TRUE(invoked);
 }
 
@@ -1783,7 +1783,7 @@ TEST_P(CordTest, ConstructFromExternalNonTrivialReleaserDestructor) {
   struct Releaser {
     explicit Releaser(bool* destroyed) : destroyed(destroyed) {}
     ~Releaser() { *destroyed = true; }
-    void operator()(turbo::string_view) const {}
+    void operator()(std::string_view) const {}
 
     bool* destroyed;
   };
@@ -1817,8 +1817,8 @@ TEST_P(CordTest, ConstructFromExternalReferenceQualifierOverloads) {
     Releaser(Releaser&& rhs) : tr_(rhs.tr_) { tr_->Record(kMove); }
     Releaser(const Releaser& rhs) : tr_(rhs.tr_) { tr_->Record(kCopy); }
 
-    void operator()(turbo::string_view) & { tr_->Record(kLValue); }
-    void operator()(turbo::string_view) && { tr_->Record(kRValue); }
+    void operator()(std::string_view) & { tr_->Record(kLValue); }
+    void operator()(std::string_view) && { tr_->Record(kRValue); }
 
    private:
     Tracker* tr_;
@@ -2169,7 +2169,7 @@ TEST_P(CordTest, DiabolicalGrowth) {
   turbo::Cord cord;
   for (char c : expected) {
     turbo::Cord shared(cord);
-    cord.Append(turbo::string_view(&c, 1));
+    cord.Append(std::string_view(&c, 1));
     MaybeHarden(cord);
   }
   std::string value;
@@ -2183,19 +2183,19 @@ TEST_P(CordTest, DiabolicalGrowth) {
 // that's appropriate for the binary.
 
 // Construct a huge cord with the specified valid prefix.
-static turbo::Cord MakeHuge(turbo::string_view prefix) {
+static turbo::Cord MakeHuge(std::string_view prefix) {
   turbo::Cord cord;
   if (sizeof(size_t) > 4) {
     // In 64-bit binaries, test 64-bit Cord support.
     const size_t size =
         static_cast<size_t>(std::numeric_limits<uint32_t>::max()) + 314;
     cord.Append(turbo::MakeCordFromExternal(
-        turbo::string_view(prefix.data(), size),
-        [](turbo::string_view s) { DoNothing(s, nullptr); }));
+        std::string_view(prefix.data(), size),
+        [](std::string_view s) { DoNothing(s, nullptr); }));
   } else {
     // Cords are limited to 32-bit lengths in 32-bit binaries.  The following
     // tests check for use of "signed int" to represent Cord length/offset.
-    // However turbo::string_view does not allow lengths >= (1u<<31), so we need
+    // However std::string_view does not allow lengths >= (1u<<31), so we need
     // to append in two parts;
     const size_t s1 = (1u << 31) - 1;
     // For shorter cord, `Append` copies the data rather than allocating a new
@@ -2203,11 +2203,11 @@ static turbo::Cord MakeHuge(turbo::string_view prefix) {
     // to not trigger the copy.
     const size_t s2 = 600;
     cord.Append(turbo::MakeCordFromExternal(
-        turbo::string_view(prefix.data(), s1),
-        [](turbo::string_view s) { DoNothing(s, nullptr); }));
+        std::string_view(prefix.data(), s1),
+        [](std::string_view s) { DoNothing(s, nullptr); }));
     cord.Append(turbo::MakeCordFromExternal(
-        turbo::string_view("", s2),
-        [](turbo::string_view s) { DoNothing(s, nullptr); }));
+        std::string_view("", s2),
+        [](std::string_view s) { DoNothing(s, nullptr); }));
   }
   return cord;
 }
@@ -2265,7 +2265,7 @@ TEST_P(CordTest, MakeFragmentedCordFromInitializerList) {
 }
 
 TEST_P(CordTest, MakeFragmentedCordFromVector) {
-  std::vector<turbo::string_view> chunks = {"A ", "fragmented ", "Cord"};
+  std::vector<std::string_view> chunks = {"A ", "fragmented ", "Cord"};
   turbo::Cord fragmented = turbo::MakeFragmentedCord(chunks);
 
   MaybeHarden(fragmented);
@@ -2303,7 +2303,7 @@ TEST_P(CordTest, CordChunkIteratorTraits) {
       "");
   static_assert(
       std::is_same<std::iterator_traits<turbo::Cord::ChunkIterator>::value_type,
-                   turbo::string_view>::value,
+                   std::string_view>::value,
       "");
   static_assert(
       std::is_same<
@@ -2312,11 +2312,11 @@ TEST_P(CordTest, CordChunkIteratorTraits) {
       "");
   static_assert(
       std::is_same<std::iterator_traits<turbo::Cord::ChunkIterator>::pointer,
-                   const turbo::string_view*>::value,
+                   const std::string_view*>::value,
       "");
   static_assert(
       std::is_same<std::iterator_traits<turbo::Cord::ChunkIterator>::reference,
-                   turbo::string_view>::value,
+                   std::string_view>::value,
       "");
 }
 
@@ -2343,10 +2343,10 @@ static void VerifyChunkIterator(const turbo::Cord& cord,
     EXPECT_EQ(pre_iter->data(), (*pre_iter).data());
     EXPECT_EQ(pre_iter->size(), (*pre_iter).size());
 
-    turbo::string_view chunk = *pre_iter;
+    std::string_view chunk = *pre_iter;
     EXPECT_FALSE(chunk.empty());
     EXPECT_LE(pos + chunk.size(), content.size());
-    EXPECT_EQ(turbo::string_view(content.c_str() + pos, chunk.size()), chunk);
+    EXPECT_EQ(std::string_view(content.c_str() + pos, chunk.size()), chunk);
 
     int n_equal_iterators = 0;
     for (turbo::Cord::ChunkIterator it = range.begin(); it != range.end();
@@ -2412,7 +2412,7 @@ TEST_P(CordTest, AdvanceAndReadOnDataEdge) {
 
     turbo::Cord cord =
         as_flat ? turbo::Cord(data)
-                : turbo::MakeCordFromExternal(data, [](turbo::string_view) {});
+                : turbo::MakeCordFromExternal(data, [](std::string_view) {});
     auto it = cord.Chars().begin();
 #if !defined(NDEBUG) || TURBO_OPTION_HARDENED
     EXPECT_DEATH_IF_SUPPORTED(cord.AdvanceAndRead(&it, 2001), ".*");
@@ -2446,7 +2446,7 @@ TEST_P(CordTest, AdvanceAndReadOnSubstringDataEdge) {
 
     turbo::Cord cord =
         as_flat ? turbo::Cord(data)
-                : turbo::MakeCordFromExternal(data, [](turbo::string_view) {});
+                : turbo::MakeCordFromExternal(data, [](std::string_view) {});
     cord = cord.Subcord(200, 2000);
     const std::string substr = data.substr(200, 2000);
 
@@ -2575,7 +2575,7 @@ static void VerifyCharIterator(const turbo::Cord& cord) {
   EXPECT_EQ(zero_advanced_end, cord.char_end());
 
   turbo::Cord::CharIterator it = cord.char_begin();
-  for (turbo::string_view chunk : cord.Chunks()) {
+  for (std::string_view chunk : cord.Chunks()) {
     while (!chunk.empty()) {
       EXPECT_EQ(turbo::Cord::ChunkRemaining(it), chunk);
       chunk.remove_prefix(1);
@@ -2677,7 +2677,7 @@ TEST_P(CordTest, ForEachChunk) {
 
     std::vector<std::string> iterated_chunks;
     turbo::CordTestPeer::ForEachChunk(c,
-                                     [&iterated_chunks](turbo::string_view sv) {
+                                     [&iterated_chunks](std::string_view sv) {
                                        iterated_chunks.emplace_back(sv);
                                      });
     EXPECT_EQ(iterated_chunks, cord_chunks);
@@ -2692,7 +2692,7 @@ TEST_P(CordTest, SmallBufferAssignFromOwnData) {
     for (size_t count = contents.size() - pos; count > 0; --count) {
       turbo::Cord c(contents);
       MaybeHarden(c);
-      turbo::string_view flat = c.Flatten();
+      std::string_view flat = c.Flatten();
       c = flat.substr(pos, count);
       EXPECT_EQ(c, contents.substr(pos, count))
           << "pos = " << pos << "; count = " << count;
@@ -2764,7 +2764,7 @@ TEST_P(CordTest, BtreeHostileSplitInsertJoin) {
     size_t offset = turbo::Uniform(bitgen, 0u, cord.size());
     size_t length = turbo::Uniform(bitgen, 100u, data.size());
     if (cord.size() == offset) {
-      cord.Append(turbo::string_view(data.data(), length));
+      cord.Append(std::string_view(data.data(), length));
     } else {
       turbo::Cord suffix;
       if (offset + length < cord.size()) {
@@ -2774,7 +2774,7 @@ TEST_P(CordTest, BtreeHostileSplitInsertJoin) {
       if (cord.size() > offset) {
         cord.RemoveSuffix(cord.size() - offset);
       }
-      cord.Append(turbo::string_view(data.data(), length));
+      cord.Append(std::string_view(data.data(), length));
       if (!suffix.empty()) {
         cord.Append(suffix);
       }
@@ -2784,7 +2784,7 @@ TEST_P(CordTest, BtreeHostileSplitInsertJoin) {
 
 class AfterExitCordTester {
  public:
-  bool Set(turbo::Cord* cord, turbo::string_view expected) {
+  bool Set(turbo::Cord* cord, std::string_view expected) {
     cord_ = cord;
     expected_ = expected;
     return true;
@@ -2795,7 +2795,7 @@ class AfterExitCordTester {
   }
  private:
   turbo::Cord* cord_;
-  turbo::string_view expected_;
+  std::string_view expected_;
 };
 
 template <typename Str>
@@ -2845,14 +2845,14 @@ constexpr int SimpleStrlen(const char* p) {
 }
 
 struct ShortView {
-  constexpr turbo::string_view operator()() const {
-    return turbo::string_view("SSO string", SimpleStrlen("SSO string"));
+  constexpr std::string_view operator()() const {
+    return std::string_view("SSO string", SimpleStrlen("SSO string"));
   }
 };
 
 struct LongView {
-  constexpr turbo::string_view operator()() const {
-    return turbo::string_view("String that does not fit SSO.",
+  constexpr std::string_view operator()() const {
+    return std::string_view("String that does not fit SSO.",
                              SimpleStrlen("String that does not fit SSO."));
   }
 };
@@ -2871,15 +2871,15 @@ namespace {
 // the start of the first chunk.
 class PopulatedCordFactory {
  public:
-  constexpr PopulatedCordFactory(turbo::string_view name,
+  constexpr PopulatedCordFactory(std::string_view name,
                                  turbo::Cord (*generator)())
       : name_(name), generator_(generator) {}
 
-  turbo::string_view Name() const { return name_; }
+  std::string_view Name() const { return name_; }
   turbo::Cord Generate() const { return generator_(); }
 
  private:
-  turbo::string_view name_;
+  std::string_view name_;
   turbo::Cord (*generator_)();
 };
 
@@ -2923,17 +2923,17 @@ PopulatedCordFactory cord_factories[] = {
 // testing.
 class CordMutator {
  public:
-  constexpr CordMutator(turbo::string_view name, void (*mutate)(turbo::Cord&),
+  constexpr CordMutator(std::string_view name, void (*mutate)(turbo::Cord&),
                         void (*undo)(turbo::Cord&) = nullptr)
       : name_(name), mutate_(mutate), undo_(undo) {}
 
-  turbo::string_view Name() const { return name_; }
+  std::string_view Name() const { return name_; }
   void Mutate(turbo::Cord& cord) const { mutate_(cord); }
   bool CanUndo() const { return undo_ != nullptr; }
   void Undo(turbo::Cord& cord) const { undo_(cord); }
 
  private:
-  turbo::string_view name_;
+  std::string_view name_;
   void (*mutate_)(turbo::Cord&);
   void (*undo_)(turbo::Cord&);
 };
@@ -3153,7 +3153,7 @@ TEST_P(CordTest, ExpectedChecksum) {
       EXPECT_EQ(dest, base_value_as_string);
 
       bool first_pass = true;
-      for (turbo::string_view chunk : cc3.Chunks()) {
+      for (std::string_view chunk : cc3.Chunks()) {
         if (first_pass) {
           EXPECT_TRUE(turbo::starts_with(chunk, "abcde"));
         }
@@ -3263,7 +3263,7 @@ TEST_P(CordTest, ChecksummedEmptyCord) {
   turbo::CopyCordToString(cc3, &dest);
   EXPECT_EQ(dest, "");
 
-  for (turbo::string_view chunk : cc3.Chunks()) {  // NOLINT(unreachable loop)
+  for (std::string_view chunk : cc3.Chunks()) {  // NOLINT(unreachable loop)
     static_cast<void>(chunk);
     GTEST_FAIL() << "no chunks expected";
   }
@@ -3277,7 +3277,7 @@ TEST_P(CordTest, ChecksummedEmptyCord) {
 
   EXPECT_EQ(cc3.TryFlat(), "");
   EXPECT_EQ(turbo::hash_of(c3), turbo::hash_of(turbo::Cord()));
-  EXPECT_EQ(turbo::hash_of(c3), turbo::hash_of(turbo::string_view()));
+  EXPECT_EQ(turbo::hash_of(c3), turbo::hash_of(std::string_view()));
 }
 
 TEST(CrcCordTest, ChecksummedEmptyCordEstimateMemoryUsage) {

@@ -62,7 +62,7 @@ void SetInitialized() {
   logging_initialized.store(true, std::memory_order_release);
 }
 
-void WriteToStderr(turbo::string_view message, turbo::LogSeverity severity) {
+void WriteToStderr(std::string_view message, turbo::LogSeverity severity) {
   if (message.empty()) return;
 #if defined(__EMSCRIPTEN__)
   // In WebAssembly, bypass filesystem emulation via fwrite.

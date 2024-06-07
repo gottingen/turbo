@@ -44,7 +44,7 @@ namespace turbo::flags_internal {
     // --------------------------------------------------------------------
     // turbo_parse_flag specializations for boolean type.
 
-    bool turbo_parse_flag(turbo::string_view text, bool *dst, std::string *) {
+    bool turbo_parse_flag(std::string_view text, bool *dst, std::string *) {
         const char *kTrue[] = {"1", "t", "true", "y", "yes"};
         const char *kFalse[] = {"0", "f", "false", "n", "no"};
         static_assert(sizeof(kTrue) == sizeof(kFalse), "true_false_equal");
@@ -69,7 +69,7 @@ namespace turbo::flags_internal {
     // Return the base to use for parsing text as an integer.  Leading 0x
     // puts us in base 16.  But leading 0 does not put us in base 8. It
     // caused too many bugs when we had that behavior.
-    static int NumericBase(turbo::string_view text) {
+    static int NumericBase(std::string_view text) {
         if (text.empty()) return 0;
         size_t num_start = (text[0] == '-' || text[0] == '+') ? 1 : 0;
         const bool hex = (text.size() >= num_start + 2 && text[num_start] == '0' &&
@@ -78,14 +78,14 @@ namespace turbo::flags_internal {
     }
 
     template<typename IntType>
-    inline bool ParseFlagImpl(turbo::string_view text, IntType &dst) {
+    inline bool ParseFlagImpl(std::string_view text, IntType &dst) {
         text = turbo::trim_all(text);
 
         return turbo::numbers_internal::safe_strtoi_base(text, &dst,
                                                          NumericBase(text));
     }
 
-    bool turbo_parse_flag(turbo::string_view text, short *dst, std::string *) {
+    bool turbo_parse_flag(std::string_view text, short *dst, std::string *) {
         int val;
         if (!ParseFlagImpl(text, val)) return false;
         if (static_cast<short>(val) != val)  // worked, but number out of range
@@ -94,7 +94,7 @@ namespace turbo::flags_internal {
         return true;
     }
 
-    bool turbo_parse_flag(turbo::string_view text, unsigned short *dst, std::string *) {
+    bool turbo_parse_flag(std::string_view text, unsigned short *dst, std::string *) {
         unsigned int val;
         if (!ParseFlagImpl(text, val)) return false;
         if (static_cast<unsigned short>(val) !=
@@ -104,32 +104,32 @@ namespace turbo::flags_internal {
         return true;
     }
 
-    bool turbo_parse_flag(turbo::string_view text, int *dst, std::string *) {
+    bool turbo_parse_flag(std::string_view text, int *dst, std::string *) {
         return ParseFlagImpl(text, *dst);
     }
 
-    bool turbo_parse_flag(turbo::string_view text, unsigned int *dst, std::string *) {
+    bool turbo_parse_flag(std::string_view text, unsigned int *dst, std::string *) {
         return ParseFlagImpl(text, *dst);
     }
 
-    bool turbo_parse_flag(turbo::string_view text, long *dst, std::string *) {
+    bool turbo_parse_flag(std::string_view text, long *dst, std::string *) {
         return ParseFlagImpl(text, *dst);
     }
 
-    bool turbo_parse_flag(turbo::string_view text, unsigned long *dst, std::string *) {
+    bool turbo_parse_flag(std::string_view text, unsigned long *dst, std::string *) {
         return ParseFlagImpl(text, *dst);
     }
 
-    bool turbo_parse_flag(turbo::string_view text, long long *dst, std::string *) {
+    bool turbo_parse_flag(std::string_view text, long long *dst, std::string *) {
         return ParseFlagImpl(text, *dst);
     }
 
-    bool turbo_parse_flag(turbo::string_view text, unsigned long long *dst,
+    bool turbo_parse_flag(std::string_view text, unsigned long long *dst,
                           std::string *) {
         return ParseFlagImpl(text, *dst);
     }
 
-    bool turbo_parse_flag(turbo::string_view text, turbo::int128 *dst, std::string *) {
+    bool turbo_parse_flag(std::string_view text, turbo::int128 *dst, std::string *) {
         text = turbo::trim_all(text);
 
         // check hex
@@ -142,7 +142,7 @@ namespace turbo::flags_internal {
                           : turbo::simple_atoi(text, dst);
     }
 
-    bool turbo_parse_flag(turbo::string_view text, turbo::uint128 *dst, std::string *) {
+    bool turbo_parse_flag(std::string_view text, turbo::uint128 *dst, std::string *) {
         text = turbo::trim_all(text);
 
         // check hex
@@ -158,18 +158,18 @@ namespace turbo::flags_internal {
     // --------------------------------------------------------------------
     // turbo_parse_flag for floating point types.
 
-    bool turbo_parse_flag(turbo::string_view text, float *dst, std::string *) {
+    bool turbo_parse_flag(std::string_view text, float *dst, std::string *) {
         return turbo::simple_atof(text, dst);
     }
 
-    bool turbo_parse_flag(turbo::string_view text, double *dst, std::string *) {
+    bool turbo_parse_flag(std::string_view text, double *dst, std::string *) {
         return turbo::simple_atod(text, dst);
     }
 
     // --------------------------------------------------------------------
     // turbo_parse_flag for strings.
 
-    bool turbo_parse_flag(turbo::string_view text, std::string *dst, std::string *) {
+    bool turbo_parse_flag(std::string_view text, std::string *dst, std::string *) {
         dst->assign(text.data(), text.size());
         return true;
     }
@@ -177,7 +177,7 @@ namespace turbo::flags_internal {
     // --------------------------------------------------------------------
     // turbo_parse_flag for vector of strings.
 
-    bool turbo_parse_flag(turbo::string_view text, std::vector<std::string> *dst,
+    bool turbo_parse_flag(std::string_view text, std::vector<std::string> *dst,
                           std::string *) {
         // An empty flag value corresponds to an empty vector, not a vector
         // with a single, empty std::string.
@@ -246,7 +246,7 @@ namespace turbo::flags_internal {
 
     std::string Unparse(double v) { return UnparseFloatingPointVal(v); }
 
-    std::string turbo_unparse_flag(turbo::string_view v) { return std::string(v); }
+    std::string turbo_unparse_flag(std::string_view v) { return std::string(v); }
 
     std::string turbo_unparse_flag(const std::vector<std::string> &v) {
         return turbo::str_join(v, ",");
@@ -254,7 +254,7 @@ namespace turbo::flags_internal {
 
 }  // namespace turbo::flags_internal
 namespace turbo {
-    bool turbo_parse_flag(turbo::string_view text, turbo::LogSeverity *dst,
+    bool turbo_parse_flag(std::string_view text, turbo::LogSeverity *dst,
                           std::string *err) {
         text = turbo::trim_all(text);
         if (text.empty()) {

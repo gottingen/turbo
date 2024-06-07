@@ -63,7 +63,7 @@ namespace turbo {
     // encountered, this function returns `false`, leaving `out` in an unspecified
     // state.
     template<typename int_type>
-    TURBO_MUST_USE_RESULT bool simple_atoi(turbo::string_view str,
+    TURBO_MUST_USE_RESULT bool simple_atoi(std::string_view str,
                                            turbo::Nonnull<int_type *> out);
 
     // simple_atof()
@@ -75,7 +75,7 @@ namespace turbo {
     // allowed formats for `str`, except simple_atof() is locale-independent and will
     // always use the "C" locale. If any errors are encountered, this function
     // returns `false`, leaving `out` in an unspecified state.
-    TURBO_MUST_USE_RESULT bool simple_atof(turbo::string_view str,
+    TURBO_MUST_USE_RESULT bool simple_atof(std::string_view str,
                                           turbo::Nonnull<float *> out);
 
     // simple_atod()
@@ -87,7 +87,7 @@ namespace turbo {
     // allowed formats for `str`, except simple_atod is locale-independent and will
     // always use the "C" locale. If any errors are encountered, this function
     // returns `false`, leaving `out` in an unspecified state.
-    TURBO_MUST_USE_RESULT bool simple_atod(turbo::string_view str,
+    TURBO_MUST_USE_RESULT bool simple_atod(std::string_view str,
                                           turbo::Nonnull<double *> out);
 
     // simple_atob()
@@ -98,7 +98,7 @@ namespace turbo {
     // are interpreted as boolean `false`: "false", "f", "no", "n", "0". If any
     // errors are encountered, this function returns `false`, leaving `out` in an
     // unspecified state.
-    TURBO_MUST_USE_RESULT bool simple_atob(turbo::string_view str,
+    TURBO_MUST_USE_RESULT bool simple_atob(std::string_view str,
                                           turbo::Nonnull<bool *> out);
 
     // simple_hex_atoi()
@@ -112,15 +112,15 @@ namespace turbo {
     // by this function. If any errors are encountered, this function returns
     // `false`, leaving `out` in an unspecified state.
     template<typename int_type>
-    TURBO_MUST_USE_RESULT bool simple_hex_atoi(turbo::string_view str,
+    TURBO_MUST_USE_RESULT bool simple_hex_atoi(std::string_view str,
                                              turbo::Nonnull<int_type *> out);
 
     // Overloads of simple_hex_atoi() for 128 bit integers.
     TURBO_MUST_USE_RESULT inline bool simple_hex_atoi(
-            turbo::string_view str, turbo::Nonnull<turbo::int128 *> out);
+            std::string_view str, turbo::Nonnull<turbo::int128 *> out);
 
     TURBO_MUST_USE_RESULT inline bool simple_hex_atoi(
-            turbo::string_view str, turbo::Nonnull<turbo::uint128 *> out);
+            std::string_view str, turbo::Nonnull<turbo::uint128 *> out);
 
 }  // namespace turbo
 
@@ -144,22 +144,22 @@ namespace turbo {
 
         // safe_strto?() functions for implementing simple_atoi()
 
-        bool safe_strto32_base(turbo::string_view text, turbo::Nonnull<int32_t *> value,
+        bool safe_strto32_base(std::string_view text, turbo::Nonnull<int32_t *> value,
                                int base);
 
-        bool safe_strto64_base(turbo::string_view text, turbo::Nonnull<int64_t *> value,
+        bool safe_strto64_base(std::string_view text, turbo::Nonnull<int64_t *> value,
                                int base);
 
-        bool safe_strto128_base(turbo::string_view text,
+        bool safe_strto128_base(std::string_view text,
                                 turbo::Nonnull<turbo::int128 *> value, int base);
 
-        bool safe_strtou32_base(turbo::string_view text, turbo::Nonnull<uint32_t *> value,
+        bool safe_strtou32_base(std::string_view text, turbo::Nonnull<uint32_t *> value,
                                 int base);
 
-        bool safe_strtou64_base(turbo::string_view text, turbo::Nonnull<uint64_t *> value,
+        bool safe_strtou64_base(std::string_view text, turbo::Nonnull<uint64_t *> value,
                                 int base);
 
-        bool safe_strtou128_base(turbo::string_view text,
+        bool safe_strtou128_base(std::string_view text,
                                  turbo::Nonnull<turbo::uint128 *> value, int base);
 
         static const int kFastToBufferSize = 32;
@@ -220,7 +220,7 @@ namespace turbo {
         // Implementation of simple_atoi, generalized to support arbitrary base (used
         // with base different from 10 elsewhere in Turbo implementation).
         template<typename int_type>
-        TURBO_MUST_USE_RESULT bool safe_strtoi_base(turbo::string_view s,
+        TURBO_MUST_USE_RESULT bool safe_strtoi_base(std::string_view s,
                                                     turbo::Nonnull<int_type *> out,
                                                     int base) {
             static_assert(sizeof(*out) == 4 || sizeof(*out) == 8,
@@ -290,34 +290,34 @@ namespace turbo {
     }  // namespace numbers_internal
 
     template<typename int_type>
-    TURBO_MUST_USE_RESULT bool simple_atoi(turbo::string_view str,
+    TURBO_MUST_USE_RESULT bool simple_atoi(std::string_view str,
                                            turbo::Nonnull<int_type *> out) {
         return numbers_internal::safe_strtoi_base(str, out, 10);
     }
 
-    TURBO_MUST_USE_RESULT inline bool simple_atoi(turbo::string_view str,
+    TURBO_MUST_USE_RESULT inline bool simple_atoi(std::string_view str,
                                                   turbo::Nonnull<turbo::int128 *> out) {
         return numbers_internal::safe_strto128_base(str, out, 10);
     }
 
-    TURBO_MUST_USE_RESULT inline bool simple_atoi(turbo::string_view str,
+    TURBO_MUST_USE_RESULT inline bool simple_atoi(std::string_view str,
                                                   turbo::Nonnull<turbo::uint128 *> out) {
         return numbers_internal::safe_strtou128_base(str, out, 10);
     }
 
     template<typename int_type>
-    TURBO_MUST_USE_RESULT bool simple_hex_atoi(turbo::string_view str,
+    TURBO_MUST_USE_RESULT bool simple_hex_atoi(std::string_view str,
                                              turbo::Nonnull<int_type *> out) {
         return numbers_internal::safe_strtoi_base(str, out, 16);
     }
 
     TURBO_MUST_USE_RESULT inline bool simple_hex_atoi(
-            turbo::string_view str, turbo::Nonnull<turbo::int128 *> out) {
+            std::string_view str, turbo::Nonnull<turbo::int128 *> out) {
         return numbers_internal::safe_strto128_base(str, out, 16);
     }
 
     TURBO_MUST_USE_RESULT inline bool simple_hex_atoi(
-            turbo::string_view str, turbo::Nonnull<turbo::uint128 *> out) {
+            std::string_view str, turbo::Nonnull<turbo::uint128 *> out) {
         return numbers_internal::safe_strtou128_base(str, out, 16);
     }
 

@@ -25,7 +25,7 @@
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace log_internal {
-bool FNMatch(turbo::string_view pattern, turbo::string_view str) {
+bool FNMatch(std::string_view pattern, std::string_view str) {
   bool in_wildcard_match = false;
   while (true) {
     if (pattern.empty()) {
@@ -48,7 +48,7 @@ bool FNMatch(turbo::string_view pattern, turbo::string_view str) {
         break;
       default:
         if (in_wildcard_match) {
-          turbo::string_view fixed_portion = pattern;
+          std::string_view fixed_portion = pattern;
           const size_t end = fixed_portion.find_first_of("*?");
           if (end != fixed_portion.npos) {
             fixed_portion = fixed_portion.substr(0, end);

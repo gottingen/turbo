@@ -50,8 +50,8 @@ TEST(str_join, APIExamples) {
   }
 
   {
-    // Collection of turbo::string_view
-    std::vector<turbo::string_view> v = {"foo", "bar", "baz"};
+    // Collection of std::string_view
+    std::vector<std::string_view> v = {"foo", "bar", "baz"};
     EXPECT_EQ("foo-bar-baz", turbo::str_join(v, "-"));
   }
 
@@ -230,7 +230,7 @@ TEST(alpha_num_formatter, FormatterAPI) {
   f(&s, static_cast<double>(5));
   f(&s, static_cast<unsigned>(6));
   f(&s, static_cast<size_t>(7));
-  f(&s, turbo::string_view(" OK"));
+  f(&s, std::string_view(" OK"));
   EXPECT_EQ("Testing: 1234567 OK", s);
 }
 
@@ -272,7 +272,7 @@ TEST(stream_formatter, FormatterAPI) {
   f(&s, static_cast<double>(5));
   f(&s, static_cast<unsigned>(6));
   f(&s, static_cast<size_t>(7));
-  f(&s, turbo::string_view(" OK "));
+  f(&s, std::string_view(" OK "));
   StreamableType streamable = {"object"};
   f(&s, streamable);
   EXPECT_EQ("Testing: 1234567 OK Streamable:object", s);
@@ -384,7 +384,7 @@ TEST(str_join, PublicAPIOverloads) {
 }
 
 TEST(str_join, Array) {
-  const turbo::string_view a[] = {"a", "b", "c"};
+  const std::string_view a[] = {"a", "b", "c"};
   EXPECT_EQ("a-b-c", turbo::str_join(a, "-"));
 }
 
@@ -407,7 +407,7 @@ TEST(str_join, InitializerList) {
   }
 
   {
-    std::initializer_list<turbo::string_view> a = {"a", "b", "c"};
+    std::initializer_list<std::string_view> a = {"a", "b", "c"};
     EXPECT_EQ("a-b-c", turbo::str_join(a, "-"));
   }
 
@@ -446,11 +446,11 @@ TEST(str_join, StringViewInitializerList) {
 
   class NoCopy {
    public:
-    explicit NoCopy(turbo::string_view view) : view_(view) {}
+    explicit NoCopy(std::string_view view) : view_(view) {}
     NoCopy(const NoCopy&) = delete;
-    operator turbo::string_view() { return view_; }  // NOLINT
+    operator std::string_view() { return view_; }  // NOLINT
    private:
-    turbo::string_view view_;
+    std::string_view view_;
   };
   {
     // Tests initializer_list of string_views preferred over initializer_list<T>
@@ -555,11 +555,11 @@ class TestIterator {
   using difference_type = int;
 
   // `data` must outlive the result.
-  static TestIterator begin(const std::vector<turbo::string_view>& data) {
+  static TestIterator begin(const std::vector<std::string_view>& data) {
     return TestIterator(&data, 0);
   }
 
-  static TestIterator end(const std::vector<turbo::string_view>& data) {
+  static TestIterator end(const std::vector<std::string_view>& data) {
     return TestIterator(nullptr, data.size());
   }
 
@@ -602,10 +602,10 @@ class TestIterator {
   }
 
  private:
-  TestIterator(const std::vector<turbo::string_view>* data, size_t pos)
+  TestIterator(const std::vector<std::string_view>* data, size_t pos)
       : data_(data), pos_(pos) {}
 
-  const std::vector<turbo::string_view>* data_;
+  const std::vector<std::string_view>* data_;
   size_t pos_;
 };
 
@@ -613,7 +613,7 @@ template <typename ValueT>
 class TestIteratorRange {
  public:
   // `data` must be non-null and must outlive the result.
-  explicit TestIteratorRange(const std::vector<turbo::string_view>& data)
+  explicit TestIteratorRange(const std::vector<std::string_view>& data)
       : begin_(TestIterator<ValueT>::begin(data)),
         end_(TestIterator<ValueT>::end(data)) {}
 
@@ -626,22 +626,22 @@ class TestIteratorRange {
 };
 
 TEST(str_join, TestIteratorRequirementsNoFormatter) {
-  const std::vector<turbo::string_view> a = {"a", "b", "c"};
+  const std::vector<std::string_view> a = {"a", "b", "c"};
 
   // When the value type is string-like (`std::string` or `string_view`),
   // the NoFormatter template specialization is used internally.
   EXPECT_EQ("a-b-c",
-            turbo::str_join(TestIteratorRange<turbo::string_view>(a), "-"));
+            turbo::str_join(TestIteratorRange<std::string_view>(a), "-"));
 }
 
 TEST(str_join, TestIteratorRequirementsCustomFormatter) {
-  const std::vector<turbo::string_view> a = {"a", "b", "c"};
+  const std::vector<std::string_view> a = {"a", "b", "c"};
   EXPECT_EQ("a-b-c",
             turbo::str_join(TestIteratorRange<TestValue>(a), "-",
                           [](std::string* out, const TestValue& value) {
                             turbo::str_append(
                                 out,
-                                turbo::string_view(value.data(), value.size()));
+                                std::string_view(value.data(), value.size()));
                           }));
 }
 

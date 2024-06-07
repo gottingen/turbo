@@ -105,10 +105,10 @@ namespace turbo {
 
     StatusBuilder unknown_error_builder() { return StatusBuilder(turbo::StatusCode::kUnknown); }
 
-    turbo::Status AnnotateStatus(const turbo::Status& s, turbo::string_view msg) {
+    turbo::Status AnnotateStatus(const turbo::Status& s, std::string_view msg) {
         if (s.ok() || msg.empty()) return s;
 
-        turbo::string_view new_msg = msg;
+        std::string_view new_msg = msg;
         std::string annotated;
         if (!s.message().empty()) {
             turbo::str_append(&annotated, s.message(), "; ", msg);
@@ -117,7 +117,7 @@ namespace turbo {
         return turbo::Status(s.code(), new_msg);
     }
 
-    StatusBuilder ret_check_fail(turbo::string_view msg) {
+    StatusBuilder ret_check_fail(std::string_view msg) {
         return internal_error_builder() << msg;
     }
 

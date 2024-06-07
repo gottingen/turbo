@@ -35,7 +35,7 @@
 //
 // Example:
 //
-// turbo::Status myFunction(turbo::string_view fname, ...) {
+// turbo::Status myFunction(std::string_view fname, ...) {
 //   ...
 //   // encounter error
 //   if (error condition) {
@@ -366,7 +366,7 @@ namespace turbo {
     //
     // Example:
     //
-    // turbo::Status myFunction(turbo::string_view fname, ...) {
+    // turbo::Status myFunction(std::string_view fname, ...) {
     //   ...
     //   // encounter error
     //   if (error condition) {
@@ -426,7 +426,7 @@ namespace turbo {
     //     info.retry_delay().seconds() = 30;
     //     // Payloads require a unique key (a URL to ensure no collisions with
     //     // other payloads), and an `turbo::Cord` to hold the encoded data.
-    //     turbo::string_view url = "type.googleapis.com/google.rpc.RetryInfo";
+    //     std::string_view url = "type.googleapis.com/google.rpc.RetryInfo";
     //     result.set_payload(url, info.SerializeAsCord());
     //     return result;
     //   }
@@ -451,7 +451,7 @@ namespace turbo {
         //
         // The `msg` string must be in UTF-8. The implementation may complain (e.g.,  // NOLINT
         // by printing a warning) if it is not.
-        Status(turbo::StatusCode code, turbo::string_view msg);
+        Status(turbo::StatusCode code, std::string_view msg);
 
         Status(const Status &);
 
@@ -515,7 +515,7 @@ namespace turbo {
         // Note that this message rarely describes the error code.  It is not unusual
         // for the error message to be the empty string. As a result, prefer
         // `operator<<` or `Status::ToString()` for debug logging.
-        turbo::string_view message() const;
+        std::string_view message() const;
 
         friend bool operator==(const Status &, const Status &);
 
@@ -590,7 +590,7 @@ namespace turbo {
         // Status::get_payload()
         //
         // Gets the payload of a status given its unique `type_url` key, if present.
-        std::optional<turbo::Cord> get_payload(turbo::string_view type_url) const;
+        std::optional<turbo::Cord> get_payload(std::string_view type_url) const;
 
         // Status::set_payload()
         //
@@ -598,13 +598,13 @@ namespace turbo {
         // any existing payload for that `type_url`.
         //
         // NOTE: This function does nothing if the Status is ok.
-        void set_payload(turbo::string_view type_url, turbo::Cord payload);
+        void set_payload(std::string_view type_url, turbo::Cord payload);
 
         // Status::erase_payload()
         //
         // Erases the payload corresponding to the `type_url` key.  Returns `true` if
         // the payload was present.
-        bool erase_payload(turbo::string_view type_url);
+        bool erase_payload(std::string_view type_url);
 
         // Status::for_each_payload()
         //
@@ -617,7 +617,7 @@ namespace turbo {
         // NOTE: Any mutation on the same 'turbo::Status' object during visitation is
         // forbidden and could result in undefined behavior.
         void for_each_payload(
-                turbo::FunctionRef<void(turbo::string_view, const turbo::Cord &)> visitor)
+                turbo::FunctionRef<void(std::string_view, const turbo::Cord &)> visitor)
         const;
 
     private:
@@ -767,70 +767,70 @@ namespace turbo {
     // These convenience functions create an `turbo::Status` object with an error
     // code as indicated by the associated function name, using the error message
     // passed in `message`.
-    Status aborted_error(turbo::string_view message);
+    Status aborted_error(std::string_view message);
 
     template <typename... Args>
     Status aborted_error(const turbo::FormatSpec<Args...>& fmt, const Args&... args) {
         return aborted_error(turbo::str_format(fmt, args...));
     }
 
-    Status already_exists_error(turbo::string_view message);
+    Status already_exists_error(std::string_view message);
 
     template <typename... Args>
     Status already_exists_error(const turbo::FormatSpec<Args...>& fmt, const Args&... args) {
         return already_exists_error(turbo::str_format(fmt, args...));
     }
 
-    Status cancelled_error(turbo::string_view message);
+    Status cancelled_error(std::string_view message);
 
     template <typename... Args>
     Status cancelled_error(const turbo::FormatSpec<Args...>& fmt, const Args&... args) {
         return cancelled_error(turbo::str_format(fmt, args...));
     }
 
-    Status data_loss_error(turbo::string_view message);
+    Status data_loss_error(std::string_view message);
 
     template <typename... Args>
     Status data_loss_error(const turbo::FormatSpec<Args...>& fmt, const Args&... args) {
         return data_loss_error(turbo::str_format(fmt, args...));
     }
 
-    Status deadline_exceeded_error(turbo::string_view message);
+    Status deadline_exceeded_error(std::string_view message);
 
     template <typename... Args>
     Status deadline_exceeded_error(const turbo::FormatSpec<Args...>& fmt, const Args&... args) {
         return deadline_exceeded_error(turbo::str_format(fmt, args...));
     }
 
-    Status failed_precondition_error(turbo::string_view message);
+    Status failed_precondition_error(std::string_view message);
 
     template <typename... Args>
     Status failed_precondition_error(const turbo::FormatSpec<Args...>& fmt, const Args&... args) {
         return failed_precondition_error(turbo::str_format(fmt, args...));
     }
 
-    Status internal_error(turbo::string_view message);
+    Status internal_error(std::string_view message);
 
     template <typename... Args>
     Status internal_error(const turbo::FormatSpec<Args...>& fmt, const Args&... args) {
         return internal_error(turbo::str_format(fmt, args...));
     }
 
-    Status invalid_argument_error(turbo::string_view message);
+    Status invalid_argument_error(std::string_view message);
 
     template <typename... Args>
     Status invalid_argument_error(const turbo::FormatSpec<Args...>& fmt, const Args&... args) {
         return invalid_argument_error(turbo::str_format(fmt, args...));
     }
 
-    Status not_found_error(turbo::string_view message);
+    Status not_found_error(std::string_view message);
 
     template <typename... Args>
     Status not_found_error(const turbo::FormatSpec<Args...>& fmt, const Args&... args) {
         return not_found_error(turbo::str_format(fmt, args...));
     }
 
-    Status out_of_range_error(turbo::string_view message);
+    Status out_of_range_error(std::string_view message);
 
     template <typename... Args>
     Status out_of_range_error(const turbo::FormatSpec<Args...>& fmt, const Args&... args) {
@@ -838,42 +838,42 @@ namespace turbo {
     }
 
 
-    Status permission_denied_error(turbo::string_view message);
+    Status permission_denied_error(std::string_view message);
 
     template <typename... Args>
     Status permission_denied_error(const turbo::FormatSpec<Args...>& fmt, const Args&... args) {
         return permission_denied_error(turbo::str_format(fmt, args...));
     }
 
-    Status resource_exhausted_error(turbo::string_view message);
+    Status resource_exhausted_error(std::string_view message);
 
     template <typename... Args>
     Status resource_exhausted_error(const turbo::FormatSpec<Args...>& fmt, const Args&... args) {
         return resource_exhausted_error(turbo::str_format(fmt, args...));
     }
 
-    Status unauthenticated_error(turbo::string_view message);
+    Status unauthenticated_error(std::string_view message);
 
     template <typename... Args>
     Status unauthenticated_error(const turbo::FormatSpec<Args...>& fmt, const Args&... args) {
         return unauthenticated_error(turbo::str_format(fmt, args...));
     }
 
-    Status unavailable_error(turbo::string_view message);
+    Status unavailable_error(std::string_view message);
 
     template <typename... Args>
     Status unavailable_error(const turbo::FormatSpec<Args...>& fmt, const Args&... args) {
         return unavailable_error(turbo::str_format(fmt, args...));
     }
 
-    Status unimplemented_error(turbo::string_view message);
+    Status unimplemented_error(std::string_view message);
 
     template <typename... Args>
     Status unimplemented_error(const turbo::FormatSpec<Args...>& fmt, const Args&... args) {
         return unimplemented_error(turbo::str_format(fmt, args...));
     }
 
-    Status unknown_error(turbo::string_view message);
+    Status unknown_error(std::string_view message);
 
     template <typename... Args>
     Status unknown_error(const turbo::FormatSpec<Args...>& fmt, const Args&... args) {
@@ -891,7 +891,7 @@ namespace turbo {
     //
     // Convenience function that creates a `turbo::Status` using an `error_number`,
     // which should be an `errno` value.
-    Status errno_to_status(int error_number, turbo::string_view message);
+    Status errno_to_status(int error_number, std::string_view message);
 
     template <typename... Args>
     Status errno_to_status(int error_number, const turbo::FormatSpec<Args...>& fmt, const Args&... args) {
@@ -959,11 +959,11 @@ namespace turbo {
         return static_cast<int>(RepToPointer(rep_)->code());
     }
 
-    inline turbo::string_view Status::message() const {
+    inline std::string_view Status::message() const {
         return !IsInlined(rep_)
                ? RepToPointer(rep_)->message()
-               : (IsMovedFrom(rep_) ? turbo::string_view(kMovedFromString)
-                                    : turbo::string_view());
+               : (IsMovedFrom(rep_) ? std::string_view(kMovedFromString)
+                                    : std::string_view());
     }
 
     inline bool operator==(const Status &lhs, const Status &rhs) {
@@ -991,19 +991,19 @@ namespace turbo {
     }
 
     inline std::optional<turbo::Cord> Status::get_payload(
-            turbo::string_view type_url) const {
+            std::string_view type_url) const {
         if (IsInlined(rep_)) return std::nullopt;
         return RepToPointer(rep_)->get_payload(type_url);
     }
 
-    inline void Status::set_payload(turbo::string_view type_url, turbo::Cord payload) {
+    inline void Status::set_payload(std::string_view type_url, turbo::Cord payload) {
         if (ok()) return;
         status_internal::StatusRep *rep = PrepareToModify(rep_);
         rep->set_payload(type_url, std::move(payload));
         rep_ = PointerToRep(rep);
     }
 
-    inline bool Status::erase_payload(turbo::string_view type_url) {
+    inline bool Status::erase_payload(std::string_view type_url) {
         if (IsInlined(rep_)) return false;
         status_internal::StatusRep *rep = PrepareToModify(rep_);
         auto res = rep->erase_payload(type_url);
@@ -1012,7 +1012,7 @@ namespace turbo {
     }
 
     inline void Status::for_each_payload(
-            turbo::FunctionRef<void(turbo::string_view, const turbo::Cord &)> visitor)
+            turbo::FunctionRef<void(std::string_view, const turbo::Cord &)> visitor)
     const {
         if (IsInlined(rep_)) return;
         RepToPointer(rep_)->for_each_payload(visitor);

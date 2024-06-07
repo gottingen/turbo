@@ -192,7 +192,7 @@ TEST(AsciiStrTo, Lower) {
   const char buf[] = "ABCDEF";
   const std::string str("GHIJKL");
   const std::string str2("MNOPQR");
-  const turbo::string_view sp(str2);
+  const std::string_view sp(str2);
   const std::string long_str("ABCDEFGHIJKLMNOPQRSTUVWXYZ1!a");
   std::string mutable_str("_`?@[{AMNOPQRSTUVWXYZ");
 
@@ -214,7 +214,7 @@ TEST(AsciiStrTo, Upper) {
   const char buf[] = "abcdef";
   const std::string str("ghijkl");
   const std::string str2("_`?@[{amnopqrstuvwxyz");
-  const turbo::string_view sp(str2);
+  const std::string_view sp(str2);
   const std::string long_str("abcdefghijklmnopqrstuvwxyz1!A");
 
   EXPECT_EQ("ABCDEF", turbo::str_to_upper(buf));
@@ -229,13 +229,13 @@ TEST(AsciiStrTo, Upper) {
 }
 
 TEST(trim_left, FromStringView) {
-  EXPECT_EQ(turbo::string_view{},
-            turbo::trim_left(turbo::string_view{}));
+  EXPECT_EQ(std::string_view{},
+            turbo::trim_left(std::string_view{}));
   EXPECT_EQ("foo", turbo::trim_left({"foo"}));
   EXPECT_EQ("foo", turbo::trim_left({"\t  \n\f\r\n\vfoo"}));
   EXPECT_EQ("foo foo\n ",
             turbo::trim_left({"\t  \n\f\r\n\vfoo foo\n "}));
-  EXPECT_EQ(turbo::string_view{}, turbo::trim_left(
+  EXPECT_EQ(std::string_view{}, turbo::trim_left(
                                      {"\t  \n\f\r\v\n\t  \n\f\r\v\n"}));
 }
 
@@ -259,17 +259,17 @@ TEST(trim_left, InPlace) {
 
   str = "\t  \n\f\r\v\n\t  \n\f\r\v\n";
   turbo::trim_left(&str);
-  EXPECT_EQ(turbo::string_view{}, str);
+  EXPECT_EQ(std::string_view{}, str);
 }
 
 TEST(trim_right, FromStringView) {
-  EXPECT_EQ(turbo::string_view{},
-            turbo::trim_right(turbo::string_view{}));
+  EXPECT_EQ(std::string_view{},
+            turbo::trim_right(std::string_view{}));
   EXPECT_EQ("foo", turbo::trim_right({"foo"}));
   EXPECT_EQ("foo", turbo::trim_right({"foo\t  \n\f\r\n\v"}));
   EXPECT_EQ(" \nfoo foo",
             turbo::trim_right({" \nfoo foo\t  \n\f\r\n\v"}));
-  EXPECT_EQ(turbo::string_view{}, turbo::trim_right(
+  EXPECT_EQ(std::string_view{}, turbo::trim_right(
                                      {"\t  \n\f\r\v\n\t  \n\f\r\v\n"}));
 }
 
@@ -293,18 +293,18 @@ TEST(trim_right, InPlace) {
 
   str = "\t  \n\f\r\v\n\t  \n\f\r\v\n";
   turbo::trim_right(&str);
-  EXPECT_EQ(turbo::string_view{}, str);
+  EXPECT_EQ(std::string_view{}, str);
 }
 
 TEST(trim_all, FromStringView) {
-  EXPECT_EQ(turbo::string_view{},
-            turbo::trim_all(turbo::string_view{}));
+  EXPECT_EQ(std::string_view{},
+            turbo::trim_all(std::string_view{}));
   EXPECT_EQ("foo", turbo::trim_all({"foo"}));
   EXPECT_EQ("foo",
             turbo::trim_all({"\t  \n\f\r\n\vfoo\t  \n\f\r\n\v"}));
   EXPECT_EQ("foo foo", turbo::trim_all(
                            {"\t  \n\f\r\n\vfoo foo\t  \n\f\r\n\v"}));
-  EXPECT_EQ(turbo::string_view{},
+  EXPECT_EQ(std::string_view{},
             turbo::trim_all({"\t  \n\f\r\v\n\t  \n\f\r\v\n"}));
 }
 
@@ -328,7 +328,7 @@ TEST(trim_all, InPlace) {
 
   str = "\t  \n\f\r\v\n\t  \n\f\r\v\n";
   turbo::trim_all(&str);
-  EXPECT_EQ(turbo::string_view{}, str);
+  EXPECT_EQ(std::string_view{}, str);
 }
 
 TEST(trim_complete, InPlace) {

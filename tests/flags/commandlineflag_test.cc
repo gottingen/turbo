@@ -63,7 +63,7 @@ namespace {
         void TearDown() override { flag_saver_.reset(); }
 
     private:
-        static std::string NormalizeFileName(turbo::string_view fname) {
+        static std::string NormalizeFileName(std::string_view fname) {
 #ifdef _WIN32
             std::string normalized(fname);
             std::replace(normalized.begin(), normalized.end(), '\\', '/');

@@ -36,7 +36,7 @@ namespace turbo::status_internal {
     // future in a non-backward-compatible way. Since it's only meant for debugging
     // purpose, you should not rely on it in any critical logic.
     using StatusPayloadPrinter = turbo::Nullable<std::optional<std::string> (*)(
-            turbo::string_view, const turbo::Cord &)>;
+            std::string_view, const turbo::Cord &)>;
 
     // Sets the global payload printer. Only one printer should be set per process.
     // If multiple printers are set, it's undefined which one will be used.

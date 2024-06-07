@@ -113,12 +113,12 @@ static bool ProcessOneTestFile(const char* filename) {
   }
 
   int num_cases = 0;
-  for (turbo::string_view v(*contents); !v.empty();) {
+  for (std::string_view v(*contents); !v.empty();) {
     size_t new_line = v.find('\n');
-    if ((new_line == turbo::string_view::npos) || (new_line < 32)) {
+    if ((new_line == std::string_view::npos) || (new_line < 32)) {
       break;
     }
-    turbo::string_view input = v.substr(31, new_line - 31);
+    std::string_view input = v.substr(31, new_line - 31);
 
     // Test turbo::simple_atof.
     {

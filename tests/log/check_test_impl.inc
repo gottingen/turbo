@@ -581,7 +581,7 @@ TEST(CHECKDeathTest, TestUserDefinedTurboStringify) {
 
   // Returns a matcher for the expected check failure message when comparing two
   // values.
-  auto expected_output = [](int lhs, turbo::string_view condition, int rhs) {
+  auto expected_output = [](int lhs, std::string_view condition, int rhs) {
     return HasSubstr(
         turbo::substitute("Check failed: v$0 $1 v$2 (StringifiableType{$0} vs. "
                          "StringifiableType{$2})",

@@ -59,13 +59,13 @@ TEST(Split, TraitsTest) {
       !turbo::strings_internal::SplitterIsConvertibleTo<std::vector<int>>::value,
       "");
   static_assert(turbo::strings_internal::SplitterIsConvertibleTo<
-                    std::vector<turbo::string_view>>::value,
+                    std::vector<std::string_view>>::value,
                 "");
   static_assert(turbo::strings_internal::SplitterIsConvertibleTo<
                     std::map<std::string, std::string>>::value,
                 "");
   static_assert(turbo::strings_internal::SplitterIsConvertibleTo<
-                    std::map<turbo::string_view, turbo::string_view>>::value,
+                    std::map<std::string_view, std::string_view>>::value,
                 "");
   static_assert(!turbo::strings_internal::SplitterIsConvertibleTo<
                     std::map<int, std::string>>::value,
@@ -114,7 +114,7 @@ TEST(Split, APIExamples) {
 
   {
     // The substrings are returned as string_views, eliminating copying.
-    std::vector<turbo::string_view> v = turbo::str_split("a,b,c", ',');
+    std::vector<std::string_view> v = turbo::str_split("a,b,c", ',');
     EXPECT_THAT(v, ElementsAre("a", "b", "c"));
   }
 
@@ -140,7 +140,7 @@ TEST(Split, APIExamples) {
   {
     // Splits string data with embedded NUL characters, using NUL as the
     // delimiter. A simple delimiter of "\0" doesn't work because strlen() will
-    // say that's the empty string when constructing the turbo::string_view
+    // say that's the empty string when constructing the std::string_view
     // delimiter. Instead, a non-empty string containing NUL can be used as the
     // delimiter.
     std::string embedded_nulls("a\0b\0c", 5);
@@ -229,7 +229,7 @@ TEST(Split, APIExamples) {
   {
     // Demonstrates use in a range-based for loop in C++11.
     std::string s = "x,x,x,x,x,x,x";
-    for (turbo::string_view sp : turbo::str_split(s, ',')) {
+    for (std::string_view sp : turbo::str_split(s, ',')) {
       EXPECT_EQ("x", sp);
     }
   }
@@ -238,7 +238,7 @@ TEST(Split, APIExamples) {
     // Demonstrates use with a Predicate in a range-based for loop.
     using turbo::SkipWhitespace;
     std::string s = " ,x,,x,,x,x,x,,";
-    for (turbo::string_view sp : turbo::str_split(s, ',', SkipWhitespace())) {
+    for (std::string_view sp : turbo::str_split(s, ',', SkipWhitespace())) {
       EXPECT_EQ("x", sp);
     }
   }
@@ -249,7 +249,7 @@ TEST(Split, APIExamples) {
     // the keys and values. This also uses the Limit delimiter so that the
     // std::string "a=b=c" will split to "a" -> "b=c".
     std::map<std::string, std::string> m;
-    for (turbo::string_view sp : turbo::str_split("a=b=c,d=e,f=,g", ',')) {
+    for (std::string_view sp : turbo::str_split("a=b=c,d=e,f=,g", ',')) {
       m.insert(turbo::str_split(sp, turbo::MaxSplits('=', 1)));
     }
     EXPECT_EQ("b=c", m.find("a")->second);
@@ -282,7 +282,7 @@ TEST(SplitIterator, Basics) {
 class Skip {
  public:
   explicit Skip(const std::string& s) : s_(s) {}
-  bool operator()(turbo::string_view sp) { return sp != s_; }
+  bool operator()(std::string_view sp) { return sp != s_; }
 
  private:
   std::string s_;
@@ -337,14 +337,14 @@ TEST(Splitter, Const) {
 }
 
 TEST(Split, EmptyAndNull) {
-  // Attention: Splitting a null turbo::string_view is different than splitting
-  // an empty turbo::string_view even though both string_views are considered
+  // Attention: Splitting a null std::string_view is different than splitting
+  // an empty std::string_view even though both string_views are considered
   // equal. This behavior is likely surprising and undesirable. However, to
   // maintain backward compatibility, there is a small "hack" in
   // str_split_internal.h that preserves this behavior. If that behavior is ever
   // changed/fixed, this test will need to be updated.
-  EXPECT_THAT(turbo::str_split(turbo::string_view(""), '-'), ElementsAre(""));
-  EXPECT_THAT(turbo::str_split(turbo::string_view(), '-'), ElementsAre());
+  EXPECT_THAT(turbo::str_split(std::string_view(""), '-'), ElementsAre(""));
+  EXPECT_THAT(turbo::str_split(std::string_view(), '-'), ElementsAre());
 }
 
 TEST(SplitIterator, EqualityAsEndCondition) {
@@ -361,7 +361,7 @@ TEST(SplitIterator, EqualityAsEndCondition) {
   // for loop. This relies on SplitIterator equality for non-end SplitIterators
   // working correctly. At this point it2 points to "c", and we use that as the
   // "end" condition in this test.
-  std::vector<turbo::string_view> v;
+  std::vector<std::string_view> v;
   for (; it != it2; ++it) {
     v.push_back(*it);
   }
@@ -374,8 +374,8 @@ TEST(SplitIterator, EqualityAsEndCondition) {
 
 TEST(Splitter, RangeIterators) {
   auto splitter = turbo::str_split("a,b,c", ',');
-  std::vector<turbo::string_view> output;
-  for (turbo::string_view p : splitter) {
+  std::vector<std::string_view> output;
+  for (std::string_view p : splitter) {
     output.push_back(p);
   }
   EXPECT_THAT(output, ElementsAre("a", "b", "c"));
@@ -403,72 +403,72 @@ void TestPairConversionOperator(const Splitter& splitter) {
 TEST(Splitter, ConversionOperator) {
   auto splitter = turbo::str_split("a,b,c,d", ',');
 
-  TestConversionOperator<std::vector<turbo::string_view>>(splitter);
+  TestConversionOperator<std::vector<std::string_view>>(splitter);
   TestConversionOperator<std::vector<std::string>>(splitter);
-  TestConversionOperator<std::list<turbo::string_view>>(splitter);
+  TestConversionOperator<std::list<std::string_view>>(splitter);
   TestConversionOperator<std::list<std::string>>(splitter);
-  TestConversionOperator<std::deque<turbo::string_view>>(splitter);
+  TestConversionOperator<std::deque<std::string_view>>(splitter);
   TestConversionOperator<std::deque<std::string>>(splitter);
-  TestConversionOperator<std::set<turbo::string_view>>(splitter);
+  TestConversionOperator<std::set<std::string_view>>(splitter);
   TestConversionOperator<std::set<std::string>>(splitter);
-  TestConversionOperator<std::multiset<turbo::string_view>>(splitter);
+  TestConversionOperator<std::multiset<std::string_view>>(splitter);
   TestConversionOperator<std::multiset<std::string>>(splitter);
-  TestConversionOperator<turbo::btree_set<turbo::string_view>>(splitter);
+  TestConversionOperator<turbo::btree_set<std::string_view>>(splitter);
   TestConversionOperator<turbo::btree_set<std::string>>(splitter);
-  TestConversionOperator<turbo::btree_multiset<turbo::string_view>>(splitter);
+  TestConversionOperator<turbo::btree_multiset<std::string_view>>(splitter);
   TestConversionOperator<turbo::btree_multiset<std::string>>(splitter);
   TestConversionOperator<std::unordered_set<std::string>>(splitter);
 
   // Tests conversion to map-like objects.
 
-  TestMapConversionOperator<std::map<turbo::string_view, turbo::string_view>>(
+  TestMapConversionOperator<std::map<std::string_view, std::string_view>>(
       splitter);
-  TestMapConversionOperator<std::map<turbo::string_view, std::string>>(splitter);
-  TestMapConversionOperator<std::map<std::string, turbo::string_view>>(splitter);
+  TestMapConversionOperator<std::map<std::string_view, std::string>>(splitter);
+  TestMapConversionOperator<std::map<std::string, std::string_view>>(splitter);
   TestMapConversionOperator<std::map<std::string, std::string>>(splitter);
   TestMapConversionOperator<
-      std::multimap<turbo::string_view, turbo::string_view>>(splitter);
-  TestMapConversionOperator<std::multimap<turbo::string_view, std::string>>(
+      std::multimap<std::string_view, std::string_view>>(splitter);
+  TestMapConversionOperator<std::multimap<std::string_view, std::string>>(
       splitter);
-  TestMapConversionOperator<std::multimap<std::string, turbo::string_view>>(
+  TestMapConversionOperator<std::multimap<std::string, std::string_view>>(
       splitter);
   TestMapConversionOperator<std::multimap<std::string, std::string>>(splitter);
   TestMapConversionOperator<
-      turbo::btree_map<turbo::string_view, turbo::string_view>>(splitter);
-  TestMapConversionOperator<turbo::btree_map<turbo::string_view, std::string>>(
+      turbo::btree_map<std::string_view, std::string_view>>(splitter);
+  TestMapConversionOperator<turbo::btree_map<std::string_view, std::string>>(
       splitter);
-  TestMapConversionOperator<turbo::btree_map<std::string, turbo::string_view>>(
+  TestMapConversionOperator<turbo::btree_map<std::string, std::string_view>>(
       splitter);
   TestMapConversionOperator<turbo::btree_map<std::string, std::string>>(
       splitter);
   TestMapConversionOperator<
-      turbo::btree_multimap<turbo::string_view, turbo::string_view>>(splitter);
+      turbo::btree_multimap<std::string_view, std::string_view>>(splitter);
   TestMapConversionOperator<
-      turbo::btree_multimap<turbo::string_view, std::string>>(splitter);
+      turbo::btree_multimap<std::string_view, std::string>>(splitter);
   TestMapConversionOperator<
-      turbo::btree_multimap<std::string, turbo::string_view>>(splitter);
+      turbo::btree_multimap<std::string, std::string_view>>(splitter);
   TestMapConversionOperator<turbo::btree_multimap<std::string, std::string>>(
       splitter);
   TestMapConversionOperator<std::unordered_map<std::string, std::string>>(
       splitter);
   TestMapConversionOperator<
-      turbo::node_hash_map<turbo::string_view, turbo::string_view>>(splitter);
+      turbo::node_hash_map<std::string_view, std::string_view>>(splitter);
   TestMapConversionOperator<
-      turbo::node_hash_map<turbo::string_view, std::string>>(splitter);
+      turbo::node_hash_map<std::string_view, std::string>>(splitter);
   TestMapConversionOperator<
-      turbo::node_hash_map<std::string, turbo::string_view>>(splitter);
+      turbo::node_hash_map<std::string, std::string_view>>(splitter);
   TestMapConversionOperator<
-      turbo::flat_hash_map<turbo::string_view, turbo::string_view>>(splitter);
+      turbo::flat_hash_map<std::string_view, std::string_view>>(splitter);
   TestMapConversionOperator<
-      turbo::flat_hash_map<turbo::string_view, std::string>>(splitter);
+      turbo::flat_hash_map<std::string_view, std::string>>(splitter);
   TestMapConversionOperator<
-      turbo::flat_hash_map<std::string, turbo::string_view>>(splitter);
+      turbo::flat_hash_map<std::string, std::string_view>>(splitter);
 
   // Tests conversion to std::pair
 
-  TestPairConversionOperator<turbo::string_view, turbo::string_view>(splitter);
-  TestPairConversionOperator<turbo::string_view, std::string>(splitter);
-  TestPairConversionOperator<std::string, turbo::string_view>(splitter);
+  TestPairConversionOperator<std::string_view, std::string_view>(splitter);
+  TestPairConversionOperator<std::string_view, std::string>(splitter);
+  TestPairConversionOperator<std::string, std::string_view>(splitter);
   TestPairConversionOperator<std::string, std::string>(splitter);
 }
 
@@ -566,7 +566,7 @@ TEST(Split, Basics) {
   }
 
   {
-    std::vector<turbo::string_view> v = turbo::str_split("a,b,c", ',');
+    std::vector<std::string_view> v = turbo::str_split("a,b,c", ',');
     EXPECT_THAT(v, ElementsAre("a", "b", "c"));
   }
 
@@ -591,7 +591,7 @@ TEST(Split, Basics) {
   }
 }
 
-turbo::string_view ReturnStringView() { return "Hello World"; }
+std::string_view ReturnStringView() { return "Hello World"; }
 const char* ReturnConstCharP() { return "Hello World"; }
 char* ReturnCharP() { return const_cast<char*>("Hello World"); }
 
@@ -616,7 +616,7 @@ TEST(Split, Temporary) {
   // This happens more often in C++11 as part of a range-based for loop.
   auto splitter = turbo::str_split(std::string(input), ',');
   std::string expected = "a";
-  for (turbo::string_view letter : splitter) {
+  for (std::string_view letter : splitter) {
     EXPECT_EQ(expected, letter);
     ++expected[0];
   }
@@ -625,7 +625,7 @@ TEST(Split, Temporary) {
   // This happens more often in C++11 as part of a range-based for loop.
   auto std_splitter = turbo::str_split(std::string(input), ',');
   expected = "a";
-  for (turbo::string_view letter : std_splitter) {
+  for (std::string_view letter : std_splitter) {
     EXPECT_EQ(expected, letter);
     ++expected[0];
   }
@@ -668,18 +668,18 @@ TEST(Split, SplitterIsCopyableAndMoveable) {
 
 TEST(Split, StringDelimiter) {
   {
-    std::vector<turbo::string_view> v = turbo::str_split("a,b", ',');
+    std::vector<std::string_view> v = turbo::str_split("a,b", ',');
     EXPECT_THAT(v, ElementsAre("a", "b"));
   }
 
   {
-    std::vector<turbo::string_view> v = turbo::str_split("a,b", std::string(","));
+    std::vector<std::string_view> v = turbo::str_split("a,b", std::string(","));
     EXPECT_THAT(v, ElementsAre("a", "b"));
   }
 
   {
-    std::vector<turbo::string_view> v =
-        turbo::str_split("a,b", turbo::string_view(","));
+    std::vector<std::string_view> v =
+        turbo::str_split("a,b", std::string_view(","));
     EXPECT_THAT(v, ElementsAre("a", "b"));
   }
 }
@@ -695,7 +695,7 @@ TEST(Split, UTF8) {
   {
     // A utf8 input string with an ascii delimiter.
     std::string to_split = "a," + utf8_string;
-    std::vector<turbo::string_view> v = turbo::str_split(to_split, ',');
+    std::vector<std::string_view> v = turbo::str_split(to_split, ',');
     EXPECT_THAT(v, ElementsAre("a", utf8_string));
   }
 
@@ -703,14 +703,14 @@ TEST(Split, UTF8) {
     // A utf8 input string and a utf8 delimiter.
     std::string to_split = "a," + utf8_string + ",b";
     std::string unicode_delimiter = "," + utf8_string + ",";
-    std::vector<turbo::string_view> v =
+    std::vector<std::string_view> v =
         turbo::str_split(to_split, unicode_delimiter);
     EXPECT_THAT(v, ElementsAre("a", "b"));
   }
 
   {
     // A utf8 input string and ByAnyChar with ascii chars.
-    std::vector<turbo::string_view> v =
+    std::vector<std::string_view> v =
         turbo::str_split(u8"Foo h\u00E4llo th\u4E1Ere", turbo::ByAnyChar(" \t"));
     EXPECT_THAT(v, ElementsAre("Foo", u8"h\u00E4llo", u8"th\u4E1Ere"));
   }
@@ -743,8 +743,8 @@ TEST(Split, EmptyStringDelimiter) {
 }
 
 TEST(Split, SubstrDelimiter) {
-  std::vector<turbo::string_view> results;
-  turbo::string_view delim("//");
+  std::vector<std::string_view> results;
+  std::string_view delim("//");
 
   results = turbo::str_split("", delim);
   EXPECT_THAT(results, ElementsAre(""));
@@ -775,7 +775,7 @@ TEST(Split, SubstrDelimiter) {
 }
 
 TEST(Split, EmptyResults) {
-  std::vector<turbo::string_view> results;
+  std::vector<std::string_view> results;
 
   results = turbo::str_split("", '#');
   EXPECT_THAT(results, ElementsAre(""));
@@ -806,9 +806,9 @@ TEST(Split, EmptyResults) {
 }
 
 template <typename Delimiter>
-static bool IsFoundAtStartingPos(turbo::string_view text, Delimiter d,
+static bool IsFoundAtStartingPos(std::string_view text, Delimiter d,
                                  size_t starting_pos, int expected_pos) {
-  turbo::string_view found = d.Find(text, starting_pos);
+  std::string_view found = d.Find(text, starting_pos);
   return found.data() != text.data() + text.size() &&
          expected_pos == found.data() - text.data();
 }
@@ -819,7 +819,7 @@ static bool IsFoundAtStartingPos(turbo::string_view text, Delimiter d,
 //   1. The actual text given, staring at position 0
 //   2. The text given with leading padding that should be ignored
 template <typename Delimiter>
-static bool IsFoundAt(turbo::string_view text, Delimiter d, int expected_pos) {
+static bool IsFoundAt(std::string_view text, Delimiter d, int expected_pos) {
   const std::string leading_text = ",x,y,z,";
   return IsFoundAtStartingPos(text, d, 0, expected_pos) &&
          IsFoundAtStartingPos(leading_text + std::string(text), d,
@@ -857,11 +857,11 @@ TEST(Delimiter, ByString) {
   TestComma(comma_string);
 
   // The first occurrence of empty string ("") in a string is at position 0.
-  // There is a test below that demonstrates this for turbo::string_view::find().
+  // There is a test below that demonstrates this for std::string_view::find().
   // If the ByString delimiter returned position 0 for this, there would
   // be an infinite loop in the SplitIterator code. To avoid this, empty string
   // is a special case in that it always returns the item at position 1.
-  turbo::string_view abc("abc");
+  std::string_view abc("abc");
   EXPECT_EQ(0, abc.find(""));  // "" is found at position 0
   ByString empty("");
   EXPECT_FALSE(IsFoundAt("", empty, 0));
@@ -918,7 +918,7 @@ TEST(Delimiter, ByAnyChar) {
   EXPECT_FALSE(IsFoundAt("=", two_delims, -1));
 
   // ByAnyChar behaves just like ByString when given a delimiter of empty
-  // string. That is, it always returns a zero-length turbo::string_view
+  // string. That is, it always returns a zero-length std::string_view
   // referring to the item at position 1, not position 0.
   ByAnyChar empty("");
   EXPECT_FALSE(IsFoundAt("", empty, 0));
@@ -933,7 +933,7 @@ TEST(Delimiter, ByAnyChar) {
 TEST(Split, ByAsciiWhitespace) {
   using turbo::ByAsciiWhitespace;
   using turbo::SkipEmpty;
-  std::vector<turbo::string_view> results;
+  std::vector<std::string_view> results;
 
   results = turbo::str_split("aaaa\n", ByAsciiWhitespace());
   EXPECT_THAT(results, ElementsAre("aaaa", ""));
@@ -997,7 +997,7 @@ TEST(Split, WorksWithLargeStrings) {
   if (sizeof(size_t) > 4) {
     std::string s(kSize, 'x');
     s.back() = '-';
-    std::vector<turbo::string_view> v = turbo::str_split(s, '-');
+    std::vector<std::string_view> v = turbo::str_split(s, '-');
     EXPECT_EQ(2, v.size());
     // The first element will contain 2G of 'x's.
     // testing::StartsWith is too slow with a 2G string.

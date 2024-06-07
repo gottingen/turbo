@@ -43,7 +43,7 @@ namespace turbo::flags_internal {
     }
 
     bool PrivateHandleAccessor::validate_input_value(const CommandLineFlag &flag,
-                                                   turbo::string_view value) {
+                                                   std::string_view value) {
         return flag.validate_input_value(value);
     }
 
@@ -53,7 +53,7 @@ namespace turbo::flags_internal {
     }
 
     bool PrivateHandleAccessor::parse_from(CommandLineFlag &flag,
-                                          turbo::string_view value,
+                                          std::string_view value,
                                           flags_internal::FlagSettingMode set_mode,
                                           flags_internal::ValueSource source,
                                           std::string &error) {

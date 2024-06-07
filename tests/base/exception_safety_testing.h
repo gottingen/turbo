@@ -78,7 +78,7 @@ struct StrongGuaranteeTagType {};
 // exceptions specifically thrown by ThrowingValue.
 class TestException {
  public:
-  explicit TestException(turbo::string_view msg) : msg_(msg) {}
+  explicit TestException(std::string_view msg) : msg_(msg) {}
   virtual ~TestException() {}
   virtual const char* what() const noexcept { return msg_.c_str(); }
 
@@ -93,7 +93,7 @@ class TestException {
 // bad_alloc exception in TestExceptionSafety.
 class TestBadAllocException : public std::bad_alloc, public TestException {
  public:
-  explicit TestBadAllocException(turbo::string_view msg) : TestException(msg) {}
+  explicit TestBadAllocException(std::string_view msg) : TestException(msg) {}
   using TestException::what;
 };
 
@@ -105,7 +105,7 @@ inline void SetCountdown(int i = 0) { countdown = i; }
 // Sets the countdown to the terminal value -1
 inline void UnsetCountdown() { SetCountdown(-1); }
 
-void MaybeThrow(turbo::string_view msg, bool throw_bad_alloc = false);
+void MaybeThrow(std::string_view msg, bool throw_bad_alloc = false);
 
 testing::AssertionResult FailureMessage(const TestException& e,
                                         int countdown) noexcept;
@@ -771,7 +771,7 @@ class ThrowingAllocator : private exceptions_internal::TrackedObject {
     if (*dummy_ < 0) std::abort();
   }
 
-  void ReadStateAndMaybeThrow(turbo::string_view msg) const {
+  void ReadStateAndMaybeThrow(std::string_view msg) const {
     if (!IsSpecified(AllocSpec::kNoThrowAllocate)) {
       exceptions_internal::MaybeThrow(
           turbo::substitute("Allocator id $0 threw from $1", *dummy_, msg));

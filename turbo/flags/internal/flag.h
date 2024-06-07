@@ -122,7 +122,7 @@ namespace turbo {
         }
 
         // Returns true if parsing of input text is successful.
-        inline bool Parse(FlagOpFn op, turbo::string_view text, void *dst,
+        inline bool Parse(FlagOpFn op, std::string_view text, void *dst,
                           std::string *error) {
             return op(FlagOp::kParse, &text, dst, error) != nullptr;
         }
@@ -189,7 +189,7 @@ namespace turbo {
 
             template<size_t... I>
             static constexpr FixedCharArray<N> FromLiteralString(
-                    turbo::string_view str, turbo::index_sequence<I...>) {
+                    std::string_view str, turbo::index_sequence<I...>) {
                 return (void) str, FixedCharArray<N>({{str[I]..., '\0'}});
             }
         };
@@ -427,7 +427,7 @@ namespace turbo {
             turbo::Mutex guard;  // Guard for concurrent callback invocations.
         };
 
-        using FlagValidatorFunc = bool (*)(turbo::string_view,std::string*) noexcept;
+        using FlagValidatorFunc = bool (*)(std::string_view,std::string*) noexcept;
 
         struct FlagValidator {
             FlagValidatorFunc func;
@@ -523,7 +523,7 @@ namespace turbo {
             void assert_valid_type(FlagFastTypeId type_id,
                                  const std::type_info *(*gen_rtti)()) const;
 
-            bool user_validate(turbo::string_view value , std::string *err) const override TURBO_LOCKS_EXCLUDED(*DataGuard());
+            bool user_validate(std::string_view value , std::string *err) const override TURBO_LOCKS_EXCLUDED(*DataGuard());
 
             bool has_user_validator() const override TURBO_LOCKS_EXCLUDED(*DataGuard());
 
@@ -568,7 +568,7 @@ namespace turbo {
 
             // Attempts to parse supplied `value` string. If parsing is successful,
             // returns new value. Otherwise returns nullptr.
-            std::unique_ptr<void, DynValueDeleter> TryParse(turbo::string_view value,
+            std::unique_ptr<void, DynValueDeleter> TryParse(std::string_view value,
                                                             std::string &err) const
             TURBO_EXCLUSIVE_LOCKS_REQUIRED(*DataGuard());
 
@@ -595,7 +595,7 @@ namespace turbo {
             }
 
             // CommandLineFlag interface implementation
-            turbo::string_view name() const override;
+            std::string_view name() const override;
 
             std::string filename() const override;
 
@@ -610,7 +610,7 @@ namespace turbo {
 
             std::string current_value() const override TURBO_LOCKS_EXCLUDED(*DataGuard());
 
-            bool validate_input_value(turbo::string_view value) const override
+            bool validate_input_value(std::string_view value) const override
             TURBO_LOCKS_EXCLUDED(*DataGuard());
 
             void check_default_value_parsing_roundtrip() const override
@@ -629,7 +629,7 @@ namespace turbo {
             bool RestoreState(const FlagState &flag_state)
             TURBO_LOCKS_EXCLUDED(*DataGuard());
 
-            bool parse_from(turbo::string_view value, FlagSettingMode set_mode,
+            bool parse_from(std::string_view value, FlagSettingMode set_mode,
                            ValueSource source, std::string &error) override
             TURBO_LOCKS_EXCLUDED(*DataGuard());
 
@@ -705,7 +705,7 @@ namespace turbo {
                       value_() {}
 
             // CommandLineFlag interface
-            turbo::string_view name() const { return impl_.name(); }
+            std::string_view name() const { return impl_.name(); }
 
             std::string filename() const { return impl_.filename(); }
 
@@ -817,7 +817,7 @@ namespace turbo {
                     // Initialize the temporary instance of type T based on current value in
                     // destination (which is going to be flag's default value).
                     T temp(*static_cast<T *>(v2));
-                    if (!turbo::parse_flag<T>(*static_cast<const turbo::string_view *>(v1), &temp,
+                    if (!turbo::parse_flag<T>(*static_cast<const std::string_view *>(v1), &temp,
                                              static_cast<std::string *>(v3))) {
                         return nullptr;
                     }

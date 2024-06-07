@@ -51,7 +51,7 @@ TEST(FlagsPathUtilTest, TestProgamNameInterfaces) {
   EXPECT_EQ(flags::ProgramInvocationName(), "a/my_test");
   EXPECT_EQ(flags::ShortProgramInvocationName(), "my_test");
 
-  turbo::string_view not_null_terminated("turbo/aaa/bbb");
+  std::string_view not_null_terminated("turbo/aaa/bbb");
   not_null_terminated = not_null_terminated.substr(1, 10);
 
   flags::SetProgramInvocationName(not_null_terminated);

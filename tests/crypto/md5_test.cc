@@ -27,7 +27,7 @@ using namespace turbo;
 
 namespace {
     /// Tests an arbitrary set of bytes passed as \p Input.
-    void TestMD5Sum(ArrayRef<uint8_t> Input, turbo::string_view Final) {
+    void TestMD5Sum(ArrayRef<uint8_t> Input, std::string_view Final) {
         MD5 Hash;
         Hash.update(Input);
         MD5::MD5Result MD5Res;
@@ -36,7 +36,7 @@ namespace {
         EXPECT_EQ(Res, Final);
     }
 
-    void TestMD5Sum(turbo::string_view Input, turbo::string_view Final) {
+    void TestMD5Sum(std::string_view Input, std::string_view Final) {
         MD5 Hash;
         Hash.update(Input);
         MD5::MD5Result MD5Res;

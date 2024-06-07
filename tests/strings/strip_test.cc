@@ -31,7 +31,7 @@
 namespace {
 
 TEST(Strip, ConsumePrefixOneChar) {
-  turbo::string_view input("abc");
+  std::string_view input("abc");
   EXPECT_TRUE(turbo::consume_prefix(&input, "a"));
   EXPECT_EQ(input, "bc");
 
@@ -49,7 +49,7 @@ TEST(Strip, ConsumePrefixOneChar) {
 }
 
 TEST(Strip, consume_prefix) {
-  turbo::string_view input("abcdef");
+  std::string_view input("abcdef");
   EXPECT_FALSE(turbo::consume_prefix(&input, "abcdefg"));
   EXPECT_EQ(input, "abcdef");
 
@@ -71,7 +71,7 @@ TEST(Strip, consume_prefix) {
 }
 
 TEST(Strip, consume_suffix) {
-  turbo::string_view input("abcdef");
+  std::string_view input("abcdef");
   EXPECT_FALSE(turbo::consume_suffix(&input, "abcdefg"));
   EXPECT_EQ(input, "abcdef");
 
@@ -93,7 +93,7 @@ TEST(Strip, consume_suffix) {
 }
 
 TEST(Strip, strip_prefix) {
-  const turbo::string_view null_str;
+  const std::string_view null_str;
 
   EXPECT_EQ(turbo::strip_prefix("foobar", "foo"), "bar");
   EXPECT_EQ(turbo::strip_prefix("foobar", ""), "foobar");
@@ -105,7 +105,7 @@ TEST(Strip, strip_prefix) {
 }
 
 TEST(Strip, strip_suffix) {
-  const turbo::string_view null_str;
+  const std::string_view null_str;
 
   EXPECT_EQ(turbo::strip_suffix("foobar", "bar"), "foo");
   EXPECT_EQ(turbo::strip_suffix("foobar", ""), "foobar");
@@ -172,10 +172,10 @@ TEST(Strip, trim_right) {
 }
 
 TEST(String, trim_left) {
-  turbo::string_view orig = "\t  \n\f\r\n\vfoo";
+  std::string_view orig = "\t  \n\f\r\n\vfoo";
   EXPECT_EQ("foo", turbo::trim_left(orig));
   orig = "\t  \n\f\r\v\n\t  \n\f\r\v\n";
-  EXPECT_EQ(turbo::string_view(), turbo::trim_left(orig));
+  EXPECT_EQ(std::string_view(), turbo::trim_left(orig));
 }
 
 TEST(Strip, trim_all) {
@@ -191,7 +191,7 @@ TEST(Strip, trim_all) {
   std::string test5 = "foo \t\f\r\v\n";
   turbo::trim_all(&test5);
   EXPECT_EQ(test5, "foo");
-  turbo::string_view test6("\t  \f\r\n\vfoo \t\f\r\v\n");
+  std::string_view test6("\t  \f\r\n\vfoo \t\f\r\v\n");
   test6 = turbo::trim_all(test6);
   EXPECT_EQ(test6, "foo");
   test6 = turbo::trim_all(test6);

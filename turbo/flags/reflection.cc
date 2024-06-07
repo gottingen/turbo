@@ -64,7 +64,7 @@ namespace turbo::flags_internal {
 
         // Returns the flag object for the specified name, or nullptr if not found.
         // Will emit a warning if a 'retired' flag is specified.
-        CommandLineFlag *FindFlag(turbo::string_view name);
+        CommandLineFlag *FindFlag(std::string_view name);
 
         static FlagRegistry &GlobalRegistry();  // returns a singleton registry
 
@@ -76,7 +76,7 @@ namespace turbo::flags_internal {
         friend void FinalizeRegistry();
 
         // The map from name to flag, for FindFlag().
-        using FlagMap = turbo::flat_hash_map<turbo::string_view, CommandLineFlag *>;
+        using FlagMap = turbo::flat_hash_map<std::string_view, CommandLineFlag *>;
         using FlagIterator = FlagMap::iterator;
         using FlagConstIterator = FlagMap::const_iterator;
         FlagMap flags_;
@@ -105,7 +105,7 @@ namespace turbo::flags_internal {
 
     }  // namespace
 
-    CommandLineFlag *FlagRegistry::FindFlag(turbo::string_view name) {
+    CommandLineFlag *FlagRegistry::FindFlag(std::string_view name) {
         if (finalized_flags_.load(std::memory_order_acquire)) {
             // We could save some gcus here if we make `name()` be non-virtual.
             // We could move the `const char*` name to the base class.
@@ -240,7 +240,7 @@ namespace turbo::flags_internal {
                     : name_(name), type_id_(type_id) {}
 
         private:
-            turbo::string_view name() const override { return name_; }
+            std::string_view name() const override { return name_; }
 
             std::string filename() const override {
                 OnAccess();
@@ -272,7 +272,7 @@ namespace turbo::flags_internal {
             }
 
             // Any input is valid
-            bool validate_input_value(turbo::string_view) const override {
+            bool validate_input_value(std::string_view) const override {
                 OnAccess();
                 return true;
             }
@@ -281,7 +281,7 @@ namespace turbo::flags_internal {
                 return nullptr;
             }
 
-            bool parse_from(turbo::string_view, flags_internal::FlagSettingMode,
+            bool parse_from(std::string_view, flags_internal::FlagSettingMode,
                            flags_internal::ValueSource, std::string &) override {
                 OnAccess();
                 return false;
@@ -364,7 +364,7 @@ namespace turbo {
 
     // --------------------------------------------------------------------
 
-    CommandLineFlag *find_command_line_flag(turbo::string_view name) {
+    CommandLineFlag *find_command_line_flag(std::string_view name) {
         if (name.empty()) return nullptr;
         flags_internal::FlagRegistry &registry =
                 flags_internal::FlagRegistry::GlobalRegistry();
@@ -373,8 +373,8 @@ namespace turbo {
 
     // --------------------------------------------------------------------
 
-    turbo::flat_hash_map<turbo::string_view, turbo::CommandLineFlag *> get_all_flags() {
-        turbo::flat_hash_map<turbo::string_view, turbo::CommandLineFlag *> res;
+    turbo::flat_hash_map<std::string_view, turbo::CommandLineFlag *> get_all_flags() {
+        turbo::flat_hash_map<std::string_view, turbo::CommandLineFlag *> res;
         flags_internal::ForEachFlag([&](CommandLineFlag &flag) {
             if (!flag.is_retired()) res.insert({flag.name(), &flag});
         });

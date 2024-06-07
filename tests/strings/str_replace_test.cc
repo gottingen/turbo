@@ -171,7 +171,7 @@ TEST(str_replace_all, ReplacementsInPlace) {
 
 TEST(str_replace_all, ReplacementsInPlaceInMap) {
   std::string s = std::string("$who bought $count #Noun. Thanks $who!");
-  std::map<turbo::string_view, turbo::string_view> replacements;
+  std::map<std::string_view, std::string_view> replacements;
   replacements["$who"] = "Bob";
   replacements["$count"] = "5";
   replacements["#Noun"] = "Apples";
@@ -183,13 +183,13 @@ TEST(str_replace_all, ReplacementsInPlaceInMap) {
 
 struct Cont {
   Cont() = default;
-  explicit Cont(turbo::string_view src) : data(src) {}
+  explicit Cont(std::string_view src) : data(src) {}
 
-  turbo::string_view data;
+  std::string_view data;
 };
 
 template <int index>
-turbo::string_view get(const Cont& c) {
+std::string_view get(const Cont& c) {
   auto splitter = turbo::str_split(c.data, ':');
   auto it = splitter.begin();
   for (int i = 0; i < index; ++i) ++it;
@@ -236,7 +236,7 @@ TEST(str_replace_all, VariableNumber) {
   }
 
   {
-    std::list<std::pair<turbo::string_view, turbo::string_view>> replacements = {
+    std::list<std::pair<std::string_view, std::string_view>> replacements = {
         {"a", "x"}, {"b", "y"}, {"c", "z"}};
 
     std::string s = turbo::str_replace_all("abc", replacements);
@@ -244,7 +244,7 @@ TEST(str_replace_all, VariableNumber) {
   }
 
   {
-    using X = std::tuple<turbo::string_view, std::string, int>;
+    using X = std::tuple<std::string_view, std::string, int>;
     std::vector<X> replacements(3);
     replacements[0] = X{"a", "x", 1};
     replacements[1] = X{"b", "y", 0};

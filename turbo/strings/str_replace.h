@@ -68,8 +68,8 @@ namespace turbo {
     //        {"#Noun", "Apples"}});
     //   EXPECT_EQ("Bob bought 5 Apples. Thanks Bob!", s);
     TURBO_MUST_USE_RESULT std::string str_replace_all(
-            turbo::string_view s,
-            std::initializer_list<std::pair<turbo::string_view, turbo::string_view>>
+            std::string_view s,
+            std::initializer_list<std::pair<std::string_view, std::string_view>>
             replacements);
 
     // Overload of `str_replace_all()` to accept a container of key/value replacement
@@ -78,7 +78,7 @@ namespace turbo {
     //
     // Examples:
     //
-    //   std::map<const turbo::string_view, const turbo::string_view> replacements;
+    //   std::map<const std::string_view, const std::string_view> replacements;
     //   replacements["$who"] = "Bob";
     //   replacements["$count"] = "5";
     //   replacements["#Noun"] = "Apples";
@@ -88,7 +88,7 @@ namespace turbo {
     //   EXPECT_EQ("Bob bought 5 Apples. Thanks Bob!", s);
     //
     //   // A std::vector of std::pair elements can be more efficient.
-    //   std::vector<std::pair<const turbo::string_view, std::string>> replacements;
+    //   std::vector<std::pair<const std::string_view, std::string>> replacements;
     //   replacements.push_back({"&", "&amp;"});
     //   replacements.push_back({"<", "&lt;"});
     //   replacements.push_back({">", "&gt;"});
@@ -96,7 +96,7 @@ namespace turbo {
     //                                  replacements);
     //   EXPECT_EQ("if (ptr &lt; &amp;foo)", s);
     template<typename StrToStrMapping>
-    std::string str_replace_all(turbo::string_view s,
+    std::string str_replace_all(std::string_view s,
                               const StrToStrMapping &replacements);
 
     // Overload of `str_replace_all()` to replace character sequences within a given
@@ -113,7 +113,7 @@ namespace turbo {
     //  EXPECT_EQ(count, 4);
     //  EXPECT_EQ("Bob bought 5 Apples. Thanks Bob!", s);
     int str_replace_all(
-            std::initializer_list<std::pair<turbo::string_view, turbo::string_view>>
+            std::initializer_list<std::pair<std::string_view, std::string_view>>
             replacements,
             turbo::Nonnull<std::string *> target);
 
@@ -137,12 +137,12 @@ namespace turbo {
     namespace strings_internal {
 
         struct ViableSubstitution {
-            turbo::string_view old;
-            turbo::string_view replacement;
+            std::string_view old;
+            std::string_view replacement;
             size_t offset;
 
-            ViableSubstitution(turbo::string_view old_str,
-                               turbo::string_view replacement_str, size_t offset_val)
+            ViableSubstitution(std::string_view old_str,
+                               std::string_view replacement_str, size_t offset_val)
                     : old(old_str), replacement(replacement_str), offset(offset_val) {}
 
             // One substitution occurs "before" another (takes priority) if either
@@ -159,13 +159,13 @@ namespace turbo {
         // overhead of such a queue isn't worth it.
         template<typename StrToStrMapping>
         std::vector<ViableSubstitution> FindSubstitutions(
-                turbo::string_view s, const StrToStrMapping &replacements) {
+                std::string_view s, const StrToStrMapping &replacements) {
             std::vector<ViableSubstitution> subs;
             subs.reserve(replacements.size());
 
             for (const auto &rep: replacements) {
                 using std::get;
-                turbo::string_view old(get<0>(rep));
+                std::string_view old(get<0>(rep));
 
                 size_t pos = s.find(old);
                 if (pos == s.npos) continue;
@@ -187,14 +187,14 @@ namespace turbo {
             return subs;
         }
 
-        int ApplySubstitutions(turbo::string_view s,
+        int ApplySubstitutions(std::string_view s,
                                turbo::Nonnull<std::vector<ViableSubstitution> *> subs_ptr,
                                turbo::Nonnull<std::string *> result_ptr);
 
     }  // namespace strings_internal
 
     template<typename StrToStrMapping>
-    std::string str_replace_all(turbo::string_view s,
+    std::string str_replace_all(std::string_view s,
                               const StrToStrMapping &replacements) {
         auto subs = strings_internal::FindSubstitutions(s, replacements);
         std::string result;

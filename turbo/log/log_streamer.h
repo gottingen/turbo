@@ -79,7 +79,7 @@ class LogStreamer final {
   //
   // Creates a LogStreamer with a given `severity` that will log a message
   // attributed to the given `file` and `line`.
-  explicit LogStreamer(turbo::LogSeverity severity, turbo::string_view file,
+  explicit LogStreamer(turbo::LogSeverity severity, std::string_view file,
                        int line)
       : severity_(severity),
         line_(line),
@@ -139,21 +139,21 @@ class LogStreamer final {
 // LogInfoStreamer()
 //
 // Returns a LogStreamer that writes at level LogSeverity::kInfo.
-inline LogStreamer LogInfoStreamer(turbo::string_view file, int line) {
+inline LogStreamer LogInfoStreamer(std::string_view file, int line) {
   return turbo::LogStreamer(turbo::LogSeverity::kInfo, file, line);
 }
 
 // LogWarningStreamer()
 //
 // Returns a LogStreamer that writes at level LogSeverity::kWarning.
-inline LogStreamer LogWarningStreamer(turbo::string_view file, int line) {
+inline LogStreamer LogWarningStreamer(std::string_view file, int line) {
   return turbo::LogStreamer(turbo::LogSeverity::kWarning, file, line);
 }
 
 // LogErrorStreamer()
 //
 // Returns a LogStreamer that writes at level LogSeverity::kError.
-inline LogStreamer LogErrorStreamer(turbo::string_view file, int line) {
+inline LogStreamer LogErrorStreamer(std::string_view file, int line) {
   return turbo::LogStreamer(turbo::LogSeverity::kError, file, line);
 }
 
@@ -163,7 +163,7 @@ inline LogStreamer LogErrorStreamer(turbo::string_view file, int line) {
 //
 // The program will be terminated when this `LogStreamer` is destroyed,
 // regardless of whether any data were streamed in.
-inline LogStreamer LogFatalStreamer(turbo::string_view file, int line) {
+inline LogStreamer LogFatalStreamer(std::string_view file, int line) {
   return turbo::LogStreamer(turbo::LogSeverity::kFatal, file, line);
 }
 
@@ -173,7 +173,7 @@ inline LogStreamer LogFatalStreamer(turbo::string_view file, int line) {
 //
 // In debug mode, the program will be terminated when this `LogStreamer` is
 // destroyed, regardless of whether any data were streamed in.
-inline LogStreamer LogDebugFatalStreamer(turbo::string_view file, int line) {
+inline LogStreamer LogDebugFatalStreamer(std::string_view file, int line) {
   return turbo::LogStreamer(turbo::kLogDebugFatal, file, line);
 }
 

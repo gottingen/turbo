@@ -58,7 +58,7 @@ namespace turbo {
             return x & 0xf;
         }
 
-        inline bool IsSurrogate(char32_t c, turbo::string_view src,
+        inline bool IsSurrogate(char32_t c, std::string_view src,
                                 turbo::Nullable<std::string *> error) {
             if (c >= 0xD800 && c <= 0xDFFF) {
                 if (error) {
@@ -87,7 +87,7 @@ namespace turbo {
 //     NOTE: any changes to this function must also be reflected in the older
 //     UnescapeCEscapeSequences().
 // ----------------------------------------------------------------------
-        bool CUnescapeInternal(turbo::string_view source, bool leave_nulls_escaped,
+        bool CUnescapeInternal(std::string_view source, bool leave_nulls_escaped,
                                turbo::Nonnull<char *> dest,
                                turbo::Nonnull<ptrdiff_t *> dest_len,
                                turbo::Nullable<std::string *> error) {
@@ -243,7 +243,7 @@ namespace turbo {
                                 d += 5;
                                 break;
                             }
-                            if (IsSurrogate(rune, turbo::string_view(hex_start, 5), error)) {
+                            if (IsSurrogate(rune, std::string_view(hex_start, 5), error)) {
                                 return false;
                             }
                             d += strings_internal::EncodeUTF8Char(d, rune);
@@ -294,7 +294,7 @@ namespace turbo {
                                 d += 9;
                                 break;
                             }
-                            if (IsSurrogate(rune, turbo::string_view(hex_start, 9), error)) {
+                            if (IsSurrogate(rune, std::string_view(hex_start, 9), error)) {
                                 return false;
                             }
                             d += strings_internal::EncodeUTF8Char(d, rune);
@@ -318,7 +318,7 @@ namespace turbo {
 //    Same as above but uses a std::string for output. 'source' and 'dest'
 //    may be the same.
 // ----------------------------------------------------------------------
-        bool CUnescapeInternal(turbo::string_view source, bool leave_nulls_escaped,
+        bool CUnescapeInternal(std::string_view source, bool leave_nulls_escaped,
                                turbo::Nonnull<std::string *> dest,
                                turbo::Nullable<std::string *> error) {
             strings_internal::STLStringResizeUninitialized(dest, source.size());
@@ -346,7 +346,7 @@ namespace turbo {
 //
 //    Escaped chars: \n, \r, \t, ", ', \, and !turbo::ascii_isprint().
 // ----------------------------------------------------------------------
-        std::string CEscapeInternal(turbo::string_view src, bool use_hex,
+        std::string CEscapeInternal(std::string_view src, bool use_hex,
                                     bool utf8_safe) {
             std::string dest;
             bool last_hex_escape = false;  // true if last output char was \xNN.
@@ -427,7 +427,7 @@ namespace turbo {
 // Calculates the length of the C-style escaped version of 'src'.
 // Assumes that non-printable characters are escaped using octal sequences, and
 // that UTF-8 bytes are not handled specially.
-        inline size_t CEscapedLength(turbo::string_view src) {
+        inline size_t CEscapedLength(std::string_view src) {
             size_t escaped_len = 0;
             // The maximum value of kCEscapedLen[x] is 4, so we can escape any string of
             // length size_t_max/4 without checking for overflow.
@@ -449,7 +449,7 @@ namespace turbo {
             return escaped_len;
         }
 
-        void CEscapeAndAppendInternal(turbo::string_view src,
+        void CEscapeAndAppendInternal(std::string_view src,
                                       turbo::Nonnull<std::string *> dest) {
             size_t escaped_len = CEscapedLength(src);
             if (escaped_len == src.size()) {
@@ -944,52 +944,52 @@ namespace turbo {
     //
     // See CUnescapeInternal() for implementation details.
     // ----------------------------------------------------------------------
-    bool c_decode(turbo::string_view source, turbo::Nonnull<std::string *> dest,
+    bool c_decode(std::string_view source, turbo::Nonnull<std::string *> dest,
                   turbo::Nullable<std::string *> error) {
         return CUnescapeInternal(source, kUnescapeNulls, dest, error);
     }
 
-    std::string c_encode(turbo::string_view src) {
+    std::string c_encode(std::string_view src) {
         std::string dest;
         CEscapeAndAppendInternal(src, &dest);
         return dest;
     }
 
-    std::string c_hex_encode(turbo::string_view src) {
+    std::string c_hex_encode(std::string_view src) {
         return CEscapeInternal(src, true, false);
     }
 
-    std::string utf8_safe_encode(turbo::string_view src) {
+    std::string utf8_safe_encode(std::string_view src) {
         return CEscapeInternal(src, false, true);
     }
 
-    std::string utf8_safe_hex_encode(turbo::string_view src) {
+    std::string utf8_safe_hex_encode(std::string_view src) {
         return CEscapeInternal(src, true, true);
     }
 
-    bool base64_decode(turbo::string_view src, turbo::Nonnull<std::string *> dest) {
+    bool base64_decode(std::string_view src, turbo::Nonnull<std::string *> dest) {
         return Base64UnescapeInternal(src.data(), src.size(), dest, kUnBase64);
     }
 
-    bool web_safe_base64_decode(turbo::string_view src,
+    bool web_safe_base64_decode(std::string_view src,
                                 turbo::Nonnull<std::string *> dest) {
         return Base64UnescapeInternal(src.data(), src.size(), dest, kUnWebSafeBase64);
     }
 
-    void base64_encode(turbo::string_view src, turbo::Nonnull<std::string *> dest) {
+    void base64_encode(std::string_view src, turbo::Nonnull<std::string *> dest) {
         strings_internal::Base64EscapeInternal(
                 reinterpret_cast<const unsigned char *>(src.data()), src.size(), dest,
                 true, strings_internal::kBase64Chars);
     }
 
-    void web_safe_base64_encode(turbo::string_view src,
+    void web_safe_base64_encode(std::string_view src,
                                 turbo::Nonnull<std::string *> dest) {
         strings_internal::Base64EscapeInternal(
                 reinterpret_cast<const unsigned char *>(src.data()), src.size(), dest,
                 false, strings_internal::kWebSafeBase64Chars);
     }
 
-    std::string base64_encode(turbo::string_view src) {
+    std::string base64_encode(std::string_view src) {
         std::string dest;
         strings_internal::Base64EscapeInternal(
                 reinterpret_cast<const unsigned char *>(src.data()), src.size(), &dest,
@@ -997,7 +997,7 @@ namespace turbo {
         return dest;
     }
 
-    std::string web_safe_base64_encode(turbo::string_view src) {
+    std::string web_safe_base64_encode(std::string_view src) {
         std::string dest;
         strings_internal::Base64EscapeInternal(
                 reinterpret_cast<const unsigned char *>(src.data()), src.size(), &dest,
@@ -1005,7 +1005,7 @@ namespace turbo {
         return dest;
     }
 
-    bool hex_string_to_bytes(turbo::string_view hex,
+    bool hex_string_to_bytes(std::string_view hex,
                              turbo::Nonnull<std::string *> bytes) {
         std::string output;
 
@@ -1031,7 +1031,7 @@ namespace turbo {
         return true;
     }
 
-    std::string hex_string_to_bytes(turbo::string_view from) {
+    std::string hex_string_to_bytes(std::string_view from) {
         std::string result;
         const auto num = from.size() / 2;
         strings_internal::STLStringResizeUninitialized(&result, num);
@@ -1039,7 +1039,7 @@ namespace turbo {
         return result;
     }
 
-    std::string bytes_to_hex_string(turbo::string_view from) {
+    std::string bytes_to_hex_string(std::string_view from) {
         std::string result;
         strings_internal::STLStringResizeUninitialized(&result, 2 * from.size());
         turbo::BytesToHexStringInternal<std::string &>(reinterpret_cast<const unsigned char *>(from.data()), result, from.size());

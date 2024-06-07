@@ -34,7 +34,7 @@ namespace turbo {
 
     namespace {
 
-        turbo::string_view TextRangeToView(const UriTextRangeStructA &range) {
+        std::string_view TextRangeToView(const UriTextRangeStructA &range) {
             if (range.first == nullptr) {
                 return "";
             } else {
@@ -53,7 +53,7 @@ namespace turbo {
         bool IsTextRangeSet(const UriTextRangeStructA &range) { return range.first != nullptr; }
 
 #ifdef _WIN32
-        bool IsDriveSpec(const turbo::string_view s) {
+        bool IsDriveSpec(const std::string_view s) {
   return (s.length() >= 2 && s[1] == ':' &&
           ((s[0] >= 'A' && s[0] <= 'Z') || (s[0] >= 'a' && s[0] <= 'z')));
 }
@@ -61,7 +61,7 @@ namespace turbo {
 
     }  // namespace
 
-    std::string uri_escape(turbo::string_view s) {
+    std::string uri_escape(std::string_view s) {
         if (s.empty()) {
             // Avoid passing null pointer to uriEscapeExA
             return std::string(s);
@@ -75,7 +75,7 @@ namespace turbo {
         return escaped;
     }
 
-    std::string uri_unescape(turbo::string_view s) {
+    std::string uri_unescape(std::string_view s) {
         std::string result(s);
         if (!result.empty()) {
             auto end = uriUnescapeInPlaceA(&result[0]);
@@ -84,7 +84,7 @@ namespace turbo {
         return result;
     }
 
-    std::string uri_encode_host(turbo::string_view host) {
+    std::string uri_encode_host(std::string_view host) {
         // Fairly naive check: if it contains a ':', it's IPv6 and needs
         // brackets, else it's OK
         if (host.find(":") != std::string::npos) {
@@ -97,7 +97,7 @@ namespace turbo {
         }
     }
 
-    bool is_valid_uri_scheme(turbo::string_view s) {
+    bool is_valid_uri_scheme(std::string_view s) {
         auto is_alpha = [](char c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); };
         auto is_scheme_char = [&](char c) {
             return is_alpha(c) || (c >= '0' && c <= '9') || c == '+' || c == '-' || c == '.';
@@ -136,7 +136,7 @@ namespace turbo {
         std::vector<std::string> data_;
         std::string string_rep_;
         int32_t port_ = -1;
-        std::vector<turbo::string_view> path_segments_;
+        std::vector<std::string_view> path_segments_;
         bool is_file_uri_;
         bool is_absolute_path_;
     };
@@ -171,7 +171,7 @@ namespace turbo {
     std::string Uri::username() const {
         auto userpass = TextRangeToView(impl_->uri_.userInfo);
         auto sep_pos = userpass.find_first_of(':');
-        if (sep_pos != turbo::string_view::npos) {
+        if (sep_pos != std::string_view::npos) {
             userpass = userpass.substr(0, sep_pos);
         }
         return uri_unescape(userpass);
@@ -180,7 +180,7 @@ namespace turbo {
     std::string Uri::password() const {
         auto userpass = TextRangeToView(impl_->uri_.userInfo);
         auto sep_pos = userpass.find_first_of(':');
-        if (sep_pos == turbo::string_view::npos) {
+        if (sep_pos == std::string_view::npos) {
             return "";
         }
         return uri_unescape(userpass.substr(sep_pos + 1));
@@ -334,7 +334,7 @@ namespace turbo {
         return uri->parse(uri_string, error_message);
     }
 
-    bool uri_from_absolute_path(turbo::string_view path, turbo::Nonnull<std::string *> uri, std::string *error_message) {
+    bool uri_from_absolute_path(std::string_view path, turbo::Nonnull<std::string *> uri, std::string *error_message) {
         if (path.empty()) {
             if (error_message != nullptr) {
                 *error_message = "uri_from_absolute_path expected an absolute path, got an empty string";

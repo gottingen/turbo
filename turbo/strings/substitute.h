@@ -51,7 +51,7 @@
 //   EXPECT_EQ("Hi. My name is Bob and I am 5 years old.", s);
 //
 // Supported types:
-//   * turbo::string_view, std::string, const char* (null is equivalent to "")
+//   * std::string_view, std::string, const char* (null is equivalent to "")
 //   * int32_t, int64_t, uint32_t, uint64_t
 //   * float, double
 //   * bool (Printed as "true" or "false")
@@ -115,7 +115,7 @@ namespace turbo {
                     value) noexcept
                     : piece_(value) {}
 
-            Arg(turbo::string_view value)  // NOLINT(google-explicit-constructor)
+            Arg(std::string_view value)  // NOLINT(google-explicit-constructor)
                     : piece_(value) {}
 
             // Overloads for primitives
@@ -227,18 +227,18 @@ namespace turbo {
 
             Arg &operator=(const Arg &) = delete;
 
-            turbo::string_view piece() const { return piece_; }
+            std::string_view piece() const { return piece_; }
 
         private:
-            turbo::string_view piece_;
+            std::string_view piece_;
             char scratch_[numbers_internal::kFastToBufferSize];
         };
 
         // Internal helper function. Don't call this from outside this implementation.
         // This interface may change without notice.
         void SubstituteAndAppendArray(
-                turbo::Nonnull<std::string *> output, turbo::string_view format,
-                turbo::Nullable<const turbo::string_view *> args_array, size_t num_args);
+                turbo::Nonnull<std::string *> output, std::string_view format,
+                turbo::Nullable<const std::string_view *> args_array, size_t num_args);
 
 #if defined(TURBO_BAD_CALL_IF)
         constexpr int CalculateOneBit(turbo::Nonnull<const char*> format) {
@@ -282,86 +282,86 @@ namespace turbo {
     //
     // Example:
     //  template <typename... Args>
-    //  void VarMsg(std::string* boilerplate, turbo::string_view format,
+    //  void VarMsg(std::string* boilerplate, std::string_view format,
     //      const Args&... args) {
     //    turbo::substitute_and_append(boilerplate, format, args...);
     //  }
     //
     inline void substitute_and_append(turbo::Nonnull<std::string *> output,
-                                    turbo::string_view format) {
+                                    std::string_view format) {
         substitute_internal::SubstituteAndAppendArray(output, format, nullptr, 0);
     }
 
     inline void substitute_and_append(turbo::Nonnull<std::string *> output,
-                                    turbo::string_view format,
+                                    std::string_view format,
                                     const substitute_internal::Arg &a0) {
-        const turbo::string_view args[] = {a0.piece()};
+        const std::string_view args[] = {a0.piece()};
         substitute_internal::SubstituteAndAppendArray(output, format, args,
                                                       TURBO_ARRAYSIZE(args));
     }
 
     inline void substitute_and_append(turbo::Nonnull<std::string *> output,
-                                    turbo::string_view format,
+                                    std::string_view format,
                                     const substitute_internal::Arg &a0,
                                     const substitute_internal::Arg &a1) {
-        const turbo::string_view args[] = {a0.piece(), a1.piece()};
+        const std::string_view args[] = {a0.piece(), a1.piece()};
         substitute_internal::SubstituteAndAppendArray(output, format, args,
                                                       TURBO_ARRAYSIZE(args));
     }
 
     inline void substitute_and_append(turbo::Nonnull<std::string *> output,
-                                    turbo::string_view format,
+                                    std::string_view format,
                                     const substitute_internal::Arg &a0,
                                     const substitute_internal::Arg &a1,
                                     const substitute_internal::Arg &a2) {
-        const turbo::string_view args[] = {a0.piece(), a1.piece(), a2.piece()};
+        const std::string_view args[] = {a0.piece(), a1.piece(), a2.piece()};
         substitute_internal::SubstituteAndAppendArray(output, format, args,
                                                       TURBO_ARRAYSIZE(args));
     }
 
     inline void substitute_and_append(turbo::Nonnull<std::string *> output,
-                                    turbo::string_view format,
+                                    std::string_view format,
                                     const substitute_internal::Arg &a0,
                                     const substitute_internal::Arg &a1,
                                     const substitute_internal::Arg &a2,
                                     const substitute_internal::Arg &a3) {
-        const turbo::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
+        const std::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
                                            a3.piece()};
         substitute_internal::SubstituteAndAppendArray(output, format, args,
                                                       TURBO_ARRAYSIZE(args));
     }
 
     inline void substitute_and_append(turbo::Nonnull<std::string *> output,
-                                    turbo::string_view format,
+                                    std::string_view format,
                                     const substitute_internal::Arg &a0,
                                     const substitute_internal::Arg &a1,
                                     const substitute_internal::Arg &a2,
                                     const substitute_internal::Arg &a3,
                                     const substitute_internal::Arg &a4) {
-        const turbo::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
+        const std::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
                                            a3.piece(), a4.piece()};
         substitute_internal::SubstituteAndAppendArray(output, format, args,
                                                       TURBO_ARRAYSIZE(args));
     }
 
     inline void substitute_and_append(
-            turbo::Nonnull<std::string *> output, turbo::string_view format,
+            turbo::Nonnull<std::string *> output, std::string_view format,
             const substitute_internal::Arg &a0, const substitute_internal::Arg &a1,
             const substitute_internal::Arg &a2, const substitute_internal::Arg &a3,
             const substitute_internal::Arg &a4, const substitute_internal::Arg &a5) {
-        const turbo::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
+        const std::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
                                            a3.piece(), a4.piece(), a5.piece()};
         substitute_internal::SubstituteAndAppendArray(output, format, args,
                                                       TURBO_ARRAYSIZE(args));
     }
 
     inline void substitute_and_append(
-            turbo::Nonnull<std::string *> output, turbo::string_view format,
+            turbo::Nonnull<std::string *> output, std::string_view format,
             const substitute_internal::Arg &a0, const substitute_internal::Arg &a1,
             const substitute_internal::Arg &a2, const substitute_internal::Arg &a3,
             const substitute_internal::Arg &a4, const substitute_internal::Arg &a5,
             const substitute_internal::Arg &a6) {
-        const turbo::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
+        const std::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
                                            a3.piece(), a4.piece(), a5.piece(),
                                            a6.piece()};
         substitute_internal::SubstituteAndAppendArray(output, format, args,
@@ -369,12 +369,12 @@ namespace turbo {
     }
 
     inline void substitute_and_append(
-            turbo::Nonnull<std::string *> output, turbo::string_view format,
+            turbo::Nonnull<std::string *> output, std::string_view format,
             const substitute_internal::Arg &a0, const substitute_internal::Arg &a1,
             const substitute_internal::Arg &a2, const substitute_internal::Arg &a3,
             const substitute_internal::Arg &a4, const substitute_internal::Arg &a5,
             const substitute_internal::Arg &a6, const substitute_internal::Arg &a7) {
-        const turbo::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
+        const std::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
                                            a3.piece(), a4.piece(), a5.piece(),
                                            a6.piece(), a7.piece()};
         substitute_internal::SubstituteAndAppendArray(output, format, args,
@@ -382,13 +382,13 @@ namespace turbo {
     }
 
     inline void substitute_and_append(
-            turbo::Nonnull<std::string *> output, turbo::string_view format,
+            turbo::Nonnull<std::string *> output, std::string_view format,
             const substitute_internal::Arg &a0, const substitute_internal::Arg &a1,
             const substitute_internal::Arg &a2, const substitute_internal::Arg &a3,
             const substitute_internal::Arg &a4, const substitute_internal::Arg &a5,
             const substitute_internal::Arg &a6, const substitute_internal::Arg &a7,
             const substitute_internal::Arg &a8) {
-        const turbo::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
+        const std::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
                                            a3.piece(), a4.piece(), a5.piece(),
                                            a6.piece(), a7.piece(), a8.piece()};
         substitute_internal::SubstituteAndAppendArray(output, format, args,
@@ -396,13 +396,13 @@ namespace turbo {
     }
 
     inline void substitute_and_append(
-            turbo::Nonnull<std::string *> output, turbo::string_view format,
+            turbo::Nonnull<std::string *> output, std::string_view format,
             const substitute_internal::Arg &a0, const substitute_internal::Arg &a1,
             const substitute_internal::Arg &a2, const substitute_internal::Arg &a3,
             const substitute_internal::Arg &a4, const substitute_internal::Arg &a5,
             const substitute_internal::Arg &a6, const substitute_internal::Arg &a7,
             const substitute_internal::Arg &a8, const substitute_internal::Arg &a9) {
-        const turbo::string_view args[] = {
+        const std::string_view args[] = {
                 a0.piece(), a1.piece(), a2.piece(), a3.piece(), a4.piece(),
                 a5.piece(), a6.piece(), a7.piece(), a8.piece(), a9.piece()};
         substitute_internal::SubstituteAndAppendArray(output, format, args,
@@ -550,24 +550,24 @@ namespace turbo {
     //
     // Example:
     //  template <typename... Args>
-    //  void VarMsg(turbo::string_view format, const Args&... args) {
+    //  void VarMsg(std::string_view format, const Args&... args) {
     //    std::string s = turbo::substitute(format, args...);
 
-    TURBO_MUST_USE_RESULT inline std::string substitute(turbo::string_view format) {
+    TURBO_MUST_USE_RESULT inline std::string substitute(std::string_view format) {
         std::string result;
         substitute_and_append(&result, format);
         return result;
     }
 
     TURBO_MUST_USE_RESULT inline std::string substitute(
-            turbo::string_view format, const substitute_internal::Arg &a0) {
+            std::string_view format, const substitute_internal::Arg &a0) {
         std::string result;
         substitute_and_append(&result, format, a0);
         return result;
     }
 
     TURBO_MUST_USE_RESULT inline std::string substitute(
-            turbo::string_view format, const substitute_internal::Arg &a0,
+            std::string_view format, const substitute_internal::Arg &a0,
             const substitute_internal::Arg &a1) {
         std::string result;
         substitute_and_append(&result, format, a0, a1);
@@ -575,7 +575,7 @@ namespace turbo {
     }
 
     TURBO_MUST_USE_RESULT inline std::string substitute(
-            turbo::string_view format, const substitute_internal::Arg &a0,
+            std::string_view format, const substitute_internal::Arg &a0,
             const substitute_internal::Arg &a1, const substitute_internal::Arg &a2) {
         std::string result;
         substitute_and_append(&result, format, a0, a1, a2);
@@ -583,7 +583,7 @@ namespace turbo {
     }
 
     TURBO_MUST_USE_RESULT inline std::string substitute(
-            turbo::string_view format, const substitute_internal::Arg &a0,
+            std::string_view format, const substitute_internal::Arg &a0,
             const substitute_internal::Arg &a1, const substitute_internal::Arg &a2,
             const substitute_internal::Arg &a3) {
         std::string result;
@@ -592,7 +592,7 @@ namespace turbo {
     }
 
     TURBO_MUST_USE_RESULT inline std::string substitute(
-            turbo::string_view format, const substitute_internal::Arg &a0,
+            std::string_view format, const substitute_internal::Arg &a0,
             const substitute_internal::Arg &a1, const substitute_internal::Arg &a2,
             const substitute_internal::Arg &a3, const substitute_internal::Arg &a4) {
         std::string result;
@@ -601,7 +601,7 @@ namespace turbo {
     }
 
     TURBO_MUST_USE_RESULT inline std::string substitute(
-            turbo::string_view format, const substitute_internal::Arg &a0,
+            std::string_view format, const substitute_internal::Arg &a0,
             const substitute_internal::Arg &a1, const substitute_internal::Arg &a2,
             const substitute_internal::Arg &a3, const substitute_internal::Arg &a4,
             const substitute_internal::Arg &a5) {
@@ -611,7 +611,7 @@ namespace turbo {
     }
 
     TURBO_MUST_USE_RESULT inline std::string substitute(
-            turbo::string_view format, const substitute_internal::Arg &a0,
+            std::string_view format, const substitute_internal::Arg &a0,
             const substitute_internal::Arg &a1, const substitute_internal::Arg &a2,
             const substitute_internal::Arg &a3, const substitute_internal::Arg &a4,
             const substitute_internal::Arg &a5, const substitute_internal::Arg &a6) {
@@ -621,7 +621,7 @@ namespace turbo {
     }
 
     TURBO_MUST_USE_RESULT inline std::string substitute(
-            turbo::string_view format, const substitute_internal::Arg &a0,
+            std::string_view format, const substitute_internal::Arg &a0,
             const substitute_internal::Arg &a1, const substitute_internal::Arg &a2,
             const substitute_internal::Arg &a3, const substitute_internal::Arg &a4,
             const substitute_internal::Arg &a5, const substitute_internal::Arg &a6,
@@ -632,7 +632,7 @@ namespace turbo {
     }
 
     TURBO_MUST_USE_RESULT inline std::string substitute(
-            turbo::string_view format, const substitute_internal::Arg &a0,
+            std::string_view format, const substitute_internal::Arg &a0,
             const substitute_internal::Arg &a1, const substitute_internal::Arg &a2,
             const substitute_internal::Arg &a3, const substitute_internal::Arg &a4,
             const substitute_internal::Arg &a5, const substitute_internal::Arg &a6,
@@ -643,7 +643,7 @@ namespace turbo {
     }
 
     TURBO_MUST_USE_RESULT inline std::string substitute(
-            turbo::string_view format, const substitute_internal::Arg &a0,
+            std::string_view format, const substitute_internal::Arg &a0,
             const substitute_internal::Arg &a1, const substitute_internal::Arg &a2,
             const substitute_internal::Arg &a3, const substitute_internal::Arg &a4,
             const substitute_internal::Arg &a5, const substitute_internal::Arg &a6,

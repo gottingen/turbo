@@ -38,7 +38,7 @@ char very_long_str_variable_name[] TURBO_INTERNAL_UNIQUE_SMALL_NAME() = "abc";
 
 TEST(UniqueSmallName, NonAutomaticVar) {
   EXPECT_EQ(very_long_int_variable_name, 0);
-  EXPECT_EQ(turbo::string_view(very_long_str_variable_name), "abc");
+  EXPECT_EQ(std::string_view(very_long_str_variable_name), "abc");
 }
 
 int VeryLongFreeFunctionName() TURBO_INTERNAL_UNIQUE_SMALL_NAME();

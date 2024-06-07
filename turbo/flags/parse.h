@@ -40,7 +40,7 @@ namespace turbo {
             kFromArgv, kFromFlagfile
         };
 
-        explicit UnrecognizedFlag(Source s, turbo::string_view f)
+        explicit UnrecognizedFlag(Source s, std::string_view f)
                 : source(s), flag_name(f) {}
 
         // This field indicates where we found this flag: on the original command line

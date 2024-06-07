@@ -303,8 +303,8 @@ namespace {
     }
 
     static struct {
-        turbo::string_view plaintext;
-        turbo::string_view cyphertext;
+        std::string_view plaintext;
+        std::string_view cyphertext;
     } const base64_tests[] = {
             // Empty string.
             {{"",             0},          {"", 0}},
@@ -613,9 +613,9 @@ namespace {
 
         // Verify the behavior when decoding bad data
         {
-            turbo::string_view data_set[] = {"ab-/", turbo::string_view("\0bcd", 4),
-                                             turbo::string_view("abc.\0", 5)};
-            for (turbo::string_view bad_data: data_set) {
+            std::string_view data_set[] = {"ab-/", std::string_view("\0bcd", 4),
+                                             std::string_view("abc.\0", 5)};
+            for (std::string_view bad_data: data_set) {
                 StringType buf;
                 EXPECT_FALSE(turbo::base64_decode(bad_data, &buf));
                 EXPECT_FALSE(turbo::web_safe_base64_decode(bad_data, &buf));
@@ -631,14 +631,14 @@ namespace {
     TEST(Base64, Padding) {
         // Padding is optional.
         // '.' is an acceptable padding character, just like '='.
-        std::initializer_list<turbo::string_view> good_padding = {
+        std::initializer_list<std::string_view> good_padding = {
                 "YQ",
                 "YQ==",
                 "YQ=.",
                 "YQ.=",
                 "YQ..",
         };
-        for (turbo::string_view b64: good_padding) {
+        for (std::string_view b64: good_padding) {
             std::string decoded;
             EXPECT_TRUE(turbo::base64_decode(b64, &decoded));
             EXPECT_EQ(decoded, "a");
@@ -646,7 +646,7 @@ namespace {
             EXPECT_TRUE(turbo::web_safe_base64_decode(b64, &websafe_decoded));
             EXPECT_EQ(websafe_decoded, "a");
         }
-        std::initializer_list<turbo::string_view> bad_padding = {
+        std::initializer_list<std::string_view> bad_padding = {
                 "YQ=",
                 "YQ.",
                 "YQ===",
@@ -662,7 +662,7 @@ namespace {
                 "YQ=====",
                 "YQ.....",
         };
-        for (turbo::string_view b64: bad_padding) {
+        for (std::string_view b64: bad_padding) {
             std::string decoded;
             EXPECT_FALSE(turbo::base64_decode(b64, &decoded));
             std::string websafe_decoded;
@@ -695,9 +695,9 @@ namespace {
     TEST(Escaping, HexStringToBytesBackToHex) {
         std::string bytes, hex;
 
-        constexpr turbo::string_view kTestHexLower = "1c2f0032f40123456789abcdef";
-        constexpr turbo::string_view kTestHexUpper = "1C2F0032F40123456789ABCDEF";
-        constexpr turbo::string_view kTestBytes = turbo::string_view(
+        constexpr std::string_view kTestHexLower = "1c2f0032f40123456789abcdef";
+        constexpr std::string_view kTestHexUpper = "1C2F0032F40123456789ABCDEF";
+        constexpr std::string_view kTestBytes = std::string_view(
                 "\x1c\x2f\x00\x32\xf4\x01\x23\x45\x67\x89\xab\xcd\xef", 13);
 
         EXPECT_TRUE(turbo::hex_string_to_bytes(kTestHexLower, &bytes));
@@ -741,14 +741,14 @@ namespace {
         std::string prefix_valid = hex_mixed + "?";
         std::string prefix_valid_result;
         b = turbo::hex_string_to_bytes(
-                turbo::string_view(prefix_valid.data(), prefix_valid.size() - 1), &prefix_valid_result);
+                std::string_view(prefix_valid.data(), prefix_valid.size() - 1), &prefix_valid_result);
         EXPECT_EQ(b, true);
         EXPECT_EQ(bytes_expected, prefix_valid_result);
 
         std::string infix_valid = "?" + hex_mixed + "???";
         std::string infix_valid_result;
         b = turbo::hex_string_to_bytes(
-                turbo::string_view(infix_valid.data() + 1, hex_mixed.size()), &infix_valid_result);
+                std::string_view(infix_valid.data() + 1, hex_mixed.size()), &infix_valid_result);
         EXPECT_EQ(b, true);
         EXPECT_EQ(bytes_expected, infix_valid_result);
 

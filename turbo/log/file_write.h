@@ -33,7 +33,7 @@ namespace turbo {
         // Returns 0 on success, or an error code on failure.
         // as the meaning that this function should open the
         // file ready for writing, and return 0 on success.
-        virtual int initialize(turbo::string_view path) = 0;
+        virtual int initialize(std::string_view path) = 0;
 
         // reinitialize the file writer with the given path.
         // Returns 0 on success, or an error code on failure.
@@ -47,7 +47,7 @@ namespace turbo {
         virtual int reopen() = 0;
 
         // Write the given message to the file.
-        virtual ssize_t write(turbo::string_view message) = 0;
+        virtual ssize_t write(std::string_view message) = 0;
 
         // Flush the file writer.
         virtual void flush() = 0;

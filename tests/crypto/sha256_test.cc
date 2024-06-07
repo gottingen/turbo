@@ -42,7 +42,7 @@ namespace {
     }
 
     /// Tests an arbitrary set of bytes passed as \p Input.
-    void TestSHA256Sum(ArrayRef<uint8_t> Input, turbo::string_view Final) {
+    void TestSHA256Sum(ArrayRef<uint8_t> Input, std::string_view Final) {
         SHA256 Hash;
         Hash.update(Input);
         auto hash = Hash.final();

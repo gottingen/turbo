@@ -51,7 +51,7 @@ TEST(OverloadTest, DispatchConsidersNumberOfArguments) {
   auto overloaded = turbo::Overload{
       [](int a) { return a + 1; },
       [](int a, int b) { return a * b; },
-      []() -> turbo::string_view { return "none"; },
+      []() -> std::string_view { return "none"; },
   };
 
   EXPECT_EQ(3, overloaded(2));
@@ -63,7 +63,7 @@ TEST(OverloadTest, SupportsConstantEvaluation) {
   auto overloaded = turbo::Overload{
       [](int a) { return a + 1; },
       [](int a, int b) { return a * b; },
-      []() -> turbo::string_view { return "none"; },
+      []() -> std::string_view { return "none"; },
   };
 
   static_assert(overloaded() == "none");
@@ -154,9 +154,9 @@ TEST(OverloadTest, DispatchConsidersSfinae) {
 TEST(OverloadTest, VariantVisitDispatchesCorrectly) {
   std::variant<int, double, std::string> v(1);
   auto overloaded = turbo::Overload{
-      [](int) -> turbo::string_view { return "int"; },
-      [](double) -> turbo::string_view { return "double"; },
-      [](const std::string&) -> turbo::string_view { return "string"; },
+      [](int) -> std::string_view { return "int"; },
+      [](double) -> std::string_view { return "double"; },
+      [](const std::string&) -> std::string_view { return "string"; },
   };
 
   EXPECT_EQ("int", std::visit(overloaded, v));

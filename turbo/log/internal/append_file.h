@@ -34,7 +34,7 @@ namespace turbo::log_internal {
         // Returns 0 on success, or an error code on failure.
         // as the meaning that this function should open the
         // file ready for writing, and return 0 on success.
-        int initialize(turbo::string_view path) override;
+        int initialize(std::string_view path) override;
 
         // reinitialize the file writer with the given path.
         // Returns 0 on success, or an error code on failure.
@@ -48,7 +48,7 @@ namespace turbo::log_internal {
         int reopen() override;
 
         // Write the given message to the file.
-        ssize_t write(turbo::string_view message) override;
+        ssize_t write(std::string_view message) override;
 
         // Flush the file writer.
         void flush() override;

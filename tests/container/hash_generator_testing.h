@@ -111,8 +111,8 @@ struct Generator<std::string> {
 };
 
 template <>
-struct Generator<turbo::string_view> {
-  turbo::string_view operator()() const;
+struct Generator<std::string_view> {
+  std::string_view operator()() const;
 };
 
 template <>

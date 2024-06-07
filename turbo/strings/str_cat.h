@@ -225,14 +225,14 @@ namespace turbo {
             auto real_width =
                     turbo::numbers_internal::FastHexToBufferZeroPad16(hex.value, end - 16);
             if (real_width >= hex.width) {
-                sink.Append(turbo::string_view(end - real_width, real_width));
+                sink.Append(std::string_view(end - real_width, real_width));
             } else {
                 // Pad first 16 chars because FastHexToBufferZeroPad16 pads only to 16 and
                 // max pad width can be up to 20.
                 std::memset(end - 32, hex.fill, 16);
                 // Patch up everything else up to the real_width.
                 std::memset(end - real_width - 16, hex.fill, 16);
-                sink.Append(turbo::string_view(end - hex.width, hex.width));
+                sink.Append(std::string_view(end - hex.width, hex.width));
             }
         }
 
@@ -299,7 +299,7 @@ namespace turbo {
                 if (add_sign_again) *--writer = '-';
             }
 
-            sink.Append(turbo::string_view(writer, static_cast<size_t>(end - writer)));
+            sink.Append(std::string_view(writer, static_cast<size_t>(end - writer)));
         }
     };
 
@@ -368,7 +368,7 @@ namespace turbo {
                  TURBO_ATTRIBUTE_LIFETIME_BOUND)
                 : piece_(NullSafeStringView(c_str)) {}
 
-        AlphaNum(turbo::string_view pc  // NOLINT(runtime/explicit)
+        AlphaNum(std::string_view pc  // NOLINT(runtime/explicit)
                  TURBO_ATTRIBUTE_LIFETIME_BOUND)
                 : piece_(pc) {}
 
@@ -392,11 +392,11 @@ namespace turbo {
 
         AlphaNum &operator=(const AlphaNum &) = delete;
 
-        turbo::string_view::size_type size() const { return piece_.size(); }
+        std::string_view::size_type size() const { return piece_.size(); }
 
         turbo::Nullable<const char *> data() const { return piece_.data(); }
 
-        turbo::string_view Piece() const { return piece_; }
+        std::string_view Piece() const { return piece_; }
 
         // Match unscoped enums.  Use integral promotion so that a `char`-backed
         // enum becomes a wider integral type AlphaNum will accept.
@@ -429,7 +429,7 @@ namespace turbo {
         AlphaNum(T e) : AlphaNum(static_cast<bool>(e)) {}  // NOLINT(runtime/explicit)
 
     private:
-        turbo::string_view piece_;
+        std::string_view piece_;
         char digits_[numbers_internal::kFastToBufferSize];
     };
 
@@ -464,10 +464,10 @@ namespace turbo {
     namespace strings_internal {
 
         // Do not call directly - this is not part of the public API.
-        std::string CatPieces(std::initializer_list<turbo::string_view> pieces);
+        std::string CatPieces(std::initializer_list<std::string_view> pieces);
 
         void AppendPieces(turbo::Nonnull<std::string *> dest,
-                          std::initializer_list<turbo::string_view> pieces);
+                          std::initializer_list<std::string_view> pieces);
 
         template<typename Integer>
         std::string IntegerToString(Integer i) {
@@ -600,11 +600,11 @@ namespace turbo {
     //   std::string s = "foo";
     //   str_append(&s, s);
     //
-    // This output is undefined as well, since `turbo::string_view` does not own its
+    // This output is undefined as well, since `std::string_view` does not own its
     // data:
     //
     //   std::string s = "foobar";
-    //   turbo::string_view p = s;
+    //   std::string_view p = s;
     //   str_append(&s, p);
 
     inline void str_append(turbo::Nonnull<std::string *>) {}

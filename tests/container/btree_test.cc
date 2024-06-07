@@ -887,8 +887,8 @@ TEST(Btree, DefaultTransparent) {
   {
     // `std::string` has heterogeneous support.
     btree_set<std::string> s = {"A"};
-    EXPECT_EQ(s.begin(), s.find(turbo::string_view("A")));
-    EXPECT_TRUE(s.contains(turbo::string_view("A")));
+    EXPECT_EQ(s.begin(), s.find(std::string_view("A")));
+    EXPECT_TRUE(s.contains(std::string_view("A")));
   }
 }
 
@@ -954,8 +954,8 @@ struct SubstringLess {
   SubstringLess() = delete;
   explicit SubstringLess(int length) : n(length) {}
   bool operator()(const std::string &a, const std::string &b) const {
-    return turbo::string_view(a).substr(0, n) <
-           turbo::string_view(b).substr(0, n);
+    return std::string_view(a).substr(0, n) <
+           std::string_view(b).substr(0, n);
   }
   int n;
 };
@@ -1255,10 +1255,10 @@ void AssertKeyCompareNotStringAdapted() {
 TEST(Btree, KeyCompareAdapter) {
   AssertKeyCompareStringAdapted<std::less<std::string>, std::string>();
   AssertKeyCompareStringAdapted<std::greater<std::string>, std::string>();
-  AssertKeyCompareStringAdapted<std::less<turbo::string_view>,
-                                turbo::string_view>();
-  AssertKeyCompareStringAdapted<std::greater<turbo::string_view>,
-                                turbo::string_view>();
+  AssertKeyCompareStringAdapted<std::less<std::string_view>,
+                                std::string_view>();
+  AssertKeyCompareStringAdapted<std::greater<std::string_view>,
+                                std::string_view>();
   AssertKeyCompareStringAdapted<std::less<turbo::Cord>, turbo::Cord>();
   AssertKeyCompareStringAdapted<std::greater<turbo::Cord>, turbo::Cord>();
   AssertKeyCompareNotStringAdapted<std::less<int>, int>();
@@ -2538,7 +2538,7 @@ TEST(Btree, BitfieldArgument) {
 }
 
 TEST(Btree, SetRangeConstructorAndInsertSupportExplicitConversionComparable) {
-  const turbo::string_view names[] = {"n1", "n2"};
+  const std::string_view names[] = {"n1", "n2"};
 
   turbo::btree_set<std::string> name_set1{std::begin(names), std::end(names)};
   EXPECT_THAT(name_set1, ElementsAreArray(names));
@@ -2602,7 +2602,7 @@ TEST(Btree,
 #if !defined(__GLIBCXX__) || \
     (defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE >= 7)
 TEST(Btree, MapRangeConstructorAndInsertSupportExplicitConversionComparable) {
-  const std::pair<turbo::string_view, int> names[] = {{"n1", 1}, {"n2", 2}};
+  const std::pair<std::string_view, int> names[] = {{"n1", 1}, {"n2", 2}};
 
   turbo::btree_map<std::string, int> name_map1{std::begin(names),
                                               std::end(names)};
@@ -2645,7 +2645,7 @@ TEST(Btree,
 TEST(Btree, HeterogeneousTryEmplace) {
   turbo::btree_map<std::string, int> m;
   std::string s = "key";
-  turbo::string_view sv = s;
+  std::string_view sv = s;
   m.try_emplace(sv, 1);
   EXPECT_EQ(m[s], 1);
 
@@ -2656,7 +2656,7 @@ TEST(Btree, HeterogeneousTryEmplace) {
 TEST(Btree, HeterogeneousOperatorMapped) {
   turbo::btree_map<std::string, int> m;
   std::string s = "key";
-  turbo::string_view sv = s;
+  std::string_view sv = s;
   m[sv] = 1;
   EXPECT_EQ(m[s], 1);
 
@@ -2667,7 +2667,7 @@ TEST(Btree, HeterogeneousOperatorMapped) {
 TEST(Btree, HeterogeneousInsertOrAssign) {
   turbo::btree_map<std::string, int> m;
   std::string s = "key";
-  turbo::string_view sv = s;
+  std::string_view sv = s;
   m.insert_or_assign(sv, 1);
   EXPECT_EQ(m[s], 1);
 

@@ -48,7 +48,7 @@
 
 namespace turbo {
 
-    bool simple_atof(turbo::string_view str, turbo::Nonnull<float *> out) {
+    bool simple_atof(std::string_view str, turbo::Nonnull<float *> out) {
         *out = 0.0;
         str = trim_all(str);
         // std::from_chars doesn't accept an initial +, but simple_atof does, so if one
@@ -79,7 +79,7 @@ namespace turbo {
         return true;
     }
 
-    bool simple_atod(turbo::string_view str, turbo::Nonnull<double *> out) {
+    bool simple_atod(std::string_view str, turbo::Nonnull<double *> out) {
         *out = 0.0;
         str = trim_all(str);
         // std::from_chars doesn't accept an initial +, but simple_atod does, so if one
@@ -110,7 +110,7 @@ namespace turbo {
         return true;
     }
 
-    bool simple_atob(turbo::string_view str, turbo::Nonnull<bool *> out) {
+    bool simple_atob(std::string_view str, turbo::Nonnull<bool *> out) {
         TURBO_RAW_CHECK(out != nullptr, "Output pointer must not be nullptr.");
         if (equals_ignore_case(str, "true") || equals_ignore_case(str, "t") ||
             equals_ignore_case(str, "yes") || equals_ignore_case(str, "y") ||
@@ -216,7 +216,7 @@ namespace turbo {
 //  uint64_t buffer = PrepareEightDigits(102030) + kEightZeroBytes;
 //  char* ascii = reinterpret_cast<char*>(&buffer);
 //  // Note two leading zeros:
-//  EXPECT_EQ(turbo::string_view(ascii, 8), "00102030");
+//  EXPECT_EQ(std::string_view(ascii, 8), "00102030");
 //
 // Pre-condition: `i` must be less than 100000000.
         inline uint64_t PrepareEightDigits(uint32_t i) {
@@ -694,7 +694,7 @@ namespace turbo {
 
 // Parse the sign and optional hex or oct prefix in text.
         inline bool safe_parse_sign_and_base(
-                turbo::Nonnull<turbo::string_view *> text /*inout*/,
+                turbo::Nonnull<std::string_view *> text /*inout*/,
                 turbo::Nonnull<int *> base_ptr /*inout*/,
                 turbo::Nonnull<bool *> negative_ptr /*output*/) {
             if (text->data() == nullptr) {
@@ -760,7 +760,7 @@ namespace turbo {
             } else {
                 return false;
             }
-            *text = turbo::string_view(start, static_cast<size_t>(end - start));
+            *text = std::string_view(start, static_cast<size_t>(end - start));
             *base_ptr = base;
             return true;
         }
@@ -980,7 +980,7 @@ namespace turbo {
 #undef X_OVER_BASE_INITIALIZER
 
         template<typename IntType>
-        inline bool safe_parse_positive_int(turbo::string_view text, int base,
+        inline bool safe_parse_positive_int(std::string_view text, int base,
                                             turbo::Nonnull<IntType *> value_p) {
             IntType value = 0;
             const IntType vmax = std::numeric_limits<IntType>::max();
@@ -1017,7 +1017,7 @@ namespace turbo {
         }
 
         template<typename IntType>
-        inline bool safe_parse_negative_int(turbo::string_view text, int base,
+        inline bool safe_parse_negative_int(std::string_view text, int base,
                                             turbo::Nonnull<IntType *> value_p) {
             IntType value = 0;
             const IntType vmin = std::numeric_limits<IntType>::min();
@@ -1062,7 +1062,7 @@ namespace turbo {
 // Input format based on POSIX.1-2008 strtol
 // http://pubs.opengroup.org/onlinepubs/9699919799/functions/strtol.html
         template<typename IntType>
-        inline bool safe_int_internal(turbo::string_view text,
+        inline bool safe_int_internal(std::string_view text,
                                       turbo::Nonnull<IntType *> value_p, int base) {
             *value_p = 0;
             bool negative;
@@ -1077,7 +1077,7 @@ namespace turbo {
         }
 
         template<typename IntType>
-        inline bool safe_uint_internal(turbo::string_view text,
+        inline bool safe_uint_internal(std::string_view text,
                                        turbo::Nonnull<IntType *> value_p, int base) {
             *value_p = 0;
             bool negative;
@@ -1112,32 +1112,32 @@ namespace turbo {
                 "e0e1e2e3e4e5e6e7e8e9eaebecedeeef"
                 "f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff";
 
-        bool safe_strto32_base(turbo::string_view text, turbo::Nonnull<int32_t *> value,
+        bool safe_strto32_base(std::string_view text, turbo::Nonnull<int32_t *> value,
                                int base) {
             return safe_int_internal<int32_t>(text, value, base);
         }
 
-        bool safe_strto64_base(turbo::string_view text, turbo::Nonnull<int64_t *> value,
+        bool safe_strto64_base(std::string_view text, turbo::Nonnull<int64_t *> value,
                                int base) {
             return safe_int_internal<int64_t>(text, value, base);
         }
 
-        bool safe_strto128_base(turbo::string_view text, turbo::Nonnull<int128 *> value,
+        bool safe_strto128_base(std::string_view text, turbo::Nonnull<int128 *> value,
                                 int base) {
             return safe_int_internal<turbo::int128>(text, value, base);
         }
 
-        bool safe_strtou32_base(turbo::string_view text, turbo::Nonnull<uint32_t *> value,
+        bool safe_strtou32_base(std::string_view text, turbo::Nonnull<uint32_t *> value,
                                 int base) {
             return safe_uint_internal<uint32_t>(text, value, base);
         }
 
-        bool safe_strtou64_base(turbo::string_view text, turbo::Nonnull<uint64_t *> value,
+        bool safe_strtou64_base(std::string_view text, turbo::Nonnull<uint64_t *> value,
                                 int base) {
             return safe_uint_internal<uint64_t>(text, value, base);
         }
 
-        bool safe_strtou128_base(turbo::string_view text, turbo::Nonnull<uint128 *> value,
+        bool safe_strtou128_base(std::string_view text, turbo::Nonnull<uint128 *> value,
                                  int base) {
             return safe_uint_internal<turbo::uint128>(text, value, base);
         }

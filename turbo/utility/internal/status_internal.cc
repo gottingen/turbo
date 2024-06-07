@@ -57,7 +57,7 @@ namespace turbo::status_internal {
     }
 
     static std::optional<size_t> FindPayloadIndexByUrl(
-            const Payloads *payloads, turbo::string_view type_url) {
+            const Payloads *payloads, std::string_view type_url) {
         if (payloads == nullptr) return std::nullopt;
 
         for (size_t i = 0; i < payloads->size(); ++i) {
@@ -68,7 +68,7 @@ namespace turbo::status_internal {
     }
 
     std::optional<turbo::Cord> StatusRep::get_payload(
-            turbo::string_view type_url) const {
+            std::string_view type_url) const {
         std::optional<size_t> index =
                 status_internal::FindPayloadIndexByUrl(payloads_.get(), type_url);
         if (index.has_value()) return (*payloads_)[index.value()].payload;
@@ -76,7 +76,7 @@ namespace turbo::status_internal {
         return std::nullopt;
     }
 
-    void StatusRep::set_payload(turbo::string_view type_url, turbo::Cord payload) {
+    void StatusRep::set_payload(std::string_view type_url, turbo::Cord payload) {
         if (payloads_ == nullptr) {
             payloads_ = turbo::make_unique<status_internal::Payloads>();
         }
@@ -91,7 +91,7 @@ namespace turbo::status_internal {
         payloads_->push_back({std::string(type_url), std::move(payload)});
     }
 
-    StatusRep::EraseResult StatusRep::erase_payload(turbo::string_view type_url) {
+    StatusRep::EraseResult StatusRep::erase_payload(std::string_view type_url) {
         std::optional<size_t> index =
                 status_internal::FindPayloadIndexByUrl(payloads_.get(), type_url);
         if (!index.has_value()) return {false, Status::PointerToRep(this)};
@@ -107,7 +107,7 @@ namespace turbo::status_internal {
     }
 
     void StatusRep::for_each_payload(
-            turbo::FunctionRef<void(turbo::string_view, const turbo::Cord &)> visitor)
+            turbo::FunctionRef<void(std::string_view, const turbo::Cord &)> visitor)
     const {
         if (auto *payloads = payloads_.get()) {
             bool in_reverse =
@@ -140,7 +140,7 @@ namespace turbo::status_internal {
         if (with_payload) {
             status_internal::StatusPayloadPrinter printer =
                     status_internal::GetStatusPayloadPrinter();
-            this->for_each_payload([&](turbo::string_view type_url,
+            this->for_each_payload([&](std::string_view type_url,
                                      const turbo::Cord &payload) {
                 std::optional<std::string> result;
                 if (printer) result = printer(type_url, payload);

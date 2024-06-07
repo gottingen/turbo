@@ -55,7 +55,7 @@ namespace turbo {
         turbo::base_internal::AtomicHook<log_internal::LoggingGlobalsListener>
                 logging_globals_listener;
 
-        size_t HashSiteForLogBacktraceAt(turbo::string_view file, int line) {
+        size_t HashSiteForLogBacktraceAt(std::string_view file, int line) {
             return turbo::hash_of(file, line);
         }
 
@@ -150,7 +150,7 @@ namespace turbo {
 
     namespace log_internal {
 
-        bool ShouldLogBacktraceAt(turbo::string_view file, int line) {
+        bool ShouldLogBacktraceAt(std::string_view file, int line) {
             const size_t flag_hash =
                     log_backtrace_at_hash.load(std::memory_order_relaxed);
 
@@ -159,7 +159,7 @@ namespace turbo {
 
     }  // namespace log_internal
 
-    void set_log_backtrace_location(turbo::string_view file, int line) {
+    void set_log_backtrace_location(std::string_view file, int line) {
         log_backtrace_at_hash.store(HashSiteForLogBacktraceAt(file, line),
                                     std::memory_order_relaxed);
     }

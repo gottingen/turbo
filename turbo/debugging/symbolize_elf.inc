@@ -581,7 +581,7 @@ const int kMaxSectionNameLen = 64;
 const int kSmallFileCacheSize = 100;
 
 bool ForEachSection(int fd,
-                    const std::function<bool(turbo::string_view name,
+                    const std::function<bool(std::string_view name,
                                              const ElfW(Shdr) &)> &callback) {
   char buf[kSmallFileCacheSize];
   CachingFile file(fd, buf, sizeof(buf));
@@ -621,7 +621,7 @@ bool ForEachSection(int fd,
       return false;
     }
 
-    turbo::string_view name(header_name,
+    std::string_view name(header_name,
                            strnlen(header_name, static_cast<size_t>(n_read)));
     if (!callback(name, out)) {
       break;

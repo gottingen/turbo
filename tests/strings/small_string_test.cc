@@ -65,21 +65,21 @@ namespace {
     }
 
     TEST_F(SmallStringTest, AssignIterPair) {
-         turbo::string_view abc = "abc";
+         std::string_view abc = "abc";
         theString.assign(abc.begin(), abc.end());
         EXPECT_EQ(3u, theString.size());
         EXPECT_STREQ("abc", theString.c_str());
     }
 
     TEST_F(SmallStringTest, Assignstringview) {
-         turbo::string_view abc = "abc";
+         std::string_view abc = "abc";
         theString.assign(abc);
         EXPECT_EQ(3u, theString.size());
         EXPECT_STREQ("abc", theString.c_str());
     }
 
     TEST_F(SmallStringTest, AssignSmallVector) {
-         turbo::string_view abc = "abc";
+         std::string_view abc = "abc";
         SmallVector<char, 10> abcVec(abc.begin(), abc.end());
         theString.assign(abcVec);
         EXPECT_EQ(3u, theString.size());
@@ -93,7 +93,7 @@ namespace {
     }
 
     TEST_F(SmallStringTest, AppendIterPair) {
-         turbo::string_view abc = "abc";
+         std::string_view abc = "abc";
         theString.append(abc.begin(), abc.end());
         theString.append(abc.begin(), abc.end());
         EXPECT_EQ(6u, theString.size());
@@ -101,7 +101,7 @@ namespace {
     }
 
     TEST_F(SmallStringTest, Appendstringview) {
-         turbo::string_view abc = "abc";
+         std::string_view abc = "abc";
         theString.append(abc);
         theString.append(abc);
         EXPECT_EQ(6u, theString.size());
@@ -109,7 +109,7 @@ namespace {
     }
 
     TEST_F(SmallStringTest, AppendSmallVector) {
-         turbo::string_view abc = "abc";
+         std::string_view abc = "abc";
         SmallVector<char, 10> abcVec(abc.begin(), abc.end());
         theString.append(abcVec);
         theString.append(abcVec);
@@ -121,7 +121,7 @@ namespace {
         theString.append({"abc", "def", "ghi"});
         EXPECT_EQ(9u, theString.size());
         EXPECT_STREQ("abcdefghi", theString.c_str());
-         turbo::string_view Jkl = "jkl";
+         std::string_view Jkl = "jkl";
         std::string Mno = "mno";
         SmallString<4> Pqr("pqr");
         const char *Stu = "stu";
@@ -131,14 +131,14 @@ namespace {
     }
 
     TEST_F(SmallStringTest, stringviewConversion) {
-         turbo::string_view abc = "abc";
+         std::string_view abc = "abc";
         theString.assign(abc.begin(), abc.end());
-         turbo::string_view thestringview = theString;
+         std::string_view thestringview = theString;
         EXPECT_EQ("abc", thestringview);
     }
 
     TEST_F(SmallStringTest, StdStringConversion) {
-         turbo::string_view abc = "abc";
+         std::string_view abc = "abc";
         theString.assign(abc.begin(), abc.end());
         std::string theStdString = std::string(theString);
         EXPECT_EQ("abc", theStdString);
@@ -164,29 +164,29 @@ namespace {
     TEST_F(SmallStringTest, Find) {
         theString = "hello";
         EXPECT_EQ(2U, theString.find('l'));
-        EXPECT_EQ( turbo::string_view::npos, theString.find('z'));
-        EXPECT_EQ( turbo::string_view::npos, theString.find("helloworld"));
+        EXPECT_EQ( std::string_view::npos, theString.find('z'));
+        EXPECT_EQ( std::string_view::npos, theString.find("helloworld"));
         EXPECT_EQ(0U, theString.find("hello"));
         EXPECT_EQ(1U, theString.find("ello"));
-        EXPECT_EQ( turbo::string_view::npos, theString.find("zz"));
+        EXPECT_EQ( std::string_view::npos, theString.find("zz"));
         EXPECT_EQ(2U, theString.find("ll", 2));
-        EXPECT_EQ( turbo::string_view::npos, theString.find("ll", 3));
+        EXPECT_EQ( std::string_view::npos, theString.find("ll", 3));
         EXPECT_EQ(0U, theString.find(""));
 
         EXPECT_EQ(3U, theString.rfind('l'));
-        EXPECT_EQ( turbo::string_view::npos, theString.rfind('z'));
-        EXPECT_EQ( turbo::string_view::npos, theString.rfind("helloworld"));
+        EXPECT_EQ( std::string_view::npos, theString.rfind('z'));
+        EXPECT_EQ( std::string_view::npos, theString.rfind("helloworld"));
         EXPECT_EQ(0U, theString.rfind("hello"));
         EXPECT_EQ(1U, theString.rfind("ello"));
-        EXPECT_EQ( turbo::string_view::npos, theString.rfind("zz"));
+        EXPECT_EQ( std::string_view::npos, theString.rfind("zz"));
 
         EXPECT_EQ(2U, theString.find_first_of('l'));
         EXPECT_EQ(1U, theString.find_first_of("el"));
-        EXPECT_EQ( turbo::string_view::npos, theString.find_first_of("xyz"));
+        EXPECT_EQ( std::string_view::npos, theString.find_first_of("xyz"));
 
         EXPECT_EQ(1U, theString.find_first_not_of('h'));
         EXPECT_EQ(4U, theString.find_first_not_of("hel"));
-        EXPECT_EQ( turbo::string_view::npos, theString.find_first_not_of("hello"));
+        EXPECT_EQ( std::string_view::npos, theString.find_first_not_of("hello"));
 
         theString = "hellx xello hell ello world foo bar hello";
         EXPECT_EQ(36U, theString.find("hello"));
@@ -224,8 +224,8 @@ namespace {
     }
 
     TEST_F(SmallStringTest, Hash) {
-        turbo::string_view abc = "abcvd";
+        std::string_view abc = "abcvd";
         SmallString<10> abc2(abc);
-        EXPECT_EQ(turbo::Hash<turbo::string_view>()(abc), turbo::Hash<SmallString<10>>()(abc2));
+        EXPECT_EQ(turbo::Hash<std::string_view>()(abc), turbo::Hash<SmallString<10>>()(abc2));
     }
 } // namespace

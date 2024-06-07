@@ -79,7 +79,7 @@ namespace turbo {
         // Non-inline code path for `turbo::extend_crc32c()`. Do not call directly.
         // Call `turbo::extend_crc32c()` (defined below) instead.
         CRC32C extend_crc32c_internal(CRC32C initial_crc,
-                                      turbo::string_view buf_to_add);
+                                      std::string_view buf_to_add);
     }  // namespace crc_internal
 
     // -----------------------------------------------------------------------------
@@ -89,7 +89,7 @@ namespace turbo {
     // compute_crc32c()
     //
     // Returns the CRC32C value of the provided string.
-    CRC32C compute_crc32c(turbo::string_view buf);
+    CRC32C compute_crc32c(std::string_view buf);
 
     // extend_crc32c()
     //
@@ -103,7 +103,7 @@ namespace turbo {
     //
     // This operation has a runtime cost of O(`buf_to_add.size()`)
     inline CRC32C extend_crc32c(CRC32C initial_crc,
-                                 turbo::string_view buf_to_add) {
+                                 std::string_view buf_to_add) {
         // Approximately 75% of calls have size <= 64.
         if (buf_to_add.size() <= 64) {
             uint32_t crc = static_cast<uint32_t>(initial_crc);

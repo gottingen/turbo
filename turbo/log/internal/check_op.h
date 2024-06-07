@@ -299,9 +299,9 @@ class StringifySink {
  public:
   explicit StringifySink(std::ostream& os TURBO_ATTRIBUTE_LIFETIME_BOUND);
 
-  void Append(turbo::string_view text);
+  void Append(std::string_view text);
   void Append(size_t length, char ch);
-  friend void TurboFormatFlush(StringifySink* sink, turbo::string_view text);
+  friend void TurboFormatFlush(StringifySink* sink, std::string_view text);
 
  private:
   std::ostream& os_;
@@ -362,7 +362,7 @@ TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(double);
 TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(char);
 TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(unsigned char);
 TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const std::string&);
-TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const turbo::string_view&);
+TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const std::string_view&);
 TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const char*);
 TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const signed char*);
 TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const unsigned char*);

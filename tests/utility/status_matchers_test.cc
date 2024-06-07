@@ -53,7 +53,7 @@ TEST(StatusMatcherTest, StatusOrIsNotOk) {
 /*
 TEST(StatusMatcherTest, IsOkAndHolds) {
   turbo::Result<int> ok_int = {4};
-  turbo::Result<turbo::string_view> ok_str = {"text"};
+  turbo::Result<std::string_view> ok_str = {"text"};
   EXPECT_THAT(ok_int, IsOkAndHolds(4));
   EXPECT_THAT(ok_int, IsOkAndHolds(Gt(0)));
   EXPECT_THAT(ok_str, IsOkAndHolds("text"));
@@ -62,7 +62,7 @@ TEST(StatusMatcherTest, IsOkAndHolds) {
 TEST(StatusMatcherTest, IsOkAndHoldsFailure) {
   turbo::Result<int> ok_int = {502};
   turbo::Result<int> error = turbo::unknown_error("Smigla");
-  turbo::Result<turbo::string_view> ok_str = {"actual"};
+  turbo::Result<std::string_view> ok_str = {"actual"};
   EXPECT_NONFATAL_FAILURE(EXPECT_THAT(ok_int, IsOkAndHolds(0)), "502");
   EXPECT_NONFATAL_FAILURE(EXPECT_THAT(error, IsOkAndHolds(0)), "Smigla");
   EXPECT_NONFATAL_FAILURE(EXPECT_THAT(ok_str, IsOkAndHolds("expected")),
@@ -86,7 +86,7 @@ TEST(StatusMatcherTest, StatusIs) {
 TEST(StatusMatcherTest, StatusOrIs) {
   turbo::Result<int> ok = {42};
   turbo::Result<int> unknown = turbo::unknown_error("unbekannt");
-  turbo::Result<turbo::string_view> invalid =
+  turbo::Result<std::string_view> invalid =
       turbo::invalid_argument_error("ungueltig");
   EXPECT_THAT(ok, StatusIs(turbo::StatusCode::kOk));
   EXPECT_THAT(ok, StatusIs(0));

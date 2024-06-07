@@ -56,14 +56,14 @@ class UniformDistributionValidator {
   }
 
  private:
-  static turbo::string_view TagLbBound(IntervalClosedOpenTag) { return "["; }
-  static turbo::string_view TagLbBound(IntervalOpenOpenTag) { return "("; }
-  static turbo::string_view TagLbBound(IntervalClosedClosedTag) { return "["; }
-  static turbo::string_view TagLbBound(IntervalOpenClosedTag) { return "("; }
-  static turbo::string_view TagUbBound(IntervalClosedOpenTag) { return ")"; }
-  static turbo::string_view TagUbBound(IntervalOpenOpenTag) { return ")"; }
-  static turbo::string_view TagUbBound(IntervalClosedClosedTag) { return "]"; }
-  static turbo::string_view TagUbBound(IntervalOpenClosedTag) { return "]"; }
+  static std::string_view TagLbBound(IntervalClosedOpenTag) { return "["; }
+  static std::string_view TagLbBound(IntervalOpenOpenTag) { return "("; }
+  static std::string_view TagLbBound(IntervalClosedClosedTag) { return "["; }
+  static std::string_view TagLbBound(IntervalOpenClosedTag) { return "("; }
+  static std::string_view TagUbBound(IntervalClosedOpenTag) { return ")"; }
+  static std::string_view TagUbBound(IntervalOpenOpenTag) { return ")"; }
+  static std::string_view TagUbBound(IntervalClosedClosedTag) { return "]"; }
+  static std::string_view TagUbBound(IntervalOpenClosedTag) { return "]"; }
 
   template <typename TagType>
   static void ValidateImpl(std::true_type /* is_floating_point */, NumType x,

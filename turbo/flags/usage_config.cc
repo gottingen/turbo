@@ -37,7 +37,7 @@ extern "C" {
 // Additional report of fatal usage error message before we std::exit. Error is
 // fatal if is_fatal argument to ReportUsageError is true.
 TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(
-        TurboInternalReportFatalUsageError)(turbo::string_view) {}
+        TurboInternalReportFatalUsageError)(std::string_view) {}
 
 }  // extern "C"
 
@@ -50,14 +50,14 @@ namespace turbo {
             // Returns true if flags defined in the filename should be reported with
             // -helpshort flag.
 
-            bool ContainsHelpshortFlags(turbo::string_view filename) {
+            bool ContainsHelpshortFlags(std::string_view filename) {
                 // By default we only want flags in binary's main. We expect the main
                 // routine to reside in <program>.cc or <program>-main.cc or
                 // <program>_main.cc, where the <program> is the name of the binary
                 // (without .exe on Windows).
                 auto suffix = flags_internal::Basename(filename);
                 auto program_name = flags_internal::ShortProgramInvocationName();
-                turbo::string_view program_name_ref = program_name;
+                std::string_view program_name_ref = program_name;
 #if defined(_WIN32)
                 turbo::consume_suffix(&program_name_ref, ".exe");
 #endif
@@ -71,7 +71,7 @@ namespace turbo {
             // Returns true if flags defined in the filename should be reported with
             // -helppackage flag.
 
-            bool ContainsHelppackageFlags(turbo::string_view filename) {
+            bool ContainsHelppackageFlags(std::string_view filename) {
                 // TODO(rogeeff): implement properly when registry is available.
                 return ContainsHelpshortFlags(filename);
             }
@@ -94,10 +94,10 @@ namespace turbo {
             // --------------------------------------------------------------------
             // Normalizes the filename specific to the build system/filesystem used.
 
-            std::string NormalizeFilename(turbo::string_view filename) {
+            std::string NormalizeFilename(std::string_view filename) {
                 // Skip any leading slashes
                 auto pos = filename.find_first_not_of("\\/");
-                if (pos == turbo::string_view::npos) return "";
+                if (pos == std::string_view::npos) return "";
 
                 filename.remove_prefix(pos);
                 return std::string(filename);
@@ -126,7 +126,7 @@ namespace turbo {
             return default_config;
         }
 
-        void ReportUsageError(turbo::string_view msg, bool is_fatal) {
+        void ReportUsageError(std::string_view msg, bool is_fatal) {
             std::cerr << "ERROR: " << msg << std::endl;
 
             if (is_fatal) {
