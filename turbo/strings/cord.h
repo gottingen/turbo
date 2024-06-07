@@ -98,7 +98,7 @@
 #include <turbo/strings/internal/resize_uninitialized.h>
 #include <turbo/strings/internal/string_constant.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/optional.h>
+#include <optional>
 
 namespace turbo {
     class Cord;
@@ -795,7 +795,7 @@ namespace turbo {
         //
         // If this cord's representation is a single flat array, returns a
         // string_view referencing that array.  Otherwise returns nullopt.
-        turbo::optional<turbo::string_view> TryFlat() const
+        std::optional<turbo::string_view> TryFlat() const
         TURBO_ATTRIBUTE_LIFETIME_BOUND;
 
         // Cord::Flatten()
@@ -849,11 +849,11 @@ namespace turbo {
 
         // Returns this cord's expected checksum, if it has one.  Otherwise, returns
         // nullopt.
-        turbo::optional<uint32_t> ExpectedChecksum() const;
+        std::optional<uint32_t> ExpectedChecksum() const;
 
         template<typename H>
         friend H turbo_hash_value(H hash_state, const turbo::Cord &c) {
-            turbo::optional<turbo::string_view> maybe_flat = c.TryFlat();
+            std::optional<turbo::string_view> maybe_flat = c.TryFlat();
             if (maybe_flat.has_value()) {
                 return H::combine(std::move(hash_state), *maybe_flat);
             }
@@ -1441,7 +1441,7 @@ namespace turbo {
         return result;
     }
 
-    inline turbo::optional<turbo::string_view> Cord::TryFlat() const
+    inline std::optional<turbo::string_view> Cord::TryFlat() const
     TURBO_ATTRIBUTE_LIFETIME_BOUND {
         turbo::cord_internal::CordRep *rep = contents_.tree();
         if (rep == nullptr) {
@@ -1451,7 +1451,7 @@ namespace turbo {
         if (GetFlatAux(rep, &fragment)) {
             return fragment;
         }
-        return turbo::nullopt;
+        return std::nullopt;
     }
 
     inline turbo::string_view Cord::Flatten() TURBO_ATTRIBUTE_LIFETIME_BOUND {

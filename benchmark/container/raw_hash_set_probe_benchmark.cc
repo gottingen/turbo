@@ -33,7 +33,7 @@
 #include <turbo/strings/str_format.h>
 #include <turbo/strings/string_view.h>
 #include <turbo/strings/strip.h>
-#include <turbo/types/optional.h>
+#include <optional>
 
 namespace {
 
@@ -470,9 +470,9 @@ constexpr int kNameWidth = 15;
 constexpr int kDistWidth = 16;
 
 bool CanRunBenchmark(turbo::string_view name) {
-  static const turbo::NoDestructor<turbo::optional<std::regex>> filter([] {
+  static const turbo::NoDestructor<std::optional<std::regex>> filter([] {
     return benchmarks.empty() || benchmarks == "all"
-               ? turbo::nullopt
+               ? std::nullopt
                : turbo::make_optional(std::regex(std::string(benchmarks)));
   }());
   return !filter->has_value() || std::regex_search(std::string(name), **filter);

@@ -40,7 +40,7 @@ namespace turbo::hash_internal {
     template<typename T>
     class SpyHashStateImpl : public HashStateBase<SpyHashStateImpl<T>> {
     public:
-        SpyHashStateImpl() : error_(std::make_shared<turbo::optional<std::string>>()) {
+        SpyHashStateImpl() : error_(std::make_shared<std::optional<std::string>>()) {
             static_assert(std::is_void<T>::value, "");
         }
 
@@ -187,7 +187,7 @@ namespace turbo::hash_internal {
             return state;
         }
 
-        turbo::optional<std::string> error() const {
+        std::optional<std::string> error() const {
             if (moved_from_) {
                 return "Returned a moved-from instance of the hash state object.";
             }
@@ -201,7 +201,7 @@ namespace turbo::hash_internal {
 
         struct UnorderedCombinerCallback {
             std::vector<std::string> element_hash_representations;
-            std::shared_ptr<turbo::optional<std::string>> error;
+            std::shared_ptr<std::optional<std::string>> error;
 
             // The inner spy can have a different type.
             template<typename U>
@@ -224,7 +224,7 @@ namespace turbo::hash_internal {
         // This is a shared_ptr because we want all instances of the particular
         // SpyHashState run to share the field. This way we can set the error for
         // use-after-move and all the copies will see it.
-        std::shared_ptr<turbo::optional<std::string>> error_;
+        std::shared_ptr<std::optional<std::string>> error_;
         bool moved_from_ = false;
     };
 

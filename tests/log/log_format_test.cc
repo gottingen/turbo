@@ -39,7 +39,7 @@
 #include <turbo/strings/str_cat.h>
 #include <turbo/strings/str_format.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/optional.h>
+#include <optional>
 
 namespace {
 using ::turbo::log_internal::AsString;
@@ -1722,7 +1722,7 @@ size_t MaxLogFieldLengthNoPrefix() {
     }
 
    private:
-    turbo::optional<size_t> size_;
+    std::optional<size_t> size_;
   } extractor_sink;
   LOG(INFO).NoPrefix().ToSinkOnly(&extractor_sink)
       << std::string(2 * turbo::log_internal::kLogMessageBufferSize, 'x');

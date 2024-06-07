@@ -94,7 +94,7 @@ namespace turbo {
                 turbo::negation<turbo::disjunction<
                         std::is_same<turbo::Result<T>, turbo::remove_cvref_t<U>>,
                         std::is_same<turbo::Status, turbo::remove_cvref_t<U>>,
-                        std::is_same<turbo::in_place_t, turbo::remove_cvref_t<U>>,
+                        std::is_same<std::in_place_t, turbo::remove_cvref_t<U>>,
                         IsDirectInitializationAmbiguous<T, U>>>>;
 
         // This trait detects whether `Result<T>::operator=(U&&)` is ambiguous, which
@@ -128,7 +128,7 @@ namespace turbo {
                 turbo::negation<turbo::disjunction<
                         std::is_same<turbo::Result<T>, turbo::remove_cvref_t<U>>,
                         std::is_same<turbo::Status, turbo::remove_cvref_t<U>>,
-                        std::is_same<turbo::in_place_t, turbo::remove_cvref_t<U>>,
+                        std::is_same<std::in_place_t, turbo::remove_cvref_t<U>>,
                         IsForwardingAssignmentAmbiguous<T, U>>>>;
 
         template<bool Value, typename T>
@@ -166,7 +166,7 @@ namespace turbo {
         using IsConstructionFromStatusValid = turbo::conjunction<
                 turbo::negation<std::is_same<turbo::Result<T>, turbo::remove_cvref_t<U>>>,
                 turbo::negation<std::is_same<T, turbo::remove_cvref_t<U>>>,
-                turbo::negation<std::is_same<turbo::in_place_t, turbo::remove_cvref_t<U>>>,
+                turbo::negation<std::is_same<std::in_place_t, turbo::remove_cvref_t<U>>>,
                 Equality<!Explicit, std::is_convertible<U, turbo::Status>>,
                 std::is_constructible<turbo::Status, U>,
                 turbo::negation<HasConversionOperatorToStatusOr<T, U>>>;
@@ -258,7 +258,7 @@ namespace turbo {
             }
 
             template<typename... Args>
-            explicit ResultData(turbo::in_place_t, Args &&... args)
+            explicit ResultData(std::in_place_t, Args &&... args)
                     : data_(std::forward<Args>(args)...) {
                 MakeStatus();
             }

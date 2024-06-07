@@ -34,11 +34,11 @@
 #include <turbo/base/casts.h>
 #include <turbo/memory/memory.h>
 #include <turbo/utility/status_impl.h>
-#include <tests/status/status_matchers_api.h>
+#include <tests/utility/status_matchers_api.h>
 #include <turbo/strings/str_cat.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/any.h>
-#include <turbo/types/variant.h>
+#include <any>
+#include <variant>
 #include <turbo/meta/utility.h>
 
 namespace {
@@ -372,7 +372,7 @@ namespace {
     };
 
     TEST(Result, InPlaceConstruction) {
-        EXPECT_THAT(turbo::Result<Foo>(turbo::in_place, 10),
+        EXPECT_THAT(turbo::Result<Foo>(std::in_place, 10),
                     IsOkAndHolds(Field(&Foo::x, 10)));
     }
 
@@ -385,7 +385,7 @@ namespace {
     };
 
     TEST(Result, InPlaceInitListConstruction) {
-        turbo::Result<InPlaceHelper> status_or(turbo::in_place, {10, 11, 12},
+        turbo::Result<InPlaceHelper> status_or(std::in_place, {10, 11, 12},
                                                 turbo::make_unique<int>(13));
         EXPECT_THAT(status_or, IsOkAndHolds(AllOf(
                 Field(&InPlaceHelper::x, ElementsAre(10, 11, 12)),
@@ -405,7 +405,7 @@ namespace {
     }
 
     TEST(Result, EmplaceInitializerList) {
-        turbo::Result<InPlaceHelper> status_or(turbo::in_place, {10, 11, 12},
+        turbo::Result<InPlaceHelper> status_or(std::in_place, {10, 11, 12},
                                                 turbo::make_unique<int>(13));
         status_or.emplace({1, 2, 3}, turbo::make_unique<int>(4));
         EXPECT_THAT(status_or,
@@ -718,13 +718,13 @@ namespace {
     TEST(Result, ImplicitConstruction) {
         // Check implicit casting works.
         auto status_or =
-                turbo::implicit_cast<turbo::Result<turbo::variant<int, std::string>>>(10);
+                turbo::implicit_cast<turbo::Result<std::variant<int, std::string>>>(10);
         EXPECT_THAT(status_or, IsOkAndHolds(VariantWith<int>(10)));
     }
 
     TEST(Result, ImplicitConstructionFromInitliazerList) {
         // Note: dropping the explicit std::initializer_list<int> is not supported
-        // by turbo::Result or turbo::optional.
+        // by turbo::Result or std::optional.
         auto status_or =
                 turbo::implicit_cast<turbo::Result<std::vector<int>>>({{10, 20, 30}});
         EXPECT_THAT(status_or, IsOkAndHolds(ElementsAre(10, 20, 30)));
@@ -826,49 +826,49 @@ namespace {
     }
 
     TEST(Result, StatusOrAnyCopyAndMoveConstructorTests) {
-        turbo::Result<turbo::any> status_or = CopyDetector(10);
-        turbo::Result<turbo::any> status_error = turbo::invalid_argument_error("foo");
+        turbo::Result<std::any> status_or = CopyDetector(10);
+        turbo::Result<std::any> status_error = turbo::invalid_argument_error("foo");
         EXPECT_THAT(
                 status_or,
                 IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, true, false))));
-        turbo::Result<turbo::any> a = status_or;
+        turbo::Result<std::any> a = status_or;
         EXPECT_THAT(
                 a, IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, false, true))));
-        turbo::Result<turbo::any> a_err = status_error;
+        turbo::Result<std::any> a_err = status_error;
         EXPECT_THAT(a_err, Not(IsOk()));
 
-        const turbo::Result<turbo::any> &cref = status_or;
+        const turbo::Result<std::any> &cref = status_or;
         // No lint for no-change copy.
-        turbo::Result<turbo::any> b = cref;  // NOLINT
+        turbo::Result<std::any> b = cref;  // NOLINT
         EXPECT_THAT(
                 b, IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, false, true))));
-        const turbo::Result<turbo::any> &cref_err = status_error;
+        const turbo::Result<std::any> &cref_err = status_error;
         // No lint for no-change copy.
-        turbo::Result<turbo::any> b_err = cref_err;  // NOLINT
+        turbo::Result<std::any> b_err = cref_err;  // NOLINT
         EXPECT_THAT(b_err, Not(IsOk()));
 
-        turbo::Result<turbo::any> c = std::move(status_or);
+        turbo::Result<std::any> c = std::move(status_or);
         EXPECT_THAT(
                 c, IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, true, false))));
-        turbo::Result<turbo::any> c_err = std::move(status_error);
+        turbo::Result<std::any> c_err = std::move(status_error);
         EXPECT_THAT(c_err, Not(IsOk()));
     }
 
     TEST(Result, StatusOrAnyCopyAndMoveAssignment) {
-        turbo::Result<turbo::any> status_or = CopyDetector(10);
-        turbo::Result<turbo::any> status_error = turbo::invalid_argument_error("foo");
-        turbo::Result<turbo::any> a;
+        turbo::Result<std::any> status_or = CopyDetector(10);
+        turbo::Result<std::any> status_error = turbo::invalid_argument_error("foo");
+        turbo::Result<std::any> a;
         a = status_or;
         EXPECT_THAT(
                 a, IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, false, true))));
         a = status_error;
         EXPECT_THAT(a, Not(IsOk()));
 
-        const turbo::Result<turbo::any> &cref = status_or;
+        const turbo::Result<std::any> &cref = status_or;
         a = cref;
         EXPECT_THAT(
                 a, IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, false, true))));
-        const turbo::Result<turbo::any> &cref_err = status_error;
+        const turbo::Result<std::any> &cref_err = status_error;
         a = cref_err;
         EXPECT_THAT(a, Not(IsOk()));
         a = std::move(status_or);
@@ -906,15 +906,15 @@ namespace {
     }
 
     TEST(Result, TurboAnyAssignment) {
-        EXPECT_FALSE((std::is_assignable<turbo::Result<turbo::any>,
+        EXPECT_FALSE((std::is_assignable<turbo::Result<std::any>,
                 turbo::Result<int>>::value));
-        turbo::Result<turbo::any> status_or;
+        turbo::Result<std::any> status_or;
         status_or = turbo::invalid_argument_error("foo");
         EXPECT_THAT(status_or, Not(IsOk()));
     }
 
     TEST(Result, ImplicitAssignment) {
-        turbo::Result<turbo::variant<int, std::string>> status_or;
+        turbo::Result<std::variant<int, std::string>> status_or;
         status_or = 10;
         EXPECT_THAT(status_or, IsOkAndHolds(VariantWith<int>(10)));
     }

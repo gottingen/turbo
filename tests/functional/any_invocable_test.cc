@@ -581,7 +581,7 @@ TYPED_TEST_P(AnyInvTestBasic, InPlaceConstruction) {
   using AnyInvType = typename TypeParam::AnyInvType;
   using AddType = typename TypeParam::AddType;
 
-  AnyInvType fun(turbo::in_place_type<AddType>, 5);
+  AnyInvType fun(std::in_place_type<AddType>, 5);
 
   EXPECT_TRUE(static_cast<bool>(fun));
   EXPECT_EQ(29, TypeParam::ToThisParam(fun)(7, 8, 9).value);
@@ -591,7 +591,7 @@ TYPED_TEST_P(AnyInvTestBasic, InPlaceConstructionInitializerList) {
   using AnyInvType = typename TypeParam::AnyInvType;
   using AddType = typename TypeParam::AddType;
 
-  AnyInvType fun(turbo::in_place_type<AddType>, {1, 2, 3, 4}, 5);
+  AnyInvType fun(std::in_place_type<AddType>, {1, 2, 3, 4}, 5);
 
   EXPECT_TRUE(static_cast<bool>(fun));
   EXPECT_EQ(39, TypeParam::ToThisParam(fun)(7, 8, 9).value);
@@ -601,7 +601,7 @@ TYPED_TEST_P(AnyInvTestBasic, InPlaceNullFunPtrConstruction) {
   using AnyInvType = typename TypeParam::AnyInvType;
   using UnqualifiedFunType = typename TypeParam::UnqualifiedFunType;
 
-  AnyInvType fun(turbo::in_place_type<UnqualifiedFunType*>, nullptr);
+  AnyInvType fun(std::in_place_type<UnqualifiedFunType*>, nullptr);
 
   // In-place construction does not lead to empty.
   EXPECT_TRUE(static_cast<bool>(fun));
@@ -611,7 +611,7 @@ TYPED_TEST_P(AnyInvTestBasic, InPlaceNullFunPtrConstructionValueInit) {
   using AnyInvType = typename TypeParam::AnyInvType;
   using UnqualifiedFunType = typename TypeParam::UnqualifiedFunType;
 
-  AnyInvType fun(turbo::in_place_type<UnqualifiedFunType*>);
+  AnyInvType fun(std::in_place_type<UnqualifiedFunType*>);
 
   // In-place construction does not lead to empty.
   EXPECT_TRUE(static_cast<bool>(fun));
@@ -621,7 +621,7 @@ TYPED_TEST_P(AnyInvTestBasic, InPlaceNullMemFunPtrConstruction) {
   using AnyInvType = typename TypeParam::AnyInvType;
   using MemFunPtrType = typename TypeParam::MemFunPtrType;
 
-  AnyInvType fun(turbo::in_place_type<MemFunPtrType>, nullptr);
+  AnyInvType fun(std::in_place_type<MemFunPtrType>, nullptr);
 
   // In-place construction does not lead to empty.
   EXPECT_TRUE(static_cast<bool>(fun));
@@ -631,7 +631,7 @@ TYPED_TEST_P(AnyInvTestBasic, InPlaceNullMemFunPtrConstructionValueInit) {
   using AnyInvType = typename TypeParam::AnyInvType;
   using MemFunPtrType = typename TypeParam::MemFunPtrType;
 
-  AnyInvType fun(turbo::in_place_type<MemFunPtrType>);
+  AnyInvType fun(std::in_place_type<MemFunPtrType>);
 
   // In-place construction does not lead to empty.
   EXPECT_TRUE(static_cast<bool>(fun));
@@ -641,7 +641,7 @@ TYPED_TEST_P(AnyInvTestBasic, InPlaceNullMemObjPtrConstruction) {
   using UnaryAnyInvType = typename TypeParam::UnaryAnyInvType;
   using MemObjPtrType = typename TypeParam::MemObjPtrType;
 
-  UnaryAnyInvType fun(turbo::in_place_type<MemObjPtrType>, nullptr);
+  UnaryAnyInvType fun(std::in_place_type<MemObjPtrType>, nullptr);
 
   // In-place construction does not lead to empty.
   EXPECT_TRUE(static_cast<bool>(fun));
@@ -651,7 +651,7 @@ TYPED_TEST_P(AnyInvTestBasic, InPlaceNullMemObjPtrConstructionValueInit) {
   using UnaryAnyInvType = typename TypeParam::UnaryAnyInvType;
   using MemObjPtrType = typename TypeParam::MemObjPtrType;
 
-  UnaryAnyInvType fun(turbo::in_place_type<MemObjPtrType>);
+  UnaryAnyInvType fun(std::in_place_type<MemObjPtrType>);
 
   // In-place construction does not lead to empty.
   EXPECT_TRUE(static_cast<bool>(fun));
@@ -661,7 +661,7 @@ TYPED_TEST_P(AnyInvTestBasic, InPlaceVoidCovarianceConstruction) {
   using VoidAnyInvType = typename TypeParam::VoidAnyInvType;
   using AddType = typename TypeParam::AddType;
 
-  VoidAnyInvType fun(turbo::in_place_type<AddType>, 5);
+  VoidAnyInvType fun(std::in_place_type<AddType>, 5);
 
   EXPECT_TRUE(static_cast<bool>(fun));
 }
@@ -681,7 +681,7 @@ TYPED_TEST_P(AnyInvTestBasic, MoveConstructionFromNonEmpty) {
   using AnyInvType = typename TypeParam::AnyInvType;
   using AddType = typename TypeParam::AddType;
 
-  AnyInvType source_fun(turbo::in_place_type<AddType>, 5);
+  AnyInvType source_fun(std::in_place_type<AddType>, 5);
   AnyInvType fun(std::move(source_fun));
 
   EXPECT_TRUE(static_cast<bool>(fun));
@@ -706,7 +706,7 @@ TYPED_TEST_P(AnyInvTestBasic, ComparisonWithNullptrNonempty) {
   using AnyInvType = typename TypeParam::AnyInvType;
   using AddType = typename TypeParam::AddType;
 
-  AnyInvType fun(turbo::in_place_type<AddType>, 5);
+  AnyInvType fun(std::in_place_type<AddType>, 5);
 
   EXPECT_FALSE(fun == nullptr);
   EXPECT_FALSE(nullptr == fun);
@@ -743,7 +743,7 @@ TYPED_TEST_P(AnyInvTestCombinatoric, MoveAssignEmptyLhsNonemptyRhs) {
   using AnyInvType = typename TypeParam::AnyInvType;
   using AddType = typename TypeParam::AddType;
 
-  AnyInvType source_fun(turbo::in_place_type<AddType>, 5);
+  AnyInvType source_fun(std::in_place_type<AddType>, 5);
   AnyInvType fun;
 
   fun = std::move(source_fun);
@@ -757,7 +757,7 @@ TYPED_TEST_P(AnyInvTestCombinatoric, MoveAssignNonemptyEmptyLhsRhs) {
   using AddType = typename TypeParam::AddType;
 
   AnyInvType source_fun;
-  AnyInvType fun(turbo::in_place_type<AddType>, 5);
+  AnyInvType fun(std::in_place_type<AddType>, 5);
 
   fun = std::move(source_fun);
 
@@ -768,8 +768,8 @@ TYPED_TEST_P(AnyInvTestCombinatoric, MoveAssignNonemptyLhsNonemptyRhs) {
   using AnyInvType = typename TypeParam::AnyInvType;
   using AddType = typename TypeParam::AddType;
 
-  AnyInvType source_fun(turbo::in_place_type<AddType>, 5);
-  AnyInvType fun(turbo::in_place_type<AddType>, 20);
+  AnyInvType source_fun(std::in_place_type<AddType>, 5);
+  AnyInvType fun(std::in_place_type<AddType>, 20);
 
   fun = std::move(source_fun);
 
@@ -790,7 +790,7 @@ TYPED_TEST_P(AnyInvTestCombinatoric, SelfMoveAssignNonempty) {
   using AnyInvType = typename TypeParam::AnyInvType;
   using AddType = typename TypeParam::AddType;
 
-  AnyInvType source_fun(turbo::in_place_type<AddType>, 5);
+  AnyInvType source_fun(std::in_place_type<AddType>, 5);
   source_fun = std::move(source_fun);
 
   // This space intentionally left blank.
@@ -1041,7 +1041,7 @@ TYPED_TEST_P(AnyInvTestCombinatoric, SwapEmptyLhsNonemptyRhs) {
   // Swap idiom
   {
     AnyInvType fun;
-    AnyInvType other(turbo::in_place_type<AddType>, 5);
+    AnyInvType other(std::in_place_type<AddType>, 5);
 
     using std::swap;
     swap(fun, other);
@@ -1058,7 +1058,7 @@ TYPED_TEST_P(AnyInvTestCombinatoric, SwapEmptyLhsNonemptyRhs) {
   // Member swap
   {
     AnyInvType fun;
-    AnyInvType other(turbo::in_place_type<AddType>, 5);
+    AnyInvType other(std::in_place_type<AddType>, 5);
 
     fun.swap(other);
 
@@ -1077,7 +1077,7 @@ TYPED_TEST_P(AnyInvTestCombinatoric, SwapNonemptyLhsEmptyRhs) {
 
   // Swap idiom
   {
-    AnyInvType fun(turbo::in_place_type<AddType>, 5);
+    AnyInvType fun(std::in_place_type<AddType>, 5);
     AnyInvType other;
 
     using std::swap;
@@ -1094,7 +1094,7 @@ TYPED_TEST_P(AnyInvTestCombinatoric, SwapNonemptyLhsEmptyRhs) {
 
   // Member swap
   {
-    AnyInvType fun(turbo::in_place_type<AddType>, 5);
+    AnyInvType fun(std::in_place_type<AddType>, 5);
     AnyInvType other;
 
     fun.swap(other);
@@ -1114,8 +1114,8 @@ TYPED_TEST_P(AnyInvTestCombinatoric, SwapNonemptyLhsNonemptyRhs) {
 
   // Swap idiom
   {
-    AnyInvType fun(turbo::in_place_type<AddType>, 5);
-    AnyInvType other(turbo::in_place_type<AddType>, 6);
+    AnyInvType fun(std::in_place_type<AddType>, 5);
+    AnyInvType other(std::in_place_type<AddType>, 6);
 
     using std::swap;
     swap(fun, other);
@@ -1132,8 +1132,8 @@ TYPED_TEST_P(AnyInvTestCombinatoric, SwapNonemptyLhsNonemptyRhs) {
 
   // Member swap
   {
-    AnyInvType fun(turbo::in_place_type<AddType>, 5);
-    AnyInvType other(turbo::in_place_type<AddType>, 6);
+    AnyInvType fun(std::in_place_type<AddType>, 5);
+    AnyInvType other(std::in_place_type<AddType>, 6);
 
     fun.swap(other);
 
@@ -1413,7 +1413,7 @@ TYPED_TEST_P(AnyInvTestRvalue, NonConstCrashesOnSecondCall) {
   using AnyInvType = typename TypeParam::AnyInvType;
   using AddType = typename TypeParam::AddType;
 
-  AnyInvType fun(turbo::in_place_type<AddType>, 5);
+  AnyInvType fun(std::in_place_type<AddType>, 5);
 
   EXPECT_TRUE(static_cast<bool>(fun));
   std::move(fun)(7, 8, 9);

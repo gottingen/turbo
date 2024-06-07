@@ -26,7 +26,7 @@
 
 #include <turbo/base/attributes.h>
 #include <turbo/random/internal/fast_uniform_bits.h>
-#include <turbo/types/optional.h>
+#include <optional>
 #include <turbo/container/span.h>
 
 namespace turbo {
@@ -98,7 +98,7 @@ void MixIntoSeedMaterial(turbo::Span<const uint32_t> sequence,
 // Salt is obtained only once and stored in static variable.
 //
 // May return empty value if optaining the salt was not possible.
-turbo::optional<uint32_t> GetSaltMaterial();
+std::optional<uint32_t> GetSaltMaterial();
 
 }  // namespace random_internal
 TURBO_NAMESPACE_END

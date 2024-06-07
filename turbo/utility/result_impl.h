@@ -55,7 +55,7 @@
 #include <turbo/strings/has_stringify.h>
 #include <turbo/strings/has_ostream_operator.h>
 #include <turbo/strings/str_format.h>
-#include <turbo/types/variant.h>
+#include <variant>
 #include <turbo/meta/utility.h>
 
 namespace turbo {
@@ -424,10 +424,10 @@ namespace turbo {
         // Constructs the inner value `T` in-place using the provided args, using the
         // `T(args...)` constructor.
         template<typename... Args>
-        explicit Result(turbo::in_place_t, Args &&... args);
+        explicit Result(std::in_place_t, Args &&... args);
 
         template<typename U, typename... Args>
-        explicit Result(turbo::in_place_t, std::initializer_list<U> ilist,
+        explicit Result(std::in_place_t, std::initializer_list<U> ilist,
                           Args &&... args);
 
         // Constructs the inner value `T` in-place using the provided args, using the
@@ -442,28 +442,28 @@ namespace turbo {
                         false, T, U, false>::value,
                         int> = 0>
         Result(U &&u)  // NOLINT
-                : Result(turbo::in_place, std::forward<U>(u)) {}
+                : Result(std::in_place, std::forward<U>(u)) {}
 
         template<typename U = T,
                 turbo::enable_if_t<internal_statusor::IsConstructionValid<
                         false, T, U, true>::value,
                         int> = 0>
         Result(U &&u TURBO_ATTRIBUTE_LIFETIME_BOUND)  // NOLINT
-                : Result(turbo::in_place, std::forward<U>(u)) {}
+                : Result(std::in_place, std::forward<U>(u)) {}
 
         template<typename U = T,
                 turbo::enable_if_t<internal_statusor::IsConstructionValid<
                         true, T, U, false>::value,
                         int> = 0>
         explicit Result(U &&u)  // NOLINT
-                : Result(turbo::in_place, std::forward<U>(u)) {}
+                : Result(std::in_place, std::forward<U>(u)) {}
 
         template<typename U = T,
                 turbo::enable_if_t<
                         internal_statusor::IsConstructionValid<true, T, U, true>::value,
                         int> = 0>
         explicit Result(U &&u TURBO_ATTRIBUTE_LIFETIME_BOUND)  // NOLINT
-                : Result(turbo::in_place, std::forward<U>(u)) {}
+                : Result(std::in_place, std::forward<U>(u)) {}
 
         // Result<T>::ok()
         //
@@ -719,14 +719,14 @@ namespace turbo {
 
     template<typename T>
     template<typename... Args>
-    Result<T>::Result(turbo::in_place_t, Args &&... args)
-            : Base(turbo::in_place, std::forward<Args>(args)...) {}
+    Result<T>::Result(std::in_place_t, Args &&... args)
+            : Base(std::in_place, std::forward<Args>(args)...) {}
 
     template<typename T>
     template<typename U, typename... Args>
-    Result<T>::Result(turbo::in_place_t, std::initializer_list<U> ilist,
+    Result<T>::Result(std::in_place_t, std::initializer_list<U> ilist,
                           Args &&... args)
-            : Base(turbo::in_place, ilist, std::forward<Args>(args)...) {}
+            : Base(std::in_place, ilist, std::forward<Args>(args)...) {}
 
     template<typename T>
     const Status &Result<T>::status() const &{

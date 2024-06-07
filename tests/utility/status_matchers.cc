@@ -19,7 +19,7 @@
 // File: status_matchers.cc
 // -----------------------------------------------------------------------------
 
-#include <tests/status/status_matchers.h>
+#include <tests/utility/status_matchers.h>
 
 #include <ostream>
 #include <string>

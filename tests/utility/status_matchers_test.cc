@@ -18,7 +18,7 @@
 // -----------------------------------------------------------------------------
 // File: status_matchers_test.cc
 // -----------------------------------------------------------------------------
-#include <tests/status/status_matchers_api.h>
+#include <tests/utility/status_matchers_api.h>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest-spi.h>

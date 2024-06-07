@@ -41,7 +41,7 @@
 #include <turbo/strings/string_view.h>
 #include <turbo/strings/strip.h>
 #include <turbo/synchronization/mutex.h>
-#include <turbo/types/optional.h>
+#include <optional>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -192,7 +192,7 @@ int AppendVModuleLocked(turbo::string_view module_pattern, int log_level)
 // Allocates memory.
 int PrependVModuleLocked(turbo::string_view module_pattern, int log_level)
     TURBO_EXCLUSIVE_LOCKS_REQUIRED(mutex) {
-  turbo::optional<int> old_log_level;
+  std::optional<int> old_log_level;
   for (const auto& info : get_vmodule_info()) {
     if (FNMatch(info.module_pattern, module_pattern)) {
       old_log_level = info.vlog_level;

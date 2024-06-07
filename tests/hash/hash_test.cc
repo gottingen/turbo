@@ -48,8 +48,8 @@
 #include <turbo/meta/type_traits.h>
 #include <tests/strings/cord_test_helpers.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/optional.h>
-#include <turbo/types/variant.h>
+#include <optional>
+#include <variant>
 
 #ifdef TURBO_INTERNAL_STD_FILESYSTEM_PATH_HASH_AVAILABLE
 #include <filesystem>  // NOLINT
@@ -695,15 +695,15 @@ TEST(HashValueTest, PrivateSanity) {
 }
 
 TEST(HashValueTest, Optional) {
-  EXPECT_TRUE(is_hashable<turbo::optional<Private>>::value);
+  EXPECT_TRUE(is_hashable<std::optional<Private>>::value);
 
-  using O = turbo::optional<Private>;
+  using O = std::optional<Private>;
   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::make_tuple(O{}, O{{1}}, O{{-1}}, O{{10}})));
 }
 
 TEST(HashValueTest, Variant) {
-  using V = turbo::variant<Private, std::string>;
+  using V = std::variant<Private, std::string>;
   EXPECT_TRUE(is_hashable<V>::value);
 
   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
@@ -711,7 +711,7 @@ TEST(HashValueTest, Variant) {
 
 #if TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
   struct S {};
-  EXPECT_FALSE(is_hashable<turbo::variant<S>>::value);
+  EXPECT_FALSE(is_hashable<std::variant<S>>::value);
 #endif
 }
 

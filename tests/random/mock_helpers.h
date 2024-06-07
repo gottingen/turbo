@@ -23,7 +23,7 @@
 
 #include <turbo/base/config.h>
 #include <turbo/base/internal/fast_type_id.h>
-#include <turbo/types/optional.h>
+#include <optional>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -74,14 +74,14 @@ class MockHelpers {
   // Empty implementation of InvokeMock.
   template <typename KeyT, typename ReturnT, typename ArgTupleT, typename URBG,
             typename... Args>
-  static turbo::optional<ReturnT> InvokeMockImpl(char, URBG*, Args&&...) {
-    return turbo::nullopt;
+  static std::optional<ReturnT> InvokeMockImpl(char, URBG*, Args&&...) {
+    return std::nullopt;
   }
 
   // Non-empty implementation of InvokeMock.
   template <typename KeyT, typename ReturnT, typename ArgTupleT, typename URBG,
             typename = invoke_mock_t<URBG>, typename... Args>
-  static turbo::optional<ReturnT> InvokeMockImpl(int, URBG* urbg,
+  static std::optional<ReturnT> InvokeMockImpl(int, URBG* urbg,
                                                 Args&&... args) {
     ArgTupleT arg_tuple(std::forward<Args>(args)...);
     ReturnT result;
@@ -89,7 +89,7 @@ class MockHelpers {
                          &result)) {
       return result;
     }
-    return turbo::nullopt;
+    return std::nullopt;
   }
 
  public:
@@ -112,7 +112,7 @@ class MockHelpers {
   // the underlying mechanism requires a pointer to an argument tuple.
   template <typename KeyT, typename URBG, typename... Args>
   static auto MaybeInvokeMock(URBG* urbg, Args&&... args)
-      -> turbo::optional<typename KeySignature<KeyT>::result_type> {
+      -> std::optional<typename KeySignature<KeyT>::result_type> {
     // Use function overloading to dispatch to the implementation since
     // more modern patterns (e.g. require + constexpr) are not supported in all
     // compiler configurations.

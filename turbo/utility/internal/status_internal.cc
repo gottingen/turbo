@@ -42,7 +42,7 @@
 #include <turbo/strings/str_format.h>
 #include <turbo/strings/str_split.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/optional.h>
+#include <optional>
 
 namespace turbo::status_internal {
 
@@ -56,24 +56,24 @@ namespace turbo::status_internal {
         }
     }
 
-    static turbo::optional<size_t> FindPayloadIndexByUrl(
+    static std::optional<size_t> FindPayloadIndexByUrl(
             const Payloads *payloads, turbo::string_view type_url) {
-        if (payloads == nullptr) return turbo::nullopt;
+        if (payloads == nullptr) return std::nullopt;
 
         for (size_t i = 0; i < payloads->size(); ++i) {
             if ((*payloads)[i].type_url == type_url) return i;
         }
 
-        return turbo::nullopt;
+        return std::nullopt;
     }
 
-    turbo::optional<turbo::Cord> StatusRep::get_payload(
+    std::optional<turbo::Cord> StatusRep::get_payload(
             turbo::string_view type_url) const {
-        turbo::optional<size_t> index =
+        std::optional<size_t> index =
                 status_internal::FindPayloadIndexByUrl(payloads_.get(), type_url);
         if (index.has_value()) return (*payloads_)[index.value()].payload;
 
-        return turbo::nullopt;
+        return std::nullopt;
     }
 
     void StatusRep::set_payload(turbo::string_view type_url, turbo::Cord payload) {
@@ -81,7 +81,7 @@ namespace turbo::status_internal {
             payloads_ = turbo::make_unique<status_internal::Payloads>();
         }
 
-        turbo::optional<size_t> index =
+        std::optional<size_t> index =
                 status_internal::FindPayloadIndexByUrl(payloads_.get(), type_url);
         if (index.has_value()) {
             (*payloads_)[index.value()].payload = std::move(payload);
@@ -92,7 +92,7 @@ namespace turbo::status_internal {
     }
 
     StatusRep::EraseResult StatusRep::erase_payload(turbo::string_view type_url) {
-        turbo::optional<size_t> index =
+        std::optional<size_t> index =
                 status_internal::FindPayloadIndexByUrl(payloads_.get(), type_url);
         if (!index.has_value()) return {false, Status::PointerToRep(this)};
         payloads_->erase(payloads_->begin() + index.value());
@@ -142,7 +142,7 @@ namespace turbo::status_internal {
                     status_internal::GetStatusPayloadPrinter();
             this->for_each_payload([&](turbo::string_view type_url,
                                      const turbo::Cord &payload) {
-                turbo::optional<std::string> result;
+                std::optional<std::string> result;
                 if (printer) result = printer(type_url, payload);
                 turbo::str_append(
                         &text, " [", type_url, "='",

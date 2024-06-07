@@ -203,16 +203,11 @@
 
 #include <turbo/base/config.h>
 #include <turbo/numeric/int128.h>
-
-#if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
 #include <optional>
-#endif
-
 #include <string>
 #include <vector>
 
 #include <turbo/strings/string_view.h>
-#include <turbo/types/optional.h>
 
 namespace turbo {
 
@@ -249,21 +244,6 @@ namespace turbo {
 
         bool turbo_parse_flag(turbo::string_view, std::vector<std::string> *, std::string *);
 
-        template<typename T>
-        bool turbo_parse_flag(turbo::string_view text, turbo::optional<T> *f,
-                              std::string *err) {
-            if (text.empty()) {
-                *f = turbo::nullopt;
-                return true;
-            }
-            T value;
-            if (!turbo::parse_flag(text, &value, err)) return false;
-
-            *f = std::move(value);
-            return true;
-        }
-
-#if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
         template <typename T>
         bool turbo_parse_flag(turbo::string_view text, std::optional<T>* f,
                            std::string* err) {
@@ -277,7 +257,6 @@ namespace turbo {
           *f = std::move(value);
           return true;
         }
-#endif
 
         template<typename T>
         bool InvokeParseFlag(turbo::string_view input, T *dst, std::string *err) {
@@ -293,17 +272,11 @@ namespace turbo {
 
         std::string turbo_unparse_flag(const std::vector<std::string> &);
 
-        template<typename T>
-        std::string turbo_unparse_flag(const turbo::optional<T> &f) {
-            return f.has_value() ? turbo::unparse_flag(*f) : "";
-        }
 
-#if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
         template <typename T>
         std::string turbo_unparse_flag(const std::optional<T>& f) {
           return f.has_value() ? turbo::unparse_flag(*f) : "";
         }
-#endif
 
         template<typename T>
         std::string Unparse(const T &v) {

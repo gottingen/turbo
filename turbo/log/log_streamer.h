@@ -35,7 +35,7 @@
 #include <turbo/log/turbo_log.h>
 #include <turbo/strings/internal/ostringstream.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/optional.h>
+#include <optional>
 #include <turbo/meta/utility.h>
 
 namespace turbo {
@@ -84,7 +84,7 @@ class LogStreamer final {
       : severity_(severity),
         line_(line),
         file_(file),
-        stream_(turbo::in_place, &buf_) {
+        stream_(std::in_place, &buf_) {
     // To match `LOG`'s defaults:
     stream_->setf(std::ios_base::showbase | std::ios_base::boolalpha);
   }
@@ -133,7 +133,7 @@ class LogStreamer final {
   std::string buf_;
   // A disengaged `stream_` indicates a moved-from `LogStreamer` that should not
   // `LOG` upon destruction.
-  turbo::optional<turbo::strings_internal::OStringStream> stream_;
+  std::optional<turbo::strings_internal::OStringStream> stream_;
 };
 
 // LogInfoStreamer()

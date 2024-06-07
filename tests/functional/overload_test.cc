@@ -24,7 +24,7 @@
 #include <turbo/base/config.h>
 #include <turbo/strings/str_cat.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/variant.h>
+#include <variant>
 
 #if defined(TURBO_INTERNAL_CPLUSPLUS_LANG) && \
     TURBO_INTERNAL_CPLUSPLUS_LANG >= 201703L
@@ -152,32 +152,32 @@ TEST(OverloadTest, DispatchConsidersSfinae) {
 }
 
 TEST(OverloadTest, VariantVisitDispatchesCorrectly) {
-  turbo::variant<int, double, std::string> v(1);
+  std::variant<int, double, std::string> v(1);
   auto overloaded = turbo::Overload{
       [](int) -> turbo::string_view { return "int"; },
       [](double) -> turbo::string_view { return "double"; },
       [](const std::string&) -> turbo::string_view { return "string"; },
   };
 
-  EXPECT_EQ("int", turbo::visit(overloaded, v));
+  EXPECT_EQ("int", std::visit(overloaded, v));
   v = 1.1;
-  EXPECT_EQ("double", turbo::visit(overloaded, v));
+  EXPECT_EQ("double", std::visit(overloaded, v));
   v = "hello";
-  EXPECT_EQ("string", turbo::visit(overloaded, v));
+  EXPECT_EQ("string", std::visit(overloaded, v));
 }
 
 TEST(OverloadTest, VariantVisitWithAutoFallbackDispatchesCorrectly) {
-  turbo::variant<std::string, int32_t, int64_t> v(int32_t{1});
+  std::variant<std::string, int32_t, int64_t> v(int32_t{1});
   auto overloaded = turbo::Overload{
       [](const std::string& s) { return s.size(); },
       [](const auto& s) { return sizeof(s); },
   };
 
-  EXPECT_EQ(4, turbo::visit(overloaded, v));
+  EXPECT_EQ(4, std::visit(overloaded, v));
   v = int64_t{1};
-  EXPECT_EQ(8, turbo::visit(overloaded, v));
+  EXPECT_EQ(8, std::visit(overloaded, v));
   v = std::string("hello");
-  EXPECT_EQ(5, turbo::visit(overloaded, v));
+  EXPECT_EQ(5, std::visit(overloaded, v));
 }
 
 // This API used to be exported as a function, so it should also work fine to
@@ -187,14 +187,14 @@ TEST(OverloadTest, UseWithParentheses) {
       turbo::Overload([](const std::string& s) { return s.size(); },
                      [](const auto& s) { return sizeof(s); });
 
-  turbo::variant<std::string, int32_t, int64_t> v(int32_t{1});
-  EXPECT_EQ(4, turbo::visit(overloaded, v));
+  std::variant<std::string, int32_t, int64_t> v(int32_t{1});
+  EXPECT_EQ(4, std::visit(overloaded, v));
 
   v = int64_t{1};
-  EXPECT_EQ(8, turbo::visit(overloaded, v));
+  EXPECT_EQ(8, std::visit(overloaded, v));
 
   v = std::string("hello");
-  EXPECT_EQ(5, turbo::visit(overloaded, v));
+  EXPECT_EQ(5, std::visit(overloaded, v));
 }
 
 TEST(OverloadTest, HasConstexprConstructor) {

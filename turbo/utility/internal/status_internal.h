@@ -29,7 +29,7 @@
 #include <turbo/container/inlined_vector.h>
 #include <turbo/strings/cord.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/optional.h>
+#include <optional>
 
 #ifndef SWIG
 // Disabled for SWIG as it doesn't parse attributes correctly.
@@ -85,7 +85,7 @@ namespace turbo {
             void Unref() const;
 
             // Payload methods correspond to the same methods in turbo::Status.
-            turbo::optional<turbo::Cord> get_payload(turbo::string_view type_url) const;
+            std::optional<turbo::Cord> get_payload(turbo::string_view type_url) const;
 
             void set_payload(turbo::string_view type_url, turbo::Cord payload);
 

@@ -74,7 +74,7 @@
 
 #include <gmock/gmock.h>  // gmock_for_status_matchers.h
 #include <turbo/base/config.h>
-#include <tests/status/status_matchers.h>
+#include <tests/utility/status_matchers.h>
 
 namespace turbo_testing {
     TURBO_NAMESPACE_BEGIN

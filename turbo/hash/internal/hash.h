@@ -70,8 +70,8 @@
 #include <turbo/numeric/bits.h>
 #include <turbo/numeric/int128.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/optional.h>
-#include <turbo/types/variant.h>
+#include <optional>
+#include <variant>
 #include <turbo/meta/utility.h>
 
 #if defined(__cpp_lib_filesystem) && __cpp_lib_filesystem >= 201703L && \
@@ -844,10 +844,10 @@ namespace turbo {
             return H::combine(std::move(hash_state), opt.get());
         }
 
-// turbo_hash_value for hashing turbo::optional
+// turbo_hash_value for hashing std::optional
         template<typename H, typename T>
         typename std::enable_if<is_hashable<T>::value, H>::type turbo_hash_value(
-                H hash_state, const turbo::optional<T> &opt) {
+                H hash_state, const std::optional<T> &opt) {
             if (opt) hash_state = H::combine(std::move(hash_state), *opt);
             return H::combine(std::move(hash_state), opt.has_value());
         }
@@ -863,12 +863,12 @@ namespace turbo {
             }
         };
 
-// turbo_hash_value for hashing turbo::variant
+        // turbo_hash_value for hashing std::variant
         template<typename H, typename... T>
         typename std::enable_if<conjunction<is_hashable<T>...>::value, H>::type
-        turbo_hash_value(H hash_state, const turbo::variant<T...> &v) {
+        turbo_hash_value(H hash_state, const std::variant<T...> &v) {
             if (!v.valueless_by_exception()) {
-                hash_state = turbo::visit(VariantVisitor<H>{std::move(hash_state)}, v);
+                hash_state = std::visit(VariantVisitor<H>{std::move(hash_state)}, v);
             }
             return H::combine(std::move(hash_state), v.index());
         }

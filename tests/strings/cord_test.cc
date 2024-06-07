@@ -63,7 +63,7 @@
 #include <turbo/strings/str_cat.h>
 #include <turbo/strings/str_format.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/optional.h>
+#include <optional>
 
 // convenience local constants
 static constexpr auto FLAT = turbo::cord_internal::FLAT;
@@ -418,7 +418,7 @@ TEST_P(CordTest, Assignment) {
   turbo::Cord x(turbo::string_view("hi there"));
   turbo::Cord y(x);
   MaybeHarden(y);
-  ASSERT_EQ(x.ExpectedChecksum(), turbo::nullopt);
+  ASSERT_EQ(x.ExpectedChecksum(), std::nullopt);
   ASSERT_EQ(std::string(x), "hi there");
   ASSERT_EQ(std::string(y), "hi there");
   ASSERT_TRUE(x == y);
@@ -620,7 +620,7 @@ TEST_P(CordTest, Subcord) {
                 std::string(sa))
           << a;
       if (pos != 0 || end_pos != a.size()) {
-        ASSERT_EQ(sa.ExpectedChecksum(), turbo::nullopt);
+        ASSERT_EQ(sa.ExpectedChecksum(), std::nullopt);
       }
     }
   }
@@ -664,7 +664,7 @@ TEST_P(CordTest, Swap) {
   MaybeHarden(x);
   swap(x, y);
   if (UseCrc()) {
-    ASSERT_EQ(x.ExpectedChecksum(), turbo::nullopt);
+    ASSERT_EQ(x.ExpectedChecksum(), std::nullopt);
     ASSERT_EQ(y.ExpectedChecksum(), 1);
   }
   ASSERT_EQ(x, turbo::Cord(b));
@@ -672,7 +672,7 @@ TEST_P(CordTest, Swap) {
   x.swap(y);
   if (UseCrc()) {
     ASSERT_EQ(x.ExpectedChecksum(), 1);
-    ASSERT_EQ(y.ExpectedChecksum(), turbo::nullopt);
+    ASSERT_EQ(y.ExpectedChecksum(), std::nullopt);
   }
   ASSERT_EQ(x, turbo::Cord(a));
   ASSERT_EQ(y, turbo::Cord(b));
@@ -1074,7 +1074,7 @@ TEST_P(CordTest, TryFlatSubstrFlat) {
 TEST_P(CordTest, TryFlatConcat) {
   turbo::Cord c = turbo::MakeFragmentedCord({"hel", "lo"});
   MaybeHarden(c);
-  EXPECT_EQ(c.TryFlat(), turbo::nullopt);
+  EXPECT_EQ(c.TryFlat(), std::nullopt);
 }
 
 TEST_P(CordTest, TryFlatExternal) {
@@ -3115,13 +3115,13 @@ TEST_P(CordTest, ExpectedChecksum) {
           continue;
         }
 
-        EXPECT_EQ(c2.ExpectedChecksum(), turbo::nullopt);
+        EXPECT_EQ(c2.ExpectedChecksum(), std::nullopt);
 
         if (mutator.CanUndo()) {
           // Undoing an operation should not restore the checksum
           mutator.Undo(c2);
           EXPECT_EQ(c2, base_value);
-          EXPECT_EQ(c2.ExpectedChecksum(), turbo::nullopt);
+          EXPECT_EQ(c2.ExpectedChecksum(), std::nullopt);
         }
       }
 
@@ -3231,7 +3231,7 @@ TEST_P(CordTest, ChecksummedEmptyCord) {
       // Not a mutation
       continue;
     }
-    EXPECT_EQ(c2.ExpectedChecksum(), turbo::nullopt);
+    EXPECT_EQ(c2.ExpectedChecksum(), std::nullopt);
 
     if (mutator.CanUndo()) {
       mutator.Undo(c2);

@@ -69,7 +69,7 @@
 #include <turbo/strings/cord.h>
 #include <turbo/strings/string_view.h>
 #include <turbo/strings/str_format.h>
-#include <turbo/types/optional.h>
+#include <optional>
 
 namespace turbo {
 
@@ -590,7 +590,7 @@ namespace turbo {
         // Status::get_payload()
         //
         // Gets the payload of a status given its unique `type_url` key, if present.
-        turbo::optional<turbo::Cord> get_payload(turbo::string_view type_url) const;
+        std::optional<turbo::Cord> get_payload(turbo::string_view type_url) const;
 
         // Status::set_payload()
         //
@@ -990,9 +990,9 @@ namespace turbo {
         swap(a.rep_, b.rep_);
     }
 
-    inline turbo::optional<turbo::Cord> Status::get_payload(
+    inline std::optional<turbo::Cord> Status::get_payload(
             turbo::string_view type_url) const {
-        if (IsInlined(rep_)) return turbo::nullopt;
+        if (IsInlined(rep_)) return std::nullopt;
         return RepToPointer(rep_)->get_payload(type_url);
     }
 

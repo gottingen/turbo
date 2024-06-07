@@ -779,7 +779,7 @@ namespace {
 
     TEST(MarshallingTest, TestOptionalBoolParsing) {
         std::string err;
-        turbo::optional<bool> value;
+        std::optional<bool> value;
 
         EXPECT_TRUE(turbo::parse_flag("", &value, &err));
         EXPECT_FALSE(value.has_value());
@@ -799,7 +799,7 @@ namespace {
 
     TEST(MarshallingTest, TestOptionalIntParsing) {
         std::string err;
-        turbo::optional<int> value;
+        std::optional<int> value;
 
         EXPECT_TRUE(turbo::parse_flag("", &value, &err));
         EXPECT_FALSE(value.has_value());
@@ -819,7 +819,7 @@ namespace {
 
     TEST(MarshallingTest, TestOptionalDoubleParsing) {
         std::string err;
-        turbo::optional<double> value;
+        std::optional<double> value;
 
         EXPECT_TRUE(turbo::parse_flag("", &value, &err));
         EXPECT_FALSE(value.has_value());
@@ -839,7 +839,7 @@ namespace {
 
     TEST(MarshallingTest, TestOptionalStringParsing) {
         std::string err;
-        turbo::optional<std::string> value;
+        std::optional<std::string> value;
 
         EXPECT_TRUE(turbo::parse_flag("", &value, &err));
         EXPECT_FALSE(value.has_value());
@@ -1043,49 +1043,49 @@ namespace {
 // --------------------------------------------------------------------
 
     TEST(MarshallingTest, TestOptionalBoolUnparsing) {
-        turbo::optional<bool> value;
+        std::optional<bool> value;
 
         EXPECT_EQ(turbo::unparse_flag(value), "");
         value = true;
         EXPECT_EQ(turbo::unparse_flag(value), "true");
         value = false;
         EXPECT_EQ(turbo::unparse_flag(value), "false");
-        value = turbo::nullopt;
+        value = std::nullopt;
         EXPECT_EQ(turbo::unparse_flag(value), "");
     }
 
 // --------------------------------------------------------------------
 
     TEST(MarshallingTest, TestOptionalIntUnparsing) {
-        turbo::optional<int> value;
+        std::optional<int> value;
 
         EXPECT_EQ(turbo::unparse_flag(value), "");
         value = 0;
         EXPECT_EQ(turbo::unparse_flag(value), "0");
         value = -12;
         EXPECT_EQ(turbo::unparse_flag(value), "-12");
-        value = turbo::nullopt;
+        value = std::nullopt;
         EXPECT_EQ(turbo::unparse_flag(value), "");
     }
 
 // --------------------------------------------------------------------
 
     TEST(MarshallingTest, TestOptionalDoubleUnparsing) {
-        turbo::optional<double> value;
+        std::optional<double> value;
 
         EXPECT_EQ(turbo::unparse_flag(value), "");
         value = 1.;
         EXPECT_EQ(turbo::unparse_flag(value), "1");
         value = -1.23;
         EXPECT_EQ(turbo::unparse_flag(value), "-1.23");
-        value = turbo::nullopt;
+        value = std::nullopt;
         EXPECT_EQ(turbo::unparse_flag(value), "");
     }
 
 // --------------------------------------------------------------------
 
     TEST(MarshallingTest, TestOptionalStringUnparsing) {
-        turbo::optional<std::string> strvalue;
+        std::optional<std::string> strvalue;
         EXPECT_EQ(turbo::unparse_flag(strvalue), "");
 
         strvalue = "asdfg";
@@ -1100,7 +1100,6 @@ namespace {
 
 // --------------------------------------------------------------------
 
-#if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
 
     TEST(MarshallingTest, TestStdOptionalUnparsing) {
       std::optional<std::string> strvalue;
@@ -1124,7 +1123,6 @@ namespace {
 
     // --------------------------------------------------------------------
 
-#endif
 
     template<typename T>
     void TestRoundtrip(T v) {

@@ -36,7 +36,7 @@
 #include <turbo/base/internal/fast_type_id.h>
 #include <turbo/flags/internal/commandlineflag.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/optional.h>
+#include <optional>
 
 namespace turbo::flags_internal {
     class PrivateHandleAccessor;
@@ -90,11 +90,11 @@ namespace turbo {
         // turbo::CommandLineFlag::try_get()
         //
         // Attempts to retrieve the flag value. Returns value on success,
-        // turbo::nullopt otherwise.
+        // std::nullopt otherwise.
         template<typename T>
-        turbo::optional<T> try_get() const {
+        std::optional<T> try_get() const {
             if (is_retired() || !is_of_type<T>()) {
-                return turbo::nullopt;
+                return std::nullopt;
             }
 
             // Implementation notes:
@@ -124,7 +124,7 @@ namespace turbo {
             Read(&u.value);
             // allow retired flags to be "read", so we can report invalid access.
             if (is_retired()) {
-                return turbo::nullopt;
+                return std::nullopt;
             }
             return std::move(u.value);
         }

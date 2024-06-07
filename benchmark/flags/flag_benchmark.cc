@@ -27,7 +27,7 @@
 #include <turbo/flags/reflection.h>
 #include <turbo/strings/string_view.h>
 #include <turbo/times/time.h>
-#include <turbo/types/optional.h>
+#include <optional>
 #include <benchmark/benchmark.h>
 
 namespace {
@@ -35,10 +35,10 @@ using String = std::string;
 using VectorOfStrings = std::vector<std::string>;
 using TurboDuration = turbo::Duration;
 
-// We do not want to take over marshalling for the types turbo::optional<int>,
-// turbo::optional<std::string> which we do not own. Instead we introduce unique
+// We do not want to take over marshalling for the types std::optional<int>,
+// std::optional<std::string> which we do not own. Instead we introduce unique
 // "aliases" to these types, which we do.
-using TurboOptionalInt = turbo::optional<int>;
+using TurboOptionalInt = std::optional<int>;
 struct OptionalInt : TurboOptionalInt {
   using TurboOptionalInt::TurboOptionalInt;
 };
@@ -57,7 +57,7 @@ std::string turbo_unparse_flag(const OptionalInt& flag) {
   return !flag ? "" : turbo::unparse_flag(*flag);
 }
 
-using TurboOptionalString = turbo::optional<std::string>;
+using TurboOptionalString = std::optional<std::string>;
 struct OptionalString : TurboOptionalString {
   using TurboOptionalString::TurboOptionalString;
 };

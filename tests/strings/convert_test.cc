@@ -46,7 +46,7 @@
 #include <turbo/strings/match.h>
 #include <turbo/strings/str_format.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/optional.h>
+#include <optional>
 #include <turbo/container/span.h>
 
 #if defined(TURBO_HAVE_STD_STRING_VIEW)
@@ -596,11 +596,11 @@ TYPED_TEST_P(TypedFormatConvertTest, AllIntsWithFlags) {
 }
 
 template <typename T>
-turbo::optional<std::string> StrPrintChar(T c) {
+std::optional<std::string> StrPrintChar(T c) {
   return StrPrint("%c", static_cast<int>(c));
 }
 template <>
-turbo::optional<std::string> StrPrintChar(wchar_t c) {
+std::optional<std::string> StrPrintChar(wchar_t c) {
   // musl libc has a bug where ("%lc", 0) writes no characters, and Android
   // doesn't support forcing UTF-8 via setlocale(). Hardcode the expected
   // answers for ASCII inputs to maximize test coverage on these platforms.
@@ -614,7 +614,7 @@ turbo::optional<std::string> StrPrintChar(wchar_t c) {
   // call.
   std::string old_locale = setlocale(LC_CTYPE, nullptr);
   if (!setlocale(LC_CTYPE, "en_US.UTF-8")) {
-    return turbo::nullopt;
+    return std::nullopt;
   }
   const std::string output = StrPrint("%lc", static_cast<wint_t>(c));
   setlocale(LC_CTYPE, old_locale.c_str());
@@ -669,7 +669,7 @@ TYPED_TEST_P(TypedFormatConvertTest, Char) {
     SCOPED_TRACE(Esc(c));
     const FormatArgImpl args[] = {FormatArgImpl(c)};
     UntypedFormatSpecImpl format("%c");
-    turbo::optional<std::string> result = StrPrintChar(c);
+    std::optional<std::string> result = StrPrintChar(c);
     if (result.has_value()) {
       EXPECT_EQ(result.value(), FormatPack(format, turbo::MakeSpan(args)));
     }
