@@ -24,15 +24,21 @@
 
 namespace turbo {
 
-    turbo::Result<std::string> get_env_string(const char *name) {
+    turbo::Result<std::string> get_env_string(const char *name, std::optional<std::string> default_value) {
 #ifdef _WIN32
         char buf[1024];
         auto get_res = GetEnvironmentVariableA(name, buf, sizeof(buf));
         if (get_res >= sizeof(buf)) {
-          return turbo::resource_exhausted_error("TOO_BIG");
+             if (default_value.has_value()) {
+                return *default_value;
+            }
+            return turbo::resource_exhausted_error("TOO_BIG");
         }
 
         if (get_res == 0) {
+            if (default_value.has_value()) {
+                return *default_value;
+            }
           return turbo::not_found_error("UNSET");
         }
 
@@ -40,6 +46,9 @@ namespace turbo {
 #else
         const char *val = ::getenv(name);
         if (val == nullptr) {
+            if (default_value.has_value()) {
+                return *default_value;
+            }
             return turbo::not_found_error("UNSET");
         }
 
@@ -56,7 +65,7 @@ namespace turbo {
             return rs.status();
         }
         bool flag;
-        if(!turbo::simple_atob(rs.value(), &flag)) {
+        if (!turbo::simple_atob(rs.value(), &flag)) {
             return turbo::invalid_argument_error("invalid bool value");
         }
         return flag;
@@ -71,7 +80,7 @@ namespace turbo {
             return rs.status();
         }
         int64_t value;
-        if(!turbo::simple_atoi(rs.value(), &value)) {
+        if (!turbo::simple_atoi(rs.value(), &value)) {
             return turbo::invalid_argument_error("invalid int value");
         }
         return value;
@@ -86,7 +95,7 @@ namespace turbo {
             return rs.status();
         }
         float value;
-        if(!turbo::simple_atof(rs.value(), &value)) {
+        if (!turbo::simple_atof(rs.value(), &value)) {
             return turbo::invalid_argument_error("invalid float value");
         }
         return value;
@@ -101,30 +110,30 @@ namespace turbo {
             return rs.status();
         }
         double value;
-        if(!turbo::simple_atod(rs.value(), &value)) {
+        if (!turbo::simple_atod(rs.value(), &value)) {
             return turbo::invalid_argument_error("invalid double value");
         }
         return value;
     }
 
     turbo::Status set_env_string(const char *name, const char *value, bool overwrite) {
-        if(name == nullptr|| value == nullptr) {
+        if (name == nullptr || value == nullptr) {
             return turbo::invalid_argument_error("value is null");
         }
 
-        if(strlen(name) == 0 || strlen(value) == 0) {
+        if (strlen(name) == 0 || strlen(value) == 0) {
             return turbo::invalid_argument_error("name or value is empty");
         }
 
         if (overwrite) {
-            return ::setenv(name, value, 1) == 0 ? turbo::OkStatus() : turbo::errno_to_status(errno,"setenv failed");
+            return ::setenv(name, value, 1) == 0 ? turbo::OkStatus() : turbo::errno_to_status(errno, "setenv failed");
         } else {
-            return ::setenv(name, value, 0) == 0 ? turbo::OkStatus() : turbo::errno_to_status(errno,"setenv failed");
+            return ::setenv(name, value, 0) == 0 ? turbo::OkStatus() : turbo::errno_to_status(errno, "setenv failed");
         }
     }
 
     turbo::Status set_env_if_not_exist(const char *name, const char *value) {
-        return ::setenv(name, value, 0) == 0 ? turbo::OkStatus() : turbo::errno_to_status(errno,"setenv failed");
+        return ::setenv(name, value, 0) == 0 ? turbo::OkStatus() : turbo::errno_to_status(errno, "setenv failed");
     }
 
     turbo::Status set_env_bool(const char *name, bool value) {
@@ -161,10 +170,10 @@ namespace turbo {
     }
 
     turbo::Status unset_env(const char *name) {
-        if(name == nullptr || strlen(name) == 0) {
+        if (name == nullptr || strlen(name) == 0) {
             return turbo::invalid_argument_error("name is nullptr or empty");
         }
-        return ::unsetenv(name) == 0 ? turbo::OkStatus() : turbo::errno_to_status(errno,"unsetenv failed");
+        return ::unsetenv(name) == 0 ? turbo::OkStatus() : turbo::errno_to_status(errno, "unsetenv failed");
     }
 
 }  // namespace turbo

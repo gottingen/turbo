@@ -28,7 +28,7 @@
 
 namespace turbo {
 
-    turbo::Result<std::string> get_env_string(const char *name);
+    turbo::Result<std::string> get_env_string(const char *name, std::optional<std::string> default_value = std::nullopt);
 
     turbo::Result<bool> get_env_bool(const char *name, std::optional<bool> default_value = std::nullopt);
 
