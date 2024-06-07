@@ -310,7 +310,7 @@ namespace turbo {
         //     while (n > 0) {
         //       CordBuffer buffer = first ? cord.GetAppendBuffer(n)
         //                                 : CordBuffer::CreateWithDefaultLimit(n);
-        //       turbo::Span<char> data = buffer.available_up_to(n);
+        //       turbo::span<char> data = buffer.available_up_to(n);
         //       FillRandomValues(data.data(), data.size());
         //       buffer.IncreaseLengthBy(data.size());
         //       cord.Append(std::move(buffer));

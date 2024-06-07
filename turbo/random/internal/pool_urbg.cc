@@ -56,7 +56,7 @@ class RandenPoolEntry {
   static constexpr size_t kCapacity =
       RandenTraits::kCapacityBytes / sizeof(uint32_t);
 
-  void Init(turbo::Span<const uint32_t> data) {
+  void Init(turbo::span<const uint32_t> data) {
     SpinLockHolder l(&mu_);  // Always uncontested.
     std::copy(data.begin(), data.end(), std::begin(state_));
     next_ = kState;
@@ -240,7 +240,7 @@ typename RandenPool<T>::result_type RandenPool<T>::Generate() {
 }
 
 template <typename T>
-void RandenPool<T>::Fill(turbo::Span<result_type> data) {
+void RandenPool<T>::Fill(turbo::span<result_type> data) {
   auto* pool = GetPoolForCurrentThread();
   pool->Fill(reinterpret_cast<uint8_t*>(data.data()),
              data.size() * sizeof(result_type));

@@ -97,7 +97,7 @@ inline std::vector<cord_internal::CordRep*> CreateFlatsFromString(
 }
 
 inline cord_internal::CordRepBtree* CordRepBtreeFromFlats(
-    turbo::Span<cord_internal::CordRep* const> flats) {
+    turbo::span<cord_internal::CordRep* const> flats) {
   assert(!flats.empty());
   auto* node = cord_internal::CordRepBtree::Create(flats[0]);
   for (size_t i = 1; i < flats.size(); ++i) {

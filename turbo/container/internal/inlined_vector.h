@@ -655,9 +655,9 @@ auto Storage<T, N, A>::Assign(ValueAdapter values,
 
   AllocationTransaction<A> allocation_tx(GetAllocator());
 
-  turbo::Span<ValueType<A>> assign_loop;
-  turbo::Span<ValueType<A>> construct_loop;
-  turbo::Span<ValueType<A>> destroy_loop;
+  turbo::span<ValueType<A>> assign_loop;
+  turbo::span<ValueType<A>> construct_loop;
+  turbo::span<ValueType<A>> destroy_loop;
 
   if (new_size > storage_view.capacity) {
     SizeType<A> requested_capacity =
@@ -782,19 +782,19 @@ auto Storage<T, N, A>::Insert(ConstIterator<A> pos, ValueAdapter values,
     IteratorValueAdapter<A, MoveIterator<A>> move_construction_values(
         MoveIterator<A>(storage_view.data +
                         (move_construction_destination_index - insert_count)));
-    turbo::Span<ValueType<A>> move_construction = {
+    turbo::span<ValueType<A>> move_construction = {
         storage_view.data + move_construction_destination_index,
         new_size - move_construction_destination_index};
 
     Pointer<A> move_assignment_values = storage_view.data + insert_index;
-    turbo::Span<ValueType<A>> move_assignment = {
+    turbo::span<ValueType<A>> move_assignment = {
         storage_view.data + insert_end_index,
         move_construction_destination_index - insert_end_index};
 
-    turbo::Span<ValueType<A>> insert_assignment = {move_assignment_values,
+    turbo::span<ValueType<A>> insert_assignment = {move_assignment_values,
                                                   move_construction.size()};
 
-    turbo::Span<ValueType<A>> insert_construction = {
+    turbo::span<ValueType<A>> insert_construction = {
         insert_assignment.data() + insert_assignment.size(),
         insert_count - insert_assignment.size()};
 

@@ -45,7 +45,7 @@ struct DistributionMoments {
   double kurtosis = 0.0;
 };
 DistributionMoments ComputeDistributionMoments(
-    turbo::Span<const double> data_points);
+    turbo::span<const double> data_points);
 
 std::ostream& operator<<(std::ostream& os, const DistributionMoments& moments);
 

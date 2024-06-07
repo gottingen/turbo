@@ -53,7 +53,7 @@ namespace turbo {
 // largest needed unconditionally, but that is more than we need in most of
 // cases. This way we use less stack in the common cases.
             class StackArray {
-                using Func = turbo::FunctionRef<void(turbo::Span<uint32_t>)>;
+                using Func = turbo::FunctionRef<void(turbo::span<uint32_t>)>;
                 static constexpr size_t kStep = 512 / sizeof(uint32_t);
                 // 5 steps is 2560 bytes, which is enough to hold a long double with the
                 // largest/smallest exponents.
@@ -152,7 +152,7 @@ namespace turbo {
 
                     StackArray::RunWithCapacity(
                             ChunksNeeded(exp),
-                            [=](turbo::Span<uint32_t> input) { f(BinaryToDecimal(input, v, exp)); });
+                            [=](turbo::span<uint32_t> input) { f(BinaryToDecimal(input, v, exp)); });
                 }
 
                 size_t TotalDigits() const {
@@ -178,7 +178,7 @@ namespace turbo {
                 }
 
             private:
-                BinaryToDecimal(turbo::Span<uint32_t> data, uint128 v, int exp) : data_(data) {
+                BinaryToDecimal(turbo::span<uint32_t> data, uint128 v, int exp) : data_(data) {
                     // We need to print the digits directly into the sink object without
                     // buffering them all first. To do this we need two things:
                     // - to know the total number of digits to do padding when necessary
@@ -240,7 +240,7 @@ namespace turbo {
                 char digits_[kDigitsPerChunk];
                 size_t size_ = 0;
 
-                turbo::Span<uint32_t> data_;
+                turbo::span<uint32_t> data_;
             };
 
 // Converts a value of the form `x * 2^-exp` into a sequence of decimal digits.
@@ -260,7 +260,7 @@ namespace turbo {
                                   "");
                     StackArray::RunWithCapacity(
                             static_cast<size_t>((Limits::digits + exp + 31) / 32),
-                            [=](turbo::Span<uint32_t> input) {
+                            [=](turbo::span<uint32_t> input) {
                                 f(FractionalDigitGenerator(input, v, exp));
                             });
                 }
@@ -311,7 +311,7 @@ namespace turbo {
                     return carry;
                 }
 
-                FractionalDigitGenerator(turbo::Span<uint32_t> data, uint128 v, int exp)
+                FractionalDigitGenerator(turbo::span<uint32_t> data, uint128 v, int exp)
                         : after_chunk_index_(static_cast<size_t>(exp / 32 + 1)), data_(data) {
                     const int offset = exp % 32;
                     // Right shift `v` by `exp` bits.
@@ -328,7 +328,7 @@ namespace turbo {
 
                 char next_digit_;
                 size_t after_chunk_index_;
-                turbo::Span<uint32_t> data_;
+                turbo::span<uint32_t> data_;
             };
 
 // Count the number of leading zero bits.

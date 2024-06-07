@@ -171,7 +171,7 @@ const std::string& GetTestTempDir() {
 
 struct FlagfileData {
   const std::string_view file_name;
-  const turbo::Span<const char* const> file_lines;
+  const turbo::span<const char* const> file_lines;
 };
 
 // clang-format off

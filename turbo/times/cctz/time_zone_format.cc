@@ -362,7 +362,7 @@ std::string format(const std::string& format, const time_point<seconds>& tp,
       pending = start = cur;
     }
 
-    // Span the sequential percent signs.
+    // span the sequential percent signs.
     const char* percent = cur;
     while (cur != end && *cur == '%') ++cur;
 

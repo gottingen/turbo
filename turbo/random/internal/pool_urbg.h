@@ -54,7 +54,7 @@ class RandenPool {
   inline result_type operator()() { return Generate(); }
 
   // Fill data with random values.
-  static void Fill(turbo::Span<result_type> data);
+  static void Fill(turbo::span<result_type> data);
 
  protected:
   // Generate returns a single value.
@@ -74,7 +74,7 @@ class PoolURBG {
   // Inheritance to access the protected static members of RandenPool.
   using unsigned_type = typename make_unsigned_bits<T>::type;
   using PoolType = RandenPool<unsigned_type>;
-  using SpanType = turbo::Span<unsigned_type>;
+  using SpanType = turbo::span<unsigned_type>;
 
   static constexpr size_t kInitialBuffer = kBufferSize + 1;
   static constexpr size_t kHalfBuffer = kBufferSize / 2;

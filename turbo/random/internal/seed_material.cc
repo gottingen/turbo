@@ -88,7 +88,7 @@ namespace {
 #if defined(TURBO_RANDOM_USE_BCRYPT)
 
 // On Windows potentially use the BCRYPT CNG API to read available entropy.
-bool ReadSeedMaterialFromOSEntropyImpl(turbo::Span<uint32_t> values) {
+bool ReadSeedMaterialFromOSEntropyImpl(turbo::span<uint32_t> values) {
   BCRYPT_ALG_HANDLE hProvider;
   NTSTATUS ret;
   ret = BCryptOpenAlgorithmProvider(&hProvider, BCRYPT_RNG_ALGORITHM,
@@ -109,7 +109,7 @@ bool ReadSeedMaterialFromOSEntropyImpl(turbo::Span<uint32_t> values) {
 #elif defined(TURBO_RANDOM_USE_NACL_SECURE_RANDOM)
 
 // On NaCL use nacl_secure_random to acquire bytes.
-bool ReadSeedMaterialFromOSEntropyImpl(turbo::Span<uint32_t> values) {
+bool ReadSeedMaterialFromOSEntropyImpl(turbo::span<uint32_t> values) {
   auto buffer = reinterpret_cast<uint8_t*>(values.data());
   size_t buffer_size = sizeof(uint32_t) * values.size();
 
@@ -129,7 +129,7 @@ bool ReadSeedMaterialFromOSEntropyImpl(turbo::Span<uint32_t> values) {
 
 #elif defined(__Fuchsia__)
 
-bool ReadSeedMaterialFromOSEntropyImpl(turbo::Span<uint32_t> values) {
+bool ReadSeedMaterialFromOSEntropyImpl(turbo::span<uint32_t> values) {
   auto buffer = reinterpret_cast<uint8_t*>(values.data());
   size_t buffer_size = sizeof(uint32_t) * values.size();
   zx_cprng_draw(buffer, buffer_size);
@@ -142,7 +142,7 @@ bool ReadSeedMaterialFromOSEntropyImpl(turbo::Span<uint32_t> values) {
 // On *nix, use getentropy() if supported. Note that libc may support
 // getentropy(), but the kernel may not, in which case this function will return
 // false.
-bool ReadSeedMaterialFromGetEntropy(turbo::Span<uint32_t> values) {
+bool ReadSeedMaterialFromGetEntropy(turbo::span<uint32_t> values) {
   auto buffer = reinterpret_cast<uint8_t*>(values.data());
   size_t buffer_size = sizeof(uint32_t) * values.size();
   while (buffer_size > 0) {
@@ -163,7 +163,7 @@ bool ReadSeedMaterialFromGetEntropy(turbo::Span<uint32_t> values) {
 #endif  // defined(TURBO_RANDOM_GETENTROPY)
 
 // On *nix, read entropy from /dev/urandom.
-bool ReadSeedMaterialFromDevURandom(turbo::Span<uint32_t> values) {
+bool ReadSeedMaterialFromDevURandom(turbo::span<uint32_t> values) {
   const char kEntropyFile[] = "/dev/urandom";
 
   auto buffer = reinterpret_cast<uint8_t*>(values.data());
@@ -190,7 +190,7 @@ bool ReadSeedMaterialFromDevURandom(turbo::Span<uint32_t> values) {
   return success;
 }
 
-bool ReadSeedMaterialFromOSEntropyImpl(turbo::Span<uint32_t> values) {
+bool ReadSeedMaterialFromOSEntropyImpl(turbo::span<uint32_t> values) {
 #if defined(TURBO_RANDOM_USE_GET_ENTROPY)
   if (ReadSeedMaterialFromGetEntropy(values)) {
     return true;
@@ -205,7 +205,7 @@ bool ReadSeedMaterialFromOSEntropyImpl(turbo::Span<uint32_t> values) {
 
 }  // namespace
 
-bool ReadSeedMaterialFromOSEntropy(turbo::Span<uint32_t> values) {
+bool ReadSeedMaterialFromOSEntropy(turbo::span<uint32_t> values) {
   assert(values.data() != nullptr);
   if (values.data() == nullptr) {
     return false;
@@ -216,8 +216,8 @@ bool ReadSeedMaterialFromOSEntropy(turbo::Span<uint32_t> values) {
   return ReadSeedMaterialFromOSEntropyImpl(values);
 }
 
-void MixIntoSeedMaterial(turbo::Span<const uint32_t> sequence,
-                         turbo::Span<uint32_t> seed_material) {
+void MixIntoSeedMaterial(turbo::span<const uint32_t> sequence,
+                         turbo::span<uint32_t> seed_material) {
   // Algorithm is based on code available at
   // https://gist.github.com/imneme/540829265469e673d045
   constexpr uint32_t kInitVal = 0x43b0d7e5;

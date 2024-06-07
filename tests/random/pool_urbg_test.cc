@@ -43,13 +43,13 @@ using is_randen_pool = typename turbo::disjunction<  //
 // MyFill either calls RandenPool::Fill() or std::generate(..., rng)
 template <typename T, typename V>
 typename turbo::enable_if_t<turbo::negation<is_randen_pool<T>>::value, void>  //
-MyFill(T& rng, turbo::Span<V> data) {  // NOLINT(runtime/references)
+MyFill(T& rng, turbo::span<V> data) {  // NOLINT(runtime/references)
   std::generate(std::begin(data), std::end(data), rng);
 }
 
 template <typename T, typename V>
 typename turbo::enable_if_t<is_randen_pool<T>::value, void>  //
-MyFill(T& rng, turbo::Span<V> data) {  // NOLINT(runtime/references)
+MyFill(T& rng, turbo::span<V> data) {  // NOLINT(runtime/references)
   rng.Fill(data);
 }
 

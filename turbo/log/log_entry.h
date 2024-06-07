@@ -215,7 +215,7 @@ namespace turbo {
         int verbose_level_;  // >=0 for `VLOG`, etc.; otherwise `kNoVerbosityLevel`.
         turbo::Time timestamp_;
         tid_t tid_;
-        turbo::Span<const char> text_message_with_prefix_and_newline_and_nul_;
+        turbo::span<const char> text_message_with_prefix_and_newline_and_nul_;
         size_t prefix_len_;
         std::string_view encoding_;
         std::string stacktrace_;

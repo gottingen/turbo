@@ -184,7 +184,7 @@ namespace turbo::log_internal {
             }
 
             void log_to_sinks(const turbo::LogEntry &entry,
-                            turbo::Span<turbo::LogSink *> extra_sinks, bool extra_sinks_only)
+                            turbo::span<turbo::LogSink *> extra_sinks, bool extra_sinks_only)
             TURBO_LOCKS_EXCLUDED(guard_) {
                 SendToSinks(entry, extra_sinks);
 
@@ -256,7 +256,7 @@ namespace turbo::log_internal {
 
             // Helper routine for log_to_sinks.
             static void SendToSinks(const turbo::LogEntry &entry,
-                                    turbo::Span<turbo::LogSink *> sinks) {
+                                    turbo::span<turbo::LogSink *> sinks) {
                 for (turbo::LogSink *sink: sinks) {
                     sink->Send(entry);
                 }
@@ -278,7 +278,7 @@ namespace turbo::log_internal {
     bool thread_is_logging_to_log_sink() { return thread_is_logging_status(); }
 
     void log_to_sinks(const turbo::LogEntry &entry,
-                    turbo::Span<turbo::LogSink *> extra_sinks, bool extra_sinks_only) {
+                    turbo::span<turbo::LogSink *> extra_sinks, bool extra_sinks_only) {
         log_internal::GlobalSinks().log_to_sinks(entry, extra_sinks, extra_sinks_only);
     }
 

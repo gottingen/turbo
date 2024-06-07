@@ -186,7 +186,7 @@ namespace turbo {
         class Streamable {
         public:
             Streamable(const UntypedFormatSpecImpl &format,
-                       turbo::Span<const FormatArgImpl> args)
+                       turbo::span<const FormatArgImpl> args)
                     : format_(format), args_(args.begin(), args.end()) {}
 
             std::ostream &Print(std::ostream &os) const;
@@ -202,25 +202,25 @@ namespace turbo {
 
 // for testing
         std::string Summarize(UntypedFormatSpecImpl format,
-                              turbo::Span<const FormatArgImpl> args);
+                              turbo::span<const FormatArgImpl> args);
 
         bool BindWithPack(const UnboundConversion *props,
-                          turbo::Span<const FormatArgImpl> pack, BoundConversion *bound);
+                          turbo::span<const FormatArgImpl> pack, BoundConversion *bound);
 
         bool format_untyped(FormatRawSinkImpl raw_sink, UntypedFormatSpecImpl format,
-                            turbo::Span<const FormatArgImpl> args);
+                            turbo::span<const FormatArgImpl> args);
 
         std::string &AppendPack(std::string *out, UntypedFormatSpecImpl format,
-                                turbo::Span<const FormatArgImpl> args);
+                                turbo::span<const FormatArgImpl> args);
 
         std::string FormatPack(UntypedFormatSpecImpl format,
-                               turbo::Span<const FormatArgImpl> args);
+                               turbo::span<const FormatArgImpl> args);
 
         int FprintF(std::FILE *output, UntypedFormatSpecImpl format,
-                    turbo::Span<const FormatArgImpl> args);
+                    turbo::span<const FormatArgImpl> args);
 
         int SnprintF(char *output, size_t size, UntypedFormatSpecImpl format,
-                     turbo::Span<const FormatArgImpl> args);
+                     turbo::span<const FormatArgImpl> args);
 
 // Returned by Streamed(v). Converts via '%s' to the std::string created
 // by std::ostream << v.

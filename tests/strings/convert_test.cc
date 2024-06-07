@@ -723,7 +723,7 @@ namespace turbo {
                 const std::vector<bool> cv = {true, false};
                 EXPECT_EQ("1,0,1,0",
                           FormatPack(UntypedFormatSpecImpl("%d,%d,%d,%d"),
-                                     turbo::Span<const FormatArgImpl>(
+                                     turbo::span<const FormatArgImpl>(
                                              {FormatArgImpl(v[0]), FormatArgImpl(v[1]),
                                               FormatArgImpl(cv[0]), FormatArgImpl(cv[1])})));
             }

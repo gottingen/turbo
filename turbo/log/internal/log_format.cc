@@ -78,7 +78,7 @@ PutLeadingWhitespace(T tid, char*& p) {
 // The fields before the filename are all fixed-width except for the thread ID,
 // which is of bounded width.
 size_t FormatBoundedFields(turbo::LogSeverity severity, turbo::Time timestamp,
-                           log_internal::Tid tid, turbo::Span<char>& buf) {
+                           log_internal::Tid tid, turbo::span<char>& buf) {
   constexpr size_t kBoundedFieldsMaxLen =
       sizeof("SMMDD HH:MM:SS.NNNNNN  ") +
       (1 + std::numeric_limits<log_internal::Tid>::digits10 + 1) - sizeof("");
@@ -149,7 +149,7 @@ size_t FormatBoundedFields(turbo::LogSeverity severity, turbo::Time timestamp,
   return bytes_formatted;
 }
 
-size_t FormatLineNumber(int line, turbo::Span<char>& buf) {
+size_t FormatLineNumber(int line, turbo::span<char>& buf) {
   constexpr size_t kLineFieldMaxLen =
       sizeof(":] ") + (1 + std::numeric_limits<int>::digits10 + 1) - sizeof("");
   if (TURBO_UNLIKELY(buf.size() < kLineFieldMaxLen)) {
@@ -194,7 +194,7 @@ std::string FormatLogMessage(turbo::LogSeverity severity,
 // 3. line number and bracket
 size_t FormatLogPrefix(turbo::LogSeverity severity, turbo::Time timestamp,
                        log_internal::Tid tid, std::string_view basename,
-                       int line, PrefixFormat format, turbo::Span<char>& buf) {
+                       int line, PrefixFormat format, turbo::span<char>& buf) {
   auto prefix_size = FormatBoundedFields(severity, timestamp, tid, buf);
   prefix_size += log_internal::AppendTruncated(basename, buf);
   prefix_size += FormatLineNumber(line, buf);

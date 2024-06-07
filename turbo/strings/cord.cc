@@ -275,7 +275,7 @@ namespace turbo {
             turbo::Nonnull<CordRep *> root, turbo::Nonnull<turbo::Nullable<char *> *> region,
             turbo::Nonnull<size_t *> size, size_t max_length) {
         if (root->IsBtree() && root->refcount.IsOne()) {
-            Span<char> span = root->btree()->GetAppendBuffer(max_length);
+            span<char> span = root->btree()->GetAppendBuffer(max_length);
             if (!span.empty()) {
                 *region = span.data();
                 *size = span.size();

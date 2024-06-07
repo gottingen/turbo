@@ -39,9 +39,9 @@
 
 namespace {
 
-static_assert(!turbo::type_traits_internal::IsOwner<turbo::Span<int>>::value &&
-                  turbo::type_traits_internal::IsView<turbo::Span<int>>::value,
-              "Span is a view, not an owner");
+static_assert(!turbo::type_traits_internal::IsOwner<turbo::span<int>>::value &&
+                  turbo::type_traits_internal::IsView<turbo::span<int>>::value,
+              "span is a view, not an owner");
 
 MATCHER_P(DataIs, data,
           turbo::str_cat("data() ", negation ? "isn't " : "is ",
@@ -67,57 +67,57 @@ std::vector<int> MakeRamp(int len, int offset = 0) {
 }
 
 TEST(IntSpan, EmptyCtors) {
-  turbo::Span<int> s;
+  turbo::span<int> s;
   EXPECT_THAT(s, SpanIs(nullptr, 0));
 }
 
 TEST(IntSpan, PtrLenCtor) {
   int a[] = {1, 2, 3};
-  turbo::Span<int> s(&a[0], 2);
+  turbo::span<int> s(&a[0], 2);
   EXPECT_THAT(s, SpanIs(a, 2));
 }
 
 TEST(IntSpan, ArrayCtor) {
   int a[] = {1, 2, 3};
-  turbo::Span<int> s(a);
+  turbo::span<int> s(a);
   EXPECT_THAT(s, SpanIs(a, 3));
 
-  EXPECT_TRUE((std::is_constructible<turbo::Span<const int>, int[3]>::value));
+  EXPECT_TRUE((std::is_constructible<turbo::span<const int>, int[3]>::value));
   EXPECT_TRUE(
-      (std::is_constructible<turbo::Span<const int>, const int[3]>::value));
-  EXPECT_FALSE((std::is_constructible<turbo::Span<int>, const int[3]>::value));
-  EXPECT_TRUE((std::is_convertible<int[3], turbo::Span<const int>>::value));
+      (std::is_constructible<turbo::span<const int>, const int[3]>::value));
+  EXPECT_FALSE((std::is_constructible<turbo::span<int>, const int[3]>::value));
+  EXPECT_TRUE((std::is_convertible<int[3], turbo::span<const int>>::value));
   EXPECT_TRUE(
-      (std::is_convertible<const int[3], turbo::Span<const int>>::value));
+      (std::is_convertible<const int[3], turbo::span<const int>>::value));
 }
 
 template <typename T>
-void TakesGenericSpan(turbo::Span<T>) {}
+void TakesGenericSpan(turbo::span<T>) {}
 
 TEST(IntSpan, ContainerCtor) {
   std::vector<int> empty;
-  turbo::Span<int> s_empty(empty);
+  turbo::span<int> s_empty(empty);
   EXPECT_THAT(s_empty, SpanIs(empty));
 
   std::vector<int> filled{1, 2, 3};
-  turbo::Span<int> s_filled(filled);
+  turbo::span<int> s_filled(filled);
   EXPECT_THAT(s_filled, SpanIs(filled));
 
-  turbo::Span<int> s_from_span(filled);
+  turbo::span<int> s_from_span(filled);
   EXPECT_THAT(s_from_span, SpanIs(s_filled));
 
-  turbo::Span<const int> const_filled = filled;
+  turbo::span<const int> const_filled = filled;
   EXPECT_THAT(const_filled, SpanIs(filled));
 
-  turbo::Span<const int> const_from_span = s_filled;
+  turbo::span<const int> const_from_span = s_filled;
   EXPECT_THAT(const_from_span, SpanIs(s_filled));
 
   EXPECT_TRUE(
-      (std::is_convertible<std::vector<int>&, turbo::Span<const int>>::value));
+      (std::is_convertible<std::vector<int>&, turbo::span<const int>>::value));
   EXPECT_TRUE(
-      (std::is_convertible<turbo::Span<int>&, turbo::Span<const int>>::value));
+      (std::is_convertible<turbo::span<int>&, turbo::span<const int>>::value));
 
-  TakesGenericSpan(turbo::Span<int>(filled));
+  TakesGenericSpan(turbo::span<int>(filled));
 }
 
 // A struct supplying shallow data() const.
@@ -129,7 +129,7 @@ struct ContainerWithShallowConstData {
 
 TEST(IntSpan, ShallowConstness) {
   const ContainerWithShallowConstData c{MakeRamp(20)};
-  turbo::Span<int> s(
+  turbo::span<int> s(
       c);  // We should be able to do this even though data() is const.
   s[0] = -1;
   EXPECT_EQ(c.storage[0], -1);
@@ -137,32 +137,32 @@ TEST(IntSpan, ShallowConstness) {
 
 TEST(CharSpan, StringCtor) {
   std::string empty = "";
-  turbo::Span<char> s_empty(empty);
+  turbo::span<char> s_empty(empty);
   EXPECT_THAT(s_empty, SpanIs(empty));
 
   std::string abc = "abc";
-  turbo::Span<char> s_abc(abc);
+  turbo::span<char> s_abc(abc);
   EXPECT_THAT(s_abc, SpanIs(abc));
 
-  turbo::Span<const char> s_const_abc = abc;
+  turbo::span<const char> s_const_abc = abc;
   EXPECT_THAT(s_const_abc, SpanIs(abc));
 
-  EXPECT_FALSE((std::is_constructible<turbo::Span<int>, std::string>::value));
+  EXPECT_FALSE((std::is_constructible<turbo::span<int>, std::string>::value));
   EXPECT_FALSE(
-      (std::is_constructible<turbo::Span<const int>, std::string>::value));
+      (std::is_constructible<turbo::span<const int>, std::string>::value));
   EXPECT_TRUE(
-      (std::is_convertible<std::string, turbo::Span<const char>>::value));
+      (std::is_convertible<std::string, turbo::span<const char>>::value));
 }
 
 TEST(IntSpan, FromConstPointer) {
-  EXPECT_TRUE((std::is_constructible<turbo::Span<const int* const>,
+  EXPECT_TRUE((std::is_constructible<turbo::span<const int* const>,
                                      std::vector<int*>>::value));
-  EXPECT_TRUE((std::is_constructible<turbo::Span<const int* const>,
+  EXPECT_TRUE((std::is_constructible<turbo::span<const int* const>,
                                      std::vector<const int*>>::value));
   EXPECT_FALSE((
-      std::is_constructible<turbo::Span<const int*>, std::vector<int*>>::value));
+      std::is_constructible<turbo::span<const int*>, std::vector<int*>>::value));
   EXPECT_FALSE((
-      std::is_constructible<turbo::Span<int*>, std::vector<const int*>>::value));
+      std::is_constructible<turbo::span<int*>, std::vector<const int*>>::value));
 }
 
 struct TypeWithMisleadingData {
@@ -179,9 +179,9 @@ struct TypeWithMisleadingSize {
 
 TEST(IntSpan, EvilTypes) {
   EXPECT_FALSE(
-      (std::is_constructible<turbo::Span<int>, TypeWithMisleadingData&>::value));
+      (std::is_constructible<turbo::span<int>, TypeWithMisleadingData&>::value));
   EXPECT_FALSE(
-      (std::is_constructible<turbo::Span<int>, TypeWithMisleadingSize&>::value));
+      (std::is_constructible<turbo::span<int>, TypeWithMisleadingSize&>::value));
 }
 
 struct Base {
@@ -192,13 +192,13 @@ struct Base {
 struct Derived : Base {};
 
 TEST(IntSpan, SpanOfDerived) {
-  EXPECT_TRUE((std::is_constructible<turbo::Span<int>, Base&>::value));
-  EXPECT_TRUE((std::is_constructible<turbo::Span<int>, Derived&>::value));
+  EXPECT_TRUE((std::is_constructible<turbo::span<int>, Base&>::value));
+  EXPECT_TRUE((std::is_constructible<turbo::span<int>, Derived&>::value));
   EXPECT_FALSE(
-      (std::is_constructible<turbo::Span<Base>, std::vector<Derived>>::value));
+      (std::is_constructible<turbo::span<Base>, std::vector<Derived>>::value));
 }
 
-void TestInitializerList(turbo::Span<const int> s, const std::vector<int>& v) {
+void TestInitializerList(turbo::span<const int> s, const std::vector<int>& v) {
   EXPECT_TRUE(std::equal(s.begin(), s.end(), v.begin(), v.end()));
 }
 
@@ -207,26 +207,26 @@ TEST(ConstIntSpan, InitializerListConversion) {
   TestInitializerList({1}, {1});
   TestInitializerList({1, 2, 3}, {1, 2, 3});
 
-  EXPECT_FALSE((std::is_constructible<turbo::Span<int>,
+  EXPECT_FALSE((std::is_constructible<turbo::span<int>,
                                       std::initializer_list<int>>::value));
   EXPECT_FALSE((
-      std::is_convertible<turbo::Span<int>, std::initializer_list<int>>::value));
+      std::is_convertible<turbo::span<int>, std::initializer_list<int>>::value));
 }
 
 TEST(IntSpan, Data) {
   int i;
-  turbo::Span<int> s(&i, 1);
+  turbo::span<int> s(&i, 1);
   EXPECT_EQ(&i, s.data());
 }
 
 TEST(IntSpan, SizeLengthEmpty) {
-  turbo::Span<int> empty;
+  turbo::span<int> empty;
   EXPECT_EQ(empty.size(), 0);
   EXPECT_TRUE(empty.empty());
   EXPECT_EQ(empty.size(), empty.length());
 
   auto v = MakeRamp(10);
-  turbo::Span<int> s(v);
+  turbo::span<int> s(v);
   EXPECT_EQ(s.size(), 10);
   EXPECT_FALSE(s.empty());
   EXPECT_EQ(s.size(), s.length());
@@ -234,7 +234,7 @@ TEST(IntSpan, SizeLengthEmpty) {
 
 TEST(IntSpan, ElementAccess) {
   auto v = MakeRamp(10);
-  turbo::Span<int> s(v);
+  turbo::span<int> s(v);
   for (int i = 0; i < s.size(); ++i) {
     EXPECT_EQ(s[i], s.at(i));
   }
@@ -250,7 +250,7 @@ TEST(IntSpan, ElementAccess) {
 
 TEST(IntSpan, AtThrows) {
   auto v = MakeRamp(10);
-  turbo::Span<int> s(v);
+  turbo::span<int> s(v);
 
   EXPECT_EQ(s.at(9), 9);
   TURBO_BASE_INTERNAL_EXPECT_FAIL(s.at(10), std::out_of_range,
@@ -259,7 +259,7 @@ TEST(IntSpan, AtThrows) {
 
 TEST(IntSpan, RemovePrefixAndSuffix) {
   auto v = MakeRamp(20, 1);
-  turbo::Span<int> s(v);
+  turbo::span<int> s(v);
   EXPECT_EQ(s.size(), 20);
 
   s.remove_suffix(0);
@@ -284,9 +284,9 @@ TEST(IntSpan, RemovePrefixAndSuffix) {
   EXPECT_EQ(v, MakeRamp(20, 1));
 
 #if !defined(NDEBUG) || TURBO_OPTION_HARDENED
-  turbo::Span<int> prefix_death(v);
+  turbo::span<int> prefix_death(v);
   EXPECT_DEATH_IF_SUPPORTED(prefix_death.remove_prefix(21), "");
-  turbo::Span<int> suffix_death(v);
+  turbo::span<int> suffix_death(v);
   EXPECT_DEATH_IF_SUPPORTED(suffix_death.remove_suffix(21), "");
 #endif
 }
@@ -295,16 +295,16 @@ TEST(IntSpan, Subspan) {
   std::vector<int> empty;
   EXPECT_EQ(turbo::MakeSpan(empty).subspan(), empty);
   EXPECT_THAT(turbo::MakeSpan(empty).subspan(0, 0), SpanIs(empty));
-  EXPECT_THAT(turbo::MakeSpan(empty).subspan(0, turbo::Span<const int>::npos),
+  EXPECT_THAT(turbo::MakeSpan(empty).subspan(0, turbo::span<const int>::npos),
               SpanIs(empty));
 
   auto ramp = MakeRamp(10);
   EXPECT_THAT(turbo::MakeSpan(ramp).subspan(), SpanIs(ramp));
   EXPECT_THAT(turbo::MakeSpan(ramp).subspan(0, 10), SpanIs(ramp));
-  EXPECT_THAT(turbo::MakeSpan(ramp).subspan(0, turbo::Span<const int>::npos),
+  EXPECT_THAT(turbo::MakeSpan(ramp).subspan(0, turbo::span<const int>::npos),
               SpanIs(ramp));
   EXPECT_THAT(turbo::MakeSpan(ramp).subspan(0, 3), SpanIs(ramp.data(), 3));
-  EXPECT_THAT(turbo::MakeSpan(ramp).subspan(5, turbo::Span<const int>::npos),
+  EXPECT_THAT(turbo::MakeSpan(ramp).subspan(5, turbo::span<const int>::npos),
               SpanIs(ramp.data() + 5, 5));
   EXPECT_THAT(turbo::MakeSpan(ramp).subspan(3, 3), SpanIs(ramp.data() + 3, 3));
   EXPECT_THAT(turbo::MakeSpan(ramp).subspan(10, 5), SpanIs(ramp.data() + 10, 0));
@@ -431,20 +431,20 @@ TEST(IntSpan, MakeSpanTypes) {
   const int* cip = ca;
   std::string s = "";
   const std::string cs = "";
-  CheckType<turbo::Span<int>>(turbo::MakeSpan(vec));
-  CheckType<turbo::Span<const int>>(turbo::MakeSpan(cvec));
-  CheckType<turbo::Span<int>>(turbo::MakeSpan(ip, ip + 1));
-  CheckType<turbo::Span<int>>(turbo::MakeSpan(ip, 1));
-  CheckType<turbo::Span<const int>>(turbo::MakeSpan(cip, cip + 1));
-  CheckType<turbo::Span<const int>>(turbo::MakeSpan(cip, 1));
-  CheckType<turbo::Span<int>>(turbo::MakeSpan(a));
-  CheckType<turbo::Span<int>>(turbo::MakeSpan(a, a + 1));
-  CheckType<turbo::Span<int>>(turbo::MakeSpan(a, 1));
-  CheckType<turbo::Span<const int>>(turbo::MakeSpan(ca));
-  CheckType<turbo::Span<const int>>(turbo::MakeSpan(ca, ca + 1));
-  CheckType<turbo::Span<const int>>(turbo::MakeSpan(ca, 1));
-  CheckType<turbo::Span<char>>(turbo::MakeSpan(s));
-  CheckType<turbo::Span<const char>>(turbo::MakeSpan(cs));
+  CheckType<turbo::span<int>>(turbo::MakeSpan(vec));
+  CheckType<turbo::span<const int>>(turbo::MakeSpan(cvec));
+  CheckType<turbo::span<int>>(turbo::MakeSpan(ip, ip + 1));
+  CheckType<turbo::span<int>>(turbo::MakeSpan(ip, 1));
+  CheckType<turbo::span<const int>>(turbo::MakeSpan(cip, cip + 1));
+  CheckType<turbo::span<const int>>(turbo::MakeSpan(cip, 1));
+  CheckType<turbo::span<int>>(turbo::MakeSpan(a));
+  CheckType<turbo::span<int>>(turbo::MakeSpan(a, a + 1));
+  CheckType<turbo::span<int>>(turbo::MakeSpan(a, 1));
+  CheckType<turbo::span<const int>>(turbo::MakeSpan(ca));
+  CheckType<turbo::span<const int>>(turbo::MakeSpan(ca, ca + 1));
+  CheckType<turbo::span<const int>>(turbo::MakeSpan(ca, 1));
+  CheckType<turbo::span<char>>(turbo::MakeSpan(s));
+  CheckType<turbo::span<const char>>(turbo::MakeSpan(cs));
 }
 
 TEST(ConstIntSpan, MakeConstSpanTypes) {
@@ -456,16 +456,16 @@ TEST(ConstIntSpan, MakeConstSpanTypes) {
   const int* cptr = carray;
   std::string s = "";
   std::string cs = "";
-  CheckType<turbo::Span<const int>>(turbo::MakeConstSpan(vec));
-  CheckType<turbo::Span<const int>>(turbo::MakeConstSpan(cvec));
-  CheckType<turbo::Span<const int>>(turbo::MakeConstSpan(ptr, ptr + 1));
-  CheckType<turbo::Span<const int>>(turbo::MakeConstSpan(ptr, 1));
-  CheckType<turbo::Span<const int>>(turbo::MakeConstSpan(cptr, cptr + 1));
-  CheckType<turbo::Span<const int>>(turbo::MakeConstSpan(cptr, 1));
-  CheckType<turbo::Span<const int>>(turbo::MakeConstSpan(array));
-  CheckType<turbo::Span<const int>>(turbo::MakeConstSpan(carray));
-  CheckType<turbo::Span<const char>>(turbo::MakeConstSpan(s));
-  CheckType<turbo::Span<const char>>(turbo::MakeConstSpan(cs));
+  CheckType<turbo::span<const int>>(turbo::MakeConstSpan(vec));
+  CheckType<turbo::span<const int>>(turbo::MakeConstSpan(cvec));
+  CheckType<turbo::span<const int>>(turbo::MakeConstSpan(ptr, ptr + 1));
+  CheckType<turbo::span<const int>>(turbo::MakeConstSpan(ptr, 1));
+  CheckType<turbo::span<const int>>(turbo::MakeConstSpan(cptr, cptr + 1));
+  CheckType<turbo::span<const int>>(turbo::MakeConstSpan(cptr, 1));
+  CheckType<turbo::span<const int>>(turbo::MakeConstSpan(array));
+  CheckType<turbo::span<const int>>(turbo::MakeConstSpan(carray));
+  CheckType<turbo::span<const char>>(turbo::MakeConstSpan(s));
+  CheckType<turbo::span<const char>>(turbo::MakeConstSpan(cs));
 }
 
 TEST(IntSpan, Equality) {
@@ -477,8 +477,8 @@ TEST(IntSpan, Equality) {
   // These two slices are from different vectors, but have the same size and
   // have the same elements (right now).  They should compare equal. Test both
   // == and !=.
-  const turbo::Span<const int> from1 = vec1;
-  const turbo::Span<const int> from2 = vec2;
+  const turbo::span<const int> from1 = vec1;
+  const turbo::span<const int> from2 = vec2;
   EXPECT_EQ(from1, from1);
   EXPECT_FALSE(from1 != from1);
   EXPECT_EQ(from1, from2);
@@ -486,21 +486,21 @@ TEST(IntSpan, Equality) {
 
   // These two slices have different underlying vector values. They should be
   // considered not equal. Test both == and !=.
-  const turbo::Span<const int> from_other = other_vec;
+  const turbo::span<const int> from_other = other_vec;
   EXPECT_NE(from1, from_other);
   EXPECT_FALSE(from1 == from_other);
 
   // Comparison between a vector and its slice should be equal. And vice-versa.
-  // This ensures implicit conversion to Span works on both sides of ==.
+  // This ensures implicit conversion to span works on both sides of ==.
   EXPECT_EQ(vec1, from1);
   EXPECT_FALSE(vec1 != from1);
   EXPECT_EQ(from1, vec1);
   EXPECT_FALSE(from1 != vec1);
 
-  // This verifies that turbo::Span<T> can be compared freely with
-  // turbo::Span<const T>.
-  const turbo::Span<int> mutable_from1(vec1);
-  const turbo::Span<int> mutable_from2(vec2);
+  // This verifies that turbo::span<T> can be compared freely with
+  // turbo::span<const T>.
+  const turbo::span<int> mutable_from1(vec1);
+  const turbo::span<int> mutable_from2(vec2);
   EXPECT_EQ(from1, mutable_from1);
   EXPECT_EQ(mutable_from1, from1);
   EXPECT_EQ(mutable_from1, mutable_from2);
@@ -513,23 +513,23 @@ TEST(IntSpan, Equality) {
   EXPECT_EQ(mutable_from1, vec1);
   EXPECT_FALSE(mutable_from1 != vec1);
 
-  // Comparison between convertible-to-Span-of-const and Span-of-mutable. Arrays
+  // Comparison between convertible-to-span-of-const and span-of-mutable. Arrays
   // are used because they're the only value type which converts to a
-  // Span-of-mutable. EXPECT_TRUE is used instead of EXPECT_EQ to avoid
+  // span-of-mutable. EXPECT_TRUE is used instead of EXPECT_EQ to avoid
   // array-to-pointer decay.
   EXPECT_TRUE(arr1 == mutable_from1);
   EXPECT_FALSE(arr1 != mutable_from1);
   EXPECT_TRUE(mutable_from1 == arr1);
   EXPECT_FALSE(mutable_from1 != arr1);
 
-  // Comparison between convertible-to-Span-of-mutable and Span-of-const
+  // Comparison between convertible-to-span-of-mutable and span-of-const
   EXPECT_TRUE(arr2 == from1);
   EXPECT_FALSE(arr2 != from1);
   EXPECT_TRUE(from1 == arr2);
   EXPECT_FALSE(from1 != arr2);
 
   // With a different size, the array slices should not be equal.
-  EXPECT_NE(from1, turbo::Span<const int>(from1).subspan(0, from1.size() - 1));
+  EXPECT_NE(from1, turbo::span<const int>(from1).subspan(0, from1.size() - 1));
 
   // With different contents, the array slices should not be equal.
   ++vec2.back();
@@ -553,8 +553,8 @@ class IntSpanOrderComparisonTest : public testing::Test {
   int arr_before_[3], arr_after_[3];
   const int carr_after_[3];
   std::vector<int> vec_before_, vec_after_;
-  turbo::Span<int> before_, after_;
-  turbo::Span<const int> cbefore_, cafter_;
+  turbo::span<int> before_, after_;
+  turbo::span<const int> cbefore_, cafter_;
 };
 
 TEST_F(IntSpanOrderComparisonTest, CompareSpans) {
@@ -638,7 +638,7 @@ TEST_F(IntSpanOrderComparisonTest, Subspans) {
 }
 
 TEST_F(IntSpanOrderComparisonTest, EmptySpans) {
-  turbo::Span<int> empty;
+  turbo::span<int> empty;
   EXPECT_FALSE(empty < empty);
   EXPECT_TRUE(empty <= empty);
   EXPECT_FALSE(empty > empty);
@@ -654,44 +654,44 @@ TEST_F(IntSpanOrderComparisonTest, EmptySpans) {
 }
 
 TEST(IntSpan, ExposesContainerTypesAndConsts) {
-  turbo::Span<int> slice;
-  CheckType<turbo::Span<int>::iterator>(slice.begin());
+  turbo::span<int> slice;
+  CheckType<turbo::span<int>::iterator>(slice.begin());
   EXPECT_TRUE((std::is_convertible<decltype(slice.begin()),
-                                   turbo::Span<int>::const_iterator>::value));
-  CheckType<turbo::Span<int>::const_iterator>(slice.cbegin());
+                                   turbo::span<int>::const_iterator>::value));
+  CheckType<turbo::span<int>::const_iterator>(slice.cbegin());
   EXPECT_TRUE((std::is_convertible<decltype(slice.end()),
-                                   turbo::Span<int>::const_iterator>::value));
-  CheckType<turbo::Span<int>::const_iterator>(slice.cend());
-  CheckType<turbo::Span<int>::reverse_iterator>(slice.rend());
+                                   turbo::span<int>::const_iterator>::value));
+  CheckType<turbo::span<int>::const_iterator>(slice.cend());
+  CheckType<turbo::span<int>::reverse_iterator>(slice.rend());
   EXPECT_TRUE(
       (std::is_convertible<decltype(slice.rend()),
-                           turbo::Span<int>::const_reverse_iterator>::value));
-  CheckType<turbo::Span<int>::const_reverse_iterator>(slice.crend());
-  testing::StaticAssertTypeEq<int, turbo::Span<int>::value_type>();
-  testing::StaticAssertTypeEq<int, turbo::Span<const int>::value_type>();
-  testing::StaticAssertTypeEq<int, turbo::Span<int>::element_type>();
-  testing::StaticAssertTypeEq<const int, turbo::Span<const int>::element_type>();
-  testing::StaticAssertTypeEq<int*, turbo::Span<int>::pointer>();
-  testing::StaticAssertTypeEq<const int*, turbo::Span<const int>::pointer>();
-  testing::StaticAssertTypeEq<int&, turbo::Span<int>::reference>();
-  testing::StaticAssertTypeEq<const int&, turbo::Span<const int>::reference>();
-  testing::StaticAssertTypeEq<const int&, turbo::Span<int>::const_reference>();
+                           turbo::span<int>::const_reverse_iterator>::value));
+  CheckType<turbo::span<int>::const_reverse_iterator>(slice.crend());
+  testing::StaticAssertTypeEq<int, turbo::span<int>::value_type>();
+  testing::StaticAssertTypeEq<int, turbo::span<const int>::value_type>();
+  testing::StaticAssertTypeEq<int, turbo::span<int>::element_type>();
+  testing::StaticAssertTypeEq<const int, turbo::span<const int>::element_type>();
+  testing::StaticAssertTypeEq<int*, turbo::span<int>::pointer>();
+  testing::StaticAssertTypeEq<const int*, turbo::span<const int>::pointer>();
+  testing::StaticAssertTypeEq<int&, turbo::span<int>::reference>();
+  testing::StaticAssertTypeEq<const int&, turbo::span<const int>::reference>();
+  testing::StaticAssertTypeEq<const int&, turbo::span<int>::const_reference>();
   testing::StaticAssertTypeEq<const int&,
-                              turbo::Span<const int>::const_reference>();
-  EXPECT_EQ(static_cast<turbo::Span<int>::size_type>(-1), turbo::Span<int>::npos);
+                              turbo::span<const int>::const_reference>();
+  EXPECT_EQ(static_cast<turbo::span<int>::size_type>(-1), turbo::span<int>::npos);
 }
 
 TEST(IntSpan, IteratorsAndReferences) {
   auto accept_pointer = [](int*) {};
   auto accept_reference = [](int&) {};
-  auto accept_iterator = [](turbo::Span<int>::iterator) {};
-  auto accept_const_iterator = [](turbo::Span<int>::const_iterator) {};
-  auto accept_reverse_iterator = [](turbo::Span<int>::reverse_iterator) {};
+  auto accept_iterator = [](turbo::span<int>::iterator) {};
+  auto accept_const_iterator = [](turbo::span<int>::const_iterator) {};
+  auto accept_reverse_iterator = [](turbo::span<int>::reverse_iterator) {};
   auto accept_const_reverse_iterator =
-      [](turbo::Span<int>::const_reverse_iterator) {};
+      [](turbo::span<int>::const_reverse_iterator) {};
 
   int a[1];
-  turbo::Span<int> s = a;
+  turbo::span<int> s = a;
 
   accept_pointer(s.data());
   accept_iterator(s.begin());
@@ -716,14 +716,14 @@ TEST(IntSpan, IteratorsAndReferences) {
 TEST(IntSpan, IteratorsAndReferences_Const) {
   auto accept_pointer = [](int*) {};
   auto accept_reference = [](int&) {};
-  auto accept_iterator = [](turbo::Span<int>::iterator) {};
-  auto accept_const_iterator = [](turbo::Span<int>::const_iterator) {};
-  auto accept_reverse_iterator = [](turbo::Span<int>::reverse_iterator) {};
+  auto accept_iterator = [](turbo::span<int>::iterator) {};
+  auto accept_const_iterator = [](turbo::span<int>::const_iterator) {};
+  auto accept_reverse_iterator = [](turbo::span<int>::reverse_iterator) {};
   auto accept_const_reverse_iterator =
-      [](turbo::Span<int>::const_reverse_iterator) {};
+      [](turbo::span<int>::const_reverse_iterator) {};
 
   int a[1];
-  const turbo::Span<int> s = a;
+  const turbo::span<int> s = a;
 
   accept_pointer(s.data());
   accept_iterator(s.begin());
@@ -748,12 +748,12 @@ TEST(IntSpan, IteratorsAndReferences_Const) {
 TEST(IntSpan, NoexceptTest) {
   int a[] = {1, 2, 3};
   std::vector<int> v;
-  EXPECT_TRUE(noexcept(turbo::Span<const int>()));
-  EXPECT_TRUE(noexcept(turbo::Span<const int>(a, 2)));
-  EXPECT_TRUE(noexcept(turbo::Span<const int>(a)));
-  EXPECT_TRUE(noexcept(turbo::Span<const int>(v)));
-  EXPECT_TRUE(noexcept(turbo::Span<int>(v)));
-  EXPECT_TRUE(noexcept(turbo::Span<const int>({1, 2, 3})));
+  EXPECT_TRUE(noexcept(turbo::span<const int>()));
+  EXPECT_TRUE(noexcept(turbo::span<const int>(a, 2)));
+  EXPECT_TRUE(noexcept(turbo::span<const int>(a)));
+  EXPECT_TRUE(noexcept(turbo::span<const int>(v)));
+  EXPECT_TRUE(noexcept(turbo::span<int>(v)));
+  EXPECT_TRUE(noexcept(turbo::span<const int>({1, 2, 3})));
   EXPECT_TRUE(noexcept(turbo::MakeSpan(v)));
   EXPECT_TRUE(noexcept(turbo::MakeSpan(a)));
   EXPECT_TRUE(noexcept(turbo::MakeSpan(a, 2)));
@@ -763,7 +763,7 @@ TEST(IntSpan, NoexceptTest) {
   EXPECT_TRUE(noexcept(turbo::MakeConstSpan(a, 2)));
   EXPECT_TRUE(noexcept(turbo::MakeConstSpan(a, a + 1)));
 
-  turbo::Span<int> s(v);
+  turbo::span<int> s(v);
   EXPECT_TRUE(noexcept(s.data()));
   EXPECT_TRUE(noexcept(s.size()));
   EXPECT_TRUE(noexcept(s.length()));
@@ -805,10 +805,10 @@ TEST(ConstIntSpan, ConstexprTest) {
   static constexpr int a[] = {1, 2, 3};
   static constexpr int sized_arr[2] = {1, 2};
   static constexpr ContainerWithConstexprMethods c{1};
-  TURBO_TEST_CONSTEXPR(turbo::Span<const int>());
-  TURBO_TEST_CONSTEXPR(turbo::Span<const int>(a, 2));
-  TURBO_TEST_CONSTEXPR(turbo::Span<const int>(sized_arr));
-  TURBO_TEST_CONSTEXPR(turbo::Span<const int>(c));
+  TURBO_TEST_CONSTEXPR(turbo::span<const int>());
+  TURBO_TEST_CONSTEXPR(turbo::span<const int>(a, 2));
+  TURBO_TEST_CONSTEXPR(turbo::span<const int>(sized_arr));
+  TURBO_TEST_CONSTEXPR(turbo::span<const int>(c));
   TURBO_TEST_CONSTEXPR(turbo::MakeSpan(&a[0], 1));
   TURBO_TEST_CONSTEXPR(turbo::MakeSpan(c));
   TURBO_TEST_CONSTEXPR(turbo::MakeSpan(a));
@@ -816,7 +816,7 @@ TEST(ConstIntSpan, ConstexprTest) {
   TURBO_TEST_CONSTEXPR(turbo::MakeConstSpan(c));
   TURBO_TEST_CONSTEXPR(turbo::MakeConstSpan(a));
 
-  constexpr turbo::Span<const int> span = c;
+  constexpr turbo::span<const int> span = c;
   TURBO_TEST_CONSTEXPR(span.data());
   TURBO_TEST_CONSTEXPR(span.size());
   TURBO_TEST_CONSTEXPR(span.length());
@@ -833,15 +833,15 @@ struct BigStruct {
   char bytes[10000];
 };
 
-TEST(Span, SpanSize) {
-  EXPECT_LE(sizeof(turbo::Span<int>), 2 * sizeof(void*));
-  EXPECT_LE(sizeof(turbo::Span<BigStruct>), 2 * sizeof(void*));
+TEST(span, SpanSize) {
+  EXPECT_LE(sizeof(turbo::span<int>), 2 * sizeof(void*));
+  EXPECT_LE(sizeof(turbo::span<BigStruct>), 2 * sizeof(void*));
 }
 
-TEST(Span, Hash) {
+TEST(span, Hash) {
   int array[] = {1, 2, 3, 4};
   int array2[] = {1, 2, 3};
-  using T = turbo::Span<const int>;
+  using T = turbo::span<const int>;
   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       {// Empties
        T(), T(nullptr, 0), T(array, 0), T(array2, 0),

@@ -225,9 +225,9 @@ class LogMessage {
 
    private:
     LogMessageData& data_;
-    turbo::Span<char> encoded_remaining_copy_;
-    turbo::Span<char> message_start_;
-    turbo::Span<char> string_start_;
+    turbo::span<char> encoded_remaining_copy_;
+    turbo::span<char> message_start_;
+    turbo::span<char> string_start_;
   };
 
   enum class StringType {

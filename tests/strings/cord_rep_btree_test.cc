@@ -221,7 +221,7 @@ CordRepBtree* MakeTree(size_t size, bool append = true) {
   return tree;
 }
 
-CordRepBtree* CreateTree(turbo::Span<CordRep* const> reps) {
+CordRepBtree* CreateTree(turbo::span<CordRep* const> reps) {
   auto it = reps.begin();
   CordRepBtree* tree = CordRepBtree::Create(*it);
   while (++it != reps.end()) tree = CordRepBtree::Append(tree, *it);
@@ -446,7 +446,7 @@ TEST_P(CordRepBtreeTest, AppendToLeafBeyondCapacity) {
   auto* result = CordRepBtree::Append(leaf, flat);
   ASSERT_THAT(result, IsNode(1));
   EXPECT_THAT(result, Ne(leaf));
-  turbo::Span<CordRep* const> edges = result->Edges();
+  turbo::span<CordRep* const> edges = result->Edges();
   ASSERT_THAT(edges, ElementsAre(leaf, IsNode(0)));
   EXPECT_THAT(edges[1]->btree()->Edges(), ElementsAre(flat));
   CordRep::Unref(result);
@@ -460,7 +460,7 @@ TEST_P(CordRepBtreeTest, PrependToLeafBeyondCapacity) {
   auto* result = CordRepBtree::Prepend(leaf, flat);
   ASSERT_THAT(result, IsNode(1));
   EXPECT_THAT(result, Ne(leaf));
-  turbo::Span<CordRep* const> edges = result->Edges();
+  turbo::span<CordRep* const> edges = result->Edges();
   ASSERT_THAT(edges, ElementsAre(IsNode(0), leaf));
   EXPECT_THAT(edges[0]->btree()->Edges(), ElementsAre(flat));
   CordRep::Unref(result);
@@ -722,7 +722,7 @@ TEST_P(CordRepBtreeDualTest, MergeLeafWithTreeExceedingLeafCapacity) {
 }
 
 void RefEdgesAt(size_t depth, AutoUnref& refs, CordRepBtree* tree) {
-  turbo::Span<CordRep* const> edges = tree->Edges();
+  turbo::span<CordRep* const> edges = tree->Edges();
   if (depth == 0) {
     refs.Ref(edges.front());
     refs.Ref(edges.back());
@@ -1144,7 +1144,7 @@ TEST_P(CordRepBtreeHeightTest, GetAppendBufferFlatWithCapacity) {
   for (int i = 1; i <= height(); ++i) {
     tree = CordRepBtree::New(tree);
   }
-  turbo::Span<char> span = tree->GetAppendBuffer(2);
+  turbo::span<char> span = tree->GetAppendBuffer(2);
   EXPECT_THAT(span, SizeIs(2u));
   EXPECT_THAT(span.data(), TypedEq<void*>(flat->Data() + 3));
   EXPECT_THAT(tree->length, Eq(5u));

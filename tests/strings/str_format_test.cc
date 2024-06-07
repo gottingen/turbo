@@ -77,7 +77,7 @@ TEST_F(FormatEntryPointTest, UntypedFormat) {
     std::string actual;
     int i = 123;
     FormatArgImpl arg_123(i);
-    turbo::Span<const FormatArgImpl> args(&arg_123, 1);
+    turbo::span<const FormatArgImpl> args(&arg_123, 1);
     UntypedFormatSpec format(fmt);
 
     EXPECT_TRUE(format_untyped(&actual, format, args));

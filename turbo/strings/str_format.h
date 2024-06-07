@@ -562,7 +562,7 @@ namespace turbo {
     // On failure, this function returns `false` and the state of the sink is
     // unspecified.
     //
-    // The arguments are provided in an `turbo::Span<const turbo::FormatArg>`.
+    // The arguments are provided in an `turbo::span<const turbo::FormatArg>`.
     // Each `turbo::FormatArg` object binds to a single argument and keeps a
     // reference to it. The values used to create the `FormatArg` objects must
     // outlive this function call.
@@ -589,7 +589,7 @@ namespace turbo {
     //
     TURBO_MUST_USE_RESULT inline bool format_untyped(
             FormatRawSink raw_sink, const UntypedFormatSpec &format,
-            turbo::Span<const FormatArg> args) {
+            turbo::span<const FormatArg> args) {
         return str_format_internal::format_untyped(
                 str_format_internal::FormatRawSinkImpl::Extract(raw_sink),
                 str_format_internal::UntypedFormatSpecImpl::Extract(format), args);

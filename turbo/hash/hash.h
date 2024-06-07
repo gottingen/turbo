@@ -432,7 +432,7 @@ namespace turbo {
 
     // using murmur3 hash algorithm
     template<typename T>
-    inline uint32_t hash32(turbo::Span<T> data, uint32_t seed = 0) {
+    inline uint32_t hash32(turbo::span<T> data, uint32_t seed = 0) {
         return hash32(data.data(), data.size() * sizeof(T), seed);
     }
 
@@ -453,12 +453,12 @@ namespace turbo {
     void hash128(const void *data, size_t size, std::array<uint32_t , 4> *result, uint32_t seed = 0);
 
     template<typename T>
-    inline void hash128(turbo::Span<T> data, std::array<uint64_t, 2> *result, uint32_t seed = 0) {
+    inline void hash128(turbo::span<T> data, std::array<uint64_t, 2> *result, uint32_t seed = 0) {
         hash128(data.data(), data.size() * sizeof(T), result, seed);
     }
 
     template<typename T>
-    inline void hash128(turbo::Span<T> data, std::array<uint32_t , 4> *result, uint32_t seed = 0) {
+    inline void hash128(turbo::span<T> data, std::array<uint32_t , 4> *result, uint32_t seed = 0) {
         hash128(data.data(), data.size() * sizeof(T), result, seed);
     }
 

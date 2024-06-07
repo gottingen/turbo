@@ -43,7 +43,7 @@ namespace str_format_internal {
 namespace {
 
 inline bool BindFromPosition(int position, int* value,
-                             turbo::Span<const FormatArgImpl> pack) {
+                             turbo::span<const FormatArgImpl> pack) {
   assert(position > 0);
   if (static_cast<size_t>(position) > pack.size()) {
     return false;
@@ -55,7 +55,7 @@ inline bool BindFromPosition(int position, int* value,
 
 class ArgContext {
  public:
-  explicit ArgContext(turbo::Span<const FormatArgImpl> pack) : pack_(pack) {}
+  explicit ArgContext(turbo::span<const FormatArgImpl> pack) : pack_(pack) {}
 
   // Fill 'bound' with the results of applying the context's argument pack
   // to the specified 'unbound'. We synthesize a BoundConversion by
@@ -66,7 +66,7 @@ class ArgContext {
   bool Bind(const UnboundConversion* unbound, BoundConversion* bound);
 
  private:
-  turbo::Span<const FormatArgImpl> pack_;
+  turbo::span<const FormatArgImpl> pack_;
 };
 
 inline bool ArgContext::Bind(const UnboundConversion* unbound,
@@ -122,7 +122,7 @@ inline bool ArgContext::Bind(const UnboundConversion* unbound,
 template <typename Converter>
 class ConverterConsumer {
  public:
-  ConverterConsumer(Converter converter, turbo::Span<const FormatArgImpl> pack)
+  ConverterConsumer(Converter converter, turbo::span<const FormatArgImpl> pack)
       : converter_(converter), arg_context_(pack) {}
 
   bool Append(std::string_view s) {
@@ -142,7 +142,7 @@ class ConverterConsumer {
 
 template <typename Converter>
 bool ConvertAll(const UntypedFormatSpecImpl format,
-                turbo::Span<const FormatArgImpl> args, Converter converter) {
+                turbo::span<const FormatArgImpl> args, Converter converter) {
   if (format.has_parsed_conversion()) {
     return format.parsed_conversion()->ProcessFormat(
         ConverterConsumer<Converter>(converter, args));
@@ -192,13 +192,13 @@ class SummarizingConverter {
 }  // namespace
 
 bool BindWithPack(const UnboundConversion* props,
-                  turbo::Span<const FormatArgImpl> pack,
+                  turbo::span<const FormatArgImpl> pack,
                   BoundConversion* bound) {
   return ArgContext(pack).Bind(props, bound);
 }
 
 std::string Summarize(const UntypedFormatSpecImpl format,
-                      turbo::Span<const FormatArgImpl> args) {
+                      turbo::span<const FormatArgImpl> args) {
   typedef SummarizingConverter Converter;
   std::string out;
   {
@@ -214,7 +214,7 @@ std::string Summarize(const UntypedFormatSpecImpl format,
 
 bool format_untyped(FormatRawSinkImpl raw_sink,
                    const UntypedFormatSpecImpl format,
-                   turbo::Span<const FormatArgImpl> args) {
+                   turbo::span<const FormatArgImpl> args) {
   FormatSinkImpl sink(raw_sink);
   using Converter = DefaultConverter;
   return ConvertAll(format, args, Converter(&sink));
@@ -226,7 +226,7 @@ std::ostream& Streamable::Print(std::ostream& os) const {
 }
 
 std::string& AppendPack(std::string* out, const UntypedFormatSpecImpl format,
-                        turbo::Span<const FormatArgImpl> args) {
+                        turbo::span<const FormatArgImpl> args) {
   size_t orig = out->size();
   if (TURBO_UNLIKELY(!format_untyped(out, format, args))) {
     out->erase(orig);
@@ -235,7 +235,7 @@ std::string& AppendPack(std::string* out, const UntypedFormatSpecImpl format,
 }
 
 std::string FormatPack(UntypedFormatSpecImpl format,
-                       turbo::Span<const FormatArgImpl> args) {
+                       turbo::span<const FormatArgImpl> args) {
   std::string out;
   if (TURBO_UNLIKELY(!format_untyped(&out, format, args))) {
     out.clear();
@@ -244,7 +244,7 @@ std::string FormatPack(UntypedFormatSpecImpl format,
 }
 
 int FprintF(std::FILE* output, const UntypedFormatSpecImpl format,
-            turbo::Span<const FormatArgImpl> args) {
+            turbo::span<const FormatArgImpl> args) {
   FILERawSink sink(output);
   if (!format_untyped(&sink, format, args)) {
     errno = EINVAL;
@@ -262,7 +262,7 @@ int FprintF(std::FILE* output, const UntypedFormatSpecImpl format,
 }
 
 int SnprintF(char* output, size_t size, const UntypedFormatSpecImpl format,
-             turbo::Span<const FormatArgImpl> args) {
+             turbo::span<const FormatArgImpl> args) {
   BufferRawSink sink(output, size ? size - 1 : 0);
   if (!format_untyped(&sink, format, args)) {
     errno = EINVAL;

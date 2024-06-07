@@ -48,7 +48,7 @@ namespace turbo {
                 T output;
             };
 
-            static void TestRoundTrip(Span<const RoundTripTestCase> test_cases) {
+            static void TestRoundTrip(span<const RoundTripTestCase> test_cases) {
                 for (size_t index = 0; index < test_cases.size(); ++index) {
                     SCOPED_TRACE(str_cat("i=", index));
                     const auto &tc = test_cases[index];
@@ -64,7 +64,7 @@ namespace turbo {
                 }
             }
 
-            static void TestRoundTripFromNaN(Span<const T> test_cases) {
+            static void TestRoundTripFromNaN(span<const T> test_cases) {
                 for (size_t i = 0; i < test_cases.size(); ++i) {
                     SCOPED_TRACE(str_cat("i=", i));
                     const auto input = test_cases[i];
@@ -147,7 +147,7 @@ namespace turbo {
                     {Limits<float>::lowest(), 0b1111110000000000u, -Limits<float>::infinity()},
             };
 
-            TestRoundTrip(Span(test_cases, std::size(test_cases)));
+            TestRoundTrip(span(test_cases, std::size(test_cases)));
         }
 
         template<>
@@ -186,7 +186,7 @@ namespace turbo {
                     {Limits<double>::lowest(), 0b1111110000000000u, -Limits<double>::infinity()},
             };
 
-            TestRoundTrip(Span(test_cases, std::size(test_cases)));
+            TestRoundTrip(span(test_cases, std::size(test_cases)));
         }
 
         template<>
@@ -194,7 +194,7 @@ namespace turbo {
             const float test_cases[] = {
                     Limits<float>::quiet_NaN(), F32(0x7f800001u), F32(0xff800001u), F32(0x7fc00000u),
                     F32(0xffc00000u), F32(0x7fffffffu), F32(0xffffffffu)};
-            TestRoundTripFromNaN(Span(test_cases, std::size(test_cases)));
+            TestRoundTripFromNaN(span(test_cases, std::size(test_cases)));
         }
 
         template<>
@@ -203,7 +203,7 @@ namespace turbo {
                                          F64(0xfff0000000000001u), F64(0x7ff8000000000000u),
                                          F64(0xfff8000000000000u), F64(0x7fffffffffffffffu),
                                          F64(0xffffffffffffffffu)};
-            TestRoundTripFromNaN(Span(test_cases, std::size(test_cases)));
+            TestRoundTripFromNaN(span(test_cases, std::size(test_cases)));
         }
 
         using NativeFloatTypes = ::testing::Types<float, double>;

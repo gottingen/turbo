@@ -398,11 +398,11 @@ void CordzInfo::Unlock() TURBO_UNLOCK_FUNCTION(mutex_) {
   }
 }
 
-turbo::Span<void* const> CordzInfo::GetStack() const {
+turbo::span<void* const> CordzInfo::GetStack() const {
   return turbo::MakeConstSpan(stack_, stack_depth_);
 }
 
-turbo::Span<void* const> CordzInfo::GetParentStack() const {
+turbo::span<void* const> CordzInfo::GetParentStack() const {
   return turbo::MakeConstSpan(parent_stack_, parent_stack_depth_);
 }
 

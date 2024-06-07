@@ -40,7 +40,7 @@ inline double fma(double x, double y, double z) { return (x * y) + z; }
 }  // namespace
 
 DistributionMoments ComputeDistributionMoments(
-    turbo::Span<const double> data_points) {
+    turbo::span<const double> data_points) {
   DistributionMoments result;
 
   // Compute m1

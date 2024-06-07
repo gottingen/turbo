@@ -104,7 +104,7 @@ class SaltedSeedSeq {
                      size_t n) {
     seq_->generate(begin, end);
     const uint32_t salt = turbo::random_internal::GetSaltMaterial().value_or(0);
-    auto span = turbo::Span<uint32_t>(&*begin, n);
+    auto span = turbo::span<uint32_t>(&*begin, n);
     MixIntoSeedMaterial(turbo::MakeConstSpan(&salt, 1), span);
   }
 

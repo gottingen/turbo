@@ -86,7 +86,7 @@ class LogEntryTestPeer {
         << "Failed to parse time " << timestamp_bits.first;
     ci_.subsecond = turbo::Duration::nanoseconds(nanos);
 
-    turbo::Span<char> view = turbo::MakeSpan(buf_);
+    turbo::span<char> view = turbo::MakeSpan(buf_);
     view.remove_suffix(2);
     entry_.prefix_len_ =
         entry_.prefix_
@@ -98,7 +98,7 @@ class LogEntryTestPeer {
     EXPECT_THAT(entry_.prefix_len_,
                 Eq(static_cast<size_t>(view.data() - buf_.data())));
     log_internal::AppendTruncated(text_message, view);
-    view = turbo::Span<char>(view.data(), view.size() + 2);
+    view = turbo::span<char>(view.data(), view.size() + 2);
     view[0] = '\n';
     view[1] = '\0';
     view.remove_prefix(2);
@@ -116,7 +116,7 @@ class LogEntryTestPeer {
   }
   std::string FormatPrefixIntoSizedBuffer(size_t sz) {
     std::string str(sz, '\0');
-    turbo::Span<char> buf(&str[0], str.size());
+    turbo::span<char> buf(&str[0], str.size());
     const size_t prefix_size = log_internal::FormatLogPrefix(
         entry_.log_severity(), entry_.timestamp(), entry_.tid(),
         entry_.source_basename(), entry_.source_line(), format_, buf);

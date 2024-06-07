@@ -87,7 +87,7 @@ enum ValueTag : uint8_t {
 // may not truncate the data it writes in order to do make space for that nul
 // terminator.  In any case, `dst` will be advanced to point at the byte where
 // subsequent writes should begin.
-bool PrintValue(turbo::Span<char>& dst, turbo::Span<const char> buf) {
+bool PrintValue(turbo::span<char>& dst, turbo::span<const char> buf) {
   if (dst.size() <= 1) return false;
   ProtoField field;
   while (field.DecodeFrom(&buf)) {
@@ -153,7 +153,7 @@ struct LogMessage::LogMessageData final {
   // cannot be truncated to fit, the size of `encoded_remaining` will be zeroed
   // to prevent encoding of any further data.  Note that in this case its data()
   // pointer will not point past the end of `encoded_buf`.
-  turbo::Span<char> encoded_remaining;
+  turbo::span<char> encoded_remaining;
 
   // A formatted string message is built in `string_buf`.
   std::array<char, kLogMessageBufferSize> string_buf;
@@ -184,12 +184,12 @@ void LogMessage::LogMessageData::FinalizeEncodingAndFormat() {
   // Note that `encoded_remaining` may have zero size without pointing past the
   // end of `encoded_buf`, so the difference between `data()` pointers is used
   // to compute the size of `encoded_data`.
-  turbo::Span<const char> encoded_data(
+  turbo::span<const char> encoded_data(
       encoded_buf.data(),
       static_cast<size_t>(encoded_remaining.data() - encoded_buf.data()));
   // `string_remaining` is the suffix of `string_buf` that has not been filled
   // yet.
-  turbo::Span<char> string_remaining(string_buf);
+  turbo::span<char> string_remaining(string_buf);
   // We may need to write a newline and nul-terminator at the end of the decoded
   // string data.  Rather than worry about whether those should overwrite the
   // end of the string (if the buffer is full) or be appended, we avoid writing
@@ -451,7 +451,7 @@ LogMessage::OstreamView::~OstreamView() {
     data_.encoded_remaining.remove_suffix(data_.encoded_remaining.size());
     return;
   }
-  const turbo::Span<const char> contents(pbase(),
+  const turbo::span<const char> contents(pbase(),
                                         static_cast<size_t>(pptr() - pbase()));
   if (contents.empty()) return;
   encoded_remaining_copy_.remove_prefix(contents.size());

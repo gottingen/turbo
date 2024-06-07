@@ -72,7 +72,7 @@ std::string FormatLogMessage(turbo::LogSeverity severity,
 // see a thread ID.
 size_t FormatLogPrefix(turbo::LogSeverity severity, turbo::Time timestamp,
                        log_internal::Tid tid, std::string_view basename,
-                       int line, PrefixFormat format, turbo::Span<char>& buf);
+                       int line, PrefixFormat format, turbo::span<char>& buf);
 
 }  // namespace log_internal
 TURBO_NAMESPACE_END
