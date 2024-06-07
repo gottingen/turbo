@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-#include <turbo/status/result_impl.h>
+#include <turbo/utility/result_impl.h>
 
 #include <cstdlib>
 #include <utility>
@@ -23,8 +23,8 @@
 #include <turbo/base/config.h>
 #include <turbo/base/internal/raw_logging.h>
 #include <turbo/base/nullability.h>
-#include <turbo/status/internal/statusor_internal.h>
-#include <turbo/status/status_impl.h>
+#include <turbo/utility/internal/statusor_internal.h>
+#include <turbo/utility/status_impl.h>
 #include <turbo/strings/str_cat.h>
 
 namespace turbo {

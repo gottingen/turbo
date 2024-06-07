@@ -85,7 +85,7 @@
 #include <array>
 #include <turbo/functional/function_ref.h>
 #include <turbo/hash/internal/hash.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo {
 

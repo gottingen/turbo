@@ -69,7 +69,7 @@
 #include <turbo/base/optimization.h>
 #include <turbo/base/port.h>    // TODO(strel): remove this include
 #include <turbo/meta/type_traits.h>
-#include <turbo/types/internal/span.h>
+#include <turbo/container/internal/span.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

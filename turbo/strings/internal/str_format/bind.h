@@ -31,8 +31,8 @@
 #include <turbo/strings/internal/str_format/extension.h>
 #include <turbo/strings/internal/str_format/parser.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/span.h>
-#include <turbo/utility/utility.h>
+#include <turbo/container/span.h>
+#include <turbo/meta/utility.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

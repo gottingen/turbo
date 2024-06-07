@@ -35,7 +35,7 @@
 #include <turbo/log/internal/config.h>
 #include <turbo/strings/string_view.h>
 #include <turbo/times/time.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo {
 

@@ -39,7 +39,7 @@
 #include <turbo/base/optimization.h>
 #include <turbo/meta/type_traits.h>
 #include <turbo/types/bad_variant_access.h>
-#include <turbo/utility/utility.h>
+#include <turbo/meta/utility.h>
 
 #if !defined(TURBO_USES_STD_VARIANT)
 

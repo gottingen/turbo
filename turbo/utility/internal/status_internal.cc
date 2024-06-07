@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/status/internal/status_internal.h>
+#include <turbo/utility/internal/status_internal.h>
 
 #include <atomic>
 #include <cassert>
@@ -34,8 +34,8 @@
 #include <turbo/debugging/stacktrace.h>
 #include <turbo/debugging/symbolize.h>
 #include <turbo/memory/memory.h>
-#include <turbo/status/status_impl.h>
-#include <turbo/status/status_payload_printer.h>
+#include <turbo/utility/status_impl.h>
+#include <turbo/utility/status_payload_printer.h>
 #include <turbo/strings/cord.h>
 #include <turbo/strings/escaping.h>
 #include <turbo/strings/str_cat.h>

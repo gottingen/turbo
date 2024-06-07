@@ -23,7 +23,7 @@
 #include <vector>
 
 #include <turbo/strings/string_view.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 // NOTE: The functions in this file are test only, and are should not be used in
 // non-test code.

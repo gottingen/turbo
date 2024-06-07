@@ -72,7 +72,7 @@
 #include <turbo/meta/type_traits.h>
 #include <turbo/strings/cord.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/compare.h>
+#include <turbo/meta/compare.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

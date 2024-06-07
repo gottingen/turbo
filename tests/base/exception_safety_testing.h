@@ -39,7 +39,7 @@
 #include <turbo/meta/type_traits.h>
 #include <turbo/strings/string_view.h>
 #include <turbo/strings/substitute.h>
-#include <turbo/utility/utility.h>
+#include <turbo/meta/utility.h>
 
 namespace testing {
 

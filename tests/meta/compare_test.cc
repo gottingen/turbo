@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/types/compare.h>
+#include <turbo/meta/compare.h>
 
 #include <gtest/gtest.h>
 #include <turbo/base/casts.h>

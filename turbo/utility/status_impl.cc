@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
-#include <turbo/status/status_impl.h>
+#include <turbo/utility/status_impl.h>
 
 #include <errno.h>
 
@@ -35,7 +35,7 @@
 #include <turbo/base/nullability.h>
 #include <turbo/debugging/stacktrace.h>
 #include <turbo/debugging/symbolize.h>
-#include <turbo/status/internal/status_internal.h>
+#include <turbo/utility/internal/status_internal.h>
 #include <turbo/strings/str_cat.h>
 #include <turbo/strings/str_format.h>
 #include <turbo/strings/str_split.h>

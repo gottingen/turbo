@@ -35,7 +35,7 @@
 #include <turbo/container/internal/compressed_tuple.h>
 #include <turbo/memory/memory.h>
 #include <turbo/meta/type_traits.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

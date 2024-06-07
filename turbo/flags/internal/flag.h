@@ -43,7 +43,7 @@
 #include <turbo/meta/type_traits.h>
 #include <turbo/strings/string_view.h>
 #include <turbo/synchronization/mutex.h>
-#include <turbo/utility/utility.h>
+#include <turbo/meta/utility.h>
 
 namespace turbo {
 

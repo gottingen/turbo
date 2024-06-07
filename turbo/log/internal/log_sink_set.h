@@ -25,7 +25,7 @@
 #include <turbo/base/config.h>
 #include <turbo/log/log_entry.h>
 #include <turbo/log/log_sink.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

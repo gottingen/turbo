@@ -50,13 +50,13 @@
 #include <turbo/base/nullability.h>
 #include <turbo/base/call_once.h>
 #include <turbo/meta/type_traits.h>
-#include <turbo/status/internal/statusor_internal.h>
-#include <turbo/status/status_impl.h>
+#include <turbo/utility/internal/statusor_internal.h>
+#include <turbo/utility/status_impl.h>
 #include <turbo/strings/has_stringify.h>
 #include <turbo/strings/has_ostream_operator.h>
 #include <turbo/strings/str_format.h>
 #include <turbo/types/variant.h>
-#include <turbo/utility/utility.h>
+#include <turbo/meta/utility.h>
 
 namespace turbo {
     // BadResultAccess

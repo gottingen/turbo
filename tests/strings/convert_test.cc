@@ -47,7 +47,7 @@
 #include <turbo/strings/str_format.h>
 #include <turbo/strings/string_view.h>
 #include <turbo/types/optional.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 #if defined(TURBO_HAVE_STD_STRING_VIEW)
 #include <string_view>

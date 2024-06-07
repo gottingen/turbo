@@ -24,9 +24,9 @@
 #include <turbo/base/attributes.h>
 #include <turbo/base/nullability.h>
 #include <turbo/meta/type_traits.h>
-#include <turbo/status/status_impl.h>
+#include <turbo/utility/status_impl.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/utility/utility.h>
+#include <turbo/meta/utility.h>
 
 namespace turbo {
 

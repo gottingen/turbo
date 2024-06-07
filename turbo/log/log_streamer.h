@@ -36,7 +36,7 @@
 #include <turbo/strings/internal/ostringstream.h>
 #include <turbo/strings/string_view.h>
 #include <turbo/types/optional.h>
-#include <turbo/utility/utility.h>
+#include <turbo/meta/utility.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

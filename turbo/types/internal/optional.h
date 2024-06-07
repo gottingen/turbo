@@ -26,7 +26,7 @@
 #include <turbo/base/internal/inline_variable.h>
 #include <turbo/memory/memory.h>
 #include <turbo/meta/type_traits.h>
-#include <turbo/utility/utility.h>
+#include <turbo/meta/utility.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

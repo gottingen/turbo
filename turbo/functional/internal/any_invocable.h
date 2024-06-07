@@ -72,7 +72,7 @@
 #include <turbo/base/macros.h>
 #include <turbo/base/optimization.h>
 #include <turbo/meta/type_traits.h>
-#include <turbo/utility/utility.h>
+#include <turbo/meta/utility.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

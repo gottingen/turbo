@@ -57,7 +57,7 @@
 #include <turbo/log/check.h>
 #include <tests/log/test_helpers.h>
 #include <turbo/log/log.h>
-#include <turbo/status/status_impl.h>
+#include <turbo/utility/status_impl.h>
 #include <turbo/strings/escaping.h>
 #include <turbo/strings/str_format.h>
 #include <turbo/strings/string_view.h>

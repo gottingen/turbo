@@ -48,7 +48,7 @@
 #include <turbo/strings/str_cat.h>
 #include <turbo/strings/str_split.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/compare.h>
+#include <turbo/meta/compare.h>
 #include <turbo/types/optional.h>
 
 TURBO_FLAG(int, test_values, 10000, "The number of values to use for tests");

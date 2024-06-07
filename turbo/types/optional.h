@@ -39,7 +39,7 @@
 #define TURBO_TYPES_OPTIONAL_H_
 
 #include <turbo/base/config.h>   // TODO(calabrese) IWYU removal?
-#include <turbo/utility/utility.h>
+#include <turbo/meta/utility.h>
 
 #ifdef TURBO_USES_STD_OPTIONAL
 

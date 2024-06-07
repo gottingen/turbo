@@ -26,7 +26,7 @@
 #include <gtest/gtest.h>
 
 #include <turbo/numeric/float16.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 #include <turbo/strings/str_cat.h>
 
 namespace turbo {

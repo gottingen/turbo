@@ -34,7 +34,7 @@
 #include <turbo/strings/internal/str_format/extension.h>
 #include <turbo/strings/internal/str_format/output.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

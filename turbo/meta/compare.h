@@ -30,8 +30,7 @@
 // (`std::partial_ordering`, etc.) and are designed to be drop-in replacements
 // for code compliant with C++20.
 
-#ifndef TURBO_TYPES_COMPARE_H_
-#define TURBO_TYPES_COMPARE_H_
+#pragma once
 
 #include <turbo/base/config.h>
 
@@ -504,5 +503,3 @@ constexpr turbo::weak_ordering do_three_way_comparison(const Compare &compare,
 }  // namespace compare_internal
 TURBO_NAMESPACE_END
 }  // namespace turbo
-
-#endif  // TURBO_TYPES_COMPARE_H_

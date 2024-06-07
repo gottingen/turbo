@@ -28,7 +28,7 @@
 #include <turbo/base/internal/cycleclock.h>
 #include <tests/hash/hash_testing.h>
 #include <turbo/meta/type_traits.h>
-#include <turbo/types/compare.h>
+#include <turbo/meta/compare.h>
 
 #define MAKE_INT128(HI, LO) turbo::MakeInt128(static_cast<int64_t>(HI), LO)
 

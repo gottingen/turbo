@@ -26,7 +26,7 @@
 #include <gtest/gtest.h>
 #include <turbo/base/config.h>
 #include <turbo/meta/type_traits.h>
-#include <turbo/utility/utility.h>
+#include <turbo/meta/utility.h>
 
 static_assert(turbo::internal_any_invocable::kStorageSize >= sizeof(void*),
               "These tests assume that the small object storage is at least "

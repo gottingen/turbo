@@ -31,7 +31,7 @@
 #include <turbo/strings/internal/cordz_update_tracker.h>
 #include <turbo/synchronization/mutex.h>
 #include <turbo/times/clock.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

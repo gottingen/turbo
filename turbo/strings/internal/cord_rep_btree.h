@@ -29,7 +29,7 @@
 #include <turbo/strings/internal/cord_internal.h>
 #include <turbo/strings/internal/cord_rep_flat.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

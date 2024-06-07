@@ -35,7 +35,7 @@
 #include <turbo/numeric/internal/representation.h>
 #include <turbo/strings/numbers.h>
 #include <turbo/types/optional.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

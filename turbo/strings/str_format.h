@@ -88,7 +88,7 @@
 #include <turbo/strings/internal/str_format/extension.h>  // IWYU pragma: export
 #include <turbo/strings/internal/str_format/parser.h>  // IWYU pragma: export
 #include <turbo/strings/string_view.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo {
 
