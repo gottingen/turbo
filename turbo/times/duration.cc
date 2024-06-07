@@ -733,7 +733,7 @@ namespace turbo {
         // fractional digits, because it is in the noise of what a Duration can
         // represent.
         struct DisplayUnit {
-            turbo::string_view abbr;
+            std::string_view abbr;
             int prec;
             double pow10;
         };
@@ -921,7 +921,7 @@ namespace turbo {
     //   a possibly signed sequence of decimal numbers, each with optional
     //   fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
     //   Valid time units are "ns", "us" "ms", "s", "m", "h".
-    bool Duration::parse(turbo::string_view dur_sv, Duration *d) {
+    bool Duration::parse(std::string_view dur_sv, Duration *d) {
         int sign = 1;
         if (turbo::consume_prefix(&dur_sv, "-")) {
             sign = -1;
@@ -962,7 +962,7 @@ namespace turbo {
         return true;
     }
 
-    bool turbo_parse_flag(turbo::string_view text, Duration *dst, std::string *) {
+    bool turbo_parse_flag(std::string_view text, Duration *dst, std::string *) {
         return Duration::parse(text, dst);
     }
 

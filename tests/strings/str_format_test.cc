@@ -32,7 +32,7 @@
 #include <turbo/strings/cord.h>
 #include <turbo/strings/str_cat.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -77,7 +77,7 @@ TEST_F(FormatEntryPointTest, UntypedFormat) {
     std::string actual;
     int i = 123;
     FormatArgImpl arg_123(i);
-    turbo::Span<const FormatArgImpl> args(&arg_123, 1);
+    turbo::span<const FormatArgImpl> args(&arg_123, 1);
     UntypedFormatSpec format(fmt);
 
     EXPECT_TRUE(format_untyped(&actual, format, args));
@@ -101,7 +101,7 @@ TEST_F(FormatEntryPointTest, UntypedFormat) {
 
 TEST_F(FormatEntryPointTest, StringFormat) {
   EXPECT_EQ("123", str_format("%d", 123));
-  constexpr turbo::string_view view("=%d=", 4);
+  constexpr std::string_view view("=%d=", 4);
   EXPECT_EQ("=123=", str_format(view, 123));
 }
 
@@ -109,7 +109,7 @@ TEST_F(FormatEntryPointTest, StringFormatV) {
   std::string hello = "hello";
   EXPECT_EQ("hello", str_format("%v", hello));
   EXPECT_EQ("123", str_format("%v", 123));
-  constexpr turbo::string_view view("=%v=", 4);
+  constexpr std::string_view view("=%v=", 4);
   EXPECT_EQ("=123=", str_format(view, 123));
 }
 
@@ -173,7 +173,7 @@ TEST_F(FormatEntryPointTest, Preparsed) {
   EXPECT_EQ("123", str_format(pc, 123));
   // rvalue ok?
   EXPECT_EQ("123", str_format(ParsedFormat<'d'>("%d"), 123));
-  constexpr turbo::string_view view("=%d=", 4);
+  constexpr std::string_view view("=%d=", 4);
   EXPECT_EQ("=123=", str_format(ParsedFormat<'d'>(view), 123));
 }
 
@@ -182,7 +182,7 @@ TEST_F(FormatEntryPointTest, PreparsedWithV) {
   EXPECT_EQ("123", str_format(pc, 123));
   // rvalue ok?
   EXPECT_EQ("123", str_format(ParsedFormat<'v'>("%v"), 123));
-  constexpr turbo::string_view view("=%v=", 4);
+  constexpr std::string_view view("=%v=", 4);
   EXPECT_EQ("=123=", str_format(ParsedFormat<'v'>(view), 123));
 }
 
@@ -308,7 +308,7 @@ TEST_F(FormatEntryPointTest, StreamWithV) {
         ParsedFormat<'v', 'u', 'c', 'v', 'f', 'v'>::NewAllowIgnored(formats[i]);
     std::ostringstream oss;
     oss << stream_format(*parsed, 123, 3, 49,
-                        turbo::string_view("multistreaming!!!"), 1.01, 1.01);
+                        std::string_view("multistreaming!!!"), 1.01, 1.01);
     int fmt_result =
         snprintf(&*buf.begin(), buf.size(), formats_for_buf[i].c_str(),  //
                  123, 3, 49, "multistreaming!!!", 1.01, 1.01);
@@ -575,8 +575,8 @@ TEST(str_format, BehavesAsDocumented) {
   EXPECT_EQ(str_format("%v", std::string("C")), "C");
   EXPECT_EQ(str_format("%s", std::string("C++")), "C++");
   EXPECT_EQ(str_format("%v", std::string("C++")), "C++");
-  EXPECT_EQ(str_format("%s", string_view("view")), "view");
-  EXPECT_EQ(str_format("%v", string_view("view")), "view");
+  EXPECT_EQ(str_format("%s", std::string_view("view")), "view");
+  EXPECT_EQ(str_format("%v", std::string_view("view")), "view");
   EXPECT_EQ(str_format("%s", turbo::Cord("cord")), "cord");
   EXPECT_EQ(str_format("%v", turbo::Cord("cord")), "cord");
   // Integral Conversion
@@ -680,13 +680,13 @@ struct SummarizeConsumer {
   std::string* out;
   explicit SummarizeConsumer(std::string* out) : out(out) {}
 
-  bool Append(string_view s) {
+  bool Append(std::string_view s) {
     *out += "[" + std::string(s) + "]";
     return true;
   }
 
   bool ConvertOne(const str_format_internal::UnboundConversion& conv,
-                  string_view s) {
+                  std::string_view s) {
     *out += "{";
     *out += std::string(s);
     *out += ":";

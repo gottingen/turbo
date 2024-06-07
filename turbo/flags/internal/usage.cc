@@ -74,7 +74,7 @@ namespace turbo::flags_internal {
         // prints "<title>Milk &amp; Cookies</title>"
         class XMLElement {
         public:
-            XMLElement(turbo::string_view tag, turbo::string_view txt)
+            XMLElement(std::string_view tag, std::string_view txt)
                     : tag_(tag), txt_(txt) {}
 
             friend std::ostream &operator<<(std::ostream &out,
@@ -118,8 +118,8 @@ namespace turbo::flags_internal {
         private:
             static bool IsValidXmlCharacter(unsigned char c) { return c >= 0x20; }
 
-            turbo::string_view tag_;
-            turbo::string_view txt_;
+            std::string_view tag_;
+            std::string_view txt_;
         };
 
         // --------------------------------------------------------------------
@@ -138,11 +138,11 @@ namespace turbo::flags_internal {
                       line_len_(0),
                       first_line_(true) {}
 
-            void Write(turbo::string_view str, bool wrap_line = false) {
+            void Write(std::string_view str, bool wrap_line = false) {
                 // Empty string - do nothing.
                 if (str.empty()) return;
 
-                std::vector<turbo::string_view> tokens;
+                std::vector<std::string_view> tokens;
                 if (wrap_line) {
                     for (auto line: turbo::str_split(str, turbo::ByAnyChar("\n\r"))) {
                         if (!tokens.empty()) {
@@ -247,7 +247,7 @@ namespace turbo::flags_internal {
         // STRIP_FLAG_HELP 1' then this flag will not be displayed by '--help'
         // and its variants.
         void FlagsHelpImpl(std::ostream &out, PerFlagFilter filter_cb,
-                           HelpFormat format, turbo::string_view program_usage_message) {
+                           HelpFormat format, std::string_view program_usage_message) {
             if (format == HelpFormat::kHumanReadable) {
                 out << flags_internal::ShortProgramInvocationName() << ": "
                     << program_usage_message << "\n\n";
@@ -291,8 +291,8 @@ namespace turbo::flags_internal {
                         .push_back(&flag);
             });
 
-            turbo::string_view package_separator;  // controls blank lines between packages
-            turbo::string_view file_separator;     // controls blank lines between files
+            std::string_view package_separator;  // controls blank lines between packages
+            std::string_view file_separator;     // controls blank lines between files
             for (auto &package: matching_flags) {
                 if (format == HelpFormat::kHumanReadable) {
                     out << package_separator;
@@ -339,7 +339,7 @@ namespace turbo::flags_internal {
 
         void FlagsHelpImpl(std::ostream &out,
                            flags_internal::FlagKindFilter filename_filter_cb,
-                           HelpFormat format, turbo::string_view program_usage_message) {
+                           HelpFormat format, std::string_view program_usage_message) {
             FlagsHelpImpl(
                     out,
                     [&](const turbo::CommandLineFlag &flag) {
@@ -361,9 +361,9 @@ namespace turbo::flags_internal {
     // --------------------------------------------------------------------
     // Produces the help messages for all flags matching the filename filter.
     // If filter is empty produces help messages for all flags.
-    void FlagsHelp(std::ostream &out, turbo::string_view filter, HelpFormat format,
-                   turbo::string_view program_usage_message) {
-        flags_internal::FlagKindFilter filter_cb = [&](turbo::string_view filename) {
+    void FlagsHelp(std::ostream &out, std::string_view filter, HelpFormat format,
+                   std::string_view program_usage_message) {
+        flags_internal::FlagKindFilter filter_cb = [&](std::string_view filename) {
             return filter.empty() || turbo::str_contains(filename, filter);
         };
         flags_internal::FlagsHelpImpl(out, filter_cb, format, program_usage_message);
@@ -373,7 +373,7 @@ namespace turbo::flags_internal {
     // Checks all the 'usage' command line flags to see if any have been set.
     // If so, handles them appropriately.
     HelpMode HandleUsageFlags(std::ostream &out,
-                              turbo::string_view program_usage_message) {
+                              std::string_view program_usage_message) {
         switch (GetFlagsHelpMode()) {
             case HelpMode::kNone:
                 break;
@@ -453,7 +453,7 @@ namespace turbo::flags_internal {
         return *match_substr;
     }
 
-    void SetFlagsHelpMatchSubstr(turbo::string_view substr) {
+    void SetFlagsHelpMatchSubstr(std::string_view substr) {
         turbo::MutexLock l(&help_attributes_guard);
         if (match_substr == nullptr) match_substr = new std::string;
         match_substr->assign(substr.data(), substr.size());
@@ -482,7 +482,7 @@ namespace turbo::flags_internal {
     // Deduces usage flags from the input argument in a form --name=value or
     // --name. argument is already split into name and value before we call this
     // function.
-    bool DeduceUsageFlags(turbo::string_view name, turbo::string_view value) {
+    bool DeduceUsageFlags(std::string_view name, std::string_view value) {
         if (turbo::consume_prefix(&name, "help")) {
             if (name.empty()) {
                 if (value.empty()) {

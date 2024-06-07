@@ -126,7 +126,7 @@ namespace turbo {
     //
     // Returns true if we should log a backtrace at the specified location.
     namespace log_internal {
-        TURBO_MUST_USE_RESULT bool ShouldLogBacktraceAt(turbo::string_view file,
+        TURBO_MUST_USE_RESULT bool ShouldLogBacktraceAt(std::string_view file,
                                                         int line);
     }  // namespace log_internal
 
@@ -135,7 +135,7 @@ namespace turbo {
     // Sets the location the backtrace should be logged at.  If the specified
     // location isn't a `LOG` statement, the effect will be the same as
     // `clear_log_backtrace_location` (but less efficient).
-    void set_log_backtrace_location(turbo::string_view file, int line);
+    void set_log_backtrace_location(std::string_view file, int line);
 
     // clear_log_backtrace_location()
     //
@@ -179,7 +179,7 @@ namespace turbo {
     // Sets `(TURBO_)VLOG(_IS_ON)` level for `module_pattern` to `log_level`.  This
     // allows programmatic control of what is normally set by the --vmodule flag.
     // Returns the level that previously applied to `module_pattern`.
-    inline int set_vlog_level(turbo::string_view module_pattern, int log_level) {
+    inline int set_vlog_level(std::string_view module_pattern, int log_level) {
         return turbo::log_internal::PrependVModule(module_pattern, log_level);
     }
 

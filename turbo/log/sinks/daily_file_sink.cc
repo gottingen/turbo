@@ -45,7 +45,7 @@ namespace turbo {
         return fname;
     }
 
-    DailyFileSink::DailyFileSink(turbo::string_view base_filename,
+    DailyFileSink::DailyFileSink(std::string_view base_filename,
                                  int rotation_hour,
                                  int rotation_minute,
                                  int check_interval_s,

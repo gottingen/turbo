@@ -31,3 +31,43 @@ carbin_cc_test(
         ${CARBIN_DEPS_LINK}
         CXXOPTS ${CARBIN_CXX_OPTIONS}
 )
+
+carbin_cc_test(
+        NAME if_constexpr_test
+        MODULE meta
+        SOURCES if_constexpr_test.cc
+        LINKS
+        turbo::turbo
+        GTest::gtest
+        GTest::gmock
+        GTest::gmock_main
+        ${CARBIN_DEPS_LINK}
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+
+carbin_cc_test(
+        NAME utility_test
+        MODULE meta
+        SOURCES utility_test.cc
+        LINKS
+        turbo::turbo
+        GTest::gtest
+        GTest::gmock
+        GTest::gmock_main
+        ${CARBIN_DEPS_LINK}
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+
+carbin_cc_test(
+        NAME compare_test
+        MODULE meta
+        SOURCES compare_test.cc
+        LINKS
+        turbo::turbo
+        GTest::gtest
+        GTest::gmock
+        GTest::gmock_main
+        ${CARBIN_DEPS_LINK}
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+

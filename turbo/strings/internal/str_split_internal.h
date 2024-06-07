@@ -54,7 +54,7 @@ namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 
-// This class is implicitly constructible from everything that turbo::string_view
+// This class is implicitly constructible from everything that std::string_view
 // is implicitly constructible from, except for rvalue strings.  This means it
 // can be used as a function parameter in places where passing a temporary
 // string might cause memory lifetime issues.
@@ -63,7 +63,7 @@ class ConvertibleToStringView {
   ConvertibleToStringView(const char* s)  // NOLINT(runtime/explicit)
       : value_(s) {}
   ConvertibleToStringView(char* s) : value_(s) {}  // NOLINT(runtime/explicit)
-  ConvertibleToStringView(turbo::string_view s)     // NOLINT(runtime/explicit)
+  ConvertibleToStringView(std::string_view s)     // NOLINT(runtime/explicit)
       : value_(s) {}
   ConvertibleToStringView(const std::string& s)  // NOLINT(runtime/explicit)
       : value_(s) {}
@@ -72,10 +72,10 @@ class ConvertibleToStringView {
   ConvertibleToStringView(std::string&& s) = delete;
   ConvertibleToStringView(const std::string&& s) = delete;
 
-  turbo::string_view value() const { return value_; }
+  std::string_view value() const { return value_; }
 
  private:
-  turbo::string_view value_;
+  std::string_view value_;
 };
 
 // An iterator that enumerates the parts of a string from a Splitter. The text
@@ -88,7 +88,7 @@ template <typename Splitter>
 class SplitIterator {
  public:
   using iterator_category = std::input_iterator_tag;
-  using value_type = turbo::string_view;
+  using value_type = std::string_view;
   using difference_type = ptrdiff_t;
   using pointer = const value_type*;
   using reference = const value_type&;
@@ -101,14 +101,14 @@ class SplitIterator {
         delimiter_(splitter->delimiter()),
         predicate_(splitter->predicate()) {
     // Hack to maintain backward compatibility. This one block makes it so an
-    // empty turbo::string_view whose .data() happens to be nullptr behaves
-    // *differently* from an otherwise empty turbo::string_view whose .data() is
+    // empty std::string_view whose .data() happens to be nullptr behaves
+    // *differently* from an otherwise empty std::string_view whose .data() is
     // not nullptr. This is an undesirable difference in general, but this
     // behavior is maintained to avoid breaking existing code that happens to
     // depend on this old behavior/bug. Perhaps it will be fixed one day. The
     // difference in behavior is as follows:
-    //   Split(turbo::string_view(""), '-');  // {""}
-    //   Split(turbo::string_view(), '-');    // {}
+    //   Split(std::string_view(""), '-');  // {""}
+    //   Split(std::string_view(), '-');    // {}
     if (splitter_->text().data() == nullptr) {
       state_ = kEndState;
       pos_ = splitter_->text().size();
@@ -133,8 +133,8 @@ class SplitIterator {
         state_ = kEndState;
         return *this;
       }
-      const turbo::string_view text = splitter_->text();
-      const turbo::string_view d = delimiter_.Find(text, pos_);
+      const std::string_view text = splitter_->text();
+      const std::string_view d = delimiter_.Find(text, pos_);
       if (d.data() == text.data() + text.size()) state_ = kLastState;
       curr_ = text.substr(pos_,
                           static_cast<size_t>(d.data() - (text.data() + pos_)));
@@ -160,7 +160,7 @@ class SplitIterator {
  private:
   size_t pos_;
   State state_;
-  turbo::string_view curr_;
+  std::string_view curr_;
   const Splitter* splitter_;
   typename Splitter::DelimiterType delimiter_;
   typename Splitter::PredicateType predicate_;
@@ -218,13 +218,13 @@ struct SplitterIsConvertibleToImpl : std::false_type {};
 
 template <typename C>
 struct SplitterIsConvertibleToImpl<C, true, false>
-    : std::is_constructible<typename C::value_type, turbo::string_view> {};
+    : std::is_constructible<typename C::value_type, std::string_view> {};
 
 template <typename C>
 struct SplitterIsConvertibleToImpl<C, true, true>
     : turbo::conjunction<
-          std::is_constructible<typename C::key_type, turbo::string_view>,
-          std::is_constructible<typename C::mapped_type, turbo::string_view>> {};
+          std::is_constructible<typename C::key_type, std::string_view>,
+          std::is_constructible<typename C::mapped_type, std::string_view>> {};
 
 template <typename C>
 struct SplitterIsConvertibleTo
@@ -247,14 +247,14 @@ struct ShouldUseLifetimeBound<
     StringType, Container,
     std::enable_if_t<
         std::is_same<StringType, std::string>::value &&
-        std::is_same<typename Container::value_type, turbo::string_view>::value>>
+        std::is_same<typename Container::value_type, std::string_view>::value>>
     : std::true_type {};
 
 template <typename StringType, typename First, typename Second>
 using ShouldUseLifetimeBoundForPair = std::integral_constant<
     bool, std::is_same<StringType, std::string>::value &&
-              (std::is_same<First, turbo::string_view>::value ||
-               std::is_same<Second, turbo::string_view>::value)>;
+              (std::is_same<First, std::string_view>::value ||
+               std::is_same<Second, std::string_view>::value)>;
 
 
 // This class implements the range that is returned by turbo::str_split(). This
@@ -268,11 +268,11 @@ using ShouldUseLifetimeBoundForPair = std::integral_constant<
 // within a range-for loop.
 //
 // Output containers can be collections of any type that is constructible from
-// an turbo::string_view.
+// an std::string_view.
 //
 // An Predicate functor may be supplied. This predicate will be used to filter
 // the split strings: only strings for which the predicate returns true will be
-// kept. A Predicate object is any unary functor that takes an turbo::string_view
+// kept. A Predicate object is any unary functor that takes an std::string_view
 // and returns bool.
 //
 // The StringType parameter can be either string_view or string, depending on
@@ -291,11 +291,11 @@ class Splitter {
         delimiter_(std::move(d)),
         predicate_(std::move(p)) {}
 
-  turbo::string_view text() const { return text_; }
+  std::string_view text() const { return text_; }
   const Delimiter& delimiter() const { return delimiter_; }
   const Predicate& predicate() const { return predicate_; }
 
-  // Range functions that iterate the split substrings as turbo::string_view
+  // Range functions that iterate the split substrings as std::string_view
   // objects. These methods enable a Splitter to be used in a range-based for
   // loop.
   const_iterator begin() const { return {const_iterator::kInitState, this}; }
@@ -350,7 +350,7 @@ class Splitter {
  private:
   template <typename First, typename Second>
   std::pair<First, Second> ConvertToPair() const {
-    turbo::string_view first, second;
+    std::string_view first, second;
     auto it = begin();
     if (it != end()) {
       first = *it;
@@ -380,24 +380,24 @@ class Splitter {
     }
   };
 
-  // Partial specialization for a std::vector<turbo::string_view>.
+  // Partial specialization for a std::vector<std::string_view>.
   //
   // Optimized for the common case of splitting to a
-  // std::vector<turbo::string_view>. In this case we first split the results to
-  // a small array of turbo::string_view on the stack, to reduce reallocations.
+  // std::vector<std::string_view>. In this case we first split the results to
+  // a small array of std::string_view on the stack, to reduce reallocations.
   template <typename A>
-  struct ConvertToContainer<std::vector<turbo::string_view, A>,
-                            turbo::string_view, false> {
-    std::vector<turbo::string_view, A> operator()(
+  struct ConvertToContainer<std::vector<std::string_view, A>,
+                            std::string_view, false> {
+    std::vector<std::string_view, A> operator()(
         const Splitter& splitter) const {
       struct raw_view {
         const char* data;
         size_t size;
-        operator turbo::string_view() const {  // NOLINT(runtime/explicit)
+        operator std::string_view() const {  // NOLINT(runtime/explicit)
           return {data, size};
         }
       };
-      std::vector<turbo::string_view, A> v;
+      std::vector<std::string_view, A> v;
       std::array<raw_view, 16> ar;
       for (auto it = splitter.begin(); !it.at_end();) {
         size_t index = 0;
@@ -418,13 +418,13 @@ class Splitter {
   // Partial specialization for a std::vector<std::string>.
   //
   // Optimized for the common case of splitting to a std::vector<std::string>.
-  // In this case we first split the results to a std::vector<turbo::string_view>
+  // In this case we first split the results to a std::vector<std::string_view>
   // so the returned std::vector<std::string> can have space reserved to avoid
   // std::string moves.
   template <typename A>
   struct ConvertToContainer<std::vector<std::string, A>, std::string, false> {
     std::vector<std::string, A> operator()(const Splitter& splitter) const {
-      const std::vector<turbo::string_view> v = splitter;
+      const std::vector<std::string_view> v = splitter;
       return std::vector<std::string, A>(v.begin(), v.end());
     }
   };
@@ -443,7 +443,7 @@ class Splitter {
       Container m;
       iterator it;
       bool insert = true;
-      for (const turbo::string_view sv : splitter) {
+      for (const std::string_view sv : splitter) {
         if (insert) {
           it = InsertOrEmplace(&m, sv);
         } else {
@@ -458,7 +458,7 @@ class Splitter {
     // the inserted item. We use emplace() if available, otherwise insert().
     template <typename M>
     static turbo::enable_if_t<HasEmplace<M>::value, iterator> InsertOrEmplace(
-        M* m, turbo::string_view key) {
+        M* m, std::string_view key) {
       // Use piecewise_construct to support old versions of gcc in which pair
       // constructor can't otherwise construct string from string_view.
       return ToIter(m->emplace(std::piecewise_construct, std::make_tuple(key),
@@ -466,7 +466,7 @@ class Splitter {
     }
     template <typename M>
     static turbo::enable_if_t<!HasEmplace<M>::value, iterator> InsertOrEmplace(
-        M* m, turbo::string_view key) {
+        M* m, std::string_view key) {
       return ToIter(m->insert(std::make_pair(First(key), Second(""))));
     }
 

@@ -45,12 +45,12 @@ namespace turbo::flags_internal {
 
         // Access to CommandLineFlag::validate_input_value.
         static bool validate_input_value(const CommandLineFlag &flag,
-                                       turbo::string_view value);
+                                       std::string_view value);
 
         // Access to CommandLineFlag::check_default_value_parsing_roundtrip.
         static void check_default_value_parsing_roundtrip(const CommandLineFlag &flag);
 
-        static bool parse_from(CommandLineFlag &flag, turbo::string_view value,
+        static bool parse_from(CommandLineFlag &flag, std::string_view value,
                               flags_internal::FlagSettingMode set_mode,
                               flags_internal::ValueSource source, std::string &error);
     };

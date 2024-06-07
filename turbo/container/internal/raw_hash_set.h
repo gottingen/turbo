@@ -219,7 +219,7 @@
 #include <turbo/memory/memory.h>
 #include <turbo/meta/type_traits.h>
 #include <turbo/numeric/bits.h>
-#include <turbo/utility/utility.h>
+#include <turbo/meta/utility.h>
 
 #ifdef TURBO_INTERNAL_HAVE_SSE2
 

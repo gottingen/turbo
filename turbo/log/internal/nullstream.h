@@ -49,7 +49,7 @@ namespace log_internal {
 // streamed in.
 class NullStream {
  public:
-  NullStream& AtLocation(turbo::string_view, int) { return *this; }
+  NullStream& AtLocation(std::string_view, int) { return *this; }
   template <typename SourceLocationType>
   NullStream& AtLocation(SourceLocationType) {
     return *this;

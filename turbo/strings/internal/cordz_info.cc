@@ -31,7 +31,7 @@
 #include <turbo/strings/internal/cordz_update_tracker.h>
 #include <turbo/synchronization/mutex.h>
 #include <turbo/times/clock.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -398,11 +398,11 @@ void CordzInfo::Unlock() TURBO_UNLOCK_FUNCTION(mutex_) {
   }
 }
 
-turbo::Span<void* const> CordzInfo::GetStack() const {
+turbo::span<void* const> CordzInfo::GetStack() const {
   return turbo::MakeConstSpan(stack_, stack_depth_);
 }
 
-turbo::Span<void* const> CordzInfo::GetParentStack() const {
+turbo::span<void* const> CordzInfo::GetParentStack() const {
   return turbo::MakeConstSpan(parent_stack_, parent_stack_depth_);
 }
 

@@ -33,7 +33,7 @@
 #include <turbo/strings/str_format.h>
 #include <turbo/strings/string_view.h>
 #include <turbo/strings/strip.h>
-#include <turbo/types/optional.h>
+#include <optional>
 
 namespace {
 
@@ -43,7 +43,7 @@ enum class OutputStyle { kRegular, kBenchmark };
 // This is populated from main().
 // When run in "benchmark" mode, we have different output. This allows
 // A/B comparisons with tools like `benchy`.
-turbo::string_view benchmarks;
+std::string_view benchmarks;
 
 OutputStyle output() {
   return !benchmarks.empty() ? OutputStyle::kBenchmark : OutputStyle::kRegular;
@@ -469,10 +469,10 @@ std::string Name() {
 constexpr int kNameWidth = 15;
 constexpr int kDistWidth = 16;
 
-bool CanRunBenchmark(turbo::string_view name) {
-  static const turbo::NoDestructor<turbo::optional<std::regex>> filter([] {
+bool CanRunBenchmark(std::string_view name) {
+  static const turbo::NoDestructor<std::optional<std::regex>> filter([] {
     return benchmarks.empty() || benchmarks == "all"
-               ? turbo::nullopt
+               ? std::nullopt
                : turbo::make_optional(std::regex(std::string(benchmarks)));
   }());
   return !filter->has_value() || std::regex_search(std::string(name), **filter);
@@ -515,7 +515,7 @@ void RunForType(std::vector<Result>& results) {
 int main(int argc, char** argv) {
   // Parse the benchmark flags. Ignore all of them except the regex pattern.
   for (int i = 1; i < argc; ++i) {
-    turbo::string_view arg = argv[i];
+    std::string_view arg = argv[i];
     const auto next = [&] { return argv[std::min(i + 1, argc - 1)]; };
 
     if (turbo::consume_prefix(&arg, "--benchmark_filter")) {
@@ -567,9 +567,9 @@ int main(int argc, char** argv) {
     case OutputStyle::kBenchmark: {
       turbo::PrintF("{\n");
       turbo::PrintF("  \"benchmarks\": [\n");
-      turbo::string_view comma;
+      std::string_view comma;
       for (const auto& result : results) {
-        auto print = [&](turbo::string_view stat, double Ratios::*val) {
+        auto print = [&](std::string_view stat, double Ratios::*val) {
           std::string name =
               turbo::str_cat(result.name, "/", result.dist_name, "/", stat);
           // Check the regex again. We might had have enabled only one of the

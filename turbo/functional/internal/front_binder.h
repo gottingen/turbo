@@ -27,7 +27,7 @@
 #include <turbo/base/internal/invoke.h>
 #include <turbo/container/internal/compressed_tuple.h>
 #include <turbo/meta/type_traits.h>
-#include <turbo/utility/utility.h>
+#include <turbo/meta/utility.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -50,7 +50,7 @@ class FrontBinder {
 
  public:
   template <class... Ts>
-  constexpr explicit FrontBinder(turbo::in_place_t, Ts&&... ts)
+  constexpr explicit FrontBinder(std::in_place_t, Ts&&... ts)
       : bound_args_(std::forward<Ts>(ts)...) {}
 
   template <class... FreeArgs, class R = base_internal::invoke_result_t<

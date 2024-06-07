@@ -39,7 +39,7 @@ namespace turbo::crc_internal {
         std::size_t offset = 0;
         for (; offset + kBlockSize < length; offset += kBlockSize) {
             crc = turbo::extend_crc32c(crc,
-                                       turbo::string_view(src_bytes + offset, kBlockSize));
+                                       std::string_view(src_bytes + offset, kBlockSize));
             non_temporal_store_memcpy(dst_bytes + offset, src_bytes + offset,
                                       kBlockSize);
         }
@@ -48,7 +48,7 @@ namespace turbo::crc_internal {
         if (offset < length) {
             std::size_t final_copy_size = length - offset;
             crc = extend_crc32c(crc,
-                                turbo::string_view(src_bytes + offset, final_copy_size));
+                                std::string_view(src_bytes + offset, final_copy_size));
 
             non_temporal_store_memcpy(dst_bytes + offset, src_bytes + offset,
                                       final_copy_size);
@@ -70,7 +70,7 @@ namespace turbo::crc_internal {
         // Copy + CRC loop - run 8k chunks until we are out of full chunks.
         std::size_t offset = 0;
         for (; offset + kBlockSize < length; offset += kBlockSize) {
-            crc = extend_crc32c(crc, turbo::string_view(src_bytes + offset, kBlockSize));
+            crc = extend_crc32c(crc, std::string_view(src_bytes + offset, kBlockSize));
 
             non_temporal_store_memcpy_avx(dst_bytes + offset, src_bytes + offset,
                                           kBlockSize);
@@ -80,7 +80,7 @@ namespace turbo::crc_internal {
         if (offset < length) {
             std::size_t final_copy_size = length - offset;
             crc = extend_crc32c(crc,
-                                turbo::string_view(src_bytes + offset, final_copy_size));
+                                std::string_view(src_bytes + offset, final_copy_size));
 
             non_temporal_store_memcpy_avx(dst_bytes + offset, src_bytes + offset,
                                           final_copy_size);

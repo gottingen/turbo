@@ -141,8 +141,8 @@ class ScopedMockLog final {
 
   // Implements the mock method:
   //
-  //   void Log(LogSeverity severity, turbo::string_view file_path,
-  //            turbo::string_view message);
+  //   void Log(LogSeverity severity, std::string_view file_path,
+  //            std::string_view message);
   //
   // The second argument to Log() is the full path of the source file in
   // which the LOG() was issued.

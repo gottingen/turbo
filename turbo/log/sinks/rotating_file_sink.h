@@ -32,7 +32,7 @@ namespace turbo {
 
     class RotatingFileSink : public LogSink {
     public:
-        RotatingFileSink(turbo::string_view base_filename,
+        RotatingFileSink(std::string_view base_filename,
                          std::size_t max_size,
                          std::size_t max_files = 0,
                          int check_interval_s = 60);

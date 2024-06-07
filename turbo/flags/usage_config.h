@@ -59,7 +59,7 @@
 namespace turbo {
 
     namespace flags_internal {
-        using FlagKindFilter = std::function<bool(turbo::string_view)>;
+        using FlagKindFilter = std::function<bool(std::string_view)>;
     }  // namespace flags_internal
 
     // FlagsUsageConfig
@@ -104,7 +104,7 @@ namespace turbo {
         //   normalize_filename("/my_company/some_long_path/src/project/file.cc")
         // might produce
         //   "project/file.cc".
-        std::function<std::string(turbo::string_view)> normalize_filename;
+        std::function<std::string(std::string_view)> normalize_filename;
     };
 
     // set_flags_usage_config()
@@ -118,7 +118,7 @@ namespace turbo {
 
         FlagsUsageConfig GetUsageConfig();
 
-        void ReportUsageError(turbo::string_view msg, bool is_fatal);
+        void ReportUsageError(std::string_view msg, bool is_fatal);
 
     }  // namespace flags_internal
 }  // namespace turbo
@@ -128,6 +128,6 @@ extern "C" {
 // Additional report of fatal usage error message before we std::exit. Error is
 // fatal if is_fatal argument to ReportUsageError is true.
 void TURBO_INTERNAL_C_SYMBOL(TurboInternalReportFatalUsageError)(
-        turbo::string_view);
+        std::string_view);
 
 }  // extern "C"

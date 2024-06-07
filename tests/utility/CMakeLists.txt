@@ -17,12 +17,25 @@
 #
 
 
-carbin_cc_test(
-        NAME if_constexpr_test
-        MODULE utility
-        SOURCES if_constexpr_test.cc
+carbin_cc_test_library(
+        NAMESPACE turbo
+        NAME status_matchers
+        SOURCES status_matchers.h status_matchers.cc status_matchers_api.h
         LINKS
         turbo::turbo
+        GTest::gtest
+        GTest::gmock
+        INCLUDES "/opt/EA/inf/include"
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+
+carbin_cc_test(
+        NAME status_matchers_test
+        MODULE utility
+        SOURCES status_matchers_test.cc
+        LINKS
+        turbo::turbo
+        status_matchers_static
         GTest::gtest
         GTest::gmock
         GTest::gmock_main
@@ -31,11 +44,26 @@ carbin_cc_test(
 )
 
 carbin_cc_test(
-        NAME utility_test
+        NAME status_test
         MODULE utility
-        SOURCES utility_test.cc
+        SOURCES status_test.cc
         LINKS
         turbo::turbo
+        status_matchers_static
+        GTest::gtest
+        GTest::gmock
+        GTest::gmock_main
+        ${CARBIN_DEPS_LINK}
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+
+carbin_cc_test(
+        NAME statusor_test
+        MODULE utility
+        SOURCES result_test.cc
+        LINKS
+        turbo::turbo
+        status_matchers_static
         GTest::gtest
         GTest::gmock
         GTest::gmock_main

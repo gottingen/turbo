@@ -88,7 +88,7 @@
 #include <turbo/strings/internal/str_format/extension.h>  // IWYU pragma: export
 #include <turbo/strings/internal/str_format/parser.h>  // IWYU pragma: export
 #include <turbo/strings/string_view.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo {
 
@@ -111,7 +111,7 @@ namespace turbo {
 
         UntypedFormatSpec &operator=(const UntypedFormatSpec &) = delete;
 
-        explicit UntypedFormatSpec(string_view s) : spec_(s) {}
+        explicit UntypedFormatSpec(std::string_view s) : spec_(s) {}
 
     protected:
         explicit UntypedFormatSpec(
@@ -186,7 +186,7 @@ namespace turbo {
     // For a `FormatSpec` to be valid at compile-time, it must be provided as
     // either:
     //
-    // * A `constexpr` literal or `turbo::string_view`, which is how it is most often
+    // * A `constexpr` literal or `std::string_view`, which is how it is most often
     //   used.
     // * A `ParsedFormat` instantiation, which ensures the format string is
     //   valid before use. (See below.)
@@ -196,8 +196,8 @@ namespace turbo {
     //   // Provided as a string literal.
     //   turbo::str_format("Welcome to %s, Number %d!", "The Village", 6);
     //
-    //   // Provided as a constexpr turbo::string_view.
-    //   constexpr turbo::string_view formatString = "Welcome to %s, Number %d!";
+    //   // Provided as a constexpr std::string_view.
+    //   constexpr std::string_view formatString = "Welcome to %s, Number %d!";
     //   turbo::str_format(formatString, "The Village", 6);
     //
     //   // Provided as a pre-compiled ParsedFormat object.
@@ -278,7 +278,7 @@ namespace turbo {
     // However, in the `str_format` library, a format conversion specifies a broader
     // C++ conceptual category instead of an exact type. For example, `%s` binds to
     // any string-like argument, so `std::string`, `std::wstring`,
-    // `turbo::string_view`, `const char*`, and `const wchar_t*` are all accepted.
+    // `std::string_view`, `const char*`, and `const wchar_t*` are all accepted.
     // Likewise, `%d` accepts any integer-like argument, etc.
 
     template<typename... Args>
@@ -491,7 +491,7 @@ namespace turbo {
     // sink, usually by adding a ADL-based free function in the same namespace as
     // the sink:
     //
-    //   void TurboFormatFlush(MySink* dest, turbo::string_view part);
+    //   void TurboFormatFlush(MySink* dest, std::string_view part);
     //
     // where `dest` is the pointer passed to `turbo::format()`. The function should
     // append `part` to `dest`.
@@ -562,7 +562,7 @@ namespace turbo {
     // On failure, this function returns `false` and the state of the sink is
     // unspecified.
     //
-    // The arguments are provided in an `turbo::Span<const turbo::FormatArg>`.
+    // The arguments are provided in an `turbo::span<const turbo::FormatArg>`.
     // Each `turbo::FormatArg` object binds to a single argument and keeps a
     // reference to it. The values used to create the `FormatArg` objects must
     // outlive this function call.
@@ -589,7 +589,7 @@ namespace turbo {
     //
     TURBO_MUST_USE_RESULT inline bool format_untyped(
             FormatRawSink raw_sink, const UntypedFormatSpec &format,
-            turbo::Span<const FormatArg> args) {
+            turbo::span<const FormatArg> args) {
         return str_format_internal::format_untyped(
                 str_format_internal::FormatRawSinkImpl::Extract(raw_sink),
                 str_format_internal::UntypedFormatSpecImpl::Extract(format), args);
@@ -849,7 +849,7 @@ namespace turbo {
 
         // Overload of FormatSink::Append() for appending the characters of a string
         // view to a format sink.
-        void Append(string_view v) { sink_->Append(v); }
+        void Append(std::string_view v) { sink_->Append(v); }
 
         // FormatSink::PutPaddedString()
         //
@@ -857,13 +857,13 @@ namespace turbo {
         // less than `width`, spaces will be appended first (if `left` is false), or
         // after (if `left` is true) to ensure the total amount appended is
         // at least `width`.
-        bool PutPaddedString(string_view v, int width, int precision, bool left) {
+        bool PutPaddedString(std::string_view v, int width, int precision, bool left) {
             return sink_->PutPaddedString(v, width, precision, left);
         }
 
         // Support `turbo::format(&sink, format, args...)`.
         friend void TurboFormatFlush(turbo::Nonnull<FormatSink *> sink,
-                                     turbo::string_view v) {
+                                     std::string_view v) {
             sink->Append(v);
         }
 

@@ -36,7 +36,7 @@
 #include <turbo/base/casts.h>
 #include <turbo/base/macros.h>
 #include <turbo/memory/memory.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace {
 

@@ -40,7 +40,7 @@
 #include <type_traits>
 #include <utility>
 
-#include <turbo/utility/utility.h>
+#include <turbo/meta/utility.h>
 
 #if defined(_MSC_VER) && !defined(__NVCC__)
 // We need to mark these classes with this declspec to ensure that
@@ -89,7 +89,7 @@ struct Storage {
   T value;
   constexpr Storage() = default;
   template <typename V>
-  explicit constexpr Storage(turbo::in_place_t, V&& v)
+  explicit constexpr Storage(std::in_place_t, V&& v)
       : value(std::forward<V>(v)) {}
   constexpr const T& get() const& { return value; }
   T& get() & { return value; }
@@ -102,7 +102,7 @@ struct TURBO_INTERNAL_COMPRESSED_TUPLE_DECLSPEC Storage<T, I, true> : T {
   constexpr Storage() = default;
 
   template <typename V>
-  explicit constexpr Storage(turbo::in_place_t, V&& v) : T(std::forward<V>(v)) {}
+  explicit constexpr Storage(std::in_place_t, V&& v) : T(std::forward<V>(v)) {}
 
   constexpr const T& get() const& { return *this; }
   T& get() & { return *this; }
@@ -124,8 +124,8 @@ struct TURBO_INTERNAL_COMPRESSED_TUPLE_DECLSPEC CompressedTupleImpl<
       Storage<Ts, std::integral_constant<size_t, I>::value>... {
   constexpr CompressedTupleImpl() = default;
   template <typename... Vs>
-  explicit constexpr CompressedTupleImpl(turbo::in_place_t, Vs&&... args)
-      : Storage<Ts, I>(turbo::in_place, std::forward<Vs>(args))... {}
+  explicit constexpr CompressedTupleImpl(std::in_place_t, Vs&&... args)
+      : Storage<Ts, I>(std::in_place, std::forward<Vs>(args))... {}
   friend CompressedTuple<Ts...>;
 };
 
@@ -136,8 +136,8 @@ struct TURBO_INTERNAL_COMPRESSED_TUPLE_DECLSPEC CompressedTupleImpl<
     : Storage<Ts, std::integral_constant<size_t, I>::value, false>... {
   constexpr CompressedTupleImpl() = default;
   template <typename... Vs>
-  explicit constexpr CompressedTupleImpl(turbo::in_place_t, Vs&&... args)
-      : Storage<Ts, I, false>(turbo::in_place, std::forward<Vs>(args))... {}
+  explicit constexpr CompressedTupleImpl(std::in_place_t, Vs&&... args)
+      : Storage<Ts, I, false>(std::in_place, std::forward<Vs>(args))... {}
   friend CompressedTuple<Ts...>;
 };
 
@@ -223,7 +223,7 @@ class TURBO_INTERNAL_COMPRESSED_TUPLE_DECLSPEC CompressedTuple
   constexpr CompressedTuple() = default;
 #endif
   explicit constexpr CompressedTuple(const Ts&... base)
-      : CompressedTuple::CompressedTupleImpl(turbo::in_place, base...) {}
+      : CompressedTuple::CompressedTupleImpl(std::in_place, base...) {}
 
   template <typename First, typename... Vs,
             turbo::enable_if_t<
@@ -235,7 +235,7 @@ class TURBO_INTERNAL_COMPRESSED_TUPLE_DECLSPEC CompressedTuple
                         CompressedTuple<Ts...>, First, Vs...>>::value,
                 bool> = true>
   explicit constexpr CompressedTuple(First&& first, Vs&&... base)
-      : CompressedTuple::CompressedTupleImpl(turbo::in_place,
+      : CompressedTuple::CompressedTupleImpl(std::in_place,
                                              std::forward<First>(first),
                                              std::forward<Vs>(base)...) {}
 

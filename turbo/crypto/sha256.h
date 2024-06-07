@@ -41,7 +41,7 @@ namespace turbo {
         void update(ArrayRef<uint8_t> Data);
 
         /// Digest more data.
-        void update(turbo::string_view Str);
+        void update(std::string_view Str);
 
         /// Return the current raw 256-bits SHA256 for the digested
         /// data since the last call to init(). This call will add data to the

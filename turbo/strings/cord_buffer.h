@@ -39,7 +39,7 @@
 #include <turbo/numeric/bits.h>
 #include <turbo/strings/internal/cord_internal.h>
 #include <turbo/strings/internal/cord_rep_flat.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo {
 
@@ -58,7 +58,7 @@ namespace turbo {
     //     turbo::Cord cord;
     //     while (length > 0) {
     //       CordBuffer buffer = CordBuffer::CreateWithDefaultLimit(length);
-    //       turbo::Span<char> data = buffer.available_up_to(length);
+    //       turbo::span<char> data = buffer.available_up_to(length);
     //       FillRandomValues(data.data(), data.size());
     //       buffer.IncreaseLengthBy(data.size());
     //       cord.Append(std::move(buffer));
@@ -196,7 +196,7 @@ namespace turbo {
         //     turbo::Cord cord;
         //     while (n > 0) {
         //       CordBuffer buffer = CordBuffer::CreateWithCustomLimit(64 << 10, n);
-        //       turbo::Span<char> data = buffer.available_up_to(n);
+        //       turbo::span<char> data = buffer.available_up_to(n);
         //       ReadFileDataOrDie(fd, data.data(), data.size());
         //       buffer.IncreaseLengthBy(data.size());
         //       cord.Append(std::move(buffer));
@@ -238,13 +238,13 @@ namespace turbo {
         //
         // Returns the span delineating the available capacity in this buffer
         // which is defined as `{ data() + length(), capacity() - length() }`.
-        turbo::Span<char> available();
+        turbo::span<char> available();
 
         // CordBuffer::available_up_to()
         //
         // Returns the span delineating the available capacity in this buffer limited
         // to `size` bytes. This is equivalent to `available().subspan(0, size)`.
-        turbo::Span<char> available_up_to(size_t size);
+        turbo::span<char> available_up_to(size_t size);
 
         // CordBuffer::data()
         //
@@ -277,7 +277,7 @@ namespace turbo {
         // will lead to undefined behavior.  Requires `length() + n <= capacity()`.
         // Typically, applications will use 'available_up_to()` to get a span of the
         // desired capacity, and use `span.size()` to increase the length as in:
-        //   turbo::Span<char> span = buffer.available_up_to(desired);
+        //   turbo::span<char> span = buffer.available_up_to(desired);
         //   buffer.IncreaseLengthBy(span.size());
         //   memcpy(span.data(), src, span.size());
         //   etc...
@@ -335,17 +335,17 @@ namespace turbo {
             }
 
             // Returns the available area of the internal SSO data
-            turbo::Span<char> short_available() {
+            turbo::span<char> short_available() {
                 const size_t length = short_length();
-                return turbo::Span<char>(short_rep.data + length,
+                return turbo::span<char>(short_rep.data + length,
                                          kInlineCapacity - length);
             }
 
             // Returns the available area of the internal SSO data
-            turbo::Span<char> long_available() const {
+            turbo::span<char> long_available() const {
                 assert(!is_short());
                 const size_t length = long_rep.rep->length;
-                return turbo::Span<char>(long_rep.rep->Data() + length,
+                return turbo::span<char>(long_rep.rep->Data() + length,
                                          long_rep.rep->Capacity() - length);
             }
 
@@ -445,10 +445,10 @@ namespace turbo {
         // `short_value` to the inlined data value. In either case, the current
         // instance length is reset to zero.
         // This method is intended to be used by Cord internal functions only.
-        cord_internal::CordRep *ConsumeValue(turbo::string_view &short_value) {
+        cord_internal::CordRep *ConsumeValue(std::string_view &short_value) {
             cord_internal::CordRep *rep = nullptr;
             if (rep_.is_short()) {
-                short_value = turbo::string_view(rep_.data(), rep_.short_length());
+                short_value = std::string_view(rep_.data(), rep_.short_length());
             } else {
                 rep = rep_.rep();
             }
@@ -538,11 +538,11 @@ namespace turbo {
         return *this;
     }
 
-    inline turbo::Span<char> CordBuffer::available() {
+    inline turbo::span<char> CordBuffer::available() {
         return rep_.is_short() ? rep_.short_available() : rep_.long_available();
     }
 
-    inline turbo::Span<char> CordBuffer::available_up_to(size_t size) {
+    inline turbo::span<char> CordBuffer::available_up_to(size_t size) {
         return available().subspan(0, size);
     }
 

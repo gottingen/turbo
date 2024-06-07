@@ -100,18 +100,18 @@ namespace turbo {
     ///
     /// This will escape directory separators, making this function unsuitable
     /// for encoding URI paths directly. See uri_from_absolute_path() instead.
-    TURBO_DLL std::string uri_escape(turbo::string_view s);
+    TURBO_DLL std::string uri_escape(std::string_view s);
 
-    TURBO_DLL std::string uri_unescape(turbo::string_view s);
+    TURBO_DLL std::string uri_unescape(std::string_view s);
 
     /// Encode a host for use within a URI, such as "localhost",
     /// "127.0.0.1", or "[::1]".
-    TURBO_DLL std::string uri_encode_host(turbo::string_view host);
+    TURBO_DLL std::string uri_encode_host(std::string_view host);
 
     /// Whether the string is a syntactically valid URI scheme according to RFC 3986.
-    TURBO_DLL bool is_valid_uri_scheme(turbo::string_view s);
+    TURBO_DLL bool is_valid_uri_scheme(std::string_view s);
 
     /// Create a file uri from a given absolute path
-    TURBO_DLL bool uri_from_absolute_path(turbo::string_view path, turbo::Nullable<std::string*> result, std::string* error_message = nullptr);
+    TURBO_DLL bool uri_from_absolute_path(std::string_view path, turbo::Nullable<std::string*> result, std::string* error_message = nullptr);
 
 }  // namespace turbo

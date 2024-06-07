@@ -38,11 +38,11 @@ namespace turbo {
         /// Default ctor - Initialize to empty.
         SmallString() = default;
 
-        /// Initialize from a  turbo::string_view.
-        SmallString(turbo::string_view S) : SmallVector<char, InternalLen>(S.begin(), S.end()) {}
+        /// Initialize from a  std::string_view.
+        SmallString(std::string_view S) : SmallVector<char, InternalLen>(S.begin(), S.end()) {}
 
         /// Initialize by concatenating a list of  turbo::string_views.
-        SmallString(std::initializer_list<turbo::string_view> Refs)
+        SmallString(std::initializer_list<std::string_view> Refs)
                 : SmallVector<char, InternalLen>() {
             this->append(Refs);
         }
@@ -57,13 +57,13 @@ namespace turbo {
 
         using SmallVector<char, InternalLen>::assign;
 
-        /// Assign from a  turbo::string_view.
-        void assign(turbo::string_view RHS) {
+        /// Assign from a  std::string_view.
+        void assign(std::string_view RHS) {
             SmallVectorImpl<char>::assign(RHS.begin(), RHS.end());
         }
 
         /// Assign from a list of  turbo::string_views.
-        void assign(std::initializer_list<turbo::string_view> Refs) {
+        void assign(std::initializer_list<std::string_view> Refs) {
             this->clear();
             append(Refs);
         }
@@ -74,19 +74,19 @@ namespace turbo {
 
         using SmallVector<char, InternalLen>::append;
 
-        /// Append from a  turbo::string_view.
-        void append(turbo::string_view RHS) {
+        /// Append from a  std::string_view.
+        void append(std::string_view RHS) {
             SmallVectorImpl<char>::append(RHS.begin(), RHS.end());
         }
 
         /// Append from a list of  turbo::string_views.
-        void append(std::initializer_list<turbo::string_view> Refs) {
+        void append(std::initializer_list<std::string_view> Refs) {
             size_t CurrentSize = this->size();
             size_t SizeNeeded = CurrentSize;
-            for (const turbo::string_view &Ref: Refs)
+            for (const std::string_view &Ref: Refs)
                 SizeNeeded += Ref.size();
             this->resize_for_overwrite(SizeNeeded);
-            for (const turbo::string_view &Ref: Refs) {
+            for (const std::string_view &Ref: Refs) {
                 std::copy(Ref.begin(), Ref.end(), this->begin() + CurrentSize);
                 CurrentSize += Ref.size();
             }
@@ -99,24 +99,24 @@ namespace turbo {
 
         /// Check for string equality.  This is more efficient than compare() when
         /// the relative ordering of inequal strings isn't needed.
-        bool equals(turbo::string_view RHS) const {
+        bool equals(std::string_view RHS) const {
             return str() == RHS;
         }
 
         /// Check for string equality, ignoring case.
-        bool equals_insensitive(turbo::string_view RHS) const {
+        bool equals_insensitive(std::string_view RHS) const {
             return compare_insensitive(RHS) == 0;
         }
 
         /// compare - Compare two strings; the result is negative, zero, or positive
         /// if this string is lexicographically less than, equal to, or greater than
         /// the \p RHS.
-        int compare(turbo::string_view RHS) const {
+        int compare(std::string_view RHS) const {
             return str().compare(RHS);
         }
 
         /// compare_insensitive - Compare two strings, ignoring case.
-        int compare_insensitive(turbo::string_view rhs) const {
+        int compare_insensitive(std::string_view rhs) const {
             auto lhs = str();
             auto min_size = std::min(lhs.size(), rhs.size());
             auto r = turbo::strings_internal::memcasecmp(lhs.data(), rhs.data(), min_size);
@@ -133,12 +133,12 @@ namespace turbo {
         /// @{
 
         /// startswith - Check if this string starts with the given \p Prefix.
-        bool starts_with(turbo::string_view Prefix) const {
+        bool starts_with(std::string_view Prefix) const {
             return turbo::starts_with(str(), Prefix);
         }
 
         /// endswith - Check if this string ends with the given \p Suffix.
-        bool ends_with(turbo::string_view Suffix) const {
+        bool ends_with(std::string_view Suffix) const {
             return turbo::ends_with(str(), Suffix);
         }
 
@@ -158,7 +158,7 @@ namespace turbo {
         ///
         /// \returns The index of the first occurrence of \p Str, or npos if not
         /// found.
-        size_t find(turbo::string_view Str, size_t From = 0) const {
+        size_t find(std::string_view Str, size_t From = 0) const {
             return str().find(Str, From);
         }
 
@@ -166,7 +166,7 @@ namespace turbo {
         ///
         /// \returns The index of the last occurrence of \p C, or npos if not
         /// found.
-        size_t rfind(char C, size_t From = turbo::string_view::npos) const {
+        size_t rfind(char C, size_t From = std::string_view::npos) const {
             return str().rfind(C, From);
         }
 
@@ -174,7 +174,7 @@ namespace turbo {
         ///
         /// \returns The index of the last occurrence of \p Str, or npos if not
         /// found.
-        size_t rfind(turbo::string_view Str) const {
+        size_t rfind(std::string_view Str) const {
             return str().rfind(Str);
         }
 
@@ -188,7 +188,7 @@ namespace turbo {
         /// not found.
         ///
         /// Complexity: O(size() + Chars.size())
-        size_t find_first_of(turbo::string_view Chars, size_t From = 0) const {
+        size_t find_first_of(std::string_view Chars, size_t From = 0) const {
             return str().find_first_of(Chars, From);
         }
 
@@ -202,13 +202,13 @@ namespace turbo {
         /// \p Chars, or npos if not found.
         ///
         /// Complexity: O(size() + Chars.size())
-        size_t find_first_not_of(turbo::string_view Chars, size_t From = 0) const {
+        size_t find_first_not_of(std::string_view Chars, size_t From = 0) const {
             return str().find_first_not_of(Chars, From);
         }
 
         /// Find the last character in the string that is \p C, or npos if not
         /// found.
-        size_t find_last_of(char C, size_t From = turbo::string_view::npos) const {
+        size_t find_last_of(char C, size_t From = std::string_view::npos) const {
             return str().find_last_of(C, From);
         }
 
@@ -217,7 +217,7 @@ namespace turbo {
         ///
         /// Complexity: O(size() + Chars.size())
         size_t find_last_of(
-                turbo::string_view Chars, size_t From = turbo::string_view::npos) const {
+                std::string_view Chars, size_t From = std::string_view::npos) const {
             return str().find_last_of(Chars, From);
         }
 
@@ -234,9 +234,9 @@ namespace turbo {
         /// \param N The number of characters to included in the substring. If \p N
         /// exceeds the number of characters remaining in the string, the string
         /// suffix (starting with \p Start) will be returned.
-        turbo::string_view substr(size_t Start, size_t N = turbo::string_view::npos) const {
+        std::string_view substr(size_t Start, size_t N = std::string_view::npos) const {
             if(Start >= this->size())
-                return turbo::string_view();
+                return std::string_view();
             return str().substr(Start, N);
         }
 
@@ -250,17 +250,17 @@ namespace turbo {
         /// substring. If this is npos, or less than \p Start, or exceeds the
         /// number of characters remaining in the string, the string suffix
         /// (starting with \p Start) will be returned.
-        turbo::string_view slice(size_t Start, size_t End) const {
+        std::string_view slice(size_t Start, size_t End) const {
             if(End <= Start || Start >= this->size())
-                return turbo::string_view();
+                return std::string_view();
 
             return str().substr(Start, End - Start);
         }
 
         // Extra methods.
 
-        /// Explicit conversion to  turbo::string_view.
-        turbo::string_view str() const { return turbo::string_view(this->data(), this->size()); }
+        /// Explicit conversion to  std::string_view.
+        std::string_view str() const { return std::string_view(this->data(), this->size()); }
 
         // TODO: Make this const, if it's safe...
         const char *c_str() {
@@ -275,20 +275,20 @@ namespace turbo {
             return H::combine(H::combine_contiguous(std::move(h), str.data(), str.size()),str.size());
         }
 
-        /// Implicit conversion to  turbo::string_view.
-        operator turbo::string_view() const { return str(); }
+        /// Implicit conversion to  std::string_view.
+        operator std::string_view() const { return str(); }
 
         explicit operator std::string() const {
             return std::string(this->data(), this->size());
         }
 
         // Extra operators.
-        SmallString &operator=(turbo::string_view RHS) {
+        SmallString &operator=(std::string_view RHS) {
             this->assign(RHS);
             return *this;
         }
 
-        SmallString &operator+=(turbo::string_view RHS) {
+        SmallString &operator+=(std::string_view RHS) {
             this->append(RHS.begin(), RHS.end());
             return *this;
         }
@@ -305,12 +305,12 @@ namespace turbo {
     }
 
     template<unsigned M>
-    bool operator==(const SmallString<M> &LHS, turbo::string_view RHS) {
+    bool operator==(const SmallString<M> &LHS, std::string_view RHS) {
         return LHS.str() == RHS;
     }
 
     template<unsigned M>
-    bool operator==(turbo::string_view LHS, const SmallString<M> &RHS) {
+    bool operator==(std::string_view LHS, const SmallString<M> &RHS) {
         return LHS == RHS.str();
     }
 

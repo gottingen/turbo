@@ -32,7 +32,7 @@
 #include <turbo/strings/internal/cordz_statistics.h>
 #include <turbo/strings/internal/cordz_update_tracker.h>
 #include <turbo/synchronization/mutex.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -173,12 +173,12 @@ class TURBO_LOCKABLE CordzInfo : public CordzHandle {
   // was first created. Some cords are created as inlined cords, and only as
   // data is added do they become a non-inlined cord. However, typically the
   // location represents reasonably well where the cord is 'created'.
-  turbo::Span<void* const> GetStack() const;
+  turbo::span<void* const> GetStack() const;
 
   // Returns the stack trace for a sampled cord's 'parent stack trace'. This
   // value may be set if the cord is sampled (promoted) after being created
   // from, or being assigned the value of an existing (sampled) cord.
-  turbo::Span<void* const> GetParentStack() const;
+  turbo::span<void* const> GetParentStack() const;
 
   // Retrieves the CordzStatistics associated with this Cord. The statistics
   // are only updated when a Cord goes through a mutation, such as an Append

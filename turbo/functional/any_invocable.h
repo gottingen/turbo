@@ -45,7 +45,7 @@
 #include <turbo/base/config.h>
 #include <turbo/functional/internal/any_invocable.h>
 #include <turbo/meta/type_traits.h>
-#include <turbo/utility/utility.h>
+#include <turbo/meta/utility.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -203,13 +203,13 @@ class AnyInvocable : private internal_any_invocable::Impl<Sig> {
   // Example:
   //
   //   AnyInvocable<int(int)> func(
-  //       turbo::in_place_type<PossiblyImmovableType>, arg1, arg2);
+  //       std::in_place_type<PossiblyImmovableType>, arg1, arg2);
   //
   template <class T, class... Args,
             typename = turbo::enable_if_t<
                 internal_any_invocable::CanEmplace<Sig, T, Args...>::value>>
-  explicit AnyInvocable(turbo::in_place_type_t<T>, Args&&... args)
-      : Impl(turbo::in_place_type<turbo::decay_t<T>>,
+  explicit AnyInvocable(std::in_place_type_t<T>, Args&&... args)
+      : Impl(std::in_place_type<turbo::decay_t<T>>,
              std::forward<Args>(args)...) {
     static_assert(std::is_same<T, turbo::decay_t<T>>::value,
                   "The explicit template argument of in_place_type is required "
@@ -220,9 +220,9 @@ class AnyInvocable : private internal_any_invocable::Impl<Sig> {
   template <class T, class U, class... Args,
             typename = turbo::enable_if_t<internal_any_invocable::CanEmplace<
                 Sig, T, std::initializer_list<U>&, Args...>::value>>
-  explicit AnyInvocable(turbo::in_place_type_t<T>,
+  explicit AnyInvocable(std::in_place_type_t<T>,
                         std::initializer_list<U> ilist, Args&&... args)
-      : Impl(turbo::in_place_type<turbo::decay_t<T>>, ilist,
+      : Impl(std::in_place_type<turbo::decay_t<T>>, ilist,
              std::forward<Args>(args)...) {
     static_assert(std::is_same<T, turbo::decay_t<T>>::value,
                   "The explicit template argument of in_place_type is required "

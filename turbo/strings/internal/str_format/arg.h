@@ -39,10 +39,7 @@
 #include <turbo/strings/has_stringify.h>
 #include <turbo/strings/internal/str_format/extension.h>
 #include <turbo/strings/string_view.h>
-
-#if defined(TURBO_HAVE_STD_STRING_VIEW)
 #include <string_view>
-#endif
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -228,21 +225,12 @@ StringConvertResult FormatConvertImpl(const std::string& v,
 StringConvertResult FormatConvertImpl(const std::wstring& v,
                                       FormatConversionSpecImpl conv,
                                       FormatSinkImpl* sink);
-StringConvertResult FormatConvertImpl(string_view v,
+StringConvertResult FormatConvertImpl(std::string_view v,
                                       FormatConversionSpecImpl conv,
                                       FormatSinkImpl* sink);
-#if defined(TURBO_HAVE_STD_STRING_VIEW)
 StringConvertResult FormatConvertImpl(std::wstring_view v,
                                       FormatConversionSpecImpl conv,
                                       FormatSinkImpl* sink);
-#if !defined(TURBO_USES_STD_STRING_VIEW)
-inline StringConvertResult FormatConvertImpl(std::string_view v,
-                                             FormatConversionSpecImpl conv,
-                                             FormatSinkImpl* sink) {
-  return FormatConvertImpl(turbo::string_view(v.data(), v.size()), conv, sink);
-}
-#endif  // !TURBO_USES_STD_STRING_VIEW
-#endif  // TURBO_HAVE_STD_STRING_VIEW
 
 using StringPtrConvertResult = ArgConvertResult<FormatConversionCharSetUnion(
     FormatConversionCharSetInternal::s,
@@ -280,7 +268,7 @@ StringConvertResult FormatConvertImpl(const TurboCord& value,
 
   if (space_remaining > 0 && !is_left) sink->Append(space_remaining, ' ');
 
-  for (string_view piece : value.Chunks()) {
+  for (std::string_view piece : value.Chunks()) {
     if (piece.size() > to_write) {
       piece.remove_suffix(piece.size() - to_write);
       to_write = 0;
@@ -650,19 +638,14 @@ class FormatArgImpl {
   TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(long double, __VA_ARGS__);        \
   TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(const char*, __VA_ARGS__);        \
   TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(std::string, __VA_ARGS__);        \
-  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(string_view, __VA_ARGS__);        \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(std::string_view, __VA_ARGS__);        \
   TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(const wchar_t*, __VA_ARGS__);     \
   TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(std::wstring, __VA_ARGS__)
 
-#if defined(TURBO_HAVE_STD_STRING_VIEW)
 #define TURBO_INTERNAL_FORMAT_DISPATCH_OVERLOADS_EXPAND_(...)       \
   TURBO_INTERNAL_FORMAT_DISPATCH_OVERLOADS_EXPAND_NO_WSTRING_VIEW_( \
       __VA_ARGS__);                                                \
   TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(std::wstring_view, __VA_ARGS__)
-#else
-#define TURBO_INTERNAL_FORMAT_DISPATCH_OVERLOADS_EXPAND_(...) \
-  TURBO_INTERNAL_FORMAT_DISPATCH_OVERLOADS_EXPAND_NO_WSTRING_VIEW_(__VA_ARGS__)
-#endif
 
 TURBO_INTERNAL_FORMAT_DISPATCH_OVERLOADS_EXPAND_(extern);
 

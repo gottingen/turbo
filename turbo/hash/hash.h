@@ -85,7 +85,7 @@
 #include <array>
 #include <turbo/functional/function_ref.h>
 #include <turbo/hash/internal/hash.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo {
 
@@ -122,7 +122,7 @@ namespace turbo {
     //  * All the standard associative containers (provided the elements are
     //    hashable)
     //  * turbo types such as the following:
-    //    * turbo::string_view
+    //    * std::string_view
     //    * turbo::uint128
     //    * turbo::Time, turbo::Duration, and turbo::TimeZone
     //  * turbo containers (provided the elements are hashable) such as the
@@ -432,13 +432,13 @@ namespace turbo {
 
     // using murmur3 hash algorithm
     template<typename T>
-    inline uint32_t hash32(turbo::Span<T> data, uint32_t seed = 0) {
+    inline uint32_t hash32(turbo::span<T> data, uint32_t seed = 0) {
         return hash32(data.data(), data.size() * sizeof(T), seed);
     }
 
     // using murmur3 hash algorithm
     // hash32 for string_view
-    inline uint32_t hash32(turbo::string_view data, uint32_t seed = 0) {
+    inline uint32_t hash32(std::string_view data, uint32_t seed = 0) {
         return hash32(data.data(), data.size(), seed);
     }
 
@@ -453,20 +453,20 @@ namespace turbo {
     void hash128(const void *data, size_t size, std::array<uint32_t , 4> *result, uint32_t seed = 0);
 
     template<typename T>
-    inline void hash128(turbo::Span<T> data, std::array<uint64_t, 2> *result, uint32_t seed = 0) {
+    inline void hash128(turbo::span<T> data, std::array<uint64_t, 2> *result, uint32_t seed = 0) {
         hash128(data.data(), data.size() * sizeof(T), result, seed);
     }
 
     template<typename T>
-    inline void hash128(turbo::Span<T> data, std::array<uint32_t , 4> *result, uint32_t seed = 0) {
+    inline void hash128(turbo::span<T> data, std::array<uint32_t , 4> *result, uint32_t seed = 0) {
         hash128(data.data(), data.size() * sizeof(T), result, seed);
     }
 
-    inline void hash128(turbo::string_view data, std::array<uint64_t, 2> *result, uint32_t seed = 0) {
+    inline void hash128(std::string_view data, std::array<uint64_t, 2> *result, uint32_t seed = 0) {
         hash128(data.data(), data.size(), result, seed);
     }
 
-    inline void hash128(turbo::string_view data, std::array<uint32_t , 4> *result, uint32_t seed = 0) {
+    inline void hash128(std::string_view data, std::array<uint32_t , 4> *result, uint32_t seed = 0) {
         hash128(data.data(), data.size(), result, seed);
     }
 

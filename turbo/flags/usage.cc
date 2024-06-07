@@ -41,7 +41,7 @@ namespace turbo {
 
     // --------------------------------------------------------------------
     // Sets the "usage" message to be used by help reporting routines.
-    void set_program_usage_message(turbo::string_view new_usage_message) {
+    void set_program_usage_message(std::string_view new_usage_message) {
         turbo::MutexLock l(&flags_internal::usage_message_guard);
 
         if (flags_internal::program_usage_message != nullptr) {
@@ -56,11 +56,11 @@ namespace turbo {
     // Returns the usage message set by set_program_usage_message().
     // Note: We able to return string_view here only because calling
     // set_program_usage_message twice is prohibited.
-    turbo::string_view program_usage_message() {
+    std::string_view program_usage_message() {
         turbo::MutexLock l(&flags_internal::usage_message_guard);
 
         return flags_internal::program_usage_message != nullptr
-               ? turbo::string_view(*flags_internal::program_usage_message)
+               ? std::string_view(*flags_internal::program_usage_message)
                : "Warning: set_program_usage_message() never called";
     }
 

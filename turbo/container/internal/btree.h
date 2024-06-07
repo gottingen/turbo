@@ -72,7 +72,7 @@
 #include <turbo/meta/type_traits.h>
 #include <turbo/strings/cord.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/compare.h>
+#include <turbo/meta/compare.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -112,15 +112,15 @@ struct StringBtreeDefaultLess {
 
   // Compatibility constructor.
   StringBtreeDefaultLess(std::less<std::string>) {}        // NOLINT
-  StringBtreeDefaultLess(std::less<turbo::string_view>) {}  // NOLINT
+  StringBtreeDefaultLess(std::less<std::string_view>) {}  // NOLINT
 
   // Allow converting to std::less for use in key_comp()/value_comp().
   explicit operator std::less<std::string>() const { return {}; }
-  explicit operator std::less<turbo::string_view>() const { return {}; }
+  explicit operator std::less<std::string_view>() const { return {}; }
   explicit operator std::less<turbo::Cord>() const { return {}; }
 
-  turbo::weak_ordering operator()(turbo::string_view lhs,
-                                 turbo::string_view rhs) const {
+  turbo::weak_ordering operator()(std::string_view lhs,
+                                 std::string_view rhs) const {
     return compare_internal::compare_result_as_ordering(lhs.compare(rhs));
   }
   StringBtreeDefaultLess(std::less<turbo::Cord>) {}  // NOLINT
@@ -129,10 +129,10 @@ struct StringBtreeDefaultLess {
     return compare_internal::compare_result_as_ordering(lhs.Compare(rhs));
   }
   turbo::weak_ordering operator()(const turbo::Cord &lhs,
-                                 turbo::string_view rhs) const {
+                                 std::string_view rhs) const {
     return compare_internal::compare_result_as_ordering(lhs.Compare(rhs));
   }
-  turbo::weak_ordering operator()(turbo::string_view lhs,
+  turbo::weak_ordering operator()(std::string_view lhs,
                                  const turbo::Cord &rhs) const {
     return compare_internal::compare_result_as_ordering(-rhs.Compare(lhs));
   }
@@ -144,15 +144,15 @@ struct StringBtreeDefaultGreater {
   StringBtreeDefaultGreater() = default;
 
   StringBtreeDefaultGreater(std::greater<std::string>) {}        // NOLINT
-  StringBtreeDefaultGreater(std::greater<turbo::string_view>) {}  // NOLINT
+  StringBtreeDefaultGreater(std::greater<std::string_view>) {}  // NOLINT
 
   // Allow converting to std::greater for use in key_comp()/value_comp().
   explicit operator std::greater<std::string>() const { return {}; }
-  explicit operator std::greater<turbo::string_view>() const { return {}; }
+  explicit operator std::greater<std::string_view>() const { return {}; }
   explicit operator std::greater<turbo::Cord>() const { return {}; }
 
-  turbo::weak_ordering operator()(turbo::string_view lhs,
-                                 turbo::string_view rhs) const {
+  turbo::weak_ordering operator()(std::string_view lhs,
+                                 std::string_view rhs) const {
     return compare_internal::compare_result_as_ordering(rhs.compare(lhs));
   }
   StringBtreeDefaultGreater(std::greater<turbo::Cord>) {}  // NOLINT
@@ -161,10 +161,10 @@ struct StringBtreeDefaultGreater {
     return compare_internal::compare_result_as_ordering(rhs.Compare(lhs));
   }
   turbo::weak_ordering operator()(const turbo::Cord &lhs,
-                                 turbo::string_view rhs) const {
+                                 std::string_view rhs) const {
     return compare_internal::compare_result_as_ordering(-lhs.Compare(rhs));
   }
-  turbo::weak_ordering operator()(turbo::string_view lhs,
+  turbo::weak_ordering operator()(std::string_view lhs,
                                  const turbo::Cord &rhs) const {
     return compare_internal::compare_result_as_ordering(rhs.Compare(lhs));
   }
@@ -288,12 +288,12 @@ struct key_compare_adapter<std::greater<std::string>, std::string> {
 };
 
 template <>
-struct key_compare_adapter<std::less<turbo::string_view>, turbo::string_view> {
+struct key_compare_adapter<std::less<std::string_view>, std::string_view> {
   using type = StringBtreeDefaultLess;
 };
 
 template <>
-struct key_compare_adapter<std::greater<turbo::string_view>, turbo::string_view> {
+struct key_compare_adapter<std::greater<std::string_view>, std::string_view> {
   using type = StringBtreeDefaultGreater;
 };
 

@@ -217,9 +217,9 @@ class ReentrancyTest : public ::testing::Test {
     LogMode mode_;
   };
 
-  static turbo::string_view LogAndReturn(turbo::LogSeverity severity,
-                                        turbo::string_view to_log,
-                                        turbo::string_view to_return) {
+  static std::string_view LogAndReturn(turbo::LogSeverity severity,
+                                        std::string_view to_log,
+                                        std::string_view to_return) {
     LOG(LEVEL(severity)) << to_log;
     return to_return;
   }

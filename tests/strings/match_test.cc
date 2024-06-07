@@ -26,9 +26,9 @@ namespace {
 
 TEST(MatchTest, starts_with) {
   const std::string s1("123\0abc", 7);
-  const turbo::string_view a("foobar");
-  const turbo::string_view b(s1);
-  const turbo::string_view e;
+  const std::string_view a("foobar");
+  const std::string_view b(s1);
+  const std::string_view e;
   EXPECT_TRUE(turbo::starts_with(a, a));
   EXPECT_TRUE(turbo::starts_with(a, "foo"));
   EXPECT_TRUE(turbo::starts_with(a, e));
@@ -43,9 +43,9 @@ TEST(MatchTest, starts_with) {
 
 TEST(MatchTest, ends_with) {
   const std::string s1("123\0abc", 7);
-  const turbo::string_view a("foobar");
-  const turbo::string_view b(s1);
-  const turbo::string_view e;
+  const std::string_view a("foobar");
+  const std::string_view b(s1);
+  const std::string_view e;
   EXPECT_TRUE(turbo::ends_with(a, a));
   EXPECT_TRUE(turbo::ends_with(a, "bar"));
   EXPECT_TRUE(turbo::ends_with(a, e));
@@ -59,10 +59,10 @@ TEST(MatchTest, ends_with) {
 }
 
 TEST(MatchTest, Contains) {
-  turbo::string_view a("abcdefg");
-  turbo::string_view b("abcd");
-  turbo::string_view c("efg");
-  turbo::string_view d("gh");
+  std::string_view a("abcdefg");
+  std::string_view b("abcd");
+  std::string_view c("efg");
+  std::string_view d("gh");
   EXPECT_TRUE(turbo::str_contains(a, a));
   EXPECT_TRUE(turbo::str_contains(a, b));
   EXPECT_TRUE(turbo::str_contains(a, c));
@@ -73,8 +73,8 @@ TEST(MatchTest, Contains) {
 }
 
 TEST(MatchTest, ContainsChar) {
-  turbo::string_view a("abcdefg");
-  turbo::string_view b("abcd");
+  std::string_view a("abcdefg");
+  std::string_view b("abcd");
   EXPECT_TRUE(turbo::str_contains(a, 'a'));
   EXPECT_TRUE(turbo::str_contains(a, 'b'));
   EXPECT_TRUE(turbo::str_contains(a, 'e'));
@@ -92,8 +92,8 @@ TEST(MatchTest, ContainsChar) {
 TEST(MatchTest, ContainsNull) {
   const std::string s = "foo";
   const char* cs = "foo";
-  const turbo::string_view sv("foo");
-  const turbo::string_view sv2("foo\0bar", 4);
+  const std::string_view sv("foo");
+  const std::string_view sv2("foo\0bar", 4);
   EXPECT_EQ(s, "foo");
   EXPECT_EQ(sv, "foo");
   EXPECT_NE(sv2, "foo");
@@ -105,7 +105,7 @@ TEST(MatchTest, ContainsNull) {
 
 TEST(MatchTest, equals_ignore_case) {
   std::string text = "the";
-  turbo::string_view data(text);
+  std::string_view data(text);
 
   EXPECT_TRUE(turbo::equals_ignore_case(data, "The"));
   EXPECT_TRUE(turbo::equals_ignore_case(data, "THE"));
@@ -145,8 +145,8 @@ TEST(MatchTest, ContainsIgnoreCase) {
 }
 
 TEST(MatchTest, ContainsCharIgnoreCase) {
-  turbo::string_view a("AaBCdefg!");
-  turbo::string_view b("AaBCd!");
+  std::string_view a("AaBCdefg!");
+  std::string_view b("AaBCd!");
   EXPECT_TRUE(turbo::str_contains_ignore_case(a, 'a'));
   EXPECT_TRUE(turbo::str_contains_ignore_case(a, 'A'));
   EXPECT_TRUE(turbo::str_contains_ignore_case(a, 'b'));
@@ -187,8 +187,8 @@ TEST(MatchTest, find_longest_common_prefix) {
 
   // "abcde" v. "abc" but in the middle of other data
   EXPECT_EQ(turbo::find_longest_common_prefix(
-                turbo::string_view("1234 abcdef").substr(5, 5),
-                turbo::string_view("5678 abcdef").substr(5, 3)),
+                std::string_view("1234 abcdef").substr(5, 5),
+                std::string_view("5678 abcdef").substr(5, 3)),
             "abc");
 }
 
@@ -286,8 +286,8 @@ TEST(MatchTest, find_longest_common_suffix) {
 
   // "abcde" v. "cde" but in the middle of other data
   EXPECT_EQ(turbo::find_longest_common_suffix(
-                turbo::string_view("1234 abcdef").substr(5, 5),
-                turbo::string_view("5678 abcdef").substr(7, 3)),
+                std::string_view("1234 abcdef").substr(5, 5),
+                std::string_view("5678 abcdef").substr(7, 3)),
             "cde");
 }
 

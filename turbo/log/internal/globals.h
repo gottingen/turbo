@@ -43,7 +43,7 @@ void SetInitialized();
 
 // Unconditionally write a `message` to stderr. If `severity` exceeds kInfo
 // we also flush the stderr stream.
-void WriteToStderr(turbo::string_view message, turbo::LogSeverity severity);
+void WriteToStderr(std::string_view message, turbo::LogSeverity severity);
 
 // Set the TimeZone used for human-friendly times (for example, the log message
 // prefix) printed by the logging library. This may only be called once.

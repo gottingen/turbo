@@ -48,7 +48,7 @@
 #include <turbo/strings/numbers.h>
 #include <turbo/strings/str_format.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/optional.h>
+#include <optional>
 
 static constexpr uint8_t kUnhex[256] = {
     0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,  //
@@ -88,10 +88,10 @@ static constexpr uint8_t kUnhex[256] = {
     0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,  //
 };
 
-static turbo::optional<std::string> ReadFileToString(const char* filename) {
+static std::optional<std::string> ReadFileToString(const char* filename) {
   FILE* f = fopen(filename, "rb");
   if (!f) {
-    return turbo::nullopt;
+    return std::nullopt;
   }
   fseek(f, 0, SEEK_END);
   size_t size = ftell(f);
@@ -100,25 +100,25 @@ static turbo::optional<std::string> ReadFileToString(const char* filename) {
   size_t n = fread(&s[0], 1, size, f);
   fclose(f);
   if (n != size) {
-    return turbo::nullopt;
+    return std::nullopt;
   }
   return s;
 }
 
 static bool ProcessOneTestFile(const char* filename) {
-  turbo::optional<std::string> contents = ReadFileToString(filename);
+  std::optional<std::string> contents = ReadFileToString(filename);
   if (!contents) {
     turbo::FPrintF(stderr, "Invalid file: %s\n", filename);
     return false;
   }
 
   int num_cases = 0;
-  for (turbo::string_view v(*contents); !v.empty();) {
+  for (std::string_view v(*contents); !v.empty();) {
     size_t new_line = v.find('\n');
-    if ((new_line == turbo::string_view::npos) || (new_line < 32)) {
+    if ((new_line == std::string_view::npos) || (new_line < 32)) {
       break;
     }
-    turbo::string_view input = v.substr(31, new_line - 31);
+    std::string_view input = v.substr(31, new_line - 31);
 
     // Test turbo::simple_atof.
     {

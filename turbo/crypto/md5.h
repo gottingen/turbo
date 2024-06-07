@@ -55,7 +55,7 @@ namespace turbo {
         void update(ArrayRef<uint8_t> Data);
 
         /// Updates the hash for the StringRef provided.
-        void update(turbo::string_view Str);
+        void update(std::string_view Str);
 
         /// Finishes off the hash and puts the result in result.
         void final(MD5Result &Result);
@@ -91,7 +91,7 @@ namespace turbo {
     };
 
     /// Helper to compute and return lower 64 bits of the given string's MD5 hash.
-    inline uint64_t md5_hash(turbo::string_view Str) {
+    inline uint64_t md5_hash(std::string_view Str) {
         MD5 Hash;
         Hash.update(Str);
         MD5::MD5Result Result;

@@ -60,9 +60,9 @@ TEST(ReadSeedMaterialFromOSEntropy, SuccessiveReadsAreDistinct) {
   uint32_t seed_material_2[kSeedMaterialSize] = {};
 
   EXPECT_TRUE(turbo::random_internal::ReadSeedMaterialFromOSEntropy(
-      turbo::Span<uint32_t>(seed_material_1, kSeedMaterialSize)));
+      turbo::span<uint32_t>(seed_material_1, kSeedMaterialSize)));
   EXPECT_TRUE(turbo::random_internal::ReadSeedMaterialFromOSEntropy(
-      turbo::Span<uint32_t>(seed_material_2, kSeedMaterialSize)));
+      turbo::span<uint32_t>(seed_material_2, kSeedMaterialSize)));
 
   EXPECT_THAT(seed_material_1, Pointwise(Ne(), seed_material_2));
 }
@@ -71,7 +71,7 @@ TEST(ReadSeedMaterialFromOSEntropy, ReadZeroBytesIsNoOp) {
   uint32_t seed_material[32] = {};
   std::memset(seed_material, 0xAA, sizeof(seed_material));
   EXPECT_TRUE(turbo::random_internal::ReadSeedMaterialFromOSEntropy(
-      turbo::Span<uint32_t>(seed_material, 0)));
+      turbo::span<uint32_t>(seed_material, 0)));
 
   EXPECT_THAT(seed_material, Each(Eq(0xAAAAAAAA)));
 }
@@ -79,12 +79,12 @@ TEST(ReadSeedMaterialFromOSEntropy, ReadZeroBytesIsNoOp) {
 TEST(ReadSeedMaterialFromOSEntropy, NullPtrVectorArgument) {
 #ifdef NDEBUG
   EXPECT_FALSE(turbo::random_internal::ReadSeedMaterialFromOSEntropy(
-      turbo::Span<uint32_t>(nullptr, 32)));
+      turbo::span<uint32_t>(nullptr, 32)));
 #else
   bool result;
   TURBO_EXPECT_DEATH_IF_SUPPORTED(
       result = turbo::random_internal::ReadSeedMaterialFromOSEntropy(
-          turbo::Span<uint32_t>(nullptr, 32)),
+          turbo::span<uint32_t>(nullptr, 32)),
       "!= nullptr");
   (void)result;  // suppress unused-variable warning
 #endif
@@ -99,7 +99,7 @@ TEST(ReadSeedMaterialFromURBG, SeedMaterialEqualsVariateSequence) {
   uint32_t seed_material[kSeedMaterialSize] = {};
 
   EXPECT_TRUE(turbo::random_internal::ReadSeedMaterialFromURBG(
-      &urbg_1, turbo::Span<uint32_t>(seed_material, kSeedMaterialSize)));
+      &urbg_1, turbo::span<uint32_t>(seed_material, kSeedMaterialSize)));
   for (uint32_t seed : seed_material) {
     EXPECT_EQ(seed, urbg_2());
   }
@@ -110,7 +110,7 @@ TEST(ReadSeedMaterialFromURBG, ReadZeroBytesIsNoOp) {
   uint32_t seed_material[32];
   std::memset(seed_material, 0xAA, sizeof(seed_material));
   EXPECT_TRUE(turbo::random_internal::ReadSeedMaterialFromURBG(
-      &urbg, turbo::Span<uint32_t>(seed_material, 0)));
+      &urbg, turbo::span<uint32_t>(seed_material, 0)));
 
   EXPECT_THAT(seed_material, Each(Eq(0xAAAAAAAA)));
 }
@@ -120,12 +120,12 @@ TEST(ReadSeedMaterialFromURBG, NullUrbgArgument) {
   uint32_t seed_material[kSeedMaterialSize];
 #ifdef NDEBUG
   EXPECT_FALSE(turbo::random_internal::ReadSeedMaterialFromURBG<std::mt19937_64>(
-      nullptr, turbo::Span<uint32_t>(seed_material, kSeedMaterialSize)));
+      nullptr, turbo::span<uint32_t>(seed_material, kSeedMaterialSize)));
 #else
   bool result;
   TURBO_EXPECT_DEATH_IF_SUPPORTED(
       result = turbo::random_internal::ReadSeedMaterialFromURBG<std::mt19937_64>(
-          nullptr, turbo::Span<uint32_t>(seed_material, kSeedMaterialSize)),
+          nullptr, turbo::span<uint32_t>(seed_material, kSeedMaterialSize)),
       "!= nullptr");
   (void)result;  // suppress unused-variable warning
 #endif
@@ -135,12 +135,12 @@ TEST(ReadSeedMaterialFromURBG, NullPtrVectorArgument) {
   std::mt19937_64 urbg;
 #ifdef NDEBUG
   EXPECT_FALSE(turbo::random_internal::ReadSeedMaterialFromURBG(
-      &urbg, turbo::Span<uint32_t>(nullptr, 32)));
+      &urbg, turbo::span<uint32_t>(nullptr, 32)));
 #else
   bool result;
   TURBO_EXPECT_DEATH_IF_SUPPORTED(
       result = turbo::random_internal::ReadSeedMaterialFromURBG(
-          &urbg, turbo::Span<uint32_t>(nullptr, 32)),
+          &urbg, turbo::span<uint32_t>(nullptr, 32)),
       "!= nullptr");
   (void)result;  // suppress unused-variable warning
 #endif
@@ -161,8 +161,8 @@ TEST(MixSequenceIntoSeedMaterial, AvalancheEffectTestOneBitLong) {
   for (uint32_t v = 1; v != 0; v <<= 1) {
     std::vector<uint32_t> seed_material_copy = seed_material;
     turbo::random_internal::MixIntoSeedMaterial(
-        turbo::Span<uint32_t>(&v, 1),
-        turbo::Span<uint32_t>(seed_material_copy.data(),
+        turbo::span<uint32_t>(&v, 1),
+        turbo::span<uint32_t>(seed_material_copy.data(),
                              seed_material_copy.size()));
 
     uint32_t changed_bits = 0;
@@ -186,8 +186,8 @@ TEST(MixSequenceIntoSeedMaterial, AvalancheEffectTestOneBitShort) {
   for (uint32_t v = 1; v != 0; v <<= 1) {
     std::vector<uint32_t> seed_material_copy = seed_material;
     turbo::random_internal::MixIntoSeedMaterial(
-        turbo::Span<uint32_t>(&v, 1),
-        turbo::Span<uint32_t>(seed_material_copy.data(),
+        turbo::span<uint32_t>(&v, 1),
+        turbo::span<uint32_t>(seed_material_copy.data(),
                              seed_material_copy.size()));
 
     uint32_t changed_bits = 0;

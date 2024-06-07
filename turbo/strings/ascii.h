@@ -169,8 +169,8 @@ namespace turbo {
     // Converts the characters in `s` to lowercase, changing the contents of `s`.
     void str_to_lower(turbo::Nonnull<std::string *> s);
 
-    // Creates a lowercase string from a given turbo::string_view.
-    TURBO_MUST_USE_RESULT inline std::string str_to_lower(turbo::string_view s) {
+    // Creates a lowercase string from a given std::string_view.
+    TURBO_MUST_USE_RESULT inline std::string str_to_lower(std::string_view s) {
         std::string result(s);
         turbo::str_to_lower(&result);
         return result;
@@ -187,17 +187,17 @@ namespace turbo {
     // Converts the characters in `s` to uppercase, changing the contents of `s`.
     void str_to_upper(turbo::Nonnull<std::string *> s);
 
-    // Creates an uppercase string from a given turbo::string_view.
-    TURBO_MUST_USE_RESULT inline std::string str_to_upper(turbo::string_view s) {
+    // Creates an uppercase string from a given std::string_view.
+    TURBO_MUST_USE_RESULT inline std::string str_to_upper(std::string_view s) {
         std::string result(s);
         turbo::str_to_upper(&result);
         return result;
     }
 
-    // Returns turbo::string_view with whitespace stripped from the beginning of the
+    // Returns std::string_view with whitespace stripped from the beginning of the
     // given string_view.
-    TURBO_MUST_USE_RESULT inline turbo::string_view trim_left(
-            turbo::string_view str) {
+    TURBO_MUST_USE_RESULT inline std::string_view trim_left(
+            std::string_view str) {
         auto it = std::find_if_not(str.begin(), str.end(), turbo::ascii_isspace);
         return str.substr(static_cast<size_t>(it - str.begin()));
     }
@@ -208,10 +208,10 @@ namespace turbo {
         str->erase(str->begin(), it);
     }
 
-    // Returns turbo::string_view with whitespace stripped from the end of the given
+    // Returns std::string_view with whitespace stripped from the end of the given
     // string_view.
-    TURBO_MUST_USE_RESULT inline turbo::string_view trim_right(
-            turbo::string_view str) {
+    TURBO_MUST_USE_RESULT inline std::string_view trim_right(
+            std::string_view str) {
         auto it = std::find_if_not(str.rbegin(), str.rend(), turbo::ascii_isspace);
         return str.substr(0, static_cast<size_t>(str.rend() - it));
     }
@@ -222,10 +222,10 @@ namespace turbo {
         str->erase(static_cast<size_t>(str->rend() - it));
     }
 
-    // Returns turbo::string_view with whitespace stripped from both ends of the
+    // Returns std::string_view with whitespace stripped from both ends of the
     // given string_view.
-    TURBO_MUST_USE_RESULT inline turbo::string_view trim_all(
-            turbo::string_view str) {
+    TURBO_MUST_USE_RESULT inline std::string_view trim_all(
+            std::string_view str) {
         return trim_right(trim_left(str));
     }
 

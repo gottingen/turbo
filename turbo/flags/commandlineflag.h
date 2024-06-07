@@ -36,7 +36,7 @@
 #include <turbo/base/internal/fast_type_id.h>
 #include <turbo/flags/internal/commandlineflag.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/optional.h>
+#include <optional>
 
 namespace turbo::flags_internal {
     class PrivateHandleAccessor;
@@ -90,11 +90,11 @@ namespace turbo {
         // turbo::CommandLineFlag::try_get()
         //
         // Attempts to retrieve the flag value. Returns value on success,
-        // turbo::nullopt otherwise.
+        // std::nullopt otherwise.
         template<typename T>
-        turbo::optional<T> try_get() const {
+        std::optional<T> try_get() const {
             if (is_retired() || !is_of_type<T>()) {
-                return turbo::nullopt;
+                return std::nullopt;
             }
 
             // Implementation notes:
@@ -124,7 +124,7 @@ namespace turbo {
             Read(&u.value);
             // allow retired flags to be "read", so we can report invalid access.
             if (is_retired()) {
-                return turbo::nullopt;
+                return std::nullopt;
             }
             return std::move(u.value);
         }
@@ -132,7 +132,7 @@ namespace turbo {
         // turbo::CommandLineFlag::Name()
         //
         // Returns name of this flag.
-        virtual turbo::string_view name() const = 0;
+        virtual std::string_view name() const = 0;
 
         // turbo::CommandLineFlag::Filename()
         //
@@ -159,7 +159,7 @@ namespace turbo {
         // Returns the current value for this flag.
         virtual std::string current_value() const = 0;
 
-        virtual bool user_validate(turbo::string_view value, std::string *err) const {
+        virtual bool user_validate(std::string_view value, std::string *err) const {
             return true;
         }
 
@@ -172,7 +172,7 @@ namespace turbo {
         // Sets the value of the flag based on specified string `value`. If the flag
         // was successfully set to new value, it returns true. Otherwise, sets `error`
         // to indicate the error, leaves the flag unchanged, and returns false.
-        bool parse_from(turbo::string_view value, std::string *error);
+        bool parse_from(std::string_view value, std::string *error);
 
     protected:
         ~CommandLineFlag() = default;
@@ -188,7 +188,7 @@ namespace turbo {
         //  * Update the flag's default value
         //  * Update the current flag value if it was never set before
         // The mode is selected based on `set_mode` parameter.
-        virtual bool parse_from(turbo::string_view value,
+        virtual bool parse_from(std::string_view value,
                                flags_internal::FlagSettingMode set_mode,
                                flags_internal::ValueSource source,
                                std::string &error) = 0;
@@ -209,7 +209,7 @@ namespace turbo {
         virtual bool is_specified_on_commandLine() const = 0;
 
         // Validates supplied value using validator or parseflag routine
-        virtual bool validate_input_value(turbo::string_view value) const = 0;
+        virtual bool validate_input_value(std::string_view value) const = 0;
 
         // Checks that flags default value can be converted to string and back to the
         // flag's value type.

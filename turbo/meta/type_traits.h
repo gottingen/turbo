@@ -50,9 +50,7 @@
 #include <span>  // NOLINT(build/c++20)
 #endif
 
-#ifdef TURBO_HAVE_STD_STRING_VIEW
 #include <string_view>
-#endif
 
 // Defines the default alignment. `__STDCPP_DEFAULT_NEW_ALIGNMENT__` is a C++17
 // feature.
@@ -632,10 +630,8 @@ template <typename T>
 struct IsView : std::integral_constant<bool, std::is_pointer<T>::value ||
                                                  IsViewImpl<T>::value> {};
 
-#ifdef TURBO_HAVE_STD_STRING_VIEW
 template <typename Char, typename Traits>
 struct IsView<std::basic_string_view<Char, Traits>> : std::true_type {};
-#endif
 
 #ifdef __cpp_lib_span
 template <typename T>

@@ -63,7 +63,7 @@ namespace turbo {
         constexpr CharSet() : m_() {}
 
         // Initializes with a given string_view.
-        constexpr explicit CharSet(turbo::string_view str) : m_() {
+        constexpr explicit CharSet(std::string_view str) : m_() {
             for (char c: str) {
                 SetChar(static_cast<unsigned char>(c));
             }

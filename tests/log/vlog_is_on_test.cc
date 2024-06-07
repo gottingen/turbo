@@ -25,25 +25,25 @@
 #include <turbo/log/globals.h>
 #include <turbo/log/log.h>
 #include <tests/log/scoped_mock_log.h>
-#include <turbo/types/optional.h>
+#include <optional>
 
 namespace {
 
 using ::testing::_;
 
-turbo::optional<int> MaxLogVerbosity() {
+std::optional<int> MaxLogVerbosity() {
 #ifdef TURBO_MAX_VLOG_VERBOSITY
   return TURBO_MAX_VLOG_VERBOSITY;
 #else
-  return turbo::nullopt;
+  return std::nullopt;
 #endif
 }
 
-turbo::optional<int> min_log_level() {
+std::optional<int> min_log_level() {
 #ifdef TURBO_MIN_LOG_LEVEL
   return static_cast<int>(TURBO_MIN_LOG_LEVEL);
 #else
-  return turbo::nullopt;
+  return std::nullopt;
 #endif
 }
 

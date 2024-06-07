@@ -41,7 +41,7 @@
 #include <turbo/strings/string_view.h>
 #include <turbo/times/civil_time.h>
 #include <turbo/times/time.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace {
 using ::turbo::log_internal::LogEntryTestPeer;
@@ -60,10 +60,10 @@ namespace log_internal {
 
 class LogEntryTestPeer {
  public:
-  LogEntryTestPeer(turbo::string_view base_filename, int line, bool prefix,
-                   turbo::LogSeverity severity, turbo::string_view timestamp,
+  LogEntryTestPeer(std::string_view base_filename, int line, bool prefix,
+                   turbo::LogSeverity severity, std::string_view timestamp,
                    turbo::LogEntry::tid_t tid, PrefixFormat format,
-                   turbo::string_view text_message)
+                   std::string_view text_message)
       : format_{format}, buf_(15000, '\0') {
     entry_.base_filename_ = base_filename;
     entry_.line_ = line;
@@ -76,7 +76,7 @@ class LogEntryTestPeer {
         IsTrue())
         << "Failed to parse time " << timestamp << ": " << time_err;
     entry_.tid_ = tid;
-    std::pair<turbo::string_view, std::string> timestamp_bits =
+    std::pair<std::string_view, std::string> timestamp_bits =
         turbo::str_split(timestamp, turbo::ByChar('.'));
     EXPECT_THAT(turbo::ParseCivilTime(timestamp_bits.first, &ci_.cs), IsTrue())
         << "Failed to parse time " << timestamp_bits.first;
@@ -86,7 +86,7 @@ class LogEntryTestPeer {
         << "Failed to parse time " << timestamp_bits.first;
     ci_.subsecond = turbo::Duration::nanoseconds(nanos);
 
-    turbo::Span<char> view = turbo::MakeSpan(buf_);
+    turbo::span<char> view = turbo::MakeSpan(buf_);
     view.remove_suffix(2);
     entry_.prefix_len_ =
         entry_.prefix_
@@ -98,7 +98,7 @@ class LogEntryTestPeer {
     EXPECT_THAT(entry_.prefix_len_,
                 Eq(static_cast<size_t>(view.data() - buf_.data())));
     log_internal::AppendTruncated(text_message, view);
-    view = turbo::Span<char>(view.data(), view.size() + 2);
+    view = turbo::span<char>(view.data(), view.size() + 2);
     view[0] = '\n';
     view[1] = '\0';
     view.remove_prefix(2);
@@ -116,7 +116,7 @@ class LogEntryTestPeer {
   }
   std::string FormatPrefixIntoSizedBuffer(size_t sz) {
     std::string str(sz, '\0');
-    turbo::Span<char> buf(&str[0], str.size());
+    turbo::span<char> buf(&str[0], str.size());
     const size_t prefix_size = log_internal::FormatLogPrefix(
         entry_.log_severity(), entry_.timestamp(), entry_.tid(),
         entry_.source_basename(), entry_.source_line(), format_, buf);

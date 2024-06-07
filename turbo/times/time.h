@@ -568,7 +568,7 @@ namespace turbo {
         // suffix.  The valid suffixes are "ns", "us" "ms", "s", "m", and "h".
         // Simple examples include "300ms", "-1.5h", and "2h45m".  Parses "0" as
         // `Duration::zero()`. Parses "inf" and "-inf" as +/- `Duration::max_infinite()`.
-        static bool parse(turbo::string_view dur_string, Duration *d);
+        static bool parse(std::string_view dur_string, Duration *d);
 
     private:
         friend constexpr int64_t time_internal::GetRepHi(Duration d);
@@ -741,7 +741,7 @@ namespace turbo {
     // Parses a command-line flag string representation `text` into a Duration
     // value. Duration flags must be specified in a format that is valid input for
     // `turbo::Duration::parse()`.
-    bool turbo_parse_flag(turbo::string_view text, Duration *dst, std::string *error);
+    bool turbo_parse_flag(std::string_view text, Duration *dst, std::string *error);
 
 
     // turbo_unparse_flag()
@@ -1087,7 +1087,7 @@ namespace turbo {
         // If the input string is "infinite-past", the returned `turbo::Time` will be
         // `turbo::Time::past_infinite()` and `true` will be returned.
         //
-        static bool parse(turbo::string_view format, turbo::string_view input, Time *time,
+        static bool parse(std::string_view format, std::string_view input, Time *time,
                           std::string *err);
 
         // Like Time::parse() above, but if the format string does not contain a UTC
@@ -1097,7 +1097,7 @@ namespace turbo {
         // of ambiguity or non-existence, in which case the "pre" time (as defined
         // by TimeZone::TimeInfo) is returned.  For these reasons we recommend that
         // all date/time strings include a UTC offset so they're context independent.
-        static bool parse(turbo::string_view format, turbo::string_view input, TimeZone tz,
+        static bool parse(std::string_view format, std::string_view input, TimeZone tz,
                           Time *time, std::string *err);
 
         // Time::format()
@@ -1137,7 +1137,7 @@ namespace turbo {
         // `turbo::Time::past_infinite()`, the returned string will be exactly "infinite-past".
         // In both cases the given format string and `turbo::TimeZone` are ignored.
         //
-        TURBO_ATTRIBUTE_PURE_FUNCTION static std::string format(turbo::string_view format,
+        TURBO_ATTRIBUTE_PURE_FUNCTION static std::string format(std::string_view format,
                                                                 Time t, TimeZone tz);
 
         // Convenience functions that format the given time using the RFC3339_full
@@ -1248,7 +1248,7 @@ namespace turbo {
     // Additionally, if you'd like to specify a time as a count of
     // seconds/milliseconds/etc from the Unix epoch, use an turbo::Duration flag
     // and add that duration to turbo::Time::from_unix_epoch() to get an turbo::Time.
-    bool turbo_parse_flag(turbo::string_view text, Time *t, std::string *error);
+    bool turbo_parse_flag(std::string_view text, Time *t, std::string *error);
 
     // turbo_unparse_flag()
     //
@@ -1318,7 +1318,7 @@ namespace turbo {
         // Loads the named zone. May perform I/O on the initial load of the named
         // zone. If the name is invalid, or some other kind of error occurs, returns
         // `false` and `*tz` is set to the UTC time zone.
-        static bool load(turbo::string_view name, TimeZone *tz);
+        static bool load(std::string_view name, TimeZone *tz);
 
         // TimeZone::fixed()
         //
@@ -1489,7 +1489,7 @@ namespace turbo {
         time_internal::cctz::time_zone cz_;
     };
 
-    inline bool TimeZone::load(turbo::string_view name, TimeZone *tz) {
+    inline bool TimeZone::load(std::string_view name, TimeZone *tz) {
         if (name == "localtime") {
             *tz = TimeZone(time_internal::cctz::local_time_zone());
             return true;

@@ -236,8 +236,8 @@ namespace turbo {
     /* The expression is run in the caller as part of the   */               \
     /* default value argument. That keeps temporaries alive */               \
     /* long enough for NonConst to work correctly.          */               \
-    static constexpr turbo::string_view Value(                                \
-        turbo::string_view turbo_flag_help = TURBO_FLAG_IMPL_FLAGHELP(txt)) {   \
+    static constexpr std::string_view Value(                                \
+        std::string_view turbo_flag_help = TURBO_FLAG_IMPL_FLAGHELP(txt)) {   \
       return turbo_flag_help;                                                 \
     }                                                                        \
     static std::string NonConst() { return std::string(Value()); }           \

@@ -52,7 +52,7 @@ struct UDT {
   UDT(const UDT&) = default;
   UDT& operator=(const UDT&) = default;
 };
-static bool turbo_parse_flag(turbo::string_view, UDT*, std::string*) {
+static bool turbo_parse_flag(std::string_view, UDT*, std::string*) {
   return true;
 }
 static std::string turbo_unparse_flag(const UDT&) { return "UDT{}"; }
@@ -72,7 +72,7 @@ namespace {
 
 namespace flags = turbo::flags_internal;
 
-static std::string NormalizeFileName(turbo::string_view fname) {
+static std::string NormalizeFileName(std::string_view fname) {
 #ifdef _WIN32
   std::string normalized(fname);
   std::replace(normalized.begin(), normalized.end(), '\\', '/');
@@ -80,7 +80,7 @@ static std::string NormalizeFileName(turbo::string_view fname) {
 #endif
 
   auto turbo_pos = fname.rfind("turbo/");
-  if (turbo_pos != turbo::string_view::npos) {
+  if (turbo_pos != std::string_view::npos) {
     fname = fname.substr(turbo_pos);
   }
   return std::string(fname);
@@ -256,7 +256,7 @@ path.
   flags::FlagsHelp(test_buf_05, "", flags::HelpFormat::kHumanReadable,
                    kTestUsageMessage);
   std::string test_out = test_buf_05.str();
-  turbo::string_view test_out_str(test_out);
+  std::string_view test_out_str(test_out);
   EXPECT_TRUE(
       turbo::starts_with(test_out_str, "usage_test: Custom usage message"));
   EXPECT_TRUE(turbo::str_contains(

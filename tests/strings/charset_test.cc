@@ -44,7 +44,7 @@ TEST(Charmap, AllTests) {
     EXPECT_FALSE(also_nothing_map.contains(ch));
   }
 
-  const turbo::CharSet symbols(turbo::string_view("&@#@^!@?", 5));
+  const turbo::CharSet symbols(std::string_view("&@#@^!@?", 5));
   EXPECT_TRUE(symbols.contains('&'));
   EXPECT_TRUE(symbols.contains('@'));
   EXPECT_TRUE(symbols.contains('#'));
@@ -55,8 +55,8 @@ TEST(Charmap, AllTests) {
   for (unsigned char ch = 1; ch != 0; ++ch) cnt += symbols.contains(ch);
   EXPECT_EQ(cnt, 4);
 
-  const turbo::CharSet lets(turbo::string_view("^abcde", 3));
-  const turbo::CharSet lets2(turbo::string_view("fghij\0klmnop", 10));
+  const turbo::CharSet lets(std::string_view("^abcde", 3));
+  const turbo::CharSet lets2(std::string_view("fghij\0klmnop", 10));
   const turbo::CharSet lets3("fghij\0klmnop");
   EXPECT_TRUE(lets2.contains('k'));
   EXPECT_FALSE(lets3.contains('k'));
@@ -147,7 +147,7 @@ TEST(Charmap, Range) {
 
 TEST(Charmap, NullByteWithStringView) {
   char characters[5] = {'a', 'b', '\0', 'd', 'x'};
-  turbo::string_view view(characters, 5);
+  std::string_view view(characters, 5);
   turbo::CharSet tester(view);
   EXPECT_TRUE(tester.contains('a'));
   EXPECT_TRUE(tester.contains('b'));

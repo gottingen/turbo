@@ -60,10 +60,10 @@ TURBO_NAMESPACE_BEGIN
 // Example:
 //
 //  // Computes incremental checksum for `data`.
-//  int ComputeChecksum(int sum, turbo::string_view data);
+//  int ComputeChecksum(int sum, std::string_view data);
 //
 //  // Computes cumulative checksum for all values in `data`
-//  int ComputeChecksum(turbo::Span<const std::string> data) {
+//  int ComputeChecksum(turbo::span<const std::string> data) {
 //    int sum = 0;
 //    auto it = data.begin();
 //    auto pit = data.begin();

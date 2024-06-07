@@ -72,7 +72,7 @@
 #include <turbo/base/macros.h>
 #include <turbo/base/optimization.h>
 #include <turbo/meta/type_traits.h>
-#include <turbo/utility/utility.h>
+#include <turbo/meta/utility.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -375,12 +375,12 @@ ReturnType RemoteInvoker(
 ////////////////////////////////////////////////////////////////////////////////
 //
 // A metafunction that checks if a type T is an instantiation of
-// turbo::in_place_type_t (needed for constructor constraints of AnyInvocable).
+// std::in_place_type_t (needed for constructor constraints of AnyInvocable).
 template <class T>
 struct IsInPlaceType : std::false_type {};
 
 template <class T>
-struct IsInPlaceType<turbo::in_place_type_t<T>> : std::true_type {};
+struct IsInPlaceType<std::in_place_type_t<T>> : std::true_type {};
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -476,7 +476,7 @@ class CoreImpl {
   // invocation of the Invocable. The unqualified type is the target object
   // type to be stored.
   template <class QualTRef, class... Args>
-  explicit CoreImpl(turbo::in_place_type_t<QualTRef>, Args&&... args) {
+  explicit CoreImpl(std::in_place_type_t<QualTRef>, Args&&... args) {
     InitializeStorage<QualTRef>(std::forward<Args>(args)...);
   }
 
@@ -819,8 +819,8 @@ using CanAssignReferenceWrapper = TrueAlias<
                                                                                \
     /*Forward along the in-place construction parameters.*/                    \
     template <class T, class... Args>                                          \
-    explicit Impl(turbo::in_place_type_t<T>, Args&&... args)                    \
-        : Core(turbo::in_place_type<turbo::decay_t<T> inv_quals>,                \
+    explicit Impl(std::in_place_type_t<T>, Args&&... args)                    \
+        : Core(std::in_place_type<turbo::decay_t<T> inv_quals>,                \
                std::forward<Args>(args)...) {}                                 \
                                                                                \
     /*Raises a fatal error when the AnyInvocable is invoked after a move*/     \

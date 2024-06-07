@@ -126,7 +126,7 @@ TEST_P(EngineParamTest, SmallCorrectnessCheckSourceAlignment) {
       ASSERT_EQ(mem_comparison, 0);
       turbo::CRC32C baseline_crc = turbo::extend_crc32c(
           initial_crc,
-          turbo::string_view(
+          std::string_view(
               static_cast<char*>(source_.get()) + source_alignment, size));
       ASSERT_EQ(baseline_crc, experiment_crc);
     }
@@ -160,7 +160,7 @@ TEST_P(EngineParamTest, SmallCorrectnessCheckDestAlignment) {
       ASSERT_EQ(mem_comparison, 0);
       turbo::CRC32C baseline_crc = turbo::extend_crc32c(
           initial_crc,
-          turbo::string_view(static_cast<char*>(source_.get()), size));
+          std::string_view(static_cast<char*>(source_.get()), size));
       ASSERT_EQ(baseline_crc, experiment_crc);
     }
   }

@@ -204,7 +204,7 @@ namespace turbo {
     /// Add the bytes in the StringRef \p Str to the hash.
     // Note that this isn't a string and so this won't include any trailing NULL
     // bytes.
-    void MD5::update(turbo::string_view Str) {
+    void MD5::update(std::string_view Str) {
         ArrayRef <uint8_t> SVal((const uint8_t *) Str.data(), Str.size());
         update(SVal);
     }

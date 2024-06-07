@@ -25,7 +25,7 @@
 #include <turbo/base/config.h>
 #include <turbo/log/log_entry.h>
 #include <turbo/log/log_sink.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -43,7 +43,7 @@ bool thread_is_logging_to_log_sink();
 // * Otherwise it will also log to the global sinks set. This set is managed
 //   by `turbo::add_log_sink` and `turbo::remove_log_sink`.
 void log_to_sinks(const turbo::LogEntry& entry,
-                turbo::Span<turbo::LogSink*> extra_sinks, bool extra_sinks_only);
+                turbo::span<turbo::LogSink*> extra_sinks, bool extra_sinks_only);
 
 // Implementation for operations with log sink set.
 void add_log_sink(turbo::LogSink* sink);

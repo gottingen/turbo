@@ -31,7 +31,7 @@
 // Ranges are specified by passing a container with `std::begin()` and
 // `std::end()` iterators, container-specific `begin()` and `end()` iterators, a
 // brace-initialized `std::initializer_list`, or a `std::tuple` of heterogeneous
-// objects. The separator string is specified as an `turbo::string_view`.
+// objects. The separator string is specified as an `std::string_view`.
 //
 // Because the default formatter uses the `turbo::AlphaNum` class,
 // `turbo::str_join()`, like `turbo::str_cat()`, will work out-of-the-box on
@@ -104,14 +104,14 @@ namespace turbo {
         return strings_internal::StreamFormatterImpl();
     }
 
-    // Function Template: pair_formatter(Formatter, turbo::string_view, Formatter)
+    // Function Template: pair_formatter(Formatter, std::string_view, Formatter)
     //
     // Formats a `std::pair` by putting a given separator between the pair's
     // `.first` and `.second` members. This formatter allows you to specify
     // custom Formatters for both the first and second member of each pair.
     template<typename FirstFormatter, typename SecondFormatter>
     inline strings_internal::PairFormatterImpl<FirstFormatter, SecondFormatter>
-    pair_formatter(FirstFormatter f1, turbo::string_view sep, SecondFormatter f2) {
+    pair_formatter(FirstFormatter f1, std::string_view sep, SecondFormatter f2) {
         return strings_internal::PairFormatterImpl<FirstFormatter, SecondFormatter>(
                 std::move(f1), sep, std::move(f2));
     }
@@ -121,7 +121,7 @@ namespace turbo {
     inline strings_internal::PairFormatterImpl<
             strings_internal::AlphaNumFormatterImpl,
             strings_internal::AlphaNumFormatterImpl>
-    pair_formatter(turbo::string_view sep) {
+    pair_formatter(std::string_view sep) {
         return pair_formatter(alpha_num_formatter(), sep, alpha_num_formatter());
     }
 
@@ -161,7 +161,7 @@ namespace turbo {
     //
     // Example 1:
     //   // Joins a collection of strings. This pattern also works with a collection
-    //   // of `turbo::string_view` or even `const char*`.
+    //   // of `std::string_view` or even `const char*`.
     //   std::vector<std::string> v = {"foo", "bar", "baz"};
     //   std::string s = turbo::str_join(v, "-");
     //   EXPECT_EQ(s, "foo-bar-baz");
@@ -169,7 +169,7 @@ namespace turbo {
     // Example 2:
     //   // Joins the values in the given `std::initializer_list<>` specified using
     //   // brace initialization. This pattern also works with an initializer_list
-    //   // of ints or `turbo::string_view` -- any `AlphaNum`-compatible type.
+    //   // of ints or `std::string_view` -- any `AlphaNum`-compatible type.
     //   std::string s = turbo::str_join({"foo", "bar", "baz"}, "-");
     //   EXPECT_EQs, "foo-bar-baz");
     //
@@ -236,61 +236,61 @@ namespace turbo {
     //   EXPECT_EQ(s, "123-abc-0.456");
 
     template<typename Iterator, typename Formatter>
-    std::string str_join(Iterator start, Iterator end, turbo::string_view sep,
+    std::string str_join(Iterator start, Iterator end, std::string_view sep,
                         Formatter &&fmt) {
         return strings_internal::JoinAlgorithm(start, end, sep, fmt);
     }
 
     template<typename Range, typename Formatter>
-    std::string str_join(const Range &range, turbo::string_view separator,
+    std::string str_join(const Range &range, std::string_view separator,
                         Formatter &&fmt) {
         return strings_internal::JoinRange(range, separator, fmt);
     }
 
     template<typename T, typename Formatter,
             typename = typename std::enable_if<
-                    !std::is_convertible<T, turbo::string_view>::value>::type>
-    std::string str_join(std::initializer_list<T> il, turbo::string_view separator,
+                    !std::is_convertible<T, std::string_view>::value>::type>
+    std::string str_join(std::initializer_list<T> il, std::string_view separator,
                         Formatter &&fmt) {
         return strings_internal::JoinRange(il, separator, fmt);
     }
 
     template<typename Formatter>
-    inline std::string str_join(std::initializer_list<turbo::string_view> il,
-                               turbo::string_view separator, Formatter &&fmt) {
+    inline std::string str_join(std::initializer_list<std::string_view> il,
+                               std::string_view separator, Formatter &&fmt) {
         return strings_internal::JoinRange(il, separator, fmt);
     }
 
     template<typename... T, typename Formatter>
-    std::string str_join(const std::tuple<T...> &value, turbo::string_view separator,
+    std::string str_join(const std::tuple<T...> &value, std::string_view separator,
                         Formatter &&fmt) {
         return strings_internal::JoinAlgorithm(value, separator, fmt);
     }
 
     template<typename Iterator>
-    std::string str_join(Iterator start, Iterator end, turbo::string_view separator) {
+    std::string str_join(Iterator start, Iterator end, std::string_view separator) {
         return strings_internal::JoinRange(start, end, separator);
     }
 
     template<typename Range>
-    std::string str_join(const Range &range, turbo::string_view separator) {
+    std::string str_join(const Range &range, std::string_view separator) {
         return strings_internal::JoinRange(range, separator);
     }
 
     template<typename T, typename = typename std::enable_if<!std::is_convertible<
-            T, turbo::string_view>::value>::type>
-    std::string str_join(std::initializer_list<T> il, turbo::string_view separator) {
+            T, std::string_view>::value>::type>
+    std::string str_join(std::initializer_list<T> il, std::string_view separator) {
         return strings_internal::JoinRange(il, separator);
     }
 
-    inline std::string str_join(std::initializer_list<turbo::string_view> il,
-                               turbo::string_view separator) {
+    inline std::string str_join(std::initializer_list<std::string_view> il,
+                               std::string_view separator) {
         return strings_internal::JoinRange(il, separator);
     }
 
     template<typename... T>
     std::string str_join(const std::tuple<T...> &value,
-                        turbo::string_view separator) {
+                        std::string_view separator) {
         return strings_internal::JoinTuple(value, separator,
                                            std::index_sequence_for<T...>{});
     }

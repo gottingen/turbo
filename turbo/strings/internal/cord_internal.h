@@ -341,7 +341,7 @@ using ExternalReleaserInvoker = void (*)(CordRepExternal*);
 // releaser is stored in the memory directly following the CordRepExternal.
 struct CordRepExternal : public CordRep {
   CordRepExternal() = default;
-  explicit constexpr CordRepExternal(turbo::string_view str)
+  explicit constexpr CordRepExternal(std::string_view str)
       : CordRep(RefcountAndFlags::Immortal{}, str.size()),
         base(str.data()),
         releaser_invoker(nullptr) {}
@@ -360,14 +360,14 @@ struct Rank0 {};
 struct Rank1 : Rank0 {};
 
 template <typename Releaser, typename = ::turbo::base_internal::invoke_result_t<
-                                 Releaser, turbo::string_view>>
-void InvokeReleaser(Rank1, Releaser&& releaser, turbo::string_view data) {
+                                 Releaser, std::string_view>>
+void InvokeReleaser(Rank1, Releaser&& releaser, std::string_view data) {
   ::turbo::base_internal::invoke(std::forward<Releaser>(releaser), data);
 }
 
 template <typename Releaser,
           typename = ::turbo::base_internal::invoke_result_t<Releaser>>
-void InvokeReleaser(Rank0, Releaser&& releaser, turbo::string_view) {
+void InvokeReleaser(Rank0, Releaser&& releaser, std::string_view) {
   ::turbo::base_internal::invoke(std::forward<Releaser>(releaser));
 }
 
@@ -386,7 +386,7 @@ struct CordRepExternalImpl
 
   ~CordRepExternalImpl() {
     InvokeReleaser(Rank1{}, std::move(this->template get<0>()),
-                   turbo::string_view(base, length));
+                   std::string_view(base, length));
   }
 
   static void Release(CordRepExternal* rep) {
@@ -455,7 +455,7 @@ enum {
   kMaxInline = 15,
 };
 
-constexpr char GetOrNull(turbo::string_view data, size_t pos) {
+constexpr char GetOrNull(std::string_view data, size_t pos) {
   return pos < data.size() ? data[pos] : '\0';
 }
 
@@ -517,7 +517,7 @@ class InlineData {
   // Explicit constexpr constructor to create a constexpr InlineData
   // value. Creates an inlined SSO value if `rep` is null, otherwise
   // creates a tree instance value.
-  constexpr InlineData(turbo::string_view sv, CordRep* rep) noexcept
+  constexpr InlineData(std::string_view sv, CordRep* rep) noexcept
       : rep_(rep ? Rep(rep) : Rep(sv)) {
     poison();
   }
@@ -699,7 +699,7 @@ class InlineData {
 
     explicit constexpr Rep(CordRep* rep) : as_tree(rep) {}
 
-    explicit constexpr Rep(turbo::string_view chars)
+    explicit constexpr Rep(std::string_view chars)
         : data{static_cast<char>((chars.size() << 1)),
                GetOrNull(chars, 0),
                GetOrNull(chars, 1),

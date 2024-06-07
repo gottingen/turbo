@@ -72,7 +72,7 @@ namespace {
                 benchmark::DoNotOptimize(base);
                 benchmark::DoNotOptimize(extension);
                 turbo::CRC32C crc =
-                        turbo::extend_crc32c(base, turbo::string_view(&extension[i], len));
+                        turbo::extend_crc32c(base, std::string_view(&extension[i], len));
                 benchmark::DoNotOptimize(crc);
             }
         }

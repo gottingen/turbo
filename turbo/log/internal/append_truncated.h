@@ -23,21 +23,21 @@
 
 #include <turbo/base/config.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 // Copies into `dst` as many bytes of `src` as will fit, then truncates the
 // copied bytes from the front of `dst` and returns the number of bytes written.
-inline size_t AppendTruncated(turbo::string_view src, turbo::Span<char> &dst) {
+inline size_t AppendTruncated(std::string_view src, turbo::span<char> &dst) {
   if (src.size() > dst.size()) src = src.substr(0, dst.size());
   memcpy(dst.data(), src.data(), src.size());
   dst.remove_prefix(src.size());
   return src.size();
 }
 // Likewise, but `n` copies of `c`.
-inline size_t AppendTruncated(char c, size_t n, turbo::Span<char> &dst) {
+inline size_t AppendTruncated(char c, size_t n, turbo::span<char> &dst) {
   if (n > dst.size()) n = dst.size();
   memset(dst.data(), c, n);
   dst.remove_prefix(n);

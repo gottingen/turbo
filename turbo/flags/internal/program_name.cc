@@ -46,7 +46,7 @@ namespace turbo::flags_internal {
                             : "UNKNOWN";
     }
 
-    void SetProgramInvocationName(turbo::string_view prog_name_str) {
+    void SetProgramInvocationName(std::string_view prog_name_str) {
         turbo::MutexLock l(&program_name_guard);
 
         if (!program_name)

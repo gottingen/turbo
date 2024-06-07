@@ -33,7 +33,7 @@
 #include <turbo/base/attributes.h>
 #include <turbo/base/config.h>
 #include <tests/log/test_helpers.h>
-#include <turbo/status/status.h>
+#include <turbo/utility/status_impl.h>
 #include <turbo/strings/string_view.h>
 #include <turbo/strings/substitute.h>
 
@@ -581,7 +581,7 @@ TEST(CHECKDeathTest, TestUserDefinedTurboStringify) {
 
   // Returns a matcher for the expected check failure message when comparing two
   // values.
-  auto expected_output = [](int lhs, turbo::string_view condition, int rhs) {
+  auto expected_output = [](int lhs, std::string_view condition, int rhs) {
     return HasSubstr(
         turbo::substitute("Check failed: v$0 $1 v$2 (StringifiableType{$0} vs. "
                          "StringifiableType{$2})",

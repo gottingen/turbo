@@ -40,6 +40,6 @@ namespace turbo::flags_internal {
 
     // Sets program invocation name to a new value. Should only be called once
     // during program initialization, before any threads are spawned.
-    void SetProgramInvocationName(turbo::string_view prog_name_str);
+    void SetProgramInvocationName(std::string_view prog_name_str);
 
 }  // namespace turbo::flags_internal

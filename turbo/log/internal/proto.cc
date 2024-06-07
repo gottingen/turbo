@@ -25,11 +25,11 @@
 
 #include <turbo/base/attributes.h>
 #include <turbo/base/config.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo::log_internal {
     namespace {
-        void EncodeRawVarint(uint64_t value, size_t size, turbo::Span<char> *buf) {
+        void EncodeRawVarint(uint64_t value, size_t size, turbo::span<char> *buf) {
             for (size_t s = 0; s < size; s++) {
                 (*buf)[s] = static_cast<char>((value & 0x7f) | (s + 1 == size ? 0 : 0x80));
                 value >>= 7;
@@ -42,7 +42,7 @@ namespace turbo::log_internal {
         }
     }  // namespace
 
-    bool EncodeVarint(uint64_t tag, uint64_t value, turbo::Span<char> *buf) {
+    bool EncodeVarint(uint64_t tag, uint64_t value, turbo::span<char> *buf) {
         const uint64_t tag_type = MakeTagType(tag, WireType::kVarint);
         const size_t tag_type_size = VarintSize(tag_type);
         const size_t value_size = VarintSize(value);
@@ -55,7 +55,7 @@ namespace turbo::log_internal {
         return true;
     }
 
-    bool Encode64Bit(uint64_t tag, uint64_t value, turbo::Span<char> *buf) {
+    bool Encode64Bit(uint64_t tag, uint64_t value, turbo::span<char> *buf) {
         const uint64_t tag_type = MakeTagType(tag, WireType::k64Bit);
         const size_t tag_type_size = VarintSize(tag_type);
         if (tag_type_size + sizeof(value) > buf->size()) {
@@ -71,7 +71,7 @@ namespace turbo::log_internal {
         return true;
     }
 
-    bool Encode32Bit(uint64_t tag, uint32_t value, turbo::Span<char> *buf) {
+    bool Encode32Bit(uint64_t tag, uint32_t value, turbo::span<char> *buf) {
         const uint64_t tag_type = MakeTagType(tag, WireType::k32Bit);
         const size_t tag_type_size = VarintSize(tag_type);
         if (tag_type_size + sizeof(value) > buf->size()) {
@@ -87,8 +87,8 @@ namespace turbo::log_internal {
         return true;
     }
 
-    bool EncodeBytes(uint64_t tag, turbo::Span<const char> value,
-                     turbo::Span<char> *buf) {
+    bool EncodeBytes(uint64_t tag, turbo::span<const char> value,
+                     turbo::span<char> *buf) {
         const uint64_t tag_type = MakeTagType(tag, WireType::kLengthDelimited);
         const size_t tag_type_size = VarintSize(tag_type);
         uint64_t length = value.size();
@@ -104,8 +104,8 @@ namespace turbo::log_internal {
         return true;
     }
 
-    bool EncodeBytesTruncate(uint64_t tag, turbo::Span<const char> value,
-                             turbo::Span<char> *buf) {
+    bool EncodeBytesTruncate(uint64_t tag, turbo::span<const char> value,
+                             turbo::span<char> *buf) {
         const uint64_t tag_type = MakeTagType(tag, WireType::kLengthDelimited);
         const size_t tag_type_size = VarintSize(tag_type);
         uint64_t length = value.size();
@@ -128,23 +128,23 @@ namespace turbo::log_internal {
         return true;
     }
 
-    TURBO_MUST_USE_RESULT turbo::Span<char> EncodeMessageStart(
-            uint64_t tag, uint64_t max_size, turbo::Span<char> *buf) {
+    TURBO_MUST_USE_RESULT turbo::span<char> EncodeMessageStart(
+            uint64_t tag, uint64_t max_size, turbo::span<char> *buf) {
         const uint64_t tag_type = MakeTagType(tag, WireType::kLengthDelimited);
         const size_t tag_type_size = VarintSize(tag_type);
         max_size = std::min<uint64_t>(max_size, buf->size());
         const size_t length_size = VarintSize(max_size);
         if (tag_type_size + length_size > buf->size()) {
             buf->remove_suffix(buf->size());
-            return turbo::Span<char>();
+            return turbo::span<char>();
         }
         EncodeRawVarint(tag_type, tag_type_size, buf);
-        const turbo::Span<char> ret = buf->subspan(0, length_size);
+        const turbo::span<char> ret = buf->subspan(0, length_size);
         EncodeRawVarint(0, length_size, buf);
         return ret;
     }
 
-    void EncodeMessageLength(turbo::Span<char> msg, const turbo::Span<char> *buf) {
+    void EncodeMessageLength(turbo::span<char> msg, const turbo::span<char> *buf) {
         if (!msg.data()) return;
         assert(buf->data() >= msg.data());
         if (buf->data() < msg.data()) return;
@@ -154,7 +154,7 @@ namespace turbo::log_internal {
     }
 
     namespace {
-        uint64_t DecodeVarint(turbo::Span<const char> *buf) {
+        uint64_t DecodeVarint(turbo::span<const char> *buf) {
             uint64_t value = 0;
             size_t s = 0;
             while (s < buf->size()) {
@@ -166,7 +166,7 @@ namespace turbo::log_internal {
             return value;
         }
 
-        uint64_t Decode64Bit(turbo::Span<const char> *buf) {
+        uint64_t Decode64Bit(turbo::span<const char> *buf) {
             uint64_t value = 0;
             size_t s = 0;
             while (s < buf->size()) {
@@ -178,7 +178,7 @@ namespace turbo::log_internal {
             return value;
         }
 
-        uint32_t Decode32Bit(turbo::Span<const char> *buf) {
+        uint32_t Decode32Bit(turbo::span<const char> *buf) {
             uint32_t value = 0;
             size_t s = 0;
             while (s < buf->size()) {
@@ -191,7 +191,7 @@ namespace turbo::log_internal {
         }
     }  // namespace
 
-    bool ProtoField::DecodeFrom(turbo::Span<const char> *data) {
+    bool ProtoField::DecodeFrom(turbo::span<const char> *data) {
         if (data->empty()) return false;
         const uint64_t tag_type = DecodeVarint(data);
         tag_ = tag_type >> 3;

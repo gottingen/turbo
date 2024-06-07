@@ -40,7 +40,7 @@ namespace turbo::crc_internal {
         std::size_t offset = 0;
         for (; offset + kBlockSize < length; offset += kBlockSize) {
             crc = turbo::extend_crc32c(crc,
-                                       turbo::string_view(src_bytes + offset, kBlockSize));
+                                       std::string_view(src_bytes + offset, kBlockSize));
             memcpy(dst_bytes + offset, src_bytes + offset, kBlockSize);
         }
 
@@ -48,7 +48,7 @@ namespace turbo::crc_internal {
         if (offset < length) {
             std::size_t final_copy_size = length - offset;
             crc = turbo::extend_crc32c(
-                    crc, turbo::string_view(src_bytes + offset, final_copy_size));
+                    crc, std::string_view(src_bytes + offset, final_copy_size));
             memcpy(dst_bytes + offset, src_bytes + offset, final_copy_size);
         }
 

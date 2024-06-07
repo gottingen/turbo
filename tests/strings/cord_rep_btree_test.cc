@@ -148,31 +148,31 @@ class DataConsumer {
   // Starts consumption of `data`. Caller must make sure `data` outlives this
   // instance. Consumes data starting at the front if `forward` is true, else
   // consumes data from the back.
-  DataConsumer(turbo::string_view data, bool forward)
+  DataConsumer(std::string_view data, bool forward)
       : data_(data), forward_(forward) {}
 
   // Return the next `n` bytes from referenced data.
-  turbo::string_view Next(size_t n) {
+  std::string_view Next(size_t n) {
     assert(n <= data_.size() - consumed_);
     consumed_ += n;
     return data_.substr(forward_ ? consumed_ - n : data_.size() - consumed_, n);
   }
 
   // Returns all data consumed so far.
-  turbo::string_view Consumed() const {
+  std::string_view Consumed() const {
     return forward_ ? data_.substr(0, consumed_)
                     : data_.substr(data_.size() - consumed_);
   }
 
  private:
-  turbo::string_view data_;
+  std::string_view data_;
   size_t consumed_ = 0;
   bool forward_;
 };
 
 // BtreeAdd returns either CordRepBtree::Append or CordRepBtree::Prepend.
 CordRepBtree* BtreeAdd(CordRepBtree* node, bool append,
-                       turbo::string_view data) {
+                       std::string_view data) {
   return append ? CordRepBtree::Append(node, data)
                 : CordRepBtree::Prepend(node, data);
 }
@@ -221,18 +221,18 @@ CordRepBtree* MakeTree(size_t size, bool append = true) {
   return tree;
 }
 
-CordRepBtree* CreateTree(turbo::Span<CordRep* const> reps) {
+CordRepBtree* CreateTree(turbo::span<CordRep* const> reps) {
   auto it = reps.begin();
   CordRepBtree* tree = CordRepBtree::Create(*it);
   while (++it != reps.end()) tree = CordRepBtree::Append(tree, *it);
   return tree;
 }
 
-CordRepBtree* CreateTree(turbo::string_view data, size_t chunk_size) {
+CordRepBtree* CreateTree(std::string_view data, size_t chunk_size) {
   return CreateTree(CreateFlatsFromString(data, chunk_size));
 }
 
-CordRepBtree* CreateTreeReverse(turbo::string_view data, size_t chunk_size) {
+CordRepBtree* CreateTreeReverse(std::string_view data, size_t chunk_size) {
   std::vector<CordRep*> flats = CreateFlatsFromString(data, chunk_size);
   auto rit = flats.rbegin();
   CordRepBtree* tree = CordRepBtree::Create(*rit);
@@ -446,7 +446,7 @@ TEST_P(CordRepBtreeTest, AppendToLeafBeyondCapacity) {
   auto* result = CordRepBtree::Append(leaf, flat);
   ASSERT_THAT(result, IsNode(1));
   EXPECT_THAT(result, Ne(leaf));
-  turbo::Span<CordRep* const> edges = result->Edges();
+  turbo::span<CordRep* const> edges = result->Edges();
   ASSERT_THAT(edges, ElementsAre(leaf, IsNode(0)));
   EXPECT_THAT(edges[1]->btree()->Edges(), ElementsAre(flat));
   CordRep::Unref(result);
@@ -460,7 +460,7 @@ TEST_P(CordRepBtreeTest, PrependToLeafBeyondCapacity) {
   auto* result = CordRepBtree::Prepend(leaf, flat);
   ASSERT_THAT(result, IsNode(1));
   EXPECT_THAT(result, Ne(leaf));
-  turbo::Span<CordRep* const> edges = result->Edges();
+  turbo::span<CordRep* const> edges = result->Edges();
   ASSERT_THAT(edges, ElementsAre(IsNode(0), leaf));
   EXPECT_THAT(edges[0]->btree()->Edges(), ElementsAre(flat));
   CordRep::Unref(result);
@@ -722,7 +722,7 @@ TEST_P(CordRepBtreeDualTest, MergeLeafWithTreeExceedingLeafCapacity) {
 }
 
 void RefEdgesAt(size_t depth, AutoUnref& refs, CordRepBtree* tree) {
-  turbo::Span<CordRep* const> edges = tree->Edges();
+  turbo::span<CordRep* const> edges = tree->Edges();
   if (depth == 0) {
     refs.Ref(edges.front());
     refs.Ref(edges.back());
@@ -835,7 +835,7 @@ TEST(CordRepBtreeTest, SubTree) {
   const size_t n = max_cap * max_cap * 2;
   const std::string data = CreateRandomString(n * 3);
   std::vector<CordRep*> flats;
-  for (turbo::string_view s = data; !s.empty(); s.remove_prefix(3)) {
+  for (std::string_view s = data; !s.empty(); s.remove_prefix(3)) {
     flats.push_back(MakeFlat(s.substr(0, 3)));
   }
   CordRepBtree* node = CordRepBtree::Create(CordRep::Ref(flats[0]));
@@ -1028,7 +1028,7 @@ TEST(CordRepBtreeTest, GetCharacter) {
 TEST_P(CordRepBtreeTest, IsFlatSingleFlat) {
   CordRepBtree* leaf = CordRepBtree::Create(MakeFlat("Hello world"));
 
-  turbo::string_view fragment;
+  std::string_view fragment;
   EXPECT_TRUE(leaf->IsFlat(nullptr));
   EXPECT_TRUE(leaf->IsFlat(&fragment));
   EXPECT_THAT(fragment, Eq("Hello world"));
@@ -1056,7 +1056,7 @@ TEST(CordRepBtreeTest, IsFlatMultiFlat) {
   data += "efgijk";
 
   EXPECT_FALSE(tree->IsFlat(nullptr));
-  turbo::string_view fragment = "Can't touch this";
+  std::string_view fragment = "Can't touch this";
   EXPECT_FALSE(tree->IsFlat(&fragment));
   EXPECT_THAT(fragment, Eq("Can't touch this"));
 
@@ -1144,7 +1144,7 @@ TEST_P(CordRepBtreeHeightTest, GetAppendBufferFlatWithCapacity) {
   for (int i = 1; i <= height(); ++i) {
     tree = CordRepBtree::New(tree);
   }
-  turbo::Span<char> span = tree->GetAppendBuffer(2);
+  turbo::span<char> span = tree->GetAppendBuffer(2);
   EXPECT_THAT(span, SizeIs(2u));
   EXPECT_THAT(span.data(), TypedEq<void*>(flat->Data() + 3));
   EXPECT_THAT(tree->length, Eq(5u));
@@ -1187,7 +1187,7 @@ TEST(CordRepBtreeTest, Dump) {
   }
 
   for (int api = 0; api <= 3; ++api) {
-    turbo::string_view api_scope;
+    std::string_view api_scope;
     std::stringstream ss;
     switch (api) {
       case 0:

@@ -127,13 +127,13 @@ std::string str_cat(const AlphaNum& a, const AlphaNum& b, const AlphaNum& c,
 namespace strings_internal {
 
 // Do not call directly - these are not part of the public API.
-std::string CatPieces(std::initializer_list<turbo::string_view> pieces) {
+std::string CatPieces(std::initializer_list<std::string_view> pieces) {
   std::string result;
   // Use uint64_t to prevent size_t overflow. We assume it is not possible for
   // in memory strings to overflow a uint64_t.
   constexpr uint64_t kMaxSize = uint64_t{std::numeric_limits<size_t>::max()};
   uint64_t total_size = 0;
-  for (turbo::string_view piece : pieces) {
+  for (std::string_view piece : pieces) {
     total_size += piece.size();
   }
   TURBO_INTERNAL_CHECK(total_size <= kMaxSize, "size_t overflow");
@@ -142,7 +142,7 @@ std::string CatPieces(std::initializer_list<turbo::string_view> pieces) {
 
   char* const begin = &result[0];
   char* out = begin;
-  for (turbo::string_view piece : pieces) {
+  for (std::string_view piece : pieces) {
     const size_t this_size = piece.size();
     if (this_size != 0) {
       memcpy(out, piece.data(), this_size);
@@ -153,7 +153,7 @@ std::string CatPieces(std::initializer_list<turbo::string_view> pieces) {
   return result;
 }
 
-// It's possible to call str_append with an turbo::string_view that is itself a
+// It's possible to call str_append with an std::string_view that is itself a
 // fragment of the string we're appending to.  However the results of this are
 // random. Therefore, check for this in debug mode.  Use unsigned math so we
 // only have to do one comparison. Note, there's an exception case: appending an
@@ -163,10 +163,10 @@ std::string CatPieces(std::initializer_list<turbo::string_view> pieces) {
          (uintptr_t((src).data() - (dest).data()) > uintptr_t((dest).size())))
 
 void AppendPieces(turbo::Nonnull<std::string*> dest,
-                  std::initializer_list<turbo::string_view> pieces) {
+                  std::initializer_list<std::string_view> pieces) {
   size_t old_size = dest->size();
   size_t to_append = 0;
-  for (turbo::string_view piece : pieces) {
+  for (std::string_view piece : pieces) {
     ASSERT_NO_OVERLAP(*dest, piece);
     to_append += piece.size();
   }
@@ -174,7 +174,7 @@ void AppendPieces(turbo::Nonnull<std::string*> dest,
 
   char* const begin = &(*dest)[0];
   char* out = begin + old_size;
-  for (turbo::string_view piece : pieces) {
+  for (std::string_view piece : pieces) {
     const size_t this_size = piece.size();
     if (this_size != 0) {
       memcpy(out, piece.data(), this_size);

@@ -37,7 +37,7 @@
 #include <turbo/strings/str_cat.h>
 #include <turbo/strings/string_view.h>
 #include <turbo/strings/substitute.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -86,7 +86,7 @@ struct UDT {
   int value;
 };
 
-bool turbo_parse_flag(turbo::string_view in, UDT* udt, std::string* err) {
+bool turbo_parse_flag(std::string_view in, UDT* udt, std::string* err) {
   if (in == "A") {
     udt->value = 1;
     return true;
@@ -170,8 +170,8 @@ const std::string& GetTestTempDir() {
 }
 
 struct FlagfileData {
-  const turbo::string_view file_name;
-  const turbo::Span<const char* const> file_lines;
+  const std::string_view file_name;
+  const turbo::span<const char* const> file_lines;
 };
 
 // clang-format off
@@ -208,7 +208,7 @@ constexpr const char* const ff2_data[] = {
 const char* GetFlagfileFlag(const std::vector<FlagfileData>& ffd,
                             std::string& flagfile_flag) {
   flagfile_flag = "--flagfile=";
-  turbo::string_view separator;
+  std::string_view separator;
   for (const auto& flagfile_data : ffd) {
     std::string flagfile_name =
         turbo::str_cat(GetTestTempDir(), flagfile_data.file_name);
@@ -300,7 +300,7 @@ std::vector<char*> InvokeParse(const char* (&in_argv)[N]) {
 
 template <int N>
 void TestParse(const char* (&in_argv)[N], int int_flag_value,
-               double double_flag_val, turbo::string_view string_flag_val,
+               double double_flag_val, std::string_view string_flag_val,
                bool bool_flag_val, int exp_position_args = 0) {
   auto out_args = InvokeParse(in_argv);
 
@@ -1004,9 +1004,9 @@ TEST_F(ParseTest, ParseTurboFlagsOnlySuccess) {
                              unrecognized_flags);
   EXPECT_THAT(positional_args,
               ElementsAreArray(
-                  {turbo::string_view("testbin"), turbo::string_view("arg1"),
-                   turbo::string_view("arg2"), turbo::string_view("--some_flag"),
-                   turbo::string_view("arg4")}));
+                  {std::string_view("testbin"), std::string_view("arg1"),
+                   std::string_view("arg2"), std::string_view("--some_flag"),
+                   std::string_view("arg4")}));
   EXPECT_THAT(unrecognized_flags,
               ElementsAreArray(
                   {turbo::UnrecognizedFlag(turbo::UnrecognizedFlag::kFromArgv,
@@ -1042,8 +1042,8 @@ TEST_F(ParseTest, UndefOkFlagsAreIgnored) {
 
   turbo::parse_turbo_flags_only(6, const_cast<char**>(in_args), positional_args,
                              unrecognized_flags);
-  EXPECT_THAT(positional_args, ElementsAreArray({turbo::string_view("testbin"),
-                                                 turbo::string_view("value")}));
+  EXPECT_THAT(positional_args, ElementsAreArray({std::string_view("testbin"),
+                                                 std::string_view("value")}));
   EXPECT_THAT(unrecognized_flags,
               ElementsAreArray(
                   {turbo::UnrecognizedFlag(turbo::UnrecognizedFlag::kFromArgv,
@@ -1072,9 +1072,9 @@ TEST_F(ParseTest, AllUndefOkFlagsAreIgnored) {
   turbo::parse_turbo_flags_only(8, const_cast<char**>(in_args), positional_args,
                              unrecognized_flags);
   EXPECT_THAT(positional_args,
-              ElementsAreArray({turbo::string_view("testbin"),
-                                turbo::string_view("value"),
-                                turbo::string_view("--undef_flag4")}));
+              ElementsAreArray({std::string_view("testbin"),
+                                std::string_view("value"),
+                                std::string_view("--undef_flag4")}));
   EXPECT_THAT(unrecognized_flags, testing::IsEmpty());
 }
 

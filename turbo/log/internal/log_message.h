@@ -75,7 +75,7 @@ class LogMessage {
 
   // Overrides the location inferred from the callsite.  The string pointed to
   // by `file` must be valid until the end of the statement.
-  LogMessage& AtLocation(turbo::string_view file, int line);
+  LogMessage& AtLocation(std::string_view file, int line);
   // Omits the prefix from this line.  The prefix includes metadata about the
   // logged data such as source code location and timestamp.
   LogMessage& NoPrefix();
@@ -146,7 +146,7 @@ class LogMessage {
 
   // These overloads are more efficient since no `ostream` is involved.
   LogMessage& operator<<(const std::string& v);
-  LogMessage& operator<<(turbo::string_view v);
+  LogMessage& operator<<(std::string_view v);
 
   // Handle stream manipulators e.g. std::endl.
   LogMessage& operator<<(std::ostream& (*m)(std::ostream& os));
@@ -225,9 +225,9 @@ class LogMessage {
 
    private:
     LogMessageData& data_;
-    turbo::Span<char> encoded_remaining_copy_;
-    turbo::Span<char> message_start_;
-    turbo::Span<char> string_start_;
+    turbo::span<char> encoded_remaining_copy_;
+    turbo::span<char> message_start_;
+    turbo::span<char> string_start_;
   };
 
   enum class StringType {
@@ -235,7 +235,7 @@ class LogMessage {
     kNotLiteral,
   };
   template <StringType str_type>
-  void CopyToEncodedBuffer(turbo::string_view str) TURBO_ATTRIBUTE_NOINLINE;
+  void CopyToEncodedBuffer(std::string_view str) TURBO_ATTRIBUTE_NOINLINE;
   template <StringType str_type>
   void CopyToEncodedBuffer(char ch, size_t num) TURBO_ATTRIBUTE_NOINLINE;
 
@@ -271,12 +271,12 @@ class StringifySink final {
                                                                       count);
   }
 
-  void Append(turbo::string_view v) {
+  void Append(std::string_view v) {
     message_.CopyToEncodedBuffer<LogMessage::StringType::kNotLiteral>(v);
   }
 
   // For types that implement `turbo_stringify` using `turbo::format()`.
-  friend void TurboFormatFlush(StringifySink* sink, turbo::string_view v) {
+  friend void TurboFormatFlush(StringifySink* sink, std::string_view v) {
     sink->Append(v);
   }
 
@@ -341,9 +341,9 @@ extern template LogMessage& LogMessage::operator<<(const double& v);
 extern template LogMessage& LogMessage::operator<<(const bool& v);
 
 extern template void LogMessage::CopyToEncodedBuffer<
-    LogMessage::StringType::kLiteral>(turbo::string_view str);
+    LogMessage::StringType::kLiteral>(std::string_view str);
 extern template void LogMessage::CopyToEncodedBuffer<
-    LogMessage::StringType::kNotLiteral>(turbo::string_view str);
+    LogMessage::StringType::kNotLiteral>(std::string_view str);
 extern template void
 LogMessage::CopyToEncodedBuffer<LogMessage::StringType::kLiteral>(char ch,
                                                                   size_t num);
@@ -356,7 +356,7 @@ class LogMessageFatal final : public LogMessage {
  public:
   LogMessageFatal(const char* file, int line) TURBO_ATTRIBUTE_COLD;
   LogMessageFatal(const char* file, int line,
-                  turbo::string_view failure_msg) TURBO_ATTRIBUTE_COLD;
+                  std::string_view failure_msg) TURBO_ATTRIBUTE_COLD;
   TURBO_ATTRIBUTE_NORETURN ~LogMessageFatal();
 };
 
@@ -383,7 +383,7 @@ class LogMessageQuietlyFatal final : public LogMessage {
  public:
   LogMessageQuietlyFatal(const char* file, int line) TURBO_ATTRIBUTE_COLD;
   LogMessageQuietlyFatal(const char* file, int line,
-                         turbo::string_view failure_msg) TURBO_ATTRIBUTE_COLD;
+                         std::string_view failure_msg) TURBO_ATTRIBUTE_COLD;
   TURBO_ATTRIBUTE_NORETURN ~LogMessageQuietlyFatal();
 };
 

@@ -265,7 +265,7 @@ namespace turbo {
             invoke_callback();
         }
 
-        turbo::string_view FlagImpl::name() const { return name_; }
+        std::string_view FlagImpl::name() const { return name_; }
 
         std::string FlagImpl::filename() const {
             return flags_internal::GetUsageConfig().normalize_filename(filename_);
@@ -448,12 +448,12 @@ namespace turbo {
         // parsed value. In case if any error is encountered in either step, the error
         // message is stored in 'err'
         std::unique_ptr<void, DynValueDeleter> FlagImpl::TryParse(
-                turbo::string_view value, std::string &err) const {
+                std::string_view value, std::string &err) const {
             std::unique_ptr<void, DynValueDeleter> tentative_value = make_init_value();
 
             std::string parse_err;
             if (!flags_internal::Parse(op_, value, tentative_value.get(), &parse_err)) {
-                turbo::string_view err_sep = parse_err.empty() ? "" : "; ";
+                std::string_view err_sep = parse_err.empty() ? "" : "; ";
                 err = turbo::str_cat("Illegal value '", value, "' specified for flag '",
                                      name(), "'", err_sep, parse_err);
                 return nullptr;
@@ -531,7 +531,7 @@ namespace turbo {
 
             StoreValue(src);
         }
-        bool FlagImpl::user_validate(turbo::string_view value, std::string *err) const {
+        bool FlagImpl::user_validate(std::string_view value, std::string *err) const {
             if (validator_ == nullptr) return true;
 
             // Make a copy of the C-style function pointer that we are about to invoke
@@ -566,7 +566,7 @@ namespace turbo {
         //  * Update the flag's default value
         //  * Update the current flag value if it was never set before
         // The mode is selected based on 'set_mode' parameter.
-        bool FlagImpl::parse_from(turbo::string_view value, FlagSettingMode set_mode,
+        bool FlagImpl::parse_from(std::string_view value, FlagSettingMode set_mode,
                                  ValueSource source, std::string &err) {
             turbo::MutexLock l(DataGuard());
 
@@ -644,7 +644,7 @@ namespace turbo {
             // small changes, e.g., precision loss for floating point types.
         }
 
-        bool FlagImpl::validate_input_value(turbo::string_view value) const {
+        bool FlagImpl::validate_input_value(std::string_view value) const {
             turbo::MutexLock l(DataGuard());
 
             auto obj = make_init_value();

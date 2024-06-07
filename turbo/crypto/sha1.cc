@@ -235,7 +235,7 @@ namespace turbo {
             addUncounted(C);
     }
 
-    void SHA1::update(turbo::string_view Str) {
+    void SHA1::update(std::string_view Str) {
         update(
                 ArrayRef<uint8_t>((uint8_t *) const_cast<char *>(Str.data()), Str.size()));
     }

@@ -21,7 +21,7 @@
 #include <string>
 
 #include <gtest/gtest.h>
-#include <turbo/types/optional.h>
+#include <optional>
 
 namespace {
 
@@ -36,7 +36,7 @@ struct TypeWithOstreamOp {
 TEST(HasOstreamOperatorTest, Works) {
   EXPECT_TRUE(turbo::HasOstreamOperator<int>::value);
   EXPECT_TRUE(turbo::HasOstreamOperator<std::string>::value);
-  EXPECT_FALSE(turbo::HasOstreamOperator<turbo::optional<int>>::value);
+  EXPECT_FALSE(turbo::HasOstreamOperator<std::optional<int>>::value);
   EXPECT_FALSE(turbo::HasOstreamOperator<TypeWithoutOstreamOp>::value);
   EXPECT_TRUE(turbo::HasOstreamOperator<TypeWithOstreamOp>::value);
 }

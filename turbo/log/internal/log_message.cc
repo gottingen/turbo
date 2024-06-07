@@ -56,7 +56,7 @@
 #include <turbo/strings/string_view.h>
 #include <turbo/times/clock.h>
 #include <turbo/times/time.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 extern "C" TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(
     TurboInternalOnFatalLogMessage)(const turbo::LogEntry&) {
@@ -87,7 +87,7 @@ enum ValueTag : uint8_t {
 // may not truncate the data it writes in order to do make space for that nul
 // terminator.  In any case, `dst` will be advanced to point at the byte where
 // subsequent writes should begin.
-bool PrintValue(turbo::Span<char>& dst, turbo::Span<const char> buf) {
+bool PrintValue(turbo::span<char>& dst, turbo::span<const char> buf) {
   if (dst.size() <= 1) return false;
   ProtoField field;
   while (field.DecodeFrom(&buf)) {
@@ -103,7 +103,7 @@ bool PrintValue(turbo::Span<char>& dst, turbo::Span<const char> buf) {
   return true;
 }
 
-turbo::string_view Basename(turbo::string_view filepath) {
+std::string_view Basename(std::string_view filepath) {
 #ifdef _WIN32
   size_t path = filepath.find_last_of("/\\");
 #else
@@ -153,7 +153,7 @@ struct LogMessage::LogMessageData final {
   // cannot be truncated to fit, the size of `encoded_remaining` will be zeroed
   // to prevent encoding of any further data.  Note that in this case its data()
   // pointer will not point past the end of `encoded_buf`.
-  turbo::Span<char> encoded_remaining;
+  turbo::span<char> encoded_remaining;
 
   // A formatted string message is built in `string_buf`.
   std::array<char, kLogMessageBufferSize> string_buf;
@@ -184,12 +184,12 @@ void LogMessage::LogMessageData::FinalizeEncodingAndFormat() {
   // Note that `encoded_remaining` may have zero size without pointing past the
   // end of `encoded_buf`, so the difference between `data()` pointers is used
   // to compute the size of `encoded_data`.
-  turbo::Span<const char> encoded_data(
+  turbo::span<const char> encoded_data(
       encoded_buf.data(),
       static_cast<size_t>(encoded_remaining.data() - encoded_buf.data()));
   // `string_remaining` is the suffix of `string_buf` that has not been filled
   // yet.
-  turbo::Span<char> string_remaining(string_buf);
+  turbo::span<char> string_remaining(string_buf);
   // We may need to write a newline and nul-terminator at the end of the decoded
   // string data.  Rather than worry about whether those should overwrite the
   // end of the string (if the buffer is full) or be appended, we avoid writing
@@ -255,7 +255,7 @@ LogMessage::~LogMessage() {
   Flush();
 }
 
-LogMessage& LogMessage::AtLocation(turbo::string_view file, int line) {
+LogMessage& LogMessage::AtLocation(std::string_view file, int line) {
   data_->entry.full_filename_ = file;
   data_->entry.base_filename_ = Basename(file);
   data_->entry.line_ = line;
@@ -360,7 +360,7 @@ LogMessage& LogMessage::operator<<(const std::string& v) {
   return *this;
 }
 
-LogMessage& LogMessage::operator<<(turbo::string_view v) {
+LogMessage& LogMessage::operator<<(std::string_view v) {
   CopyToEncodedBuffer<StringType::kNotLiteral>(v);
   return *this;
 }
@@ -415,7 +415,7 @@ void LogMessage::Flush() {
 
   data_->FinalizeEncodingAndFormat();
   data_->entry.encoding_ =
-      turbo::string_view(data_->encoded_buf.data(),
+      std::string_view(data_->encoded_buf.data(),
                         static_cast<size_t>(data_->encoded_remaining.data() -
                                             data_->encoded_buf.data()));
   SendToLog();
@@ -451,7 +451,7 @@ LogMessage::OstreamView::~OstreamView() {
     data_.encoded_remaining.remove_suffix(data_.encoded_remaining.size());
     return;
   }
-  const turbo::Span<const char> contents(pbase(),
+  const turbo::span<const char> contents(pbase(),
                                         static_cast<size_t>(pptr() - pbase()));
   if (contents.empty()) return;
   encoded_remaining_copy_.remove_prefix(contents.size());
@@ -529,7 +529,7 @@ void LogMessage::LogBacktraceIfNeeded() {
 // `str_type`.  Truncates `str` if necessary, but emits nothing and marks the
 // buffer full if  even the field headers do not fit.
 template <LogMessage::StringType str_type>
-void LogMessage::CopyToEncodedBuffer(turbo::string_view str) {
+void LogMessage::CopyToEncodedBuffer(std::string_view str) {
   auto encoded_remaining_copy = data_->encoded_remaining;
   auto start = EncodeMessageStart(
       EventTag::kValue, BufferSizeFor(WireType::kLengthDelimited) + str.size(),
@@ -551,9 +551,9 @@ void LogMessage::CopyToEncodedBuffer(turbo::string_view str) {
   }
 }
 template void LogMessage::CopyToEncodedBuffer<LogMessage::StringType::kLiteral>(
-    turbo::string_view str);
+    std::string_view str);
 template void LogMessage::CopyToEncodedBuffer<
-    LogMessage::StringType::kNotLiteral>(turbo::string_view str);
+    LogMessage::StringType::kNotLiteral>(std::string_view str);
 template <LogMessage::StringType str_type>
 void LogMessage::CopyToEncodedBuffer(char ch, size_t num) {
   auto encoded_remaining_copy = data_->encoded_remaining;
@@ -592,7 +592,7 @@ LogMessageFatal::LogMessageFatal(const char* file, int line)
     : LogMessage(file, line, turbo::LogSeverity::kFatal) {}
 
 LogMessageFatal::LogMessageFatal(const char* file, int line,
-                                 turbo::string_view failure_msg)
+                                 std::string_view failure_msg)
     : LogMessage(file, line, turbo::LogSeverity::kFatal) {
   *this << "Check failed: " << failure_msg << " ";
 }
@@ -627,7 +627,7 @@ LogMessageQuietlyFatal::LogMessageQuietlyFatal(const char* file, int line)
 }
 
 LogMessageQuietlyFatal::LogMessageQuietlyFatal(const char* file, int line,
-                                               turbo::string_view failure_msg)
+                                               std::string_view failure_msg)
     : LogMessageQuietlyFatal(file, line) {
     *this << "Check failed: " << failure_msg << " ";
 }

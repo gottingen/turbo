@@ -151,9 +151,9 @@ TEST(PairArgs, Piecewise) {
 }
 
 TEST(WithConstructed, Simple) {
-  EXPECT_EQ(1, WithConstructed<turbo::string_view>(
+  EXPECT_EQ(1, WithConstructed<std::string_view>(
                    std::make_tuple(std::string("a")),
-                   [](turbo::string_view str) { return str.size(); }));
+                   [](std::string_view str) { return str.size(); }));
 }
 
 template <class F, class Arg>

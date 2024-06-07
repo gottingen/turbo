@@ -28,7 +28,7 @@ namespace turbo {
 
     bool CommandLineFlag::is_retired() const { return false; }
 
-    bool CommandLineFlag::parse_from(turbo::string_view value, std::string *error) {
+    bool CommandLineFlag::parse_from(std::string_view value, std::string *error) {
         return parse_from(value, flags_internal::SET_FLAGS_VALUE,
                          flags_internal::kProgrammaticChange, *error);
     }

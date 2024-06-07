@@ -44,7 +44,7 @@ class BufferRawSink {
   BufferRawSink(char* buffer, size_t size) : buffer_(buffer), size_(size) {}
 
   size_t total_written() const { return total_written_; }
-  void Write(string_view v);
+  void Write(std::string_view v);
 
  private:
   char* buffer_;
@@ -59,7 +59,7 @@ class FILERawSink {
  public:
   explicit FILERawSink(std::FILE* output) : output_(output) {}
 
-  void Write(string_view v);
+  void Write(std::string_view v);
 
   size_t count() const { return count_; }
   int error() const { return error_; }
@@ -71,25 +71,25 @@ class FILERawSink {
 };
 
 // Provide RawSink integration with common types from the STL.
-inline void TurboFormatFlush(std::string* out, string_view s) {
+inline void TurboFormatFlush(std::string* out, std::string_view s) {
   out->append(s.data(), s.size());
 }
-inline void TurboFormatFlush(std::ostream* out, string_view s) {
+inline void TurboFormatFlush(std::ostream* out, std::string_view s) {
   out->write(s.data(), static_cast<std::streamsize>(s.size()));
 }
 
-inline void TurboFormatFlush(FILERawSink* sink, string_view v) {
+inline void TurboFormatFlush(FILERawSink* sink, std::string_view v) {
   sink->Write(v);
 }
 
-inline void TurboFormatFlush(BufferRawSink* sink, string_view v) {
+inline void TurboFormatFlush(BufferRawSink* sink, std::string_view v) {
   sink->Write(v);
 }
 
 // This is a SFINAE to get a better compiler error message when the type
 // is not supported.
 template <typename T>
-auto InvokeFlush(T* out, string_view s) -> decltype(TurboFormatFlush(out, s)) {
+auto InvokeFlush(T* out, std::string_view s) -> decltype(TurboFormatFlush(out, s)) {
   TurboFormatFlush(out, s);
 }
 

@@ -26,14 +26,14 @@ namespace turbo {
         _color_active = log_internal::in_terminal(file) && log_internal::is_color_terminal();
     }
 
-    std::array<turbo::string_view, static_cast<int>(LogSeverity::kFatal) + 1> colors_map = {
+    std::array<std::string_view, static_cast<int>(LogSeverity::kFatal) + 1> colors_map = {
             AnsiColorSink::green,  // kInfo
             AnsiColorSink::yellow_bold, // kWarning
             AnsiColorSink::red_bold, // kError
             AnsiColorSink::bold_on_red, // kFatal
     };
 
-    void AnsiColorSink::set_level_color(const LogSeverity severity, const turbo::string_view color) {
+    void AnsiColorSink::set_level_color(const LogSeverity severity, const std::string_view color) {
         colors_map[static_cast<int>(severity)] = color;
     }
 

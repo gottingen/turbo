@@ -558,56 +558,6 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #define TURBO_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE 0
 #endif
 
-// TURBO_HAVE_STD_ANY
-//
-// Checks whether C++17 std::any is available.
-#ifdef TURBO_HAVE_STD_ANY
-#error "TURBO_HAVE_STD_ANY cannot be directly set."
-#elif defined(__cpp_lib_any) && __cpp_lib_any >= 201606L
-#define TURBO_HAVE_STD_ANY 1
-#elif defined(TURBO_INTERNAL_CPLUSPLUS_LANG) && \
-    TURBO_INTERNAL_CPLUSPLUS_LANG >= 201703L && \
-    !TURBO_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE
-#define TURBO_HAVE_STD_ANY 1
-#endif
-
-// TURBO_HAVE_STD_OPTIONAL
-//
-// Checks whether C++17 std::optional is available.
-#ifdef TURBO_HAVE_STD_OPTIONAL
-#error "TURBO_HAVE_STD_OPTIONAL cannot be directly set."
-#elif defined(__cpp_lib_optional) && __cpp_lib_optional >= 202106L
-#define TURBO_HAVE_STD_OPTIONAL 1
-#elif defined(TURBO_INTERNAL_CPLUSPLUS_LANG) && \
-    TURBO_INTERNAL_CPLUSPLUS_LANG >= 201703L && \
-    !TURBO_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE
-#define TURBO_HAVE_STD_OPTIONAL 1
-#endif
-
-// TURBO_HAVE_STD_VARIANT
-//
-// Checks whether C++17 std::variant is available.
-#ifdef TURBO_HAVE_STD_VARIANT
-#error "TURBO_HAVE_STD_VARIANT cannot be directly set."
-#elif defined(__cpp_lib_variant) && __cpp_lib_variant >= 201606L
-#define TURBO_HAVE_STD_VARIANT 1
-#elif defined(TURBO_INTERNAL_CPLUSPLUS_LANG) && \
-    TURBO_INTERNAL_CPLUSPLUS_LANG >= 201703L && \
-    !TURBO_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE
-#define TURBO_HAVE_STD_VARIANT 1
-#endif
-
-// TURBO_HAVE_STD_STRING_VIEW
-//
-// Checks whether C++17 std::string_view is available.
-#ifdef TURBO_HAVE_STD_STRING_VIEW
-#error "TURBO_HAVE_STD_STRING_VIEW cannot be directly set."
-#elif defined(__cpp_lib_string_view) && __cpp_lib_string_view >= 201606L
-#define TURBO_HAVE_STD_STRING_VIEW 1
-#elif defined(TURBO_INTERNAL_CPLUSPLUS_LANG) && \
-    TURBO_INTERNAL_CPLUSPLUS_LANG >= 201703L
-#define TURBO_HAVE_STD_STRING_VIEW 1
-#endif
 
 // TURBO_HAVE_STD_ORDERING
 //
@@ -624,11 +574,6 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
      TURBO_INTERNAL_CPLUSPLUS_LANG >= 202002L)
 #define TURBO_HAVE_STD_ORDERING 1
 #endif
-
-#define TURBO_USES_STD_ANY 1
-#define TURBO_USES_STD_OPTIONAL 1
-#define TURBO_USES_STD_VARIANT 1
-#define TURBO_USES_STD_STRING_VIEW 1
 
 // TURBO_USES_STD_ORDERING
 //

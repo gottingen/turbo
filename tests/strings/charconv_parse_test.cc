@@ -59,7 +59,7 @@ void ExpectParsedFloat(std::string s, turbo::chars_format format_flags,
     begin_subrange = static_cast<int>(open_bracket_pos);
     s.replace(open_bracket_pos, 1, "");
     std::string::size_type close_bracket_pos = s.find(']');
-    CHECK_NE(close_bracket_pos, turbo::string_view::npos)
+    CHECK_NE(close_bracket_pos, std::string_view::npos)
         << "Test input contains [ without matching ]";
     end_subrange = static_cast<int>(close_bracket_pos);
     s.replace(close_bracket_pos, 1, "");
@@ -121,7 +121,7 @@ void ExpectSpecial(const std::string& s, turbo::chars_format format_flags,
 
 // Check that a given input string is not matched by Float.
 template <int base>
-void ExpectFailedParse(turbo::string_view s, turbo::chars_format format_flags) {
+void ExpectFailedParse(std::string_view s, turbo::chars_format format_flags) {
   ParsedFloat parsed =
       ParseFloat<base>(s.data(), s.data() + s.size(), format_flags);
   EXPECT_EQ(parsed.end, nullptr);

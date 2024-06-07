@@ -29,8 +29,8 @@ TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 
 struct base64_testcase {
-  turbo::string_view plaintext;
-  turbo::string_view cyphertext;
+  std::string_view plaintext;
+  std::string_view cyphertext;
 };
 
 inline const std::array<base64_testcase, 5>& base64_strings() {

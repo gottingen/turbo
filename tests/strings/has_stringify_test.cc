@@ -20,7 +20,7 @@
 #include <string>
 
 #include <gtest/gtest.h>
-#include <turbo/types/optional.h>
+#include <optional>
 
 namespace {
 
@@ -37,7 +37,7 @@ TEST(HasTurboStringifyTest, Works) {
   EXPECT_FALSE(turbo::HasTurboStringify<TypeWithoutTurboStringify>::value);
   EXPECT_TRUE(turbo::HasTurboStringify<TypeWithTurboStringify>::value);
   EXPECT_FALSE(
-      turbo::HasTurboStringify<turbo::optional<TypeWithTurboStringify>>::value);
+      turbo::HasTurboStringify<std::optional<TypeWithTurboStringify>>::value);
 }
 
 }  // namespace

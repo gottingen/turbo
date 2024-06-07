@@ -42,11 +42,11 @@ namespace turbo {
     //
     // Example:
     //
-    //   turbo::string_view input("abc");
+    //   std::string_view input("abc");
     //   EXPECT_TRUE(turbo::consume_prefix(&input, "a"));
     //   EXPECT_EQ(input, "bc");
-    inline bool consume_prefix(turbo::Nonnull<turbo::string_view *> str,
-                              turbo::string_view expected) {
+    inline bool consume_prefix(turbo::Nonnull<std::string_view *> str,
+                              std::string_view expected) {
         if (!turbo::starts_with(*str, expected)) return false;
         str->remove_prefix(expected.size());
         return true;
@@ -60,11 +60,11 @@ namespace turbo {
     //
     // Example:
     //
-    //   turbo::string_view input("abcdef");
+    //   std::string_view input("abcdef");
     //   EXPECT_TRUE(turbo::consume_suffix(&input, "def"));
     //   EXPECT_EQ(input, "abc");
-    inline bool consume_suffix(turbo::Nonnull<turbo::string_view *> str,
-                              turbo::string_view expected) {
+    inline bool consume_suffix(turbo::Nonnull<std::string_view *> str,
+                              std::string_view expected) {
         if (!turbo::ends_with(*str, expected)) return false;
         str->remove_suffix(expected.size());
         return true;
@@ -75,8 +75,8 @@ namespace turbo {
     // Returns a view into the input string `str` with the given `prefix` removed,
     // but leaving the original string intact. If the prefix does not match at the
     // start of the string, returns the original string instead.
-    TURBO_MUST_USE_RESULT inline turbo::string_view strip_prefix(
-            turbo::string_view str, turbo::string_view prefix) {
+    TURBO_MUST_USE_RESULT inline std::string_view strip_prefix(
+            std::string_view str, std::string_view prefix) {
         if (turbo::starts_with(str, prefix)) str.remove_prefix(prefix.size());
         return str;
     }
@@ -86,8 +86,8 @@ namespace turbo {
     // Returns a view into the input string `str` with the given `suffix` removed,
     // but leaving the original string intact. If the suffix does not match at the
     // end of the string, returns the original string instead.
-    TURBO_MUST_USE_RESULT inline turbo::string_view strip_suffix(
-            turbo::string_view str, turbo::string_view suffix) {
+    TURBO_MUST_USE_RESULT inline std::string_view strip_suffix(
+            std::string_view str, std::string_view suffix) {
         if (turbo::ends_with(str, suffix)) str.remove_suffix(suffix.size());
         return str;
     }

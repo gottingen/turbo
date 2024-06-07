@@ -33,11 +33,11 @@
 #include <turbo/base/casts.h>
 #include <turbo/base/config.h>
 #include <turbo/strings/string_view.h>
-#include <turbo/types/span.h>
+#include <turbo/container/span.h>
 
 namespace turbo::log_internal {
 
-    // turbo::Span<char> represents a view into the available space in a mutable
+    // turbo::span<char> represents a view into the available space in a mutable
     // buffer during encoding.  Encoding functions shrink the span as they go so
     // that the same view can be passed to a series of Encode functions.  If the
     // data do not fit, nothing is encoded, the view is set to size zero (so that
@@ -69,17 +69,17 @@ namespace turbo::log_internal {
     // Encodes the specified integer as a varint field and returns true if it fits.
     // Used for int32_t, int64_t, uint32_t, uint64_t, bool, and enum field types.
     // Consumes up to kMaxVarintSize * 2 bytes (20).
-    bool EncodeVarint(uint64_t tag, uint64_t value, turbo::Span<char> *buf);
+    bool EncodeVarint(uint64_t tag, uint64_t value, turbo::span<char> *buf);
 
-    inline bool EncodeVarint(uint64_t tag, int64_t value, turbo::Span<char> *buf) {
+    inline bool EncodeVarint(uint64_t tag, int64_t value, turbo::span<char> *buf) {
         return EncodeVarint(tag, static_cast<uint64_t>(value), buf);
     }
 
-    inline bool EncodeVarint(uint64_t tag, uint32_t value, turbo::Span<char> *buf) {
+    inline bool EncodeVarint(uint64_t tag, uint32_t value, turbo::span<char> *buf) {
         return EncodeVarint(tag, static_cast<uint64_t>(value), buf);
     }
 
-    inline bool EncodeVarint(uint64_t tag, int32_t value, turbo::Span<char> *buf) {
+    inline bool EncodeVarint(uint64_t tag, int32_t value, turbo::span<char> *buf) {
         return EncodeVarint(tag, static_cast<uint64_t>(value), buf);
     }
 
@@ -88,7 +88,7 @@ namespace turbo::log_internal {
     // Used for sint32 and sint64 field types.
     // Consumes up to kMaxVarintSize * 2 bytes (20).
     inline bool EncodeVarintZigZag(uint64_t tag, int64_t value,
-                                   turbo::Span<char> *buf) {
+                                   turbo::span<char> *buf) {
         if (value < 0)
             return EncodeVarint(tag, 2 * static_cast<uint64_t>(-(value + 1)) + 1, buf);
         return EncodeVarint(tag, 2 * static_cast<uint64_t>(value), buf);
@@ -97,40 +97,40 @@ namespace turbo::log_internal {
     // Encodes the specified integer as a 64-bit field and returns true if it fits.
     // Used for fixed64 and sfixed64 field types.
     // Consumes up to kMaxVarintSize + 8 bytes (18).
-    bool Encode64Bit(uint64_t tag, uint64_t value, turbo::Span<char> *buf);
+    bool Encode64Bit(uint64_t tag, uint64_t value, turbo::span<char> *buf);
 
-    inline bool Encode64Bit(uint64_t tag, int64_t value, turbo::Span<char> *buf) {
+    inline bool Encode64Bit(uint64_t tag, int64_t value, turbo::span<char> *buf) {
         return Encode64Bit(tag, static_cast<uint64_t>(value), buf);
     }
 
-    inline bool Encode64Bit(uint64_t tag, uint32_t value, turbo::Span<char> *buf) {
+    inline bool Encode64Bit(uint64_t tag, uint32_t value, turbo::span<char> *buf) {
         return Encode64Bit(tag, static_cast<uint64_t>(value), buf);
     }
 
-    inline bool Encode64Bit(uint64_t tag, int32_t value, turbo::Span<char> *buf) {
+    inline bool Encode64Bit(uint64_t tag, int32_t value, turbo::span<char> *buf) {
         return Encode64Bit(tag, static_cast<uint64_t>(value), buf);
     }
 
     // Encodes the specified double as a 64-bit field and returns true if it fits.
     // Used for double field type.
     // Consumes up to kMaxVarintSize + 8 bytes (18).
-    inline bool EncodeDouble(uint64_t tag, double value, turbo::Span<char> *buf) {
+    inline bool EncodeDouble(uint64_t tag, double value, turbo::span<char> *buf) {
         return Encode64Bit(tag, turbo::bit_cast<uint64_t>(value), buf);
     }
 
     // Encodes the specified integer as a 32-bit field and returns true if it fits.
     // Used for fixed32 and sfixed32 field types.
     // Consumes up to kMaxVarintSize + 4 bytes (14).
-    bool Encode32Bit(uint64_t tag, uint32_t value, turbo::Span<char> *buf);
+    bool Encode32Bit(uint64_t tag, uint32_t value, turbo::span<char> *buf);
 
-    inline bool Encode32Bit(uint64_t tag, int32_t value, turbo::Span<char> *buf) {
+    inline bool Encode32Bit(uint64_t tag, int32_t value, turbo::span<char> *buf) {
         return Encode32Bit(tag, static_cast<uint32_t>(value), buf);
     }
 
     // Encodes the specified float as a 32-bit field and returns true if it fits.
     // Used for float field type.
     // Consumes up to kMaxVarintSize + 4 bytes (14).
-    inline bool EncodeFloat(uint64_t tag, float value, turbo::Span<char> *buf) {
+    inline bool EncodeFloat(uint64_t tag, float value, turbo::span<char> *buf) {
         return Encode32Bit(tag, turbo::bit_cast<uint32_t>(value), buf);
     }
 
@@ -138,23 +138,23 @@ namespace turbo::log_internal {
     // they fit.
     // Used for string, bytes, message, and packed-repeated field type.
     // Consumes up to kMaxVarintSize * 2 + value.size() bytes (20 + value.size()).
-    bool EncodeBytes(uint64_t tag, turbo::Span<const char> value,
-                     turbo::Span<char> *buf);
+    bool EncodeBytes(uint64_t tag, turbo::span<const char> value,
+                     turbo::span<char> *buf);
 
     // Encodes as many of the specified bytes as will fit as a length-delimited
     // field and returns true as long as the field header (`tag_type` and `length`)
     // fits.
     // Used for string, bytes, message, and packed-repeated field type.
     // Consumes up to kMaxVarintSize * 2 + value.size() bytes (20 + value.size()).
-    bool EncodeBytesTruncate(uint64_t tag, turbo::Span<const char> value,
-                             turbo::Span<char> *buf);
+    bool EncodeBytesTruncate(uint64_t tag, turbo::span<const char> value,
+                             turbo::span<char> *buf);
 
     // Encodes the specified string as a length-delimited field and returns true if
     // it fits.
     // Used for string, bytes, message, and packed-repeated field type.
     // Consumes up to kMaxVarintSize * 2 + value.size() bytes (20 + value.size()).
-    inline bool EncodeString(uint64_t tag, turbo::string_view value,
-                             turbo::Span<char> *buf) {
+    inline bool EncodeString(uint64_t tag, std::string_view value,
+                             turbo::span<char> *buf) {
         return EncodeBytes(tag, value, buf);
     }
 
@@ -163,27 +163,27 @@ namespace turbo::log_internal {
     // fits.
     // Used for string, bytes, message, and packed-repeated field type.
     // Consumes up to kMaxVarintSize * 2 + value.size() bytes (20 + value.size()).
-    inline bool EncodeStringTruncate(uint64_t tag, turbo::string_view value,
-                                     turbo::Span<char> *buf) {
+    inline bool EncodeStringTruncate(uint64_t tag, std::string_view value,
+                                     turbo::span<char> *buf) {
         return EncodeBytesTruncate(tag, value, buf);
     }
 
     // Encodes the header for a length-delimited field containing up to `max_size`
     // bytes or the number remaining in the buffer, whichever is less.  If the
-    // header fits, a non-nullptr `Span` is returned; this must be passed to
+    // header fits, a non-nullptr `span` is returned; this must be passed to
     // `EncodeMessageLength` after all contents are encoded to finalize the length
-    // field.  If the header does not fit, a nullptr `Span` is returned which is
+    // field.  If the header does not fit, a nullptr `span` is returned which is
     // safe to pass to `EncodeMessageLength` but need not be.
     // Used for string, bytes, message, and packed-repeated field type.
     // Consumes up to kMaxVarintSize * 2 bytes (20).
-    TURBO_MUST_USE_RESULT turbo::Span<char> EncodeMessageStart(uint64_t tag,
+    TURBO_MUST_USE_RESULT turbo::span<char> EncodeMessageStart(uint64_t tag,
                                                                uint64_t max_size,
-                                                               turbo::Span<char> *buf);
+                                                               turbo::span<char> *buf);
 
     // Finalizes the length field in `msg` so that it encompasses all data encoded
     // since the call to `EncodeMessageStart` which returned `msg`.  Does nothing if
-    // `msg` is a `nullptr` `Span`.
-    void EncodeMessageLength(turbo::Span<char> msg, const turbo::Span<char> *buf);
+    // `msg` is a `nullptr` `span`.
+    void EncodeMessageLength(turbo::span<char> msg, const turbo::span<char> *buf);
 
     enum class WireType : uint64_t {
         kVarint = 0,
@@ -228,7 +228,7 @@ namespace turbo::log_internal {
                BufferSizeFor(tail...);
     }
 
-    // turbo::Span<const char> represents a view into the un-processed space in a
+    // turbo::span<const char> represents a view into the un-processed space in a
     // buffer during decoding.  Decoding functions shrink the span as they go so
     // that the same view can be decoded iteratively until all data are processed.
     // In general, if the buffer is exhausted but additional bytes are expected by
@@ -241,7 +241,7 @@ namespace turbo::log_internal {
     public:
         // Consumes bytes from `data` and returns true if there were any bytes to
         // decode.
-        bool DecodeFrom(turbo::Span<const char> *data);
+        bool DecodeFrom(turbo::span<const char> *data);
 
         uint64_t tag() const { return tag_; }
 
@@ -282,11 +282,11 @@ namespace turbo::log_internal {
 
         // To decode fields within a submessage field, call
         // `DecodeNextField(field.BytesValue())`.
-        turbo::Span<const char> bytes_value() const { return data_; }
+        turbo::span<const char> bytes_value() const { return data_; }
 
-        turbo::string_view string_value() const {
+        std::string_view string_value() const {
             const auto data = bytes_value();
-            return turbo::string_view(data.data(), data.size());
+            return std::string_view(data.data(), data.size());
         }
 
         // Returns the encoded length of a length-delimited field.  This equals
@@ -300,7 +300,7 @@ namespace turbo::log_internal {
         // For `kTypeVarint`, `kType64Bit`, and `kType32Bit`, holds the decoded value.
         // For `kTypeLengthDelimited`, holds the decoded length.
         uint64_t value_;
-        turbo::Span<const char> data_;
+        turbo::span<const char> data_;
     };
 
 }  // namespace turbo::log_internal

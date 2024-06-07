@@ -31,10 +31,10 @@ class UserDefinedType {
  public:
   UserDefinedType() = default;
 
-  void Append(turbo::string_view str) { value_.append(str.data(), str.size()); }
+  void Append(std::string_view str) { value_.append(str.data(), str.size()); }
   const std::string& Value() const { return value_; }
 
-  friend void TurboFormatFlush(UserDefinedType* x, turbo::string_view str) {
+  friend void TurboFormatFlush(UserDefinedType* x, std::string_view str) {
     x->Append(str);
   }
 
