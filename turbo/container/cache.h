@@ -19,7 +19,26 @@
 // Created by jeff on 24-6-8.
 //
 
-#ifndef TURBO_CACHE_H
-#define TURBO_CACHE_H
+#pragma once
 
-#endif //TURBO_CACHE_H
+#include <turbo/container/cache/cache_policy.h>
+#include <turbo/container/cache/cache_internal.h>
+#include <turbo/container/cache/fifo_cache_policy.h>
+#include <turbo/container/cache/lru_cache_policy.h>
+#include <turbo/container/cache/lfu_cache_policy.h>
+
+namespace turbo{
+
+    template <typename Key, typename Value>
+    using Cache = fixed_sized_cache<Key, Value, NoCachePolicy>;
+
+    template <typename Key, typename Value>
+    using LRUCache = fixed_sized_cache<Key, Value, LRUCachePolicy>;
+
+    template <typename Key, typename Value>
+    using LFUCache = fixed_sized_cache<Key, Value, LFUCachePolicy>;
+
+    template <typename Key, typename Value>
+    using FIFOCache = fixed_sized_cache<Key, Value, FIFOCachePolicy>;
+
+}  // namespace turbo

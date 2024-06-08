@@ -77,11 +77,11 @@ namespace turbo {
             clear();
         }
 
-        /**
-         * \brief Put element into the cache
-         * \param[in] key Key value to use
-         * \param[in] value Value to assign to the given key
-         */
+        // put a key-value pair into the cache
+        // if the key is already present in the cache, the value will be updated
+        // key Key to be used in the cache
+        // value Value to be stored in the cache
+        // cb Callback function to be called when the element is erased
         void put(const Key &key, const Value &value, on_erase_cb cb = nullptr) noexcept {
             operation_guard lock{safe_op};
             auto elem_it = find_elem(key);

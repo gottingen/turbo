@@ -46,6 +46,7 @@ set(CONTAINER_SRC_LIST
         unordered_set_test
         intrusive_list_test
         span_test
+        cache_test
 )
 
 foreach (SRC ${CONTAINER_SRC_LIST})

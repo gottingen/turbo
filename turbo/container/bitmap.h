@@ -55,7 +55,7 @@
  */
 
 #define ROARING_API_NOT_IN_GLOBAL_NAMESPACE  // see remarks in roaring.h
-#include <turbo/container/roaring.h>
+#include <turbo/container/internal/roaring.h>
 #undef ROARING_API_NOT_IN_GLOBAL_NAMESPACE
 /* begin file cpp/roaring.hh */
 /*

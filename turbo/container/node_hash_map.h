@@ -545,10 +545,10 @@ namespace turbo {
         using Base::key_eq;
     };
 
-// erase_if(node_hash_map<>, Pred)
-//
-// Erases all elements that satisfy the predicate `pred` from the container `c`.
-// Returns the number of erased elements.
+    // erase_if(node_hash_map<>, Pred)
+    //
+    // Erases all elements that satisfy the predicate `pred` from the container `c`.
+    // Returns the number of erased elements.
     template<typename K, typename V, typename H, typename E, typename A,
             typename Predicate>
     typename node_hash_map<K, V, H, E, A>::size_type erase_if(
