@@ -116,7 +116,7 @@ TURBO_FLAG(std::string, log_backtrace_at, "",
 });
 
 TURBO_FLAG(bool, log_prefix, true,
-           "Prepend the log prefix to the start of each log line")
+           "prepend the log prefix to the start of each log line")
 .on_update([] () noexcept {
     turbo::log_internal::RawEnableLogPrefix(turbo::get_flag(FLAGS_log_prefix));
 });

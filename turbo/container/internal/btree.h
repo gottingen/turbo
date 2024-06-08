@@ -45,8 +45,7 @@
 // pointing to the item just after the one that was erased (or end() if none
 // exists).
 
-#ifndef TURBO_CONTAINER_INTERNAL_BTREE_H_
-#define TURBO_CONTAINER_INTERNAL_BTREE_H_
+#pragma once
 
 #include <algorithm>
 #include <cassert>
@@ -75,7 +74,6 @@
 #include <turbo/meta/compare.h>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
 #ifdef TURBO_BTREE_ENABLE_GENERATIONS
@@ -126,15 +124,15 @@ struct StringBtreeDefaultLess {
   StringBtreeDefaultLess(std::less<turbo::Cord>) {}  // NOLINT
   turbo::weak_ordering operator()(const turbo::Cord &lhs,
                                  const turbo::Cord &rhs) const {
-    return compare_internal::compare_result_as_ordering(lhs.Compare(rhs));
+    return compare_internal::compare_result_as_ordering(lhs.compare(rhs));
   }
   turbo::weak_ordering operator()(const turbo::Cord &lhs,
                                  std::string_view rhs) const {
-    return compare_internal::compare_result_as_ordering(lhs.Compare(rhs));
+    return compare_internal::compare_result_as_ordering(lhs.compare(rhs));
   }
   turbo::weak_ordering operator()(std::string_view lhs,
                                  const turbo::Cord &rhs) const {
-    return compare_internal::compare_result_as_ordering(-rhs.Compare(lhs));
+    return compare_internal::compare_result_as_ordering(-rhs.compare(lhs));
   }
 };
 
@@ -158,15 +156,15 @@ struct StringBtreeDefaultGreater {
   StringBtreeDefaultGreater(std::greater<turbo::Cord>) {}  // NOLINT
   turbo::weak_ordering operator()(const turbo::Cord &lhs,
                                  const turbo::Cord &rhs) const {
-    return compare_internal::compare_result_as_ordering(rhs.Compare(lhs));
+    return compare_internal::compare_result_as_ordering(rhs.compare(lhs));
   }
   turbo::weak_ordering operator()(const turbo::Cord &lhs,
                                  std::string_view rhs) const {
-    return compare_internal::compare_result_as_ordering(-lhs.Compare(rhs));
+    return compare_internal::compare_result_as_ordering(-lhs.compare(rhs));
   }
   turbo::weak_ordering operator()(std::string_view lhs,
                                  const turbo::Cord &rhs) const {
-    return compare_internal::compare_result_as_ordering(rhs.Compare(lhs));
+    return compare_internal::compare_result_as_ordering(rhs.compare(lhs));
   }
 };
 
@@ -3043,7 +3041,4 @@ struct btree_access {
 #undef TURBO_BTREE_ENABLE_GENERATIONS
 
 }  // namespace container_internal
-TURBO_NAMESPACE_END
 }  // namespace turbo
-
-#endif  // TURBO_CONTAINER_INTERNAL_BTREE_H_

@@ -487,11 +487,11 @@ namespace turbo {
     // FormatRawSink is a type erased wrapper around arbitrary sink objects
     // specifically used as an argument to `format()`.
     //
-    // All the object has to do define an overload of `TurboFormatFlush()` for the
+    // All the object has to do define an overload of `turbo_format_flush()` for the
     // sink, usually by adding a ADL-based free function in the same namespace as
     // the sink:
     //
-    //   void TurboFormatFlush(MySink* dest, std::string_view part);
+    //   void turbo_format_flush(MySink* dest, std::string_view part);
     //
     // where `dest` is the pointer passed to `turbo::format()`. The function should
     // append `part` to `dest`.
@@ -862,7 +862,7 @@ namespace turbo {
         }
 
         // Support `turbo::format(&sink, format, args...)`.
-        friend void TurboFormatFlush(turbo::Nonnull<FormatSink *> sink,
+        friend void turbo_format_flush(turbo::Nonnull<FormatSink *> sink,
                                      std::string_view v) {
             sink->Append(v);
         }

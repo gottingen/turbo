@@ -101,7 +101,7 @@ inline cord_internal::CordRepBtree* CordRepBtreeFromFlats(
   assert(!flats.empty());
   auto* node = cord_internal::CordRepBtree::Create(flats[0]);
   for (size_t i = 1; i < flats.size(); ++i) {
-    node = cord_internal::CordRepBtree::Append(node, flats[i]);
+    node = cord_internal::CordRepBtree::append(node, flats[i]);
   }
   return node;
 }

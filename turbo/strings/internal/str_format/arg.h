@@ -15,8 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#ifndef TURBO_STRINGS_INTERNAL_STR_FORMAT_ARG_H_
-#define TURBO_STRINGS_INTERNAL_STR_FORMAT_ARG_H_
+#pragma once
 
 #include <string.h>
 #include <wchar.h>
@@ -42,144 +41,159 @@
 #include <string_view>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 
-class Cord;
-class format_count_capture;
-class FormatSink;
+    class Cord;
 
-template <turbo::FormatConversionCharSet C>
-struct FormatConvertResult;
-class FormatConversionSpec;
+    class format_count_capture;
 
-namespace str_format_internal {
+    class FormatSink;
 
-template <FormatConversionCharSet C>
-struct ArgConvertResult {
-  bool value;
-};
+    template<turbo::FormatConversionCharSet C>
+    struct FormatConvertResult;
 
-using IntegralConvertResult = ArgConvertResult<FormatConversionCharSetUnion(
-    FormatConversionCharSetInternal::c,
-    FormatConversionCharSetInternal::kNumeric,
-    FormatConversionCharSetInternal::kStar,
-    FormatConversionCharSetInternal::v)>;
-using FloatingConvertResult = ArgConvertResult<FormatConversionCharSetUnion(
-    FormatConversionCharSetInternal::kFloating,
-    FormatConversionCharSetInternal::v)>;
-using CharConvertResult = ArgConvertResult<FormatConversionCharSetUnion(
-    FormatConversionCharSetInternal::c,
-    FormatConversionCharSetInternal::kNumeric,
-    FormatConversionCharSetInternal::kStar)>;
+    class FormatConversionSpec;
 
-template <typename T, typename = void>
-struct HasUserDefinedConvert : std::false_type {};
+    namespace str_format_internal {
 
-template <typename T>
-struct HasUserDefinedConvert<T, void_t<decltype(TurboFormatConvert(
-                                    std::declval<const T&>(),
-                                    std::declval<const FormatConversionSpec&>(),
-                                    std::declval<FormatSink*>()))>>
-    : std::true_type {};
+        template<FormatConversionCharSet C>
+        struct ArgConvertResult {
+            bool value;
+        };
+
+        using IntegralConvertResult = ArgConvertResult<FormatConversionCharSetUnion(
+                FormatConversionCharSetInternal::c,
+                FormatConversionCharSetInternal::kNumeric,
+                FormatConversionCharSetInternal::kStar,
+                FormatConversionCharSetInternal::v)>;
+        using FloatingConvertResult = ArgConvertResult<FormatConversionCharSetUnion(
+                FormatConversionCharSetInternal::kFloating,
+                FormatConversionCharSetInternal::v)>;
+        using CharConvertResult = ArgConvertResult<FormatConversionCharSetUnion(
+                FormatConversionCharSetInternal::c,
+                FormatConversionCharSetInternal::kNumeric,
+                FormatConversionCharSetInternal::kStar)>;
+
+        template<typename T, typename = void>
+        struct HasUserDefinedConvert : std::false_type {
+        };
+
+        template<typename T>
+        struct HasUserDefinedConvert<T, void_t<decltype(TurboFormatConvert(
+                std::declval<const T &>(),
+                std::declval<const FormatConversionSpec &>(),
+                std::declval<FormatSink *>()))>>
+                : std::true_type {
+        };
 
 // These declarations prevent ADL lookup from continuing in turbo namespaces,
 // we are deliberately using these as ADL hooks and want them to consider
 // non-turbo namespaces only.
-void TurboFormatConvert();
-void turbo_stringify();
+        void TurboFormatConvert();
 
-template <typename T>
-bool ConvertIntArg(T v, FormatConversionSpecImpl conv, FormatSinkImpl* sink);
+        void turbo_stringify();
+
+        template<typename T>
+        bool ConvertIntArg(T v, FormatConversionSpecImpl conv, FormatSinkImpl *sink);
 
 // Forward declarations of internal `ConvertIntArg` function template
 // instantiations are here to avoid including the template body in the headers
 // and instantiating it in large numbers of translation units. Explicit
 // instantiations can be found in "turbo/strings/internal/str_format/arg.cc"
-extern template bool ConvertIntArg<char>(char v, FormatConversionSpecImpl conv,
-                                         FormatSinkImpl* sink);
-extern template bool ConvertIntArg<signed char>(signed char v,
-                                                FormatConversionSpecImpl conv,
-                                                FormatSinkImpl* sink);
-extern template bool ConvertIntArg<unsigned char>(unsigned char v,
-                                                  FormatConversionSpecImpl conv,
-                                                  FormatSinkImpl* sink);
-extern template bool ConvertIntArg<wchar_t>(wchar_t v,
-                                            FormatConversionSpecImpl conv,
-                                            FormatSinkImpl* sink);
-extern template bool ConvertIntArg<short>(short v,  // NOLINT
-                                          FormatConversionSpecImpl conv,
-                                          FormatSinkImpl* sink);
-extern template bool ConvertIntArg<unsigned short>(   // NOLINT
-    unsigned short v, FormatConversionSpecImpl conv,  // NOLINT
-    FormatSinkImpl* sink);
-extern template bool ConvertIntArg<int>(int v, FormatConversionSpecImpl conv,
-                                        FormatSinkImpl* sink);
-extern template bool ConvertIntArg<unsigned int>(unsigned int v,
-                                                 FormatConversionSpecImpl conv,
-                                                 FormatSinkImpl* sink);
-extern template bool ConvertIntArg<long>(                           // NOLINT
-    long v, FormatConversionSpecImpl conv, FormatSinkImpl* sink);   // NOLINT
-extern template bool ConvertIntArg<unsigned long>(unsigned long v,  // NOLINT
-                                                  FormatConversionSpecImpl conv,
-                                                  FormatSinkImpl* sink);
-extern template bool ConvertIntArg<long long>(long long v,  // NOLINT
-                                              FormatConversionSpecImpl conv,
-                                              FormatSinkImpl* sink);
-extern template bool ConvertIntArg<unsigned long long>(   // NOLINT
-    unsigned long long v, FormatConversionSpecImpl conv,  // NOLINT
-    FormatSinkImpl* sink);
+        extern template bool ConvertIntArg<char>(char v, FormatConversionSpecImpl conv,
+                                                 FormatSinkImpl *sink);
 
-template <typename T>
-auto FormatConvertImpl(const T& v, FormatConversionSpecImpl conv,
-                       FormatSinkImpl* sink)
-    -> decltype(TurboFormatConvert(v,
-                                  std::declval<const FormatConversionSpec&>(),
-                                  std::declval<FormatSink*>())) {
-  using FormatConversionSpecT =
-      turbo::enable_if_t<sizeof(const T& (*)()) != 0, FormatConversionSpec>;
-  using FormatSinkT =
-      turbo::enable_if_t<sizeof(const T& (*)()) != 0, FormatSink>;
-  auto fcs = conv.Wrap<FormatConversionSpecT>();
-  auto fs = sink->Wrap<FormatSinkT>();
-  return TurboFormatConvert(v, fcs, &fs);
-}
+        extern template bool ConvertIntArg<signed char>(signed char v,
+                                                        FormatConversionSpecImpl conv,
+                                                        FormatSinkImpl *sink);
 
-template <typename T>
-auto FormatConvertImpl(const T& v, FormatConversionSpecImpl conv,
-                       FormatSinkImpl* sink)
-    -> std::enable_if_t<std::is_enum<T>::value &&
+        extern template bool ConvertIntArg<unsigned char>(unsigned char v,
+                                                          FormatConversionSpecImpl conv,
+                                                          FormatSinkImpl *sink);
+
+        extern template bool ConvertIntArg<wchar_t>(wchar_t v,
+                                                    FormatConversionSpecImpl conv,
+                                                    FormatSinkImpl *sink);
+
+        extern template bool ConvertIntArg<short>(short v,  // NOLINT
+                                                  FormatConversionSpecImpl conv,
+                                                  FormatSinkImpl *sink);
+
+        extern template bool ConvertIntArg<unsigned short>(   // NOLINT
+                unsigned short v, FormatConversionSpecImpl conv,  // NOLINT
+                FormatSinkImpl *sink);
+
+        extern template bool ConvertIntArg<int>(int v, FormatConversionSpecImpl conv,
+                                                FormatSinkImpl *sink);
+
+        extern template bool ConvertIntArg<unsigned int>(unsigned int v,
+                                                         FormatConversionSpecImpl conv,
+                                                         FormatSinkImpl *sink);
+
+        extern template bool ConvertIntArg<long>(                           // NOLINT
+                long v, FormatConversionSpecImpl conv, FormatSinkImpl *sink);   // NOLINT
+        extern template bool ConvertIntArg<unsigned long>(unsigned long v,  // NOLINT
+                                                          FormatConversionSpecImpl conv,
+                                                          FormatSinkImpl *sink);
+
+        extern template bool ConvertIntArg<long long>(long long v,  // NOLINT
+                                                      FormatConversionSpecImpl conv,
+                                                      FormatSinkImpl *sink);
+
+        extern template bool ConvertIntArg<unsigned long long>(   // NOLINT
+                unsigned long long v, FormatConversionSpecImpl conv,  // NOLINT
+                FormatSinkImpl *sink);
+
+        template<typename T>
+        auto FormatConvertImpl(const T &v, FormatConversionSpecImpl conv,
+                               FormatSinkImpl *sink)
+        -> decltype(TurboFormatConvert(v,
+                                       std::declval<const FormatConversionSpec &>(),
+                                       std::declval<FormatSink *>())) {
+            using FormatConversionSpecT =
+                    turbo::enable_if_t<sizeof(const T &(*)()) != 0, FormatConversionSpec>;
+            using FormatSinkT =
+                    turbo::enable_if_t<sizeof(const T &(*)()) != 0, FormatSink>;
+            auto fcs = conv.Wrap<FormatConversionSpecT>();
+            auto fs = sink->Wrap<FormatSinkT>();
+            return TurboFormatConvert(v, fcs, &fs);
+        }
+
+        template<typename T>
+        auto FormatConvertImpl(const T &v, FormatConversionSpecImpl conv,
+                               FormatSinkImpl *sink)
+        -> std::enable_if_t<std::is_enum<T>::value &&
                             std::is_void<decltype(turbo_stringify(
-                                std::declval<FormatSink&>(), v))>::value,
-                        IntegralConvertResult> {
-  if (conv.conversion_char() == FormatConversionCharInternal::v) {
-    using FormatSinkT =
-        turbo::enable_if_t<sizeof(const T& (*)()) != 0, FormatSink>;
-    auto fs = sink->Wrap<FormatSinkT>();
-    turbo_stringify(fs, v);
-    return {true};
-  } else {
-    return {ConvertIntArg(
-        static_cast<typename std::underlying_type<T>::type>(v), conv, sink)};
-  }
-}
+                                    std::declval<FormatSink &>(), v))>::value,
+                IntegralConvertResult> {
+            if (conv.conversion_char() == FormatConversionCharInternal::v) {
+                using FormatSinkT =
+                        turbo::enable_if_t<sizeof(const T &(*)()) != 0, FormatSink>;
+                auto fs = sink->Wrap<FormatSinkT>();
+                turbo_stringify(fs, v);
+                return {true};
+            } else {
+                return {ConvertIntArg(
+                        static_cast<typename std::underlying_type<T>::type>(v), conv, sink)};
+            }
+        }
 
-template <typename T>
-auto FormatConvertImpl(const T& v, FormatConversionSpecImpl,
-                       FormatSinkImpl* sink)
-    -> std::enable_if_t<!std::is_enum<T>::value &&
+        template<typename T>
+        auto FormatConvertImpl(const T &v, FormatConversionSpecImpl,
+                               FormatSinkImpl *sink)
+        -> std::enable_if_t<!std::is_enum<T>::value &&
                             !std::is_same<T, turbo::Cord>::value &&
                             std::is_void<decltype(turbo_stringify(
-                                std::declval<FormatSink&>(), v))>::value,
-                        ArgConvertResult<FormatConversionCharSetInternal::v>> {
-  using FormatSinkT =
-      turbo::enable_if_t<sizeof(const T& (*)()) != 0, FormatSink>;
-  auto fs = sink->Wrap<FormatSinkT>();
-  turbo_stringify(fs, v);
-  return {true};
-}
+                                    std::declval<FormatSink &>(), v))>::value,
+                ArgConvertResult<FormatConversionCharSetInternal::v>> {
+            using FormatSinkT =
+                    turbo::enable_if_t<sizeof(const T &(*)()) != 0, FormatSink>;
+            auto fs = sink->Wrap<FormatSinkT>();
+            turbo_stringify(fs, v);
+            return {true};
+        }
 
-template <typename T>
-class StreamedWrapper;
+        template<typename T>
+        class StreamedWrapper;
 
 // If 'v' can be converted (in the printf sense) according to 'conv',
 // then convert it, appending to `sink` and return `true`.
@@ -193,420 +207,448 @@ class StreamedWrapper;
 // functions in the namespaces associated with 'v'.
 
 // Raw pointers.
-struct VoidPtr {
-  VoidPtr() = default;
-  template <typename T,
-            decltype(reinterpret_cast<uintptr_t>(std::declval<T*>())) = 0>
-  VoidPtr(T* ptr)  // NOLINT
-      : value(ptr ? reinterpret_cast<uintptr_t>(ptr) : 0) {}
-  uintptr_t value;
-};
+        struct VoidPtr {
+            VoidPtr() = default;
 
-template <FormatConversionCharSet C>
-constexpr FormatConversionCharSet ExtractCharSet(FormatConvertResult<C>) {
-  return C;
-}
+            template<typename T,
+                    decltype(reinterpret_cast<uintptr_t>(std::declval<T *>())) = 0>
+            VoidPtr(T *ptr)  // NOLINT
+                    : value(ptr ? reinterpret_cast<uintptr_t>(ptr) : 0) {}
 
-template <FormatConversionCharSet C>
-constexpr FormatConversionCharSet ExtractCharSet(ArgConvertResult<C>) {
-  return C;
-}
+            uintptr_t value;
+        };
 
-ArgConvertResult<FormatConversionCharSetInternal::p> FormatConvertImpl(
-    VoidPtr v, FormatConversionSpecImpl conv, FormatSinkImpl* sink);
+        template<FormatConversionCharSet C>
+        constexpr FormatConversionCharSet ExtractCharSet(FormatConvertResult<C>) {
+            return C;
+        }
+
+        template<FormatConversionCharSet C>
+        constexpr FormatConversionCharSet ExtractCharSet(ArgConvertResult<C>) {
+            return C;
+        }
+
+        ArgConvertResult<FormatConversionCharSetInternal::p> FormatConvertImpl(
+                VoidPtr v, FormatConversionSpecImpl conv, FormatSinkImpl *sink);
 
 // Strings.
-using StringConvertResult = ArgConvertResult<FormatConversionCharSetUnion(
-    FormatConversionCharSetInternal::s,
-    FormatConversionCharSetInternal::v)>;
-StringConvertResult FormatConvertImpl(const std::string& v,
-                                      FormatConversionSpecImpl conv,
-                                      FormatSinkImpl* sink);
-StringConvertResult FormatConvertImpl(const std::wstring& v,
-                                      FormatConversionSpecImpl conv,
-                                      FormatSinkImpl* sink);
-StringConvertResult FormatConvertImpl(std::string_view v,
-                                      FormatConversionSpecImpl conv,
-                                      FormatSinkImpl* sink);
-StringConvertResult FormatConvertImpl(std::wstring_view v,
-                                      FormatConversionSpecImpl conv,
-                                      FormatSinkImpl* sink);
+        using StringConvertResult = ArgConvertResult<FormatConversionCharSetUnion(
+                FormatConversionCharSetInternal::s,
+                FormatConversionCharSetInternal::v)>;
 
-using StringPtrConvertResult = ArgConvertResult<FormatConversionCharSetUnion(
-    FormatConversionCharSetInternal::s,
-    FormatConversionCharSetInternal::p)>;
-StringPtrConvertResult FormatConvertImpl(const char* v,
-                                         FormatConversionSpecImpl conv,
-                                         FormatSinkImpl* sink);
-StringPtrConvertResult FormatConvertImpl(const wchar_t* v,
-                                         FormatConversionSpecImpl conv,
-                                         FormatSinkImpl* sink);
-// This overload is needed to disambiguate, since `nullptr` could match either
-// of the other overloads equally well.
-StringPtrConvertResult FormatConvertImpl(std::nullptr_t,
-                                         FormatConversionSpecImpl conv,
-                                         FormatSinkImpl* sink);
+        StringConvertResult FormatConvertImpl(const std::string &v,
+                                              FormatConversionSpecImpl conv,
+                                              FormatSinkImpl *sink);
 
-template <class TurboCord, typename std::enable_if<std::is_same<
-                              TurboCord, turbo::Cord>::value>::type* = nullptr>
-StringConvertResult FormatConvertImpl(const TurboCord& value,
-                                      FormatConversionSpecImpl conv,
-                                      FormatSinkImpl* sink) {
-  bool is_left = conv.has_left_flag();
-  size_t space_remaining = 0;
+        StringConvertResult FormatConvertImpl(const std::wstring &v,
+                                              FormatConversionSpecImpl conv,
+                                              FormatSinkImpl *sink);
 
-  int width = conv.width();
-  if (width >= 0) space_remaining = static_cast<size_t>(width);
+        StringConvertResult FormatConvertImpl(std::string_view v,
+                                              FormatConversionSpecImpl conv,
+                                              FormatSinkImpl *sink);
 
-  size_t to_write = value.size();
+        StringConvertResult FormatConvertImpl(std::wstring_view v,
+                                              FormatConversionSpecImpl conv,
+                                              FormatSinkImpl *sink);
 
-  int precision = conv.precision();
-  if (precision >= 0)
-    to_write = (std::min)(to_write, static_cast<size_t>(precision));
+        using StringPtrConvertResult = ArgConvertResult<FormatConversionCharSetUnion(
+                FormatConversionCharSetInternal::s,
+                FormatConversionCharSetInternal::p)>;
 
-  space_remaining = Excess(to_write, space_remaining);
+        StringPtrConvertResult FormatConvertImpl(const char *v,
+                                                 FormatConversionSpecImpl conv,
+                                                 FormatSinkImpl *sink);
 
-  if (space_remaining > 0 && !is_left) sink->Append(space_remaining, ' ');
+        StringPtrConvertResult FormatConvertImpl(const wchar_t *v,
+                                                 FormatConversionSpecImpl conv,
+                                                 FormatSinkImpl *sink);
 
-  for (std::string_view piece : value.Chunks()) {
-    if (piece.size() > to_write) {
-      piece.remove_suffix(piece.size() - to_write);
-      to_write = 0;
-    } else {
-      to_write -= piece.size();
-    }
-    sink->Append(piece);
-    if (to_write == 0) {
-      break;
-    }
-  }
+        // This overload is needed to disambiguate, since `nullptr` could match either
+        // of the other overloads equally well.
+        StringPtrConvertResult FormatConvertImpl(std::nullptr_t,
+                                                 FormatConversionSpecImpl conv,
+                                                 FormatSinkImpl *sink);
 
-  if (space_remaining > 0 && is_left) sink->Append(space_remaining, ' ');
-  return {true};
-}
+        template<class TurboCord, typename std::enable_if<std::is_same<
+                TurboCord, turbo::Cord>::value>::type * = nullptr>
+        StringConvertResult FormatConvertImpl(const TurboCord &value,
+                                              FormatConversionSpecImpl conv,
+                                              FormatSinkImpl *sink) {
+            bool is_left = conv.has_left_flag();
+            size_t space_remaining = 0;
 
-bool ConvertBoolArg(bool v, FormatSinkImpl* sink);
+            int width = conv.width();
+            if (width >= 0) space_remaining = static_cast<size_t>(width);
+
+            size_t to_write = value.size();
+
+            int precision = conv.precision();
+            if (precision >= 0)
+                to_write = (std::min)(to_write, static_cast<size_t>(precision));
+
+            space_remaining = Excess(to_write, space_remaining);
+
+            if (space_remaining > 0 && !is_left) sink->Append(space_remaining, ' ');
+
+            for (std::string_view piece: value.chunks()) {
+                if (piece.size() > to_write) {
+                    piece.remove_suffix(piece.size() - to_write);
+                    to_write = 0;
+                } else {
+                    to_write -= piece.size();
+                }
+                sink->Append(piece);
+                if (to_write == 0) {
+                    break;
+                }
+            }
+
+            if (space_remaining > 0 && is_left) sink->Append(space_remaining, ' ');
+            return {true};
+        }
+
+        bool ConvertBoolArg(bool v, FormatSinkImpl *sink);
 
 // Floats.
-FloatingConvertResult FormatConvertImpl(float v, FormatConversionSpecImpl conv,
-                                        FormatSinkImpl* sink);
-FloatingConvertResult FormatConvertImpl(double v, FormatConversionSpecImpl conv,
-                                        FormatSinkImpl* sink);
-FloatingConvertResult FormatConvertImpl(long double v,
-                                        FormatConversionSpecImpl conv,
-                                        FormatSinkImpl* sink);
+        FloatingConvertResult FormatConvertImpl(float v, FormatConversionSpecImpl conv,
+                                                FormatSinkImpl *sink);
+
+        FloatingConvertResult FormatConvertImpl(double v, FormatConversionSpecImpl conv,
+                                                FormatSinkImpl *sink);
+
+        FloatingConvertResult FormatConvertImpl(long double v,
+                                                FormatConversionSpecImpl conv,
+                                                FormatSinkImpl *sink);
 
 // Chars.
-CharConvertResult FormatConvertImpl(char v, FormatConversionSpecImpl conv,
-                                    FormatSinkImpl* sink);
-CharConvertResult FormatConvertImpl(wchar_t v,
-                                    FormatConversionSpecImpl conv,
-                                    FormatSinkImpl* sink);
+        CharConvertResult FormatConvertImpl(char v, FormatConversionSpecImpl conv,
+                                            FormatSinkImpl *sink);
 
-// Ints.
-IntegralConvertResult FormatConvertImpl(signed char v,
-                                        FormatConversionSpecImpl conv,
-                                        FormatSinkImpl* sink);
-IntegralConvertResult FormatConvertImpl(unsigned char v,
-                                        FormatConversionSpecImpl conv,
-                                        FormatSinkImpl* sink);
-IntegralConvertResult FormatConvertImpl(short v,  // NOLINT
-                                        FormatConversionSpecImpl conv,
-                                        FormatSinkImpl* sink);
-IntegralConvertResult FormatConvertImpl(unsigned short v,  // NOLINT
-                                        FormatConversionSpecImpl conv,
-                                        FormatSinkImpl* sink);
-IntegralConvertResult FormatConvertImpl(int v, FormatConversionSpecImpl conv,
-                                        FormatSinkImpl* sink);
-IntegralConvertResult FormatConvertImpl(unsigned v,
-                                        FormatConversionSpecImpl conv,
-                                        FormatSinkImpl* sink);
-IntegralConvertResult FormatConvertImpl(long v,  // NOLINT
-                                        FormatConversionSpecImpl conv,
-                                        FormatSinkImpl* sink);
-IntegralConvertResult FormatConvertImpl(unsigned long v,  // NOLINT
-                                        FormatConversionSpecImpl conv,
-                                        FormatSinkImpl* sink);
-IntegralConvertResult FormatConvertImpl(long long v,  // NOLINT
-                                        FormatConversionSpecImpl conv,
-                                        FormatSinkImpl* sink);
-IntegralConvertResult FormatConvertImpl(unsigned long long v,  // NOLINT
-                                        FormatConversionSpecImpl conv,
-                                        FormatSinkImpl* sink);
-IntegralConvertResult FormatConvertImpl(int128 v, FormatConversionSpecImpl conv,
-                                        FormatSinkImpl* sink);
-IntegralConvertResult FormatConvertImpl(uint128 v,
-                                        FormatConversionSpecImpl conv,
-                                        FormatSinkImpl* sink);
+        CharConvertResult FormatConvertImpl(wchar_t v,
+                                            FormatConversionSpecImpl conv,
+                                            FormatSinkImpl *sink);
+
+        // Ints.
+        IntegralConvertResult FormatConvertImpl(signed char v,
+                                                FormatConversionSpecImpl conv,
+                                                FormatSinkImpl *sink);
+
+        IntegralConvertResult FormatConvertImpl(unsigned char v,
+                                                FormatConversionSpecImpl conv,
+                                                FormatSinkImpl *sink);
+
+        IntegralConvertResult FormatConvertImpl(short v,  // NOLINT
+                                                FormatConversionSpecImpl conv,
+                                                FormatSinkImpl *sink);
+
+        IntegralConvertResult FormatConvertImpl(unsigned short v,  // NOLINT
+                                                FormatConversionSpecImpl conv,
+                                                FormatSinkImpl *sink);
+
+        IntegralConvertResult FormatConvertImpl(int v, FormatConversionSpecImpl conv,
+                                                FormatSinkImpl *sink);
+
+        IntegralConvertResult FormatConvertImpl(unsigned v,
+                                                FormatConversionSpecImpl conv,
+                                                FormatSinkImpl *sink);
+
+        IntegralConvertResult FormatConvertImpl(long v,  // NOLINT
+                                                FormatConversionSpecImpl conv,
+                                                FormatSinkImpl *sink);
+
+        IntegralConvertResult FormatConvertImpl(unsigned long v,  // NOLINT
+                                                FormatConversionSpecImpl conv,
+                                                FormatSinkImpl *sink);
+
+        IntegralConvertResult FormatConvertImpl(long long v,  // NOLINT
+                                                FormatConversionSpecImpl conv,
+                                                FormatSinkImpl *sink);
+
+        IntegralConvertResult FormatConvertImpl(unsigned long long v,  // NOLINT
+                                                FormatConversionSpecImpl conv,
+                                                FormatSinkImpl *sink);
+
+        IntegralConvertResult FormatConvertImpl(int128 v, FormatConversionSpecImpl conv,
+                                                FormatSinkImpl *sink);
+
+        IntegralConvertResult FormatConvertImpl(uint128 v,
+                                                FormatConversionSpecImpl conv,
+                                                FormatSinkImpl *sink);
 
 // This function needs to be a template due to ambiguity regarding type
 // conversions.
-template <typename T, enable_if_t<std::is_same<T, bool>::value, int> = 0>
-IntegralConvertResult FormatConvertImpl(T v, FormatConversionSpecImpl conv,
-                                        FormatSinkImpl* sink) {
-  if (conv.conversion_char() == FormatConversionCharInternal::v) {
-    return {ConvertBoolArg(v, sink)};
-  }
+        template<typename T, enable_if_t<std::is_same<T, bool>::value, int> = 0>
+        IntegralConvertResult FormatConvertImpl(T v, FormatConversionSpecImpl conv,
+                                                FormatSinkImpl *sink) {
+            if (conv.conversion_char() == FormatConversionCharInternal::v) {
+                return {ConvertBoolArg(v, sink)};
+            }
 
-  return FormatConvertImpl(static_cast<int>(v), conv, sink);
-}
+            return FormatConvertImpl(static_cast<int>(v), conv, sink);
+        }
 
 // We provide this function to help the checker, but it is never defined.
 // FormatArgImpl will use the underlying Convert functions instead.
-template <typename T>
-typename std::enable_if<std::is_enum<T>::value &&
-                            !HasUserDefinedConvert<T>::value &&
-                            !HasTurboStringify<T>::value,
-                        IntegralConvertResult>::type
-FormatConvertImpl(T v, FormatConversionSpecImpl conv, FormatSinkImpl* sink);
+        template<typename T>
+        typename std::enable_if<std::is_enum<T>::value &&
+                                !HasUserDefinedConvert<T>::value &&
+                                !HasTurboStringify<T>::value,
+                IntegralConvertResult>::type
+        FormatConvertImpl(T v, FormatConversionSpecImpl conv, FormatSinkImpl *sink);
 
-template <typename T>
-StringConvertResult FormatConvertImpl(const StreamedWrapper<T>& v,
-                                      FormatConversionSpecImpl conv,
-                                      FormatSinkImpl* out) {
-  std::ostringstream oss;
-  oss << v.v_;
-  if (!oss) return {false};
-  return str_format_internal::FormatConvertImpl(oss.str(), conv, out);
-}
+        template<typename T>
+        StringConvertResult FormatConvertImpl(const StreamedWrapper<T> &v,
+                                              FormatConversionSpecImpl conv,
+                                              FormatSinkImpl *out) {
+            std::ostringstream oss;
+            oss << v.v_;
+            if (!oss) return {false};
+            return str_format_internal::FormatConvertImpl(oss.str(), conv, out);
+        }
 
 // Use templates and dependent types to delay evaluation of the function
 // until after format_count_capture is fully defined.
-struct FormatCountCaptureHelper {
-  template <class T = int>
-  static ArgConvertResult<FormatConversionCharSetInternal::n> ConvertHelper(
-      const format_count_capture& v, FormatConversionSpecImpl conv,
-      FormatSinkImpl* sink) {
-    const turbo::enable_if_t<sizeof(T) != 0, format_count_capture>& v2 = v;
+        struct FormatCountCaptureHelper {
+            template<class T = int>
+            static ArgConvertResult<FormatConversionCharSetInternal::n> ConvertHelper(
+                    const format_count_capture &v, FormatConversionSpecImpl conv,
+                    FormatSinkImpl *sink) {
+                const turbo::enable_if_t<sizeof(T) != 0, format_count_capture> &v2 = v;
 
-    if (conv.conversion_char() !=
-        str_format_internal::FormatConversionCharInternal::n) {
-      return {false};
-    }
-    *v2.p_ = static_cast<int>(sink->size());
-    return {true};
-  }
-};
+                if (conv.conversion_char() !=
+                    str_format_internal::FormatConversionCharInternal::n) {
+                    return {false};
+                }
+                *v2.p_ = static_cast<int>(sink->size());
+                return {true};
+            }
+        };
 
-template <class T = int>
-ArgConvertResult<FormatConversionCharSetInternal::n> FormatConvertImpl(
-    const format_count_capture& v, FormatConversionSpecImpl conv,
-    FormatSinkImpl* sink) {
-  return FormatCountCaptureHelper::ConvertHelper(v, conv, sink);
-}
+        template<class T = int>
+        ArgConvertResult<FormatConversionCharSetInternal::n> FormatConvertImpl(
+                const format_count_capture &v, FormatConversionSpecImpl conv,
+                FormatSinkImpl *sink) {
+            return FormatCountCaptureHelper::ConvertHelper(v, conv, sink);
+        }
 
 // Helper friend struct to hide implementation details from the public API of
 // FormatArgImpl.
-struct FormatArgImplFriend {
-  template <typename Arg>
-  static bool ToInt(Arg arg, int* out) {
-    // A value initialized FormatConversionSpecImpl has a `none` conv, which
-    // tells the dispatcher to run the `int` conversion.
-    return arg.dispatcher_(arg.data_, {}, out);
-  }
+        struct FormatArgImplFriend {
+            template<typename Arg>
+            static bool ToInt(Arg arg, int *out) {
+                // A value initialized FormatConversionSpecImpl has a `none` conv, which
+                // tells the dispatcher to run the `int` conversion.
+                return arg.dispatcher_(arg.data_, {}, out);
+            }
 
-  template <typename Arg>
-  static bool Convert(Arg arg, FormatConversionSpecImpl conv,
-                      FormatSinkImpl* out) {
-    return arg.dispatcher_(arg.data_, conv, out);
-  }
+            template<typename Arg>
+            static bool Convert(Arg arg, FormatConversionSpecImpl conv,
+                                FormatSinkImpl *out) {
+                return arg.dispatcher_(arg.data_, conv, out);
+            }
 
-  template <typename Arg>
-  static typename Arg::Dispatcher GetVTablePtrForTest(Arg arg) {
-    return arg.dispatcher_;
-  }
-};
+            template<typename Arg>
+            static typename Arg::Dispatcher GetVTablePtrForTest(Arg arg) {
+                return arg.dispatcher_;
+            }
+        };
 
-template <typename Arg>
-constexpr FormatConversionCharSet ArgumentToConv() {
-  using ConvResult = decltype(str_format_internal::FormatConvertImpl(
-      std::declval<const Arg&>(),
-      std::declval<const FormatConversionSpecImpl&>(),
-      std::declval<FormatSinkImpl*>()));
-  return turbo::str_format_internal::ExtractCharSet(ConvResult{});
-}
+        template<typename Arg>
+        constexpr FormatConversionCharSet ArgumentToConv() {
+            using ConvResult = decltype(str_format_internal::FormatConvertImpl(
+                    std::declval<const Arg &>(),
+                    std::declval<const FormatConversionSpecImpl &>(),
+                    std::declval<FormatSinkImpl *>()));
+            return turbo::str_format_internal::ExtractCharSet(ConvResult{});
+        }
 
 // A type-erased handle to a format argument.
-class FormatArgImpl {
- private:
-  enum { kInlinedSpace = 8 };
+        class FormatArgImpl {
+        private:
+            enum {
+                kInlinedSpace = 8
+            };
 
-  using VoidPtr = str_format_internal::VoidPtr;
+            using VoidPtr = str_format_internal::VoidPtr;
 
-  union Data {
-    const void* ptr;
-    const volatile void* volatile_ptr;
-    char buf[kInlinedSpace];
-  };
+            union Data {
+                const void *ptr;
+                const volatile void *volatile_ptr;
+                char buf[kInlinedSpace];
+            };
 
-  using Dispatcher = bool (*)(Data, FormatConversionSpecImpl, void* out);
+            using Dispatcher = bool (*)(Data, FormatConversionSpecImpl, void *out);
 
-  template <typename T>
-  struct store_by_value
-      : std::integral_constant<bool, (sizeof(T) <= kInlinedSpace) &&
-                                         (std::is_integral<T>::value ||
-                                          std::is_floating_point<T>::value ||
-                                          std::is_pointer<T>::value ||
-                                          std::is_same<VoidPtr, T>::value)> {};
+            template<typename T>
+            struct store_by_value
+                    : std::integral_constant<bool, (sizeof(T) <= kInlinedSpace) &&
+                                                   (std::is_integral<T>::value ||
+                                                    std::is_floating_point<T>::value ||
+                                                    std::is_pointer<T>::value ||
+                                                    std::is_same<VoidPtr, T>::value)> {
+            };
 
-  enum StoragePolicy { ByPointer, ByVolatilePointer, ByValue };
-  template <typename T>
-  struct storage_policy
-      : std::integral_constant<StoragePolicy,
-                               (std::is_volatile<T>::value
-                                    ? ByVolatilePointer
-                                    : (store_by_value<T>::value ? ByValue
-                                                                : ByPointer))> {
-  };
+            enum StoragePolicy {
+                ByPointer, ByVolatilePointer, ByValue
+            };
+            template<typename T>
+            struct storage_policy
+                    : std::integral_constant<StoragePolicy,
+                            (std::is_volatile<T>::value
+                             ? ByVolatilePointer
+                             : (store_by_value<T>::value ? ByValue
+                                                         : ByPointer))> {
+            };
 
-  // To reduce the number of vtables we will decay values before hand.
-  // Anything with a user-defined Convert will get its own vtable.
-  // For everything else:
-  //   - Decay char* and char arrays into `const char*`
-  //   - Decay wchar_t* and wchar_t arrays into `const wchar_t*`
-  //   - Decay any other pointer to `const void*`
-  //   - Decay all enums to the integral promotion of their underlying type.
-  //   - Decay function pointers to void*.
-  template <typename T, typename = void>
-  struct DecayType {
-    static constexpr bool kHasUserDefined =
-        str_format_internal::HasUserDefinedConvert<T>::value ||
-        HasTurboStringify<T>::value;
-    using type = typename std::conditional<
-        !kHasUserDefined && std::is_convertible<T, const char*>::value,
-        const char*,
-        typename std::conditional<
-            !kHasUserDefined && std::is_convertible<T, const wchar_t*>::value,
-            const wchar_t*,
-            typename std::conditional<
-                !kHasUserDefined && std::is_convertible<T, VoidPtr>::value,
-                VoidPtr,
-                const T&>::type>::type>::type;
-  };
-  template <typename T>
-  struct DecayType<
-      T, typename std::enable_if<
-             !str_format_internal::HasUserDefinedConvert<T>::value &&
-             !HasTurboStringify<T>::value && std::is_enum<T>::value>::type> {
-    using type = decltype(+typename std::underlying_type<T>::type());
-  };
+            // To reduce the number of vtables we will decay values before hand.
+            // Anything with a user-defined Convert will get its own vtable.
+            // For everything else:
+            //   - Decay char* and char arrays into `const char*`
+            //   - Decay wchar_t* and wchar_t arrays into `const wchar_t*`
+            //   - Decay any other pointer to `const void*`
+            //   - Decay all enums to the integral promotion of their underlying type.
+            //   - Decay function pointers to void*.
+            template<typename T, typename = void>
+            struct DecayType {
+                static constexpr bool kHasUserDefined =
+                        str_format_internal::HasUserDefinedConvert<T>::value ||
+                        HasTurboStringify<T>::value;
+                using type = typename std::conditional<
+                        !kHasUserDefined && std::is_convertible<T, const char *>::value,
+                        const char *,
+                        typename std::conditional<
+                                !kHasUserDefined && std::is_convertible<T, const wchar_t *>::value,
+                                const wchar_t *,
+                                typename std::conditional<
+                                        !kHasUserDefined && std::is_convertible<T, VoidPtr>::value,
+                                        VoidPtr,
+                                        const T &>::type>::type>::type;
+            };
+            template<typename T>
+            struct DecayType<
+                    T, typename std::enable_if<
+                            !str_format_internal::HasUserDefinedConvert<T>::value &&
+                            !HasTurboStringify<T>::value && std::is_enum<T>::value>::type> {
+                using type = decltype(+typename std::underlying_type<T>::type());
+            };
 
- public:
-  template <typename T>
-  explicit FormatArgImpl(const T& value) {
-    using D = typename DecayType<T>::type;
-    static_assert(
-        std::is_same<D, const T&>::value || storage_policy<D>::value == ByValue,
-        "Decayed types must be stored by value");
-    Init(static_cast<D>(value));
-  }
+        public:
+            template<typename T>
+            explicit FormatArgImpl(const T &value) {
+                using D = typename DecayType<T>::type;
+                static_assert(
+                        std::is_same<D, const T &>::value || storage_policy<D>::value == ByValue,
+                        "Decayed types must be stored by value");
+                Init(static_cast<D>(value));
+            }
 
- private:
-  friend struct str_format_internal::FormatArgImplFriend;
-  template <typename T, StoragePolicy = storage_policy<T>::value>
-  struct Manager;
+        private:
+            friend struct str_format_internal::FormatArgImplFriend;
+            template<typename T, StoragePolicy = storage_policy<T>::value>
+            struct Manager;
 
-  template <typename T>
-  struct Manager<T, ByPointer> {
-    static Data SetValue(const T& value) {
-      Data data;
-      data.ptr = std::addressof(value);
-      return data;
-    }
+            template<typename T>
+            struct Manager<T, ByPointer> {
+                static Data SetValue(const T &value) {
+                    Data data;
+                    data.ptr = std::addressof(value);
+                    return data;
+                }
 
-    static const T& Value(Data arg) { return *static_cast<const T*>(arg.ptr); }
-  };
+                static const T &Value(Data arg) { return *static_cast<const T *>(arg.ptr); }
+            };
 
-  template <typename T>
-  struct Manager<T, ByVolatilePointer> {
-    static Data SetValue(const T& value) {
-      Data data;
-      data.volatile_ptr = &value;
-      return data;
-    }
+            template<typename T>
+            struct Manager<T, ByVolatilePointer> {
+                static Data SetValue(const T &value) {
+                    Data data;
+                    data.volatile_ptr = &value;
+                    return data;
+                }
 
-    static const T& Value(Data arg) {
-      return *static_cast<const T*>(arg.volatile_ptr);
-    }
-  };
+                static const T &Value(Data arg) {
+                    return *static_cast<const T *>(arg.volatile_ptr);
+                }
+            };
 
-  template <typename T>
-  struct Manager<T, ByValue> {
-    static Data SetValue(const T& value) {
-      Data data;
-      memcpy(data.buf, &value, sizeof(value));
-      return data;
-    }
+            template<typename T>
+            struct Manager<T, ByValue> {
+                static Data SetValue(const T &value) {
+                    Data data;
+                    memcpy(data.buf, &value, sizeof(value));
+                    return data;
+                }
 
-    static T Value(Data arg) {
-      T value;
-      memcpy(&value, arg.buf, sizeof(T));
-      return value;
-    }
-  };
+                static T Value(Data arg) {
+                    T value;
+                    memcpy(&value, arg.buf, sizeof(T));
+                    return value;
+                }
+            };
 
-  template <typename T>
-  void Init(const T& value) {
-    data_ = Manager<T>::SetValue(value);
-    dispatcher_ = &Dispatch<T>;
-  }
+            template<typename T>
+            void Init(const T &value) {
+                data_ = Manager<T>::SetValue(value);
+                dispatcher_ = &Dispatch<T>;
+            }
 
-  template <typename T>
-  static int ToIntVal(const T& val) {
-    using CommonType = typename std::conditional<std::is_signed<T>::value,
-                                                 int64_t, uint64_t>::type;
-    if (static_cast<CommonType>(val) >
-        static_cast<CommonType>((std::numeric_limits<int>::max)())) {
-      return (std::numeric_limits<int>::max)();
-    } else if (std::is_signed<T>::value &&
-               static_cast<CommonType>(val) <
-                   static_cast<CommonType>((std::numeric_limits<int>::min)())) {
-      return (std::numeric_limits<int>::min)();
-    }
-    return static_cast<int>(val);
-  }
+            template<typename T>
+            static int ToIntVal(const T &val) {
+                using CommonType = typename std::conditional<std::is_signed<T>::value,
+                        int64_t, uint64_t>::type;
+                if (static_cast<CommonType>(val) >
+                    static_cast<CommonType>((std::numeric_limits<int>::max)())) {
+                    return (std::numeric_limits<int>::max)();
+                } else if (std::is_signed<T>::value &&
+                           static_cast<CommonType>(val) <
+                           static_cast<CommonType>((std::numeric_limits<int>::min)())) {
+                    return (std::numeric_limits<int>::min)();
+                }
+                return static_cast<int>(val);
+            }
 
-  template <typename T>
-  static bool ToInt(Data arg, int* out, std::true_type /* is_integral */,
-                    std::false_type) {
-    *out = ToIntVal(Manager<T>::Value(arg));
-    return true;
-  }
+            template<typename T>
+            static bool ToInt(Data arg, int *out, std::true_type /* is_integral */,
+                              std::false_type) {
+                *out = ToIntVal(Manager<T>::Value(arg));
+                return true;
+            }
 
-  template <typename T>
-  static bool ToInt(Data arg, int* out, std::false_type,
-                    std::true_type /* is_enum */) {
-    *out = ToIntVal(static_cast<typename std::underlying_type<T>::type>(
-        Manager<T>::Value(arg)));
-    return true;
-  }
+            template<typename T>
+            static bool ToInt(Data arg, int *out, std::false_type,
+                              std::true_type /* is_enum */) {
+                *out = ToIntVal(static_cast<typename std::underlying_type<T>::type>(
+                                        Manager<T>::Value(arg)));
+                return true;
+            }
 
-  template <typename T>
-  static bool ToInt(Data, int*, std::false_type, std::false_type) {
-    return false;
-  }
+            template<typename T>
+            static bool ToInt(Data, int *, std::false_type, std::false_type) {
+                return false;
+            }
 
-  template <typename T>
-  static bool Dispatch(Data arg, FormatConversionSpecImpl spec, void* out) {
-    // A `none` conv indicates that we want the `int` conversion.
-    if (TURBO_UNLIKELY(spec.conversion_char() ==
-                           FormatConversionCharInternal::kNone)) {
-      return ToInt<T>(arg, static_cast<int*>(out), std::is_integral<T>(),
-                      std::is_enum<T>());
-    }
-    if (TURBO_UNLIKELY(!Contains(ArgumentToConv<T>(),
-                                     spec.conversion_char()))) {
-      return false;
-    }
-    return str_format_internal::FormatConvertImpl(
-               Manager<T>::Value(arg), spec,
-               static_cast<FormatSinkImpl*>(out))
-        .value;
-  }
+            template<typename T>
+            static bool Dispatch(Data arg, FormatConversionSpecImpl spec, void *out) {
+                // A `none` conv indicates that we want the `int` conversion.
+                if (TURBO_UNLIKELY(spec.conversion_char() ==
+                                   FormatConversionCharInternal::kNone)) {
+                    return ToInt<T>(arg, static_cast<int *>(out), std::is_integral<T>(),
+                                    std::is_enum<T>());
+                }
+                if (TURBO_UNLIKELY(!Contains(ArgumentToConv<T>(),
+                                             spec.conversion_char()))) {
+                    return false;
+                }
+                return str_format_internal::FormatConvertImpl(
+                        Manager<T>::Value(arg), spec,
+                        static_cast<FormatSinkImpl *>(out))
+                        .value;
+            }
 
-  Data data_;
-  Dispatcher dispatcher_;
-};
+            Data data_;
+            Dispatcher dispatcher_;
+        };
 
 #define TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(T, E)                     \
   E template bool FormatArgImpl::Dispatch<T>(Data, FormatConversionSpecImpl, \
@@ -647,11 +689,8 @@ class FormatArgImpl {
       __VA_ARGS__);                                                \
   TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(std::wstring_view, __VA_ARGS__)
 
-TURBO_INTERNAL_FORMAT_DISPATCH_OVERLOADS_EXPAND_(extern);
+        TURBO_INTERNAL_FORMAT_DISPATCH_OVERLOADS_EXPAND_(extern);
 
 
-}  // namespace str_format_internal
-TURBO_NAMESPACE_END
+    }  // namespace str_format_internal
 }  // namespace turbo
-
-#endif  // TURBO_STRINGS_INTERNAL_STR_FORMAT_ARG_H_

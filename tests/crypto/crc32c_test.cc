@@ -173,7 +173,7 @@ TEST(CRC32C, Memcpy) {
   }
 }
 
-TEST(CRC32C, RemovePrefix) {
+TEST(CRC32C, remove_prefix) {
   std::string hello = "Hello, ";
   std::string world = "world!";
   std::string hello_world = turbo::str_cat(hello, world);
@@ -185,7 +185,7 @@ TEST(CRC32C, RemovePrefix) {
   EXPECT_EQ(turbo::remove_crc32c_prefix(crc_a, crc_ab, world.size()), crc_b);
 }
 
-TEST(CRC32C, RemoveSuffix) {
+TEST(CRC32C, remove_suffix) {
   std::string hello = "Hello, ";
   std::string world = "world!";
   std::string hello_world = turbo::str_cat(hello, world);

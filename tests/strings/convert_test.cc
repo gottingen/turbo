@@ -1274,10 +1274,10 @@ namespace turbo {
                 EXPECT_EQ(format("%.16La", eights), "0xc.0828384858688000p+128");
             }
 
-// We don't actually store the results. This is just to exercise the rest of the
-// machinery.
+            // We don't actually store the results. This is just to exercise the rest of the
+            // machinery.
             struct NullSink {
-                friend void TurboFormatFlush(NullSink *, std::string_view) {}
+                friend void turbo_format_flush(NullSink *, std::string_view) {}
             };
 
             template<typename... T>

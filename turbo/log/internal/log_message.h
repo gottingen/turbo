@@ -276,7 +276,7 @@ class StringifySink final {
   }
 
   // For types that implement `turbo_stringify` using `turbo::format()`.
-  friend void TurboFormatFlush(StringifySink* sink, std::string_view v) {
+  friend void turbo_format_flush(StringifySink* sink, std::string_view v) {
     sink->Append(v);
   }
 

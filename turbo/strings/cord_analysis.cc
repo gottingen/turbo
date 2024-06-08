@@ -184,15 +184,15 @@ namespace turbo {
 
         }  // namespace
 
-        size_t GetEstimatedMemoryUsage(turbo::Nonnull<const CordRep *> rep) {
+        size_t get_estimated_memory_usage(turbo::Nonnull<const CordRep *> rep) {
             return GetEstimatedUsage<Mode::kTotal>(rep);
         }
 
-        size_t GetEstimatedFairShareMemoryUsage(turbo::Nonnull<const CordRep *> rep) {
+        size_t get_estimated_fair_share_memory_usage(turbo::Nonnull<const CordRep *> rep) {
             return GetEstimatedUsage<Mode::kFairShare>(rep);
         }
 
-        size_t GetMorePreciseMemoryUsage(turbo::Nonnull<const CordRep *> rep) {
+        size_t get_more_precise_memory_usage(turbo::Nonnull<const CordRep *> rep) {
             return GetEstimatedUsage<Mode::kTotalMorePrecise>(rep);
         }
 

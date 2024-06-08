@@ -29,7 +29,7 @@
 #include <turbo/base/config.h>
 #include <turbo/strings/internal/cord_internal.h>
 #include <turbo/strings/internal/cord_rep_flat.h>
-#include <turbo/strings/internal/cord_rep_test_util.h>
+#include <tests/strings/cord_rep_test_util.h>
 #include <turbo/strings/string_view.h>
 #include <turbo/container/span.h>
 
@@ -72,11 +72,11 @@ INSTANTIATE_TEST_SUITE_P(MediumSize, CordBufferTest,
                                          kInlinedSize + 1, kDefaultLimit - 1,
                                          kDefaultLimit));
 
-TEST_P(CordBufferTest, MaximumPayload) {
-  EXPECT_THAT(CordBuffer::MaximumPayload(), Eq(kMaxFlatLength));
-  EXPECT_THAT(CordBuffer::MaximumPayload(512), Eq(512 - kFlatOverhead));
-  EXPECT_THAT(CordBuffer::MaximumPayload(k64KiB), Eq(k64KiB - kFlatOverhead));
-  EXPECT_THAT(CordBuffer::MaximumPayload(k1MB), Eq(k64KiB - kFlatOverhead));
+TEST_P(CordBufferTest, maximum_payload) {
+  EXPECT_THAT(CordBuffer::maximum_payload(), Eq(kMaxFlatLength));
+  EXPECT_THAT(CordBuffer::maximum_payload(512), Eq(512 - kFlatOverhead));
+  EXPECT_THAT(CordBuffer::maximum_payload(k64KiB), Eq(k64KiB - kFlatOverhead));
+  EXPECT_THAT(CordBuffer::maximum_payload(k1MB), Eq(k64KiB - kFlatOverhead));
 }
 
 TEST(CordBufferTest, ConstructDefault) {
@@ -90,14 +90,14 @@ TEST(CordBufferTest, ConstructDefault) {
 }
 
 TEST(CordBufferTest, CreateSsoWithDefaultLimit) {
-  CordBuffer buffer = CordBuffer::CreateWithDefaultLimit(3);
+  CordBuffer buffer = CordBuffer::create_with_default_limit(3);
   EXPECT_THAT(buffer.capacity(), Ge(3));
   EXPECT_THAT(buffer.capacity(), Le(sizeof(CordBuffer)));
   EXPECT_THAT(buffer.length(), Eq(0));
   memset(buffer.data(), 0xCD, buffer.capacity());
 
   memcpy(buffer.data(), "Abc", 3);
-  buffer.SetLength(3);
+  buffer.set_length(3);
   EXPECT_THAT(buffer.length(), Eq(3));
   std::string_view short_value;
   EXPECT_THAT(CordBufferTestPeer::ConsumeValue(buffer, short_value),
@@ -108,32 +108,32 @@ TEST(CordBufferTest, CreateSsoWithDefaultLimit) {
 
 TEST_P(CordBufferTest, Available) {
   const size_t requested = GetParam();
-  CordBuffer buffer = CordBuffer::CreateWithDefaultLimit(requested);
+  CordBuffer buffer = CordBuffer::create_with_default_limit(requested);
   EXPECT_THAT(buffer.available().data(), Eq(buffer.data()));
   EXPECT_THAT(buffer.available().size(), Eq(buffer.capacity()));
 
-  buffer.SetLength(2);
+  buffer.set_length(2);
   EXPECT_THAT(buffer.available().data(), Eq(buffer.data() + 2));
   EXPECT_THAT(buffer.available().size(), Eq(buffer.capacity() - 2));
 }
 
-TEST_P(CordBufferTest, IncreaseLengthBy) {
+TEST_P(CordBufferTest, increase_length_by) {
   const size_t requested = GetParam();
-  CordBuffer buffer = CordBuffer::CreateWithDefaultLimit(requested);
-  buffer.IncreaseLengthBy(2);
+  CordBuffer buffer = CordBuffer::create_with_default_limit(requested);
+  buffer.increase_length_by(2);
   EXPECT_THAT(buffer.length(), Eq(2));
-  buffer.IncreaseLengthBy(5);
+  buffer.increase_length_by(5);
   EXPECT_THAT(buffer.length(), Eq(7));
 }
 
 TEST_P(CordBufferTest, AvailableUpTo) {
   const size_t requested = GetParam();
-  CordBuffer buffer = CordBuffer::CreateWithDefaultLimit(requested);
+  CordBuffer buffer = CordBuffer::create_with_default_limit(requested);
   size_t expected_up_to = std::min<size_t>(3, buffer.capacity());
   EXPECT_THAT(buffer.available_up_to(3).data(), Eq(buffer.data()));
   EXPECT_THAT(buffer.available_up_to(3).size(), Eq(expected_up_to));
 
-  buffer.SetLength(2);
+  buffer.set_length(2);
   expected_up_to = std::min<size_t>(3, buffer.capacity() - 2);
   EXPECT_THAT(buffer.available_up_to(3).data(), Eq(buffer.data() + 2));
   EXPECT_THAT(buffer.available_up_to(3).size(), Eq(expected_up_to));
@@ -146,9 +146,9 @@ size_t MaxCapacityFor(size_t block_size, size_t requested) {
   return block_size - kFlatOverhead;
 }
 
-TEST_P(CordBufferTest, CreateWithDefaultLimit) {
+TEST_P(CordBufferTest, create_with_default_limit) {
   const size_t requested = GetParam();
-  CordBuffer buffer = CordBuffer::CreateWithDefaultLimit(requested);
+  CordBuffer buffer = CordBuffer::create_with_default_limit(requested);
   EXPECT_THAT(buffer.capacity(), Ge(requested));
   EXPECT_THAT(buffer.capacity(), Le(MaxCapacityFor(kMaxFlatSize, requested)));
   EXPECT_THAT(buffer.length(), Eq(0));
@@ -157,7 +157,7 @@ TEST_P(CordBufferTest, CreateWithDefaultLimit) {
 
   std::string data(requested - 1, 'x');
   memcpy(buffer.data(), data.c_str(), requested);
-  buffer.SetLength(requested);
+  buffer.set_length(requested);
 
   EXPECT_THAT(buffer.length(), Eq(requested));
   EXPECT_THAT(std::string_view(buffer.data()), Eq(data));
@@ -165,7 +165,7 @@ TEST_P(CordBufferTest, CreateWithDefaultLimit) {
 
 TEST(CordBufferTest, CreateWithDefaultLimitAskingFor2GB) {
   constexpr size_t k2GiB = 1U << 31;
-  CordBuffer buffer = CordBuffer::CreateWithDefaultLimit(k2GiB);
+  CordBuffer buffer = CordBuffer::create_with_default_limit(k2GiB);
   // Expect to never be awarded more than a reasonable memory size, even in
   // cases where a (debug) memory allocator may grant us somewhat more memory
   // than `kDefaultLimit` which should be no more than `2 * kDefaultLimit`
@@ -177,10 +177,10 @@ TEST(CordBufferTest, CreateWithDefaultLimitAskingFor2GB) {
 
 TEST_P(CordBufferTest, MoveConstruct) {
   const size_t requested = GetParam();
-  CordBuffer from = CordBuffer::CreateWithDefaultLimit(requested);
+  CordBuffer from = CordBuffer::create_with_default_limit(requested);
   const size_t capacity = from.capacity();
   memcpy(from.data(), "Abc", 4);
-  from.SetLength(4);
+  from.set_length(4);
 
   CordBuffer to(std::move(from));
   EXPECT_THAT(to.capacity(), Eq(capacity));
@@ -192,10 +192,10 @@ TEST_P(CordBufferTest, MoveConstruct) {
 
 TEST_P(CordBufferTest, MoveAssign) {
   const size_t requested = GetParam();
-  CordBuffer from = CordBuffer::CreateWithDefaultLimit(requested);
+  CordBuffer from = CordBuffer::create_with_default_limit(requested);
   const size_t capacity = from.capacity();
   memcpy(from.data(), "Abc", 4);
-  from.SetLength(4);
+  from.set_length(4);
 
   CordBuffer to;
   to = std::move(from);
@@ -208,9 +208,9 @@ TEST_P(CordBufferTest, MoveAssign) {
 
 TEST_P(CordBufferTest, ConsumeValue) {
   const size_t requested = GetParam();
-  CordBuffer buffer = CordBuffer::CreateWithDefaultLimit(requested);
+  CordBuffer buffer = CordBuffer::create_with_default_limit(requested);
   memcpy(buffer.data(), "Abc", 4);
-  buffer.SetLength(3);
+  buffer.set_length(3);
 
   std::string_view short_value;
   if (cord_internal::CordRep* rep =
@@ -226,7 +226,7 @@ TEST_P(CordBufferTest, ConsumeValue) {
 TEST_P(CordBufferTest, CreateWithCustomLimitWithinDefaultLimit) {
   const size_t requested = GetParam();
   CordBuffer buffer =
-      CordBuffer::CreateWithCustomLimit(kMaxFlatSize, requested);
+      CordBuffer::create_with_custom_limit(kMaxFlatSize, requested);
   EXPECT_THAT(buffer.capacity(), Ge(requested));
   EXPECT_THAT(buffer.capacity(), Le(MaxCapacityFor(kMaxFlatSize, requested)));
   EXPECT_THAT(buffer.length(), Eq(0));
@@ -235,27 +235,27 @@ TEST_P(CordBufferTest, CreateWithCustomLimitWithinDefaultLimit) {
 
   std::string data(requested - 1, 'x');
   memcpy(buffer.data(), data.c_str(), requested);
-  buffer.SetLength(requested);
+  buffer.set_length(requested);
 
   EXPECT_THAT(buffer.length(), Eq(requested));
   EXPECT_THAT(std::string_view(buffer.data()), Eq(data));
 }
 
 TEST(CordLargeBufferTest, CreateAtOrBelowDefaultLimit) {
-  CordBuffer buffer = CordBuffer::CreateWithCustomLimit(k64KiB, kDefaultLimit);
+  CordBuffer buffer = CordBuffer::create_with_custom_limit(k64KiB, kDefaultLimit);
   EXPECT_THAT(buffer.capacity(), Ge(kDefaultLimit));
   EXPECT_THAT(buffer.capacity(),
               Le(MaxCapacityFor(kMaxFlatSize, kDefaultLimit)));
 
-  buffer = CordBuffer::CreateWithCustomLimit(k64KiB, 3178);
+  buffer = CordBuffer::create_with_custom_limit(k64KiB, 3178);
   EXPECT_THAT(buffer.capacity(), Ge(3178));
 }
 
-TEST(CordLargeBufferTest, CreateWithCustomLimit) {
+TEST(CordLargeBufferTest, create_with_custom_limit) {
   ASSERT_THAT((kMaxFlatSize & (kMaxFlatSize - 1)) == 0, "Must be power of 2");
 
   for (size_t size = kMaxFlatSize; size <= kCustomLimit; size *= 2) {
-    CordBuffer buffer = CordBuffer::CreateWithCustomLimit(size, size);
+    CordBuffer buffer = CordBuffer::create_with_custom_limit(size, size);
     size_t expected = size - kFlatOverhead;
     ASSERT_THAT(buffer.capacity(), Ge(expected));
     EXPECT_THAT(buffer.capacity(), Le(MaxCapacityFor(size, expected)));
@@ -263,7 +263,7 @@ TEST(CordLargeBufferTest, CreateWithCustomLimit) {
 }
 
 TEST(CordLargeBufferTest, CreateWithTooLargeLimit) {
-  CordBuffer buffer = CordBuffer::CreateWithCustomLimit(k64KiB, k1MB);
+  CordBuffer buffer = CordBuffer::create_with_custom_limit(k64KiB, k1MB);
   ASSERT_THAT(buffer.capacity(), Ge(k64KiB - kFlatOverhead));
   EXPECT_THAT(buffer.capacity(), Le(MaxCapacityFor(k64KiB, k1MB)));
 }
@@ -272,12 +272,12 @@ TEST(CordLargeBufferTest, CreateWithHugeValueForOverFlowHardening) {
   for (size_t dist_from_max = 0; dist_from_max <= 32; ++dist_from_max) {
     size_t capacity = std::numeric_limits<size_t>::max() - dist_from_max;
 
-    CordBuffer buffer = CordBuffer::CreateWithDefaultLimit(capacity);
+    CordBuffer buffer = CordBuffer::create_with_default_limit(capacity);
     ASSERT_THAT(buffer.capacity(), Ge(kDefaultLimit));
     EXPECT_THAT(buffer.capacity(), Le(MaxCapacityFor(kMaxFlatSize, capacity)));
 
     for (size_t limit = kMaxFlatSize; limit <= kCustomLimit; limit *= 2) {
-      CordBuffer buffer = CordBuffer::CreateWithCustomLimit(limit, capacity);
+      CordBuffer buffer = CordBuffer::create_with_custom_limit(limit, capacity);
       ASSERT_THAT(buffer.capacity(), Ge(limit - kFlatOverhead));
       EXPECT_THAT(buffer.capacity(), Le(MaxCapacityFor(limit, capacity)));
     }
@@ -285,22 +285,22 @@ TEST(CordLargeBufferTest, CreateWithHugeValueForOverFlowHardening) {
 }
 
 TEST(CordLargeBufferTest, CreateWithSmallLimit) {
-  CordBuffer buffer = CordBuffer::CreateWithCustomLimit(512, 1024);
+  CordBuffer buffer = CordBuffer::create_with_custom_limit(512, 1024);
   ASSERT_THAT(buffer.capacity(), Ge(512 - kFlatOverhead));
   EXPECT_THAT(buffer.capacity(), Le(MaxCapacityFor(512, 1024)));
 
   // Ask for precise block size, should return size - kOverhead
-  buffer = CordBuffer::CreateWithCustomLimit(512, 512);
+  buffer = CordBuffer::create_with_custom_limit(512, 512);
   ASSERT_THAT(buffer.capacity(), Ge(512 - kFlatOverhead));
   EXPECT_THAT(buffer.capacity(), Le(MaxCapacityFor(512, 512)));
 
   // Corner case: 511 < block_size, but 511 + kOverhead is above
-  buffer = CordBuffer::CreateWithCustomLimit(512, 511);
+  buffer = CordBuffer::create_with_custom_limit(512, 511);
   ASSERT_THAT(buffer.capacity(), Ge(512 - kFlatOverhead));
   EXPECT_THAT(buffer.capacity(), Le(MaxCapacityFor(512, 511)));
 
   // Corner case: 498 + kOverhead < block_size
-  buffer = CordBuffer::CreateWithCustomLimit(512, 498);
+  buffer = CordBuffer::create_with_custom_limit(512, 498);
   ASSERT_THAT(buffer.capacity(), Ge(512 - kFlatOverhead));
   EXPECT_THAT(buffer.capacity(), Le(MaxCapacityFor(512, 498)));
 }
@@ -308,14 +308,14 @@ TEST(CordLargeBufferTest, CreateWithSmallLimit) {
 TEST(CordLargeBufferTest, CreateWasteFull) {
   // 15 KiB gets rounded down to next pow2 value.
   const size_t requested = (15 << 10);
-  CordBuffer buffer = CordBuffer::CreateWithCustomLimit(k16KiB, requested);
+  CordBuffer buffer = CordBuffer::create_with_custom_limit(k16KiB, requested);
   ASSERT_THAT(buffer.capacity(), Ge(k8KiB - kFlatOverhead));
   EXPECT_THAT(buffer.capacity(), Le(MaxCapacityFor(k8KiB, requested)));
 }
 
 TEST(CordLargeBufferTest, CreateSmallSlop) {
   const size_t requested = k16KiB - 2 * kFlatOverhead;
-  CordBuffer buffer = CordBuffer::CreateWithCustomLimit(k16KiB, requested);
+  CordBuffer buffer = CordBuffer::create_with_custom_limit(k16KiB, requested);
   ASSERT_THAT(buffer.capacity(), Ge(k16KiB - kFlatOverhead));
   EXPECT_THAT(buffer.capacity(), Le(MaxCapacityFor(k16KiB, requested)));
 }

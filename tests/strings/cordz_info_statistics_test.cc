@@ -295,14 +295,14 @@ TEST(CordzInfoStatisticsTest, BtreeLeaf) {
   auto* external = External(3000);
 
   CordRepBtree* tree = CordRepBtree::Create(flat1);
-  tree = CordRepBtree::Append(tree, substr);
-  tree = CordRepBtree::Append(tree, external);
+  tree = CordRepBtree::append(tree, substr);
+  tree = CordRepBtree::append(tree, external);
   size_t flat3_count = CordRepBtree::kMaxCapacity - 3;
   size_t flat3_size = 0;
   for (size_t i = 0; i < flat3_count; ++i) {
     auto* flat3 = Flat(70);
     flat3_size += SizeOf(flat3);
-    tree = CordRepBtree::Append(tree, flat3);
+    tree = CordRepBtree::append(tree, flat3);
   }
   ref.NeedsUnref(tree);
 
@@ -337,22 +337,22 @@ TEST(CordzInfoStatisticsTest, BtreeNodeShared) {
     if (i == 0) {
       tree = CordRepBtree::Create(flat1);
     } else {
-      tree = CordRepBtree::Append(tree, flat1);
+      tree = CordRepBtree::append(tree, flat1);
     }
 
     auto* flat2 = Flat(200);
     auto* substr = Substring(flat2);
     mem_size += SizeOf(flat2) + SizeOf(substr);
-    tree = CordRepBtree::Append(tree, substr);
+    tree = CordRepBtree::append(tree, substr);
 
     auto* external = External(30);
     mem_size += SizeOf(external);
-    tree = CordRepBtree::Append(tree, external);
+    tree = CordRepBtree::append(tree, external);
 
     for (size_t i = 0; i < flat3_count; ++i) {
       auto* flat3 = Flat(70);
       mem_size += SizeOf(flat3);
-      tree = CordRepBtree::Append(tree, flat3);
+      tree = CordRepBtree::append(tree, flat3);
     }
 
     if (i == 0) {

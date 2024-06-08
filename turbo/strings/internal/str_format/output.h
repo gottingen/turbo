@@ -71,26 +71,26 @@ class FILERawSink {
 };
 
 // Provide RawSink integration with common types from the STL.
-inline void TurboFormatFlush(std::string* out, std::string_view s) {
+inline void turbo_format_flush(std::string* out, std::string_view s) {
   out->append(s.data(), s.size());
 }
-inline void TurboFormatFlush(std::ostream* out, std::string_view s) {
+inline void turbo_format_flush(std::ostream* out, std::string_view s) {
   out->write(s.data(), static_cast<std::streamsize>(s.size()));
 }
 
-inline void TurboFormatFlush(FILERawSink* sink, std::string_view v) {
+inline void turbo_format_flush(FILERawSink* sink, std::string_view v) {
   sink->Write(v);
 }
 
-inline void TurboFormatFlush(BufferRawSink* sink, std::string_view v) {
+inline void turbo_format_flush(BufferRawSink* sink, std::string_view v) {
   sink->Write(v);
 }
 
 // This is a SFINAE to get a better compiler error message when the type
 // is not supported.
 template <typename T>
-auto InvokeFlush(T* out, std::string_view s) -> decltype(TurboFormatFlush(out, s)) {
-  TurboFormatFlush(out, s);
+auto InvokeFlush(T* out, std::string_view s) -> decltype(turbo_format_flush(out, s)) {
+        turbo_format_flush(out, s);
 }
 
 }  // namespace str_format_internal

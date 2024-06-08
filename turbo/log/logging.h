@@ -21,7 +21,9 @@
 #include <turbo/log/log.h>
 #include <turbo/log/check.h>
 #include <turbo/log/die_if_null.h>
+#include <turbo/log/vlog_is_on.h>
 #include <turbo/log/globals.h>
+#include <turbo/log/initialize.h>
 
 namespace turbo {
 
