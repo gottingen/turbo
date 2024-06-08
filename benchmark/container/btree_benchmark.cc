@@ -591,7 +591,7 @@ struct BigType {
     return *this;
   }
 
-  // Compare only the first Copies elements if Copies is less than Size.
+  // compare only the first Copies elements if Copies is less than Size.
   bool operator<(const BigType& other) const {
     return std::lexicographical_compare(
         values.begin(), values.begin() + std::min(Size, Copies),

@@ -53,7 +53,7 @@ Methods AllMethods() {
                  Method::kFlatten,
                  Method::kGetAppendBuffer,
                  Method::kGetAppendRegion,
-                 Method::kMakeCordFromExternal,
+                 Method::kmake_cord_from_external,
                  Method::kMoveAppendCord,
                  Method::kMoveAssignCord,
                  Method::kMovePrependCord,

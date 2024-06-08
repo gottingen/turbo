@@ -51,7 +51,7 @@ struct CordzStatistics {
   size_t size = 0;
 
   // The estimated memory used by the sampled cord. This value matches the
-  // value as reported by Cord::EstimatedMemoryUsage().
+  // value as reported by Cord::estimated_memory_usage().
   // A value of 0 implies the property has not been recorded.
   size_t estimated_memory_usage = 0;
 

@@ -130,7 +130,7 @@ TURBO_NAMESPACE_BEGIN
 //     return H::combine_contiguous(std::move(state), x.p, x.p + x.size);
 //   }
 //   friend bool operator==(Bad4 x, Bad4 y) {
-//    // Compare two ranges for equality. C++14 code can instead use std::equal.
+//    // compare two ranges for equality. C++14 code can instead use std::equal.
 //     return turbo::equal(x.p, x.p + x.size, y.p, y.p + y.size);
 //   }
 // };

@@ -52,7 +52,7 @@ namespace turbo {
 // or EXTERNAL nodes. The implementation allows for data to be added to either
 // end of the tree only, it does not provide any 'insert' logic. This has the
 // benefit that we can expect good fill ratios: all nodes except the outer
-// 'legs' will have 100% fill ratios for trees built using Append/Prepend
+// 'legs' will have 100% fill ratios for trees built using append/prepend
 // methods. Merged trees will typically have a fill ratio well above 50% as in a
 // similar fashion, one side of the merged tree will typically have a 100% fill
 // ratio, and the 'open' end will average 50%. All operations are O(log(n)) or
@@ -65,7 +65,7 @@ namespace turbo {
 // call, simplifying the API. An example of building a tree:
 //
 //   CordRepBtree* tree = CordRepBtree::Create(MakeFlat("Hello"));
-//   tree = CordRepBtree::Append(tree, MakeFlat("world"));
+//   tree = CordRepBtree::append(tree, MakeFlat("world"));
 //
 // In the above example, all inputs are consumed, making each call affecting
 // `tree` reference count neutral. The returned `tree` value can be different
@@ -195,15 +195,15 @@ namespace turbo {
             // 1) `rep` is a data node (See `IsDataNode` for valid data edges).
             // `rep` is appended or prepended to this tree 'as is'.
             // 2) `rep` is a BTREE.
-            // `rep` is merged into `tree` respecting the Append/Prepend order.
+            // `rep` is merged into `tree` respecting the append/prepend order.
             // 3) `rep` is some other (legacy) type.
             // `rep` is converted in place and added to `tree`
             // Requires `tree` and `rep` to be not null.
-            static CordRepBtree *Append(CordRepBtree *tree, CordRep *rep);
+            static CordRepBtree *append(CordRepBtree *tree, CordRep *rep);
 
-            static CordRepBtree *Prepend(CordRepBtree *tree, CordRep *rep);
+            static CordRepBtree *prepend(CordRepBtree *tree, CordRep *rep);
 
-            // Append/Prepend the data in `data` to this tree.
+            // append/prepend the data in `data` to this tree.
             // The `extra` parameter defines how much extra capacity should be allocated
             // for any additional FLAT being allocated. This is an optimization hint from
             // the caller. For example, a caller may need to add 2 string_views of data
@@ -214,10 +214,10 @@ namespace turbo {
             // There is no limit on the size of `data`. If `data` can not be stored inside
             // a single flat, then the function will iteratively add flats until all data
             // has been consumed and appended or prepended to the tree.
-            static CordRepBtree *Append(CordRepBtree *tree, std::string_view data,
+            static CordRepBtree *append(CordRepBtree *tree, std::string_view data,
                                         size_t extra = 0);
 
-            static CordRepBtree *Prepend(CordRepBtree *tree, std::string_view data,
+            static CordRepBtree *prepend(CordRepBtree *tree, std::string_view data,
                                          size_t extra = 0);
 
             // Returns a new tree, containing `n` bytes of data from this instance
@@ -236,9 +236,9 @@ namespace turbo {
             // However, the actual implementation will as much as possible perform 'in
             // place' modifications on the tree on all nodes and edges that are mutable.
             // For example, in a fully privately owned tree with the last edge being a
-            // flat of length 12, RemoveSuffix(1) will simply set the length of that data
+            // flat of length 12, remove_suffix(1) will simply set the length of that data
             // edge to 11, and reduce the length of all nodes on the edge path by 1.
-            static CordRep *RemoveSuffix(CordRepBtree *tree, size_t n);
+            static CordRep *remove_suffix(CordRepBtree *tree, size_t n);
 
             // Returns the character at the given offset.
             char GetCharacter(size_t offset) const;
@@ -266,7 +266,7 @@ namespace turbo {
             // Requires `this->refcount.IsOne()`: this function forces the caller to do
             // this fast path check on the top level node, as this is the most commonly
             // shared node of a cord tree.
-            span<char> GetAppendBuffer(size_t size);
+            span<char> get_append_buffer(size_t size);
 
             // Extracts the right-most data edge from this tree iff:
             // - the tree and all internal edges to the right-most node are not shared.
@@ -279,7 +279,7 @@ namespace turbo {
             // pre-existing capacity, and add the modified rep back to the tree.
             //
             // Simplified such code would look similar to this:
-            //   void MyTreeBuilder::Append(std::string_view data) {
+            //   void MyTreeBuilder::append(std::string_view data) {
             //     ExtractResult result = CordRepBtree::ExtractAppendBuffer(tree_, 1);
             //     if (CordRep* rep = result.extracted) {
             //       size_t available = rep->Capacity() - rep->length;
@@ -290,7 +290,7 @@ namespace turbo {
             //       if (!result.tree->IsBtree()) {
             //         tree_ = CordRepBtree::Create(result.tree);
             //       }
-            //       tree_ = CordRepBtree::Append(tree_, rep);
+            //       tree_ = CordRepBtree::append(tree_, rep);
             //     }
             //     ...
             //     // Remaining edge in `result.tree`.
@@ -472,7 +472,7 @@ namespace turbo {
             // The data is added either forwards or reversed depending on `edge_type`.
             // Callers must check the length of the returned node to determine if all data
             // was copied or not.
-            // See the `Append/Prepend` function for the meaning and purpose of `extra`.
+            // See the `append/prepend` function for the meaning and purpose of `extra`.
             template<EdgeType edge_type>
             static CordRepBtree *NewLeaf(std::string_view data, size_t extra);
 
@@ -513,7 +513,7 @@ namespace turbo {
             // Returns a tree containing the result of appending `right` to `left`.
             static CordRepBtree *MergeTrees(CordRepBtree *left, CordRepBtree *right);
 
-            // Fallback functions for `Create()`, `Append()` and `Prepend()` which
+            // Fallback functions for `Create()`, `append()` and `prepend()` which
             // deal with legacy / non conforming input, i.e.: CONCAT trees.
             static CordRepBtree *CreateSlow(CordRep *rep);
 
@@ -554,7 +554,7 @@ namespace turbo {
             // Returns any remaining data from `data` that was not added, which is
             // depending on the edge type (front / back) either the remaining prefix of
             // suffix of the input.
-            // See the `Append/Prepend` function for the meaning and purpose of `extra`.
+            // See the `append/prepend` function for the meaning and purpose of `extra`.
             template<EdgeType edge_type>
             std::string_view AddData(std::string_view data, size_t extra);
 
@@ -590,7 +590,7 @@ namespace turbo {
             static CordRepBtree *AddCordRep(CordRepBtree *tree, CordRep *rep);
 
             // Adds `data` to the specified tree, returning the modified tree.
-            // See the `Append/Prepend` function for the meaning and purpose of `extra`.
+            // See the `append/prepend` function for the meaning and purpose of `extra`.
             template<EdgeType edge_type>
             static CordRepBtree *AddData(CordRepBtree *tree, std::string_view data,
                                          size_t extra = 0);
@@ -601,7 +601,7 @@ namespace turbo {
             template<EdgeType edge_type>
             static CordRepBtree *Merge(CordRepBtree *dst, CordRepBtree *src);
 
-            // Fallback version of GetAppendBuffer for large trees: GetAppendBuffer()
+            // Fallback version of get_append_buffer for large trees: get_append_buffer()
             // implements an inlined version for trees of limited height (3 levels),
             // GetAppendBufferSlow implements the logic for large trees.
             span<char> GetAppendBufferSlow(size_t size);
@@ -878,7 +878,7 @@ namespace turbo {
             return CreateSlow(rep);
         }
 
-        inline span<char> CordRepBtree::GetAppendBuffer(size_t size) {
+        inline span<char> CordRepBtree::get_append_buffer(size_t size) {
             assert(refcount.IsOne());
             CordRepBtree *tree = this;
             const int height = this->height();
@@ -934,14 +934,14 @@ namespace turbo {
         extern template CordRepBtree *CordRepBtree::AddCordRep<CordRepBtree::kFront>(
                 CordRepBtree *tree, CordRep *rep);
 
-        inline CordRepBtree *CordRepBtree::Append(CordRepBtree *tree, CordRep *rep) {
+        inline CordRepBtree *CordRepBtree::append(CordRepBtree *tree, CordRep *rep) {
             if (TURBO_LIKELY(IsDataEdge(rep))) {
                 return CordRepBtree::AddCordRep<kBack>(tree, rep);
             }
             return AppendSlow(tree, rep);
         }
 
-        inline CordRepBtree *CordRepBtree::Prepend(CordRepBtree *tree, CordRep *rep) {
+        inline CordRepBtree *CordRepBtree::prepend(CordRepBtree *tree, CordRep *rep) {
             if (TURBO_LIKELY(IsDataEdge(rep))) {
                 return CordRepBtree::AddCordRep<kFront>(tree, rep);
             }

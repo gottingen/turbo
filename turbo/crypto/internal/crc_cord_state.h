@@ -75,7 +75,7 @@ namespace turbo::crc_internal {
         struct Rep {
             // `removed_prefix` is the crc and length of any prefix that has been
             // removed from the Cord (for example, by calling
-            // `CrcCord::RemovePrefix()`). To get the checksum of any prefix of the
+            // `CrcCord::remove_prefix()`). To get the checksum of any prefix of the
             // cord, this value must be subtracted from `prefix_crc`. See `Checksum()`
             // for an example.
             //

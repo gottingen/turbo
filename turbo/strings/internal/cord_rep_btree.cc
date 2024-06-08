@@ -36,7 +36,6 @@
 #include <turbo/strings/string_view.h>
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
     namespace cord_internal {
 
 #ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
@@ -841,7 +840,7 @@ namespace turbo {
             return tree;
         }
 
-        CordRep *CordRepBtree::RemoveSuffix(CordRepBtree *tree, size_t n) {
+        CordRep *CordRepBtree::remove_suffix(CordRepBtree *tree, size_t n) {
             // Check input and deal with trivial cases 'Remove all/none'
             assert(tree != nullptr);
             assert(n <= tree->length);
@@ -1014,7 +1013,7 @@ namespace turbo {
         }
 
         span<char> CordRepBtree::GetAppendBufferSlow(size_t size) {
-            // The inlined version in `GetAppendBuffer()` deals with all heights <= 3.
+            // The inlined version in `get_append_buffer()` deals with all heights <= 3.
             assert(height() >= 4);
             assert(refcount.IsOne());
 
@@ -1088,12 +1087,12 @@ namespace turbo {
             return tree;
         }
 
-        CordRepBtree *CordRepBtree::Append(CordRepBtree *tree, std::string_view data,
+        CordRepBtree *CordRepBtree::append(CordRepBtree *tree, std::string_view data,
                                            size_t extra) {
             return CordRepBtree::AddData<kBack>(tree, data, extra);
         }
 
-        CordRepBtree *CordRepBtree::Prepend(CordRepBtree *tree, std::string_view data,
+        CordRepBtree *CordRepBtree::prepend(CordRepBtree *tree, std::string_view data,
                                             size_t extra) {
             return CordRepBtree::AddData<kFront>(tree, data, extra);
         }
@@ -1243,5 +1242,4 @@ namespace turbo {
         }
 
     }  // namespace cord_internal
-    TURBO_NAMESPACE_END
 }  // namespace turbo

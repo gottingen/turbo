@@ -54,7 +54,7 @@ namespace cord_internal {
 //   CordRepBtreeReader reader;
 //   std::string_view sv = reader.Init(tree);
 //   if (sv.length() > 100) {
-//     sv.RemovePrefix(100);
+//     sv.remove_prefix(100);
 //   } else {
 //     sv = reader.Skip(100 - sv.length());
 //   }

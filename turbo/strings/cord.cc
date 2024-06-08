@@ -110,7 +110,7 @@ namespace turbo {
         data += kMaxFlatLength;
         length -= kMaxFlatLength;
         auto *root = CordRepBtree::Create(flat);
-        return CordRepBtree::Append(root, {data, length}, alloc_hint);
+        return CordRepBtree::append(root, {data, length}, alloc_hint);
     }
 
     // Create a new tree out of the specified array.
@@ -212,7 +212,7 @@ namespace turbo {
         assert(!is_tree());
         if (!data_.is_empty()) {
             CordRepFlat *flat = MakeFlatWithExtraCapacity(0);
-            tree = CordRepBtree::Append(CordRepBtree::Create(flat), tree);
+            tree = CordRepBtree::append(CordRepBtree::Create(flat), tree);
         }
         EmplaceTree(tree, method);
     }
@@ -221,7 +221,7 @@ namespace turbo {
                                            MethodIdentifier method) {
         assert(is_tree());
         const CordzUpdateScope scope(data_.cordz_info(), method);
-        tree = CordRepBtree::Append(ForceBtree(data_.as_tree()), tree);
+        tree = CordRepBtree::append(ForceBtree(data_.as_tree()), tree);
         SetTree(tree, scope);
     }
 
@@ -242,7 +242,7 @@ namespace turbo {
         assert(!is_tree());
         if (!data_.is_empty()) {
             CordRepFlat *flat = MakeFlatWithExtraCapacity(0);
-            tree = CordRepBtree::Prepend(CordRepBtree::Create(flat), tree);
+            tree = CordRepBtree::prepend(CordRepBtree::Create(flat), tree);
         }
         EmplaceTree(tree, method);
     }
@@ -251,7 +251,7 @@ namespace turbo {
                                             MethodIdentifier method) {
         assert(is_tree());
         const CordzUpdateScope scope(data_.cordz_info(), method);
-        tree = CordRepBtree::Prepend(ForceBtree(data_.as_tree()), tree);
+        tree = CordRepBtree::prepend(ForceBtree(data_.as_tree()), tree);
         SetTree(tree, scope);
     }
 
@@ -275,7 +275,7 @@ namespace turbo {
             turbo::Nonnull<CordRep *> root, turbo::Nonnull<turbo::Nullable<char *> *> region,
             turbo::Nonnull<size_t *> size, size_t max_length) {
         if (root->IsBtree() && root->refcount.IsOne()) {
-            span<char> span = root->btree()->GetAppendBuffer(max_length);
+            span<char> span = root->btree()->get_append_buffer(max_length);
             if (!span.empty()) {
                 *region = span.data();
                 *size = span.size();
@@ -372,7 +372,7 @@ namespace turbo {
 // --------------------------------------------------------------------
 // Mutators
 
-    void Cord::Clear() {
+    void Cord::clear() {
         if (CordRep *tree = contents_.clear()) {
             CordRep::Unref(tree);
         }
@@ -446,7 +446,7 @@ namespace turbo {
             // Try to fit in the inline buffer if possible.
             size_t inline_length = inline_size();
             if (src.size() <= kMaxInline - inline_length) {
-                // Append new data to embedded array
+                // append new data to embedded array
                 set_inline_size(inline_length + src.size());
                 memcpy(data_.as_chars() + inline_length, src.data(), src.size());
                 return;
@@ -471,7 +471,7 @@ namespace turbo {
         // TODO(b/192061034): keep legacy 10% growth rate: consider other rates.
         rep = ForceBtree(rep);
         const size_t min_growth = std::max<size_t>(rep->length / 10, src.size());
-        rep = CordRepBtree::Append(rep->btree(), src, min_growth - src.size());
+        rep = CordRepBtree::append(rep->btree(), src, min_growth - src.size());
 
         CommitTree(root, rep, scope, method);
     }
@@ -487,7 +487,7 @@ namespace turbo {
     }
 
     template<typename C>
-    inline void Cord::AppendImpl(C &&src) {
+    inline void Cord::append_impl(C &&src) {
         auto constexpr method = CordzUpdateTracker::kAppendCord;
 
         contents_.MaybeRemoveEmptyCrcNode();
@@ -523,12 +523,12 @@ namespace turbo {
             }
             if (&src == this) {
                 // ChunkIterator below assumes that src is not modified during traversal.
-                Append(Cord(src));
+                append(Cord(src));
                 return;
             }
             // TODO(mec): Should we only do this if "dst" has space?
-            for (std::string_view chunk: src.Chunks()) {
-                Append(chunk);
+            for (std::string_view chunk: src.chunks()) {
+                append(chunk);
             }
             return;
         }
@@ -584,23 +584,23 @@ namespace turbo {
         return CreateAppendBuffer(contents_.data_, block_size, capacity);
     }
 
-    void Cord::Append(const Cord &src) { AppendImpl(src); }
+    void Cord::append(const Cord &src) { append_impl(src); }
 
-    void Cord::Append(Cord &&src) { AppendImpl(std::move(src)); }
+    void Cord::append(Cord &&src) { append_impl(std::move(src)); }
 
     template<typename T, Cord::EnableIfString<T>>
-    void Cord::Append(T &&src) {
+    void Cord::append(T &&src) {
         if (src.size() <= kMaxBytesToCopy) {
-            Append(std::string_view(src));
+            append(std::string_view(src));
         } else {
             CordRep *rep = CordRepFromString(std::forward<T>(src));
             contents_.AppendTree(rep, CordzUpdateTracker::kAppendString);
         }
     }
 
-    template void Cord::Append(std::string &&src);
+    template void Cord::append(std::string &&src);
 
-    void Cord::Prepend(const Cord &src) {
+    void Cord::prepend(const Cord &src) {
         contents_.MaybeRemoveEmptyCrcNode();
         if (src.empty()) return;
 
@@ -614,7 +614,7 @@ namespace turbo {
 
         // `src` cord is inlined.
         std::string_view src_contents(src.contents_.data(), src.contents_.size());
-        return Prepend(src_contents);
+        return prepend(src_contents);
     }
 
     void Cord::PrependArray(std::string_view src, MethodIdentifier method) {
@@ -665,18 +665,18 @@ namespace turbo {
     }
 
     template<typename T, Cord::EnableIfString<T>>
-    inline void Cord::Prepend(T &&src) {
+    inline void Cord::prepend(T &&src) {
         if (src.size() <= kMaxBytesToCopy) {
-            Prepend(std::string_view(src));
+            prepend(std::string_view(src));
         } else {
             CordRep *rep = CordRepFromString(std::forward<T>(src));
             contents_.PrependTree(rep, CordzUpdateTracker::kPrependString);
         }
     }
 
-    template void Cord::Prepend(std::string &&src);
+    template void Cord::prepend(std::string &&src);
 
-    void Cord::RemovePrefix(size_t n) {
+    void Cord::remove_prefix(size_t n) {
         TURBO_INTERNAL_CHECK(n <= size(),
                              turbo::str_cat("Requested prefix size ", n,
                                             " exceeds Cord's size ", size()));
@@ -707,7 +707,7 @@ namespace turbo {
         }
     }
 
-    void Cord::RemoveSuffix(size_t n) {
+    void Cord::remove_suffix(size_t n) {
         TURBO_INTERNAL_CHECK(n <= size(),
                              turbo::str_cat("Requested suffix size ", n,
                                             " exceeds Cord's size ", size()));
@@ -723,7 +723,7 @@ namespace turbo {
                 CordRep::Unref(tree);
                 tree = nullptr;
             } else if (tree->IsBtree()) {
-                tree = CordRepBtree::RemoveSuffix(tree->btree(), n);
+                tree = CordRepBtree::remove_suffix(tree->btree(), n);
             } else if (!tree->IsExternal() && tree->refcount.IsOne()) {
                 assert(tree->IsFlat() || tree->IsSubstring());
                 tree->length -= n;
@@ -736,7 +736,7 @@ namespace turbo {
         }
     }
 
-    Cord Cord::Subcord(size_t pos, size_t new_size) const {
+    Cord Cord::subcord(size_t pos, size_t new_size) const {
         Cord sub_cord;
         size_t length = size();
         if (pos > length) pos = length;
@@ -878,7 +878,7 @@ namespace turbo {
         }
     }
 
-    void Cord::SetExpectedChecksum(uint32_t crc) {
+    void Cord::set_expected_checksum(uint32_t crc) {
         // Construct a CrcCordState with a single chunk.
         crc_internal::CrcCordState state;
         state.mutable_rep()->prefix_crc.push_back(
@@ -894,7 +894,7 @@ namespace turbo {
         return &contents_.tree()->crc()->crc_cord_state;
     }
 
-    std::optional<uint32_t> Cord::ExpectedChecksum() const {
+    std::optional<uint32_t> Cord::expected_checksum() const {
         if (!contents_.is_tree() || !contents_.tree()->IsCrc()) {
             return std::nullopt;
         }
@@ -1020,7 +1020,7 @@ namespace turbo {
         return data_comp_res == 0 ? +1 : data_comp_res;
     }
 
-    int Cord::Compare(std::string_view rhs) const {
+    int Cord::compare(std::string_view rhs) const {
         return SharedCompareImpl(*this, rhs);
     }
 
@@ -1035,7 +1035,7 @@ namespace turbo {
         if (my_size < rhs_size) return false;
 
         Cord tmp(*this);
-        tmp.RemovePrefix(my_size - rhs_size);
+        tmp.remove_prefix(my_size - rhs_size);
         return tmp.EqualsImpl(rhs, rhs_size);
     }
 
@@ -1046,7 +1046,7 @@ namespace turbo {
         if (my_size < rhs_size) return false;
 
         Cord tmp(*this);
-        tmp.RemovePrefix(my_size - rhs_size);
+        tmp.remove_prefix(my_size - rhs_size);
         return tmp.EqualsImpl(rhs, rhs_size);
     }
 
@@ -1084,7 +1084,7 @@ namespace turbo {
             memcpy(dst, fragment.data(), fragment.size());
             return;
         }
-        for (std::string_view chunk: Chunks()) {
+        for (std::string_view chunk: chunks()) {
             memcpy(dst, chunk.data(), chunk.size());
             dst += chunk.size();
         }
@@ -1097,7 +1097,7 @@ namespace turbo {
         auto constexpr method = CordzUpdateTracker::kCordReader;
 
         if (n <= InlineRep::kMaxInline) {
-            // Range to read fits in inline data. Flatten it.
+            // Range to read fits in inline data. flatten it.
             char *data = subcord.contents_.set_data(n);
             while (n > current_chunk_.size()) {
                 memcpy(data, current_chunk_.data(), current_chunk_.size());
@@ -1208,7 +1208,7 @@ namespace turbo {
                 if (needle.empty()) {
                     return true;
                 }
-                turbo::Cord::Advance(&position, min_length);
+                turbo::Cord::advance(&position, min_length);
                 haystack_chunk = turbo::Cord::ChunkRemaining(position);
             }
         }
@@ -1216,8 +1216,8 @@ namespace turbo {
     }  // namespace
 
     // A few options how this could be implemented:
-    // (a) Flatten the Cord and find, i.e.
-    //       haystack.Flatten().find(needle)
+    // (a) flatten the Cord and find, i.e.
+    //       haystack.flatten().find(needle)
     //     For large 'haystack' (where Cord makes sense to be used), this copies
     //     the whole 'haystack' and can be slow.
     // (b) Use std::search, i.e.
@@ -1252,12 +1252,12 @@ namespace turbo {
             auto idx = haystack_chunk.find(needle.front());
             if (idx == std::string_view::npos) {
                 // No potential match in this chunk, advance past it.
-                Cord::Advance(&it, haystack_chunk.size());
+                Cord::advance(&it, haystack_chunk.size());
                 continue;
             }
             // We found the start of a potential match in the chunk. Advance the
             // iterator and haystack chunk to the match the position.
-            Cord::Advance(&it, idx);
+            Cord::advance(&it, idx);
             // Check if there is enough haystack remaining to actually have a match.
             if (it.chunk_iterator_.bytes_remaining_ < needle.size()) {
                 break;
@@ -1267,13 +1267,13 @@ namespace turbo {
                 return it;
             }
             // No match, increment the iterator for the next attempt.
-            Cord::Advance(&it, 1);
+            Cord::advance(&it, 1);
         }
         // If we got here, we did not find `needle`.
         return char_end();
     }
 
-    turbo::Cord::CharIterator turbo::Cord::Find(std::string_view needle) const {
+    turbo::Cord::CharIterator turbo::Cord::find(std::string_view needle) const {
         if (needle.empty()) {
             return char_begin();
         }
@@ -1288,11 +1288,11 @@ namespace turbo {
 
     namespace {
 
-// Tests whether the sequence of chunks beginning at `haystack` starts with the
-// sequence of chunks beginning at `needle_begin` and extending to `needle_end`.
-//
-// REQUIRES: remaining `turbo::Cord` starting at `position` is greater than or
-// equal to `needle_end - needle_begin` and `advance`.
+        // Tests whether the sequence of chunks beginning at `haystack` starts with the
+        // sequence of chunks beginning at `needle_begin` and extending to `needle_end`.
+        //
+        // REQUIRES: remaining `turbo::Cord` starting at `position` is greater than or
+        // equal to `needle_end - needle_begin` and `advance`.
         bool IsSubcordInCordAt(turbo::Cord::CharIterator haystack,
                                turbo::Cord::CharIterator needle_begin,
                                turbo::Cord::CharIterator needle_end) {
@@ -1305,17 +1305,17 @@ namespace turbo {
                     needle_chunk.substr(0, min_length)) {
                     return false;
                 }
-                turbo::Cord::Advance(&haystack, min_length);
-                turbo::Cord::Advance(&needle_begin, min_length);
+                turbo::Cord::advance(&haystack, min_length);
+                turbo::Cord::advance(&needle_begin, min_length);
             }
             return true;
         }
 
-// Tests whether the sequence of chunks beginning at `position` starts with the
-// cord `needle`.
-//
-// REQUIRES: remaining `turbo::Cord` starting at `position` is greater than or
-// equal to `needle.size()`.
+        // Tests whether the sequence of chunks beginning at `position` starts with the
+        // cord `needle`.
+        //
+        // REQUIRES: remaining `turbo::Cord` starting at `position` is greater than or
+        // equal to `needle.size()`.
         bool IsSubcordInCordAt(turbo::Cord::CharIterator position,
                                const turbo::Cord &needle) {
             return IsSubcordInCordAt(position, needle.char_begin(), needle.char_end());
@@ -1323,7 +1323,7 @@ namespace turbo {
 
     }  // namespace
 
-    turbo::Cord::CharIterator turbo::Cord::Find(const turbo::Cord &needle) const {
+    turbo::Cord::CharIterator turbo::Cord::find(const turbo::Cord &needle) const {
         if (needle.empty()) {
             return char_begin();
         }
@@ -1346,12 +1346,12 @@ namespace turbo {
             // subcord. Advance past the first chunk and check for the remainder.
             auto haystack_advanced_it = haystack_it;
             auto needle_it = needle.char_begin();
-            Cord::Advance(&haystack_advanced_it, needle_chunk.size());
-            Cord::Advance(&needle_it, needle_chunk.size());
+            Cord::advance(&haystack_advanced_it, needle_chunk.size());
+            Cord::advance(&needle_it, needle_chunk.size());
             if (IsSubcordInCordAt(haystack_advanced_it, needle_it, needle.char_end())) {
                 return haystack_it;
             }
-            Cord::Advance(&haystack_it, 1);
+            Cord::advance(&haystack_it, 1);
             if (haystack_it.chunk_iterator_.bytes_remaining_ < needle_size) {
                 break;
             }
@@ -1368,14 +1368,14 @@ namespace turbo {
     }
 
     bool Cord::Contains(std::string_view rhs) const {
-        return rhs.empty() || Find(rhs) != char_end();
+        return rhs.empty() || find(rhs) != char_end();
     }
 
     bool Cord::Contains(const turbo::Cord &rhs) const {
-        return rhs.empty() || Find(rhs) != char_end();
+        return rhs.empty() || find(rhs) != char_end();
     }
 
-    std::string_view Cord::FlattenSlowPath() {
+    std::string_view Cord::flatten_slow_path() {
         assert(contents_.is_tree());
         size_t total_size = size();
         CordRep *new_rep;
@@ -1560,7 +1560,7 @@ namespace turbo {
     }
 
     std::ostream &operator<<(std::ostream &out, const Cord &cord) {
-        for (std::string_view chunk: cord.Chunks()) {
+        for (std::string_view chunk: cord.chunks()) {
             out.write(chunk.data(), static_cast<std::streamsize>(chunk.size()));
         }
         return out;

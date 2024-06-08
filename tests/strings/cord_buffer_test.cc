@@ -29,7 +29,7 @@
 #include <turbo/base/config.h>
 #include <turbo/strings/internal/cord_internal.h>
 #include <turbo/strings/internal/cord_rep_flat.h>
-#include <turbo/strings/internal/cord_rep_test_util.h>
+#include <tests/strings/cord_rep_test_util.h>
 #include <turbo/strings/string_view.h>
 #include <turbo/container/span.h>
 

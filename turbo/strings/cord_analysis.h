@@ -42,9 +42,9 @@ namespace turbo {
         //   cord.append(some_other_cord);
         //   cord.append(some_other_cord);
         //    // Calls GetEstimatedMemoryUsage() and counts `other_cord` twice:
-        //   cord.EstimatedMemoryUsage(kTotal);
+        //   cord.estimated_memory_usage(kTotal);
         //    // Calls GetMorePreciseMemoryUsage() and counts `other_cord` once:
-        //   cord.EstimatedMemoryUsage(kTotalMorePrecise);
+        //   cord.estimated_memory_usage(kTotalMorePrecise);
         //
         // This is more expensive than `GetEstimatedMemoryUsage()` as it requires
         // deduplicating all memory references.

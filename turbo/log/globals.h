@@ -143,7 +143,7 @@ namespace turbo {
     void clear_log_backtrace_location();
 
     //------------------------------------------------------------------------------
-    // Prepend Log Prefix
+    // prepend Log Prefix
     //------------------------------------------------------------------------------
     //
     // This option tells the logging library that every logged message
@@ -151,13 +151,13 @@ namespace turbo {
 
     // should_prepend_log_prefix()
     //
-    // Returns the value of the Prepend Log Prefix option.
+    // Returns the value of the prepend Log Prefix option.
     // This function is async-signal-safe.
     TURBO_MUST_USE_RESULT bool should_prepend_log_prefix();
 
     // enable_log_prefix()
     //
-    // Updates the value of the Prepend Log Prefix option.
+    // Updates the value of the prepend Log Prefix option.
     // This function is async-signal-safe.
     void enable_log_prefix(bool on_off);
 

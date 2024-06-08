@@ -90,7 +90,7 @@ struct TypeErasedTurboHash {
 
 turbo::Cord FlatCord(size_t size) {
   turbo::Cord result(std::string(size, 'a'));
-  result.Flatten();
+  result.flatten();
   return result;
 }
 

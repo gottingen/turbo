@@ -22,7 +22,7 @@
 #include <turbo/base/config.h>
 #include <turbo/crypto/internal/crc_cord_state.h>
 #include <turbo/strings/internal/cord_internal.h>
-#include <turbo/strings/internal/cord_rep_test_util.h>
+#include <tests/strings/cord_rep_test_util.h>
 
 namespace turbo {
     TURBO_NAMESPACE_BEGIN

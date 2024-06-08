@@ -26,7 +26,7 @@
 #include <turbo/base/internal/raw_logging.h>
 #include <turbo/strings/internal/cord_internal.h>
 #include <turbo/strings/internal/cord_rep_btree.h>
-#include <turbo/strings/internal/cord_rep_test_util.h>
+#include <tests/strings/cord_rep_test_util.h>
 #include <turbo/strings/str_cat.h>
 #include <turbo/strings/string_view.h>
 
@@ -245,7 +245,7 @@ TEST(CordRepBtreeNavigatorTest, InitOffset) {
   // Whitebox: InitOffset() is implemented in terms of Seek() which is
   // exhaustively tested. Only test it initializes / forwards properly..
   CordRepBtree* tree = CordRepBtree::Create(MakeFlat("abc"));
-  tree = CordRepBtree::Append(tree, MakeFlat("def"));
+  tree = CordRepBtree::append(tree, MakeFlat("def"));
   CordRepBtreeNavigator nav;
   Position pos = nav.InitOffset(tree, 5);
   EXPECT_TRUE(nav);
@@ -327,7 +327,7 @@ TEST(CordRepBtreeNavigatorTest, NavigateMaximumTreeDepth) {
   CordRepFlat* flat2 = MakeFlat("World Hello");
 
   CordRepBtree* node = CordRepBtree::Create(flat1);
-  node = CordRepBtree::Append(node, flat2);
+  node = CordRepBtree::append(node, flat2);
   while (node->height() < CordRepBtree::kMaxHeight) {
     node = CordRepBtree::New(node);
   }

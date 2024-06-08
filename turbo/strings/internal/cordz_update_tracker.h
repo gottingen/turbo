@@ -55,7 +55,7 @@ class CordzUpdateTracker {
     kFlatten,
     kGetAppendBuffer,
     kGetAppendRegion,
-    kMakeCordFromExternal,
+    kmake_cord_from_external,
     kMoveAppendCord,
     kMoveAssignCord,
     kMovePrependCord,

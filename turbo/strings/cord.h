@@ -106,13 +106,13 @@ namespace turbo {
     class CordTestPeer;
 
     template<typename Releaser>
-    Cord MakeCordFromExternal(std::string_view, Releaser &&);
+    Cord make_cord_from_external(std::string_view, Releaser &&);
 
     void CopyCordToString(const Cord &src, turbo::Nonnull<std::string *> dst);
 
     void AppendCordToString(const Cord &src, turbo::Nonnull<std::string *> dst);
 
-// Cord memory accounting modes
+    // Cord memory accounting modes
     enum class CordMemoryAccounting {
         // Counts the *approximate* number of bytes held in full or in part by this
         // Cord (which may not remain the same between invocations). Cords that share
@@ -127,12 +127,12 @@ namespace turbo {
         //
         // For example:
         //   turbo::Cord cord;
-        //   cord.Append(some_other_cord);
-        //   cord.Append(some_other_cord);
+        //   cord.append(some_other_cord);
+        //   cord.append(some_other_cord);
         //   // Counts `some_other_cord` twice:
-        //   cord.EstimatedMemoryUsage(kTotal);
+        //   cord.estimated_memory_usage(kTotal);
         //   // Counts `some_other_cord` once:
-        //   cord.EstimatedMemoryUsage(kTotalMorePrecise);
+        //   cord.estimated_memory_usage(kTotalMorePrecise);
         //
         // The `kTotalMorePrecise` number is more expensive to compute as it requires
         // deduplicating all memory references. Applications should prefer to use
@@ -167,7 +167,7 @@ namespace turbo {
     // The Cord API provides the following common API operations:
     //
     // * Create or assign Cords out of existing string data, memory, or other Cords
-    // * Append and prepend data to an existing Cord
+    // * append and prepend data to an existing Cord
     // * Create new Sub-Cords from existing Cord data
     // * Swap Cord data and compare Cord equality
     // * Write out Cord data by constructing a `std::string`
@@ -220,7 +220,7 @@ namespace turbo {
             if (contents_.is_tree()) DestroyCordSlow();
         }
 
-        // MakeCordFromExternal()
+        // make_cord_from_external()
         //
         // Creates a Cord that takes ownership of external string memory. The
         // contents of `data` are not copied to the Cord; instead, the external
@@ -228,7 +228,7 @@ namespace turbo {
         // changed for the life of the Cord, though it may be prepended or appended
         // to.
         //
-        // `MakeCordFromExternal()` takes a callable "releaser" that is invoked when
+        // `make_cord_from_external()` takes a callable "releaser" that is invoked when
         // the reference count for `data` reaches zero. As noted above, this data must
         // remain live until the releaser is invoked. The callable releaser also must:
         //
@@ -240,7 +240,7 @@ namespace turbo {
         // Cord MakeCord(BlockPool* pool) {
         //   Block* block = pool->NewBlock();
         //   FillBlock(block);
-        //   return turbo::MakeCordFromExternal(
+        //   return turbo::make_cord_from_external(
         //       block->ToStringView(),
         //       [pool, block](std::string_view v) {
         //         pool->FreeBlock(block, v);
@@ -251,7 +251,7 @@ namespace turbo {
         // releaser doesn't do anything. For example, consider the following:
         //
         // void Foo(const char* buffer, int len) {
-        //   auto c = turbo::MakeCordFromExternal(std::string_view(buffer, len),
+        //   auto c = turbo::make_cord_from_external(std::string_view(buffer, len),
         //                                       [](std::string_view) {});
         //
         //   // BUG: If Bar() copies its cord for any reason, including keeping a
@@ -260,31 +260,31 @@ namespace turbo {
         //   Bar(c);
         // }
         template<typename Releaser>
-        friend Cord MakeCordFromExternal(std::string_view data, Releaser &&releaser);
+        friend Cord make_cord_from_external(std::string_view data, Releaser &&releaser);
 
         // Cord::Clear()
         //
         // Releases the Cord data. Any nodes that share data with other Cords, if
         // applicable, will have their reference counts reduced by 1.
-        TURBO_ATTRIBUTE_REINITIALIZES void Clear();
+        TURBO_ATTRIBUTE_REINITIALIZES void clear();
 
-        // Cord::Append()
+        // Cord::append()
         //
         // Appends data to the Cord, which may come from another Cord or other string
         // data.
-        void Append(const Cord &src);
+        void append(const Cord &src);
 
-        void Append(Cord &&src);
+        void append(Cord &&src);
 
-        void Append(std::string_view src);
+        void append(std::string_view src);
 
         template<typename T, EnableIfString<T> = 0>
-        void Append(T &&src);
+        void append(T &&src);
 
         // Appends `buffer` to this cord, unless `buffer` has a zero length in which
         // case this method has no effect on this cord instance.
         // This method is guaranteed to consume `buffer`.
-        void Append(CordBuffer buffer);
+        void append(CordBuffer buffer);
 
         // Returns a CordBuffer, re-using potential existing capacity in this cord.
         //
@@ -298,70 +298,70 @@ namespace turbo {
         // a capacity of at least `buffer.length + min_capacity`. Otherwise, this
         // method will return `CordBuffer::CreateWithDefaultLimit(capacity)`.
         //
-        // Below an example of using GetAppendBuffer. Notice that in this example we
-        // use `GetAppendBuffer()` only on the first iteration. As we know nothing
+        // Below an example of using get_append_buffer. Notice that in this example we
+        // use `get_append_buffer()` only on the first iteration. As we know nothing
         // about any initial extra capacity in `cord`, we may be able to use the extra
         // capacity. But as we add new buffers with fully utilized contents after that
-        // we avoid calling `GetAppendBuffer()` on subsequent iterations: while this
+        // we avoid calling `get_append_buffer()` on subsequent iterations: while this
         // works fine, it results in an unnecessary inspection of cord contents:
         //
         //   void AppendRandomDataToCord(turbo::Cord &cord, size_t n) {
         //     bool first = true;
         //     while (n > 0) {
-        //       CordBuffer buffer = first ? cord.GetAppendBuffer(n)
+        //       CordBuffer buffer = first ? cord.get_append_buffer(n)
         //                                 : CordBuffer::CreateWithDefaultLimit(n);
         //       turbo::span<char> data = buffer.available_up_to(n);
         //       FillRandomValues(data.data(), data.size());
         //       buffer.IncreaseLengthBy(data.size());
-        //       cord.Append(std::move(buffer));
+        //       cord.append(std::move(buffer));
         //       n -= data.size();
         //       first = false;
         //     }
         //   }
-        CordBuffer GetAppendBuffer(size_t capacity, size_t min_capacity = 16);
+        CordBuffer get_append_buffer(size_t capacity, size_t min_capacity = 16);
 
         // Returns a CordBuffer, re-using potential existing capacity in this cord.
         //
-        // This function is identical to `GetAppendBuffer`, except that in the case
+        // This function is identical to `get_append_buffer`, except that in the case
         // where a new `CordBuffer` is allocated, it is allocated using the provided
-        // custom limit instead of the default limit. `GetAppendBuffer` will default
+        // custom limit instead of the default limit. `get_append_buffer` will default
         // to `CordBuffer::CreateWithDefaultLimit(capacity)` whereas this method
         // will default to `CordBuffer::CreateWithCustomLimit(block_size, capacity)`.
-        // This method is equivalent to `GetAppendBuffer` if `block_size` is zero.
+        // This method is equivalent to `get_append_buffer` if `block_size` is zero.
         // See the documentation for `CreateWithCustomLimit` for more details on the
         // restrictions and legal values for `block_size`.
-        CordBuffer GetCustomAppendBuffer(size_t block_size, size_t capacity,
+        CordBuffer get_custom_append_buffer(size_t block_size, size_t capacity,
                                          size_t min_capacity = 16);
 
-        // Cord::Prepend()
+        // Cord::prepend()
         //
         // Prepends data to the Cord, which may come from another Cord or other string
         // data.
-        void Prepend(const Cord &src);
+        void prepend(const Cord &src);
 
-        void Prepend(std::string_view src);
+        void prepend(std::string_view src);
 
         template<typename T, EnableIfString<T> = 0>
-        void Prepend(T &&src);
+        void prepend(T &&src);
 
         // Prepends `buffer` to this cord, unless `buffer` has a zero length in which
         // case this method has no effect on this cord instance.
         // This method is guaranteed to consume `buffer`.
-        void Prepend(CordBuffer buffer);
+        void prepend(CordBuffer buffer);
 
-        // Cord::RemovePrefix()
+        // Cord::remove_prefix()
         //
         // Removes the first `n` bytes of a Cord.
-        void RemovePrefix(size_t n);
+        void remove_prefix(size_t n);
 
-        void RemoveSuffix(size_t n);
+        void remove_suffix(size_t n);
 
-        // Cord::Subcord()
+        // Cord::subcord()
         //
         // Returns a new Cord representing the subrange [pos, pos + new_size) of
         // *this. If pos >= size(), the result is empty(). If
         // (pos + new_size) >= size(), the result is the subrange [pos, size()).
-        Cord Subcord(size_t pos, size_t new_size) const;
+        Cord subcord(size_t pos, size_t new_size) const;
 
         // Cord::swap()
         //
@@ -383,25 +383,25 @@ namespace turbo {
         // Determines whether the given Cord is empty, returning `true` if so.
         bool empty() const;
 
-        // Cord::EstimatedMemoryUsage()
+        // Cord::estimated_memory_usage()
         //
         // Returns the *approximate* number of bytes held by this cord.
         // See CordMemoryAccounting for more information on the accounting method.
-        size_t EstimatedMemoryUsage(CordMemoryAccounting accounting_method =
+        size_t estimated_memory_usage(CordMemoryAccounting accounting_method =
         CordMemoryAccounting::kTotal) const;
 
-        // Cord::Compare()
+        // Cord::compare()
         //
         // Compares 'this' Cord with rhs. This function and its relatives treat Cords
         // as sequences of unsigned bytes. The comparison is a straightforward
-        // lexicographic comparison. `Cord::Compare()` returns values as follows:
+        // lexicographic comparison. `Cord::compare()` returns values as follows:
         //
         //   -1  'this' Cord is smaller
         //    0  two Cords are equal
         //    1  'this' Cord is larger
-        int Compare(std::string_view rhs) const;
+        int compare(std::string_view rhs) const;
 
-        int Compare(const Cord &rhs) const;
+        int compare(const Cord &rhs) const;
 
         // Cord::starts_with()
         //
@@ -465,7 +465,7 @@ namespace turbo {
         // of a Cord without modifying it.
         //
         // Generally, you do not instantiate a `Cord::ChunkIterator` directly;
-        // instead, you create one implicitly through use of the `Cord::Chunks()`
+        // instead, you create one implicitly through use of the `Cord::chunks()`
         // member function.
         //
         // The `Cord::ChunkIterator` has the following properties:
@@ -555,7 +555,7 @@ namespace turbo {
         //
         // Returns an iterator to the first chunk of the `Cord`.
         //
-        // Generally, prefer using `Cord::Chunks()` within a range-based for loop for
+        // Generally, prefer using `Cord::chunks()` within a range-based for loop for
         // iterating over the chunks of a Cord. This method may be useful for getting
         // a `ChunkIterator` where range-based for-loops are not useful.
         //
@@ -571,7 +571,7 @@ namespace turbo {
         //
         // Returns an iterator one increment past the last chunk of the `Cord`.
         //
-        // Generally, prefer using `Cord::Chunks()` within a range-based for loop for
+        // Generally, prefer using `Cord::chunks()` within a range-based for loop for
         // iterating over the chunks of a Cord. This method may be useful for getting
         // a `ChunkIterator` where range-based for-loops may not be available.
         ChunkIterator chunk_end() const TURBO_ATTRIBUTE_LIFETIME_BOUND;
@@ -584,7 +584,7 @@ namespace turbo {
         // producing an iterator which can be used within a range-based for loop.
         // Construction of a `ChunkRange` will return an iterator pointing to the
         // first chunk of the Cord. Generally, do not construct a `ChunkRange`
-        // directly; instead, prefer to use the `Cord::Chunks()` method.
+        // directly; instead, prefer to use the `Cord::chunks()` method.
         //
         // Implementation note: `ChunkRange` is simply a convenience wrapper over
         // `Cord::chunk_begin()` and `Cord::chunk_end()`.
@@ -610,26 +610,26 @@ namespace turbo {
             turbo::Nonnull<const Cord *> cord_;
         };
 
-        // Cord::Chunks()
+        // Cord::chunks()
         //
         // Returns a `Cord::ChunkRange` for iterating over the chunks of a `Cord` with
         // a range-based for-loop. For most iteration tasks on a Cord, use
-        // `Cord::Chunks()` to retrieve this iterator.
+        // `Cord::chunks()` to retrieve this iterator.
         //
         // Example:
         //
         //   void ProcessChunks(const Cord& cord) {
-        //     for (std::string_view chunk : cord.Chunks()) { ... }
+        //     for (std::string_view chunk : cord.chunks()) { ... }
         //   }
         //
         // Note that the ordinary caveats of temporary lifetime extension apply:
         //
         //   void Process() {
-        //     for (std::string_view chunk : CordFactory().Chunks()) {
+        //     for (std::string_view chunk : CordFactory().chunks()) {
         //       // The temporary Cord returned by CordFactory has been destroyed!
         //     }
         //   }
-        ChunkRange Chunks() const TURBO_ATTRIBUTE_LIFETIME_BOUND;
+        ChunkRange chunks() const TURBO_ATTRIBUTE_LIFETIME_BOUND;
 
         //----------------------------------------------------------------------------
         // Cord::CharIterator
@@ -686,20 +686,20 @@ namespace turbo {
             ChunkIterator chunk_iterator_;
         };
 
-        // Cord::AdvanceAndRead()
+        // Cord::advance_and_read()
         //
         // Advances the `Cord::CharIterator` by `n_bytes` and returns the bytes
         // advanced as a separate `Cord`. `n_bytes` must be less than or equal to the
         // number of bytes within the Cord; otherwise, behavior is undefined. It is
         // valid to pass `char_end()` and `0`.
-        static Cord AdvanceAndRead(turbo::Nonnull<CharIterator *> it, size_t n_bytes);
+        static Cord advance_and_read(turbo::Nonnull<CharIterator *> it, size_t n_bytes);
 
         // Cord::Advance()
         //
         // Advances the `Cord::CharIterator` by `n_bytes`. `n_bytes` must be less than
         // or equal to the number of bytes remaining within the Cord; otherwise,
         // behavior is undefined. It is valid to pass `char_end()` and `0`.
-        static void Advance(turbo::Nonnull<CharIterator *> it, size_t n_bytes);
+        static void advance(turbo::Nonnull<CharIterator *> it, size_t n_bytes);
 
         // Cord::ChunkRemaining()
         //
@@ -777,7 +777,7 @@ namespace turbo {
         //       // The temporary Cord returned by CordFactory has been destroyed!
         //     }
         //   }
-        CharRange Chars() const TURBO_ATTRIBUTE_LIFETIME_BOUND;
+        CharRange chars() const TURBO_ATTRIBUTE_LIFETIME_BOUND;
 
         // Cord::operator[]
         //
@@ -791,44 +791,44 @@ namespace turbo {
         // repeatedly in a loop.
         char operator[](size_t i) const;
 
-        // Cord::TryFlat()
+        // Cord::try_flat()
         //
         // If this cord's representation is a single flat array, returns a
         // string_view referencing that array.  Otherwise returns nullopt.
-        std::optional<std::string_view> TryFlat() const
+        std::optional<std::string_view> try_flat() const
         TURBO_ATTRIBUTE_LIFETIME_BOUND;
 
-        // Cord::Flatten()
+        // Cord::flatten()
         //
         // Flattens the cord into a single array and returns a view of the data.
         //
         // If the cord was already flat, the contents are not modified.
-        std::string_view Flatten() TURBO_ATTRIBUTE_LIFETIME_BOUND;
+        std::string_view flatten() TURBO_ATTRIBUTE_LIFETIME_BOUND;
 
-        // Cord::Find()
+        // Cord::find()
         //
         // Returns an iterator to the first occurrance of the substring `needle`.
         //
         // If the substring `needle` does not occur, `Cord::char_end()` is returned.
-        CharIterator Find(std::string_view needle) const;
+        CharIterator find(std::string_view needle) const;
 
-        CharIterator Find(const turbo::Cord &needle) const;
+        CharIterator find(const turbo::Cord &needle) const;
 
         // Supports turbo::Cord as a sink object for turbo::format().
         friend void TurboFormatFlush(turbo::Nonnull<turbo::Cord *> cord,
                                      std::string_view part) {
-            cord->Append(part);
+            cord->append(part);
         }
 
         // Support automatic stringification with turbo::str_cat and turbo::str_format.
         template<typename Sink>
         friend void turbo_stringify(Sink &sink, const turbo::Cord &cord) {
-            for (std::string_view chunk: cord.Chunks()) {
+            for (std::string_view chunk: cord.chunks()) {
                 sink.Append(chunk);
             }
         }
 
-        // Cord::SetExpectedChecksum()
+        // Cord::set_expected_checksum()
         //
         // Stores a checksum value with this non-empty cord instance, for later
         // retrieval.
@@ -845,15 +845,15 @@ namespace turbo {
         // does no CRC validation, and assigns no meaning to this number.
         //
         // This call has no effect if this cord is empty.
-        void SetExpectedChecksum(uint32_t crc);
+        void set_expected_checksum(uint32_t crc);
 
         // Returns this cord's expected checksum, if it has one.  Otherwise, returns
         // nullopt.
-        std::optional<uint32_t> ExpectedChecksum() const;
+        std::optional<uint32_t> expected_checksum() const;
 
         template<typename H>
         friend H turbo_hash_value(H hash_state, const turbo::Cord &c) {
-            std::optional<std::string_view> maybe_flat = c.TryFlat();
+            std::optional<std::string_view> maybe_flat = c.try_flat();
             if (maybe_flat.has_value()) {
                 return H::combine(std::move(hash_state), *maybe_flat);
             }
@@ -892,12 +892,12 @@ namespace turbo {
                 const Cord &cord);
 
         // Calls the provided function once for each cord chunk, in order.  Unlike
-        // Chunks(), this API will not allocate memory.
-        void ForEachChunk(turbo::FunctionRef<void(std::string_view)>) const;
+        // chunks(), this API will not allocate memory.
+        void for_each_chunk(turbo::FunctionRef<void(std::string_view)>) const;
 
         // Allocates new contiguous storage for the contents of the cord. This is
-        // called by Flatten() when the cord was not already flat.
-        std::string_view FlattenSlowPath();
+        // called by flatten() when the cord was not already flat.
+        std::string_view flatten_slow_path();
 
         // Actual cord contents are hidden inside the following simple
         // class so that we can isolate the bulk of cord.cc from changes
@@ -1068,11 +1068,11 @@ namespace turbo {
 
         InlineRep contents_;
 
-        // Helper for GetFlat() and TryFlat().
+        // Helper for GetFlat() and try_flat().
         static bool GetFlatAux(turbo::Nonnull<turbo::cord_internal::CordRep *> rep,
                                turbo::Nonnull<std::string_view *> fragment);
 
-        // Helper for ForEachChunk().
+        // Helper for for_each_chunk().
         static void ForEachChunkAux(
                 turbo::Nonnull<turbo::cord_internal::CordRep *> rep,
                 turbo::FunctionRef<void(std::string_view)> callback);
@@ -1109,9 +1109,9 @@ namespace turbo {
 
         turbo::Nonnull<turbo::cord_internal::CordRep *> TakeRep() &&;
 
-        // Helper for Append().
+        // Helper for append().
         template<typename C>
-        void AppendImpl(C &&src);
+        void append_impl(C &&src);
 
         // Appends / Prepends `src` to this instance, using precise sizing.
         // This method does explicitly not attempt to use any spare capacity
@@ -1136,7 +1136,7 @@ namespace turbo {
         template<typename H>
         H HashFragmented(H hash_state) const {
             typename H::TurboInternalPiecewiseCombiner combiner;
-            ForEachChunk([&combiner, &hash_state](std::string_view chunk) {
+            for_each_chunk([&combiner, &hash_state](std::string_view chunk) {
                 hash_state = combiner.add_buffer(std::move(hash_state), chunk.data(),
                                                  chunk.size());
             });
@@ -1155,29 +1155,27 @@ namespace turbo {
         void CopyToArrayImpl(turbo::Nonnull<char *> dst) const;
     };
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
-// allow a Cord to be logged
+    // allow a Cord to be logged
     extern std::ostream &operator<<(std::ostream &out, const Cord &cord);
 
-// ------------------------------------------------------------------
-// Internal details follow.  Clients should ignore.
+        // ------------------------------------------------------------------
+        // Internal details follow.  Clients should ignore.
 
     namespace cord_internal {
 
-// Does non-template-specific `CordRepExternal` initialization.
-// Requires `data` to be non-empty.
+        // Does non-template-specific `CordRepExternal` initialization.
+        // Requires `data` to be non-empty.
         void InitializeCordRepExternal(std::string_view data,
                                        turbo::Nonnull<CordRepExternal *> rep);
 
-// Creates a new `CordRep` that owns `data` and `releaser` and returns a pointer
-// to it. Requires `data` to be non-empty.
+        // Creates a new `CordRep` that owns `data` and `releaser` and returns a pointer
+        // to it. Requires `data` to be non-empty.
         template<typename Releaser>
-// NOLINTNEXTLINE - suppress clang-tidy raw pointer return.
+        // NOLINTNEXTLINE - suppress clang-tidy raw pointer return.
         turbo::Nonnull<CordRep *> NewExternalRep(std::string_view data,
                                                  Releaser &&releaser) {
             assert(!data.empty());
@@ -1188,9 +1186,9 @@ namespace turbo {
             return rep;
         }
 
-// Overload for function reference types that dispatches using a function
-// pointer because there are no `alignof()` or `sizeof()` a function reference.
-// NOLINTNEXTLINE - suppress clang-tidy raw pointer return.
+        // Overload for function reference types that dispatches using a function
+        // pointer because there are no `alignof()` or `sizeof()` a function reference.
+        // NOLINTNEXTLINE - suppress clang-tidy raw pointer return.
         inline turbo::Nonnull<CordRep *> NewExternalRep(
                 std::string_view data, void (&releaser)(std::string_view)) {
             return NewExternalRep(data, &releaser);
@@ -1199,12 +1197,12 @@ namespace turbo {
     }  // namespace cord_internal
 
     template<typename Releaser>
-    Cord MakeCordFromExternal(std::string_view data, Releaser &&releaser) {
+    Cord make_cord_from_external(std::string_view data, Releaser &&releaser) {
         Cord cord;
         if (TURBO_LIKELY(!data.empty())) {
             cord.contents_.EmplaceTree(::turbo::cord_internal::NewExternalRep(
                                                data, std::forward<Releaser>(releaser)),
-                                       Cord::MethodIdentifier::kMakeCordFromExternal);
+                                       Cord::MethodIdentifier::kmake_cord_from_external);
         } else {
             using ReleaserType = turbo::decay_t<Releaser>;
             cord_internal::InvokeReleaser(
@@ -1422,7 +1420,7 @@ namespace turbo {
 
     inline bool Cord::empty() const { return size() == 0; }
 
-    inline size_t Cord::EstimatedMemoryUsage(
+    inline size_t Cord::estimated_memory_usage(
             CordMemoryAccounting accounting_method) const {
         size_t result = sizeof(Cord);
         if (const turbo::cord_internal::CordRep *rep = contents_.tree()) {
@@ -1441,7 +1439,7 @@ namespace turbo {
         return result;
     }
 
-    inline std::optional<std::string_view> Cord::TryFlat() const
+    inline std::optional<std::string_view> Cord::try_flat() const
     TURBO_ATTRIBUTE_LIFETIME_BOUND {
         turbo::cord_internal::CordRep *rep = contents_.tree();
         if (rep == nullptr) {
@@ -1454,7 +1452,7 @@ namespace turbo {
         return std::nullopt;
     }
 
-    inline std::string_view Cord::Flatten() TURBO_ATTRIBUTE_LIFETIME_BOUND {
+    inline std::string_view Cord::flatten() TURBO_ATTRIBUTE_LIFETIME_BOUND {
         turbo::cord_internal::CordRep *rep = contents_.tree();
         if (rep == nullptr) {
             return std::string_view(contents_.data(), contents_.size());
@@ -1464,18 +1462,18 @@ namespace turbo {
                 return already_flat_contents;
             }
         }
-        return FlattenSlowPath();
+        return flatten_slow_path();
     }
 
-    inline void Cord::Append(std::string_view src) {
+    inline void Cord::append(std::string_view src) {
         contents_.AppendArray(src, CordzUpdateTracker::kAppendString);
     }
 
-    inline void Cord::Prepend(std::string_view src) {
+    inline void Cord::prepend(std::string_view src) {
         PrependArray(src, CordzUpdateTracker::kPrependString);
     }
 
-    inline void Cord::Append(CordBuffer buffer) {
+    inline void Cord::append(CordBuffer buffer) {
         if (TURBO_UNLIKELY(buffer.length() == 0)) return;
         contents_.MaybeRemoveEmptyCrcNode();
         std::string_view short_value;
@@ -1486,7 +1484,7 @@ namespace turbo {
         }
     }
 
-    inline void Cord::Prepend(CordBuffer buffer) {
+    inline void Cord::prepend(CordBuffer buffer) {
         if (TURBO_UNLIKELY(buffer.length() == 0)) return;
         contents_.MaybeRemoveEmptyCrcNode();
         std::string_view short_value;
@@ -1497,12 +1495,12 @@ namespace turbo {
         }
     }
 
-    inline CordBuffer Cord::GetAppendBuffer(size_t capacity, size_t min_capacity) {
+    inline CordBuffer Cord::get_append_buffer(size_t capacity, size_t min_capacity) {
         if (empty()) return CordBuffer::CreateWithDefaultLimit(capacity);
         return GetAppendBufferSlowPath(0, capacity, min_capacity);
     }
 
-    inline CordBuffer Cord::GetCustomAppendBuffer(size_t block_size,
+    inline CordBuffer Cord::get_custom_append_buffer(size_t block_size,
                                                   size_t capacity,
                                                   size_t min_capacity) {
         if (empty()) {
@@ -1512,19 +1510,19 @@ namespace turbo {
         return GetAppendBufferSlowPath(block_size, capacity, min_capacity);
     }
 
-    extern template void Cord::Append(std::string &&src);
+    extern template void Cord::append(std::string &&src);
 
-    extern template void Cord::Prepend(std::string &&src);
+    extern template void Cord::prepend(std::string &&src);
 
-    inline int Cord::Compare(const Cord &rhs) const {
+    inline int Cord::compare(const Cord &rhs) const {
         if (!contents_.is_tree() && !rhs.contents_.is_tree()) {
-            return contents_.data_.Compare(rhs.contents_.data_);
+            return contents_.data_.compare(rhs.contents_.data_);
         }
 
         return CompareImpl(rhs);
     }
 
-// Does 'this' cord start/end with rhs
+    // Does 'this' cord start/end with rhs
     inline bool Cord::starts_with(const Cord &rhs) const {
         if (contents_.IsSame(rhs.contents_)) return true;
         size_t rhs_size = rhs.size();
@@ -1670,7 +1668,7 @@ namespace turbo {
         return cord_->chunk_end();
     }
 
-    inline Cord::ChunkRange Cord::Chunks() const { return ChunkRange(this); }
+    inline Cord::ChunkRange Cord::chunks() const { return ChunkRange(this); }
 
     inline Cord::CharIterator &Cord::CharIterator::operator++() {
         if (TURBO_LIKELY(chunk_iterator_->size() > 1)) {
@@ -1703,13 +1701,13 @@ namespace turbo {
         return chunk_iterator_->data();
     }
 
-    inline Cord Cord::AdvanceAndRead(turbo::Nonnull<CharIterator *> it,
+    inline Cord Cord::advance_and_read(turbo::Nonnull<CharIterator *> it,
                                      size_t n_bytes) {
         assert(it != nullptr);
         return it->chunk_iterator_.AdvanceAndReadBytes(n_bytes);
     }
 
-    inline void Cord::Advance(turbo::Nonnull<CharIterator *> it, size_t n_bytes) {
+    inline void Cord::advance(turbo::Nonnull<CharIterator *> it, size_t n_bytes) {
         assert(it != nullptr);
         it->chunk_iterator_.AdvanceBytes(n_bytes);
     }
@@ -1732,9 +1730,9 @@ namespace turbo {
         return cord_->char_end();
     }
 
-    inline Cord::CharRange Cord::Chars() const { return CharRange(this); }
+    inline Cord::CharRange Cord::chars() const { return CharRange(this); }
 
-    inline void Cord::ForEachChunk(
+    inline void Cord::for_each_chunk(
             turbo::FunctionRef<void(std::string_view)> callback) const {
         turbo::cord_internal::CordRep *rep = contents_.tree();
         if (rep == nullptr) {
@@ -1754,16 +1752,16 @@ namespace turbo {
 
     inline bool operator!=(const Cord &x, const Cord &y) { return !(x == y); }
 
-    inline bool operator<(const Cord &x, const Cord &y) { return x.Compare(y) < 0; }
+    inline bool operator<(const Cord &x, const Cord &y) { return x.compare(y) < 0; }
 
-    inline bool operator>(const Cord &x, const Cord &y) { return x.Compare(y) > 0; }
+    inline bool operator>(const Cord &x, const Cord &y) { return x.compare(y) > 0; }
 
     inline bool operator<=(const Cord &x, const Cord &y) {
-        return x.Compare(y) <= 0;
+        return x.compare(y) <= 0;
     }
 
     inline bool operator>=(const Cord &x, const Cord &y) {
-        return x.Compare(y) >= 0;
+        return x.compare(y) >= 0;
     }
 
     // Nonmember Cord-to-std::string_view relational operators.
@@ -1784,11 +1782,11 @@ namespace turbo {
     inline bool operator!=(std::string_view x, const Cord &y) { return !(x == y); }
 
     inline bool operator<(const Cord &x, std::string_view y) {
-        return x.Compare(y) < 0;
+        return x.compare(y) < 0;
     }
 
     inline bool operator<(std::string_view x, const Cord &y) {
-        return y.Compare(x) > 0;
+        return y.compare(x) > 0;
     }
 
     inline bool operator>(const Cord &x, std::string_view y) { return y < x; }

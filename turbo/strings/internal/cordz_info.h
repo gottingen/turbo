@@ -181,8 +181,8 @@ class TURBO_LOCKABLE CordzInfo : public CordzHandle {
   turbo::span<void* const> GetParentStack() const;
 
   // Retrieves the CordzStatistics associated with this Cord. The statistics
-  // are only updated when a Cord goes through a mutation, such as an Append
-  // or RemovePrefix.
+  // are only updated when a Cord goes through a mutation, such as an append
+  // or remove_prefix.
   CordzStatistics GetCordzStatistics() const;
 
   int64_t sampling_stride() const { return sampling_stride_; }
