@@ -508,42 +508,42 @@ TEST_P(CordTest, StartsEndsWith) {
     ASSERT_TRUE(!empty.ends_with("xyz"));
 }
 
-TEST_P(CordTest, Contains) {
+TEST_P(CordTest, contains) {
     auto flat_haystack = turbo::Cord("this is a flat cord");
     auto fragmented_haystack = turbo::MakeFragmentedCord(
             {"this", " ", "is", " ", "a", " ", "fragmented", " ", "cord"});
 
-    EXPECT_TRUE(flat_haystack.Contains(""));
-    EXPECT_TRUE(fragmented_haystack.Contains(""));
-    EXPECT_TRUE(flat_haystack.Contains(turbo::Cord("")));
-    EXPECT_TRUE(fragmented_haystack.Contains(turbo::Cord("")));
-    EXPECT_TRUE(turbo::Cord("").Contains(""));
-    EXPECT_TRUE(turbo::Cord("").Contains(turbo::Cord("")));
-    EXPECT_FALSE(turbo::Cord("").Contains(flat_haystack));
-    EXPECT_FALSE(turbo::Cord("").Contains(fragmented_haystack));
+    EXPECT_TRUE(flat_haystack.contains(""));
+    EXPECT_TRUE(fragmented_haystack.contains(""));
+    EXPECT_TRUE(flat_haystack.contains(turbo::Cord("")));
+    EXPECT_TRUE(fragmented_haystack.contains(turbo::Cord("")));
+    EXPECT_TRUE(turbo::Cord("").contains(""));
+    EXPECT_TRUE(turbo::Cord("").contains(turbo::Cord("")));
+    EXPECT_FALSE(turbo::Cord("").contains(flat_haystack));
+    EXPECT_FALSE(turbo::Cord("").contains(fragmented_haystack));
 
-    EXPECT_FALSE(flat_haystack.Contains("z"));
-    EXPECT_FALSE(fragmented_haystack.Contains("z"));
-    EXPECT_FALSE(flat_haystack.Contains(turbo::Cord("z")));
-    EXPECT_FALSE(fragmented_haystack.Contains(turbo::Cord("z")));
+    EXPECT_FALSE(flat_haystack.contains("z"));
+    EXPECT_FALSE(fragmented_haystack.contains("z"));
+    EXPECT_FALSE(flat_haystack.contains(turbo::Cord("z")));
+    EXPECT_FALSE(fragmented_haystack.contains(turbo::Cord("z")));
 
-    EXPECT_FALSE(flat_haystack.Contains("is an"));
-    EXPECT_FALSE(fragmented_haystack.Contains("is an"));
-    EXPECT_FALSE(flat_haystack.Contains(turbo::Cord("is an")));
-    EXPECT_FALSE(fragmented_haystack.Contains(turbo::Cord("is an")));
+    EXPECT_FALSE(flat_haystack.contains("is an"));
+    EXPECT_FALSE(fragmented_haystack.contains("is an"));
+    EXPECT_FALSE(flat_haystack.contains(turbo::Cord("is an")));
+    EXPECT_FALSE(fragmented_haystack.contains(turbo::Cord("is an")));
     EXPECT_FALSE(
-            flat_haystack.Contains(turbo::MakeFragmentedCord({"is", " ", "an"})));
-    EXPECT_FALSE(fragmented_haystack.Contains(
+            flat_haystack.contains(turbo::MakeFragmentedCord({"is", " ", "an"})));
+    EXPECT_FALSE(fragmented_haystack.contains(
             turbo::MakeFragmentedCord({"is", " ", "an"})));
 
-    EXPECT_TRUE(flat_haystack.Contains("is a"));
-    EXPECT_TRUE(fragmented_haystack.Contains("is a"));
-    EXPECT_TRUE(flat_haystack.Contains(turbo::Cord("is a")));
-    EXPECT_TRUE(fragmented_haystack.Contains(turbo::Cord("is a")));
+    EXPECT_TRUE(flat_haystack.contains("is a"));
+    EXPECT_TRUE(fragmented_haystack.contains("is a"));
+    EXPECT_TRUE(flat_haystack.contains(turbo::Cord("is a")));
+    EXPECT_TRUE(fragmented_haystack.contains(turbo::Cord("is a")));
     EXPECT_TRUE(
-            flat_haystack.Contains(turbo::MakeFragmentedCord({"is", " ", "a"})));
+            flat_haystack.contains(turbo::MakeFragmentedCord({"is", " ", "a"})));
     EXPECT_TRUE(
-            fragmented_haystack.Contains(turbo::MakeFragmentedCord({"is", " ", "a"})));
+            fragmented_haystack.contains(turbo::MakeFragmentedCord({"is", " ", "a"})));
 }
 
 TEST_P(CordTest, Find) {
@@ -684,18 +684,18 @@ TEST_P(CordTest, Swap) {
 
 static void VerifyCopyToString(const turbo::Cord &cord) {
     std::string initially_empty;
-    turbo::CopyCordToString(cord, &initially_empty);
+    turbo::copy_cord_to_string(cord, &initially_empty);
     EXPECT_EQ(initially_empty, cord);
 
     constexpr size_t kInitialLength = 1024;
     std::string has_initial_contents(kInitialLength, 'x');
     const char *address_before_copy = has_initial_contents.data();
-    turbo::CopyCordToString(cord, &has_initial_contents);
+    turbo::copy_cord_to_string(cord, &has_initial_contents);
     EXPECT_EQ(has_initial_contents, cord);
 
     if (cord.size() <= kInitialLength) {
         EXPECT_EQ(has_initial_contents.data(), address_before_copy)
-                            << "CopyCordToString allocated new string storage; "
+                            << "copy_cord_to_string allocated new string storage; "
                                "has_initial_contents = \""
                             << has_initial_contents << "\"";
     }
@@ -711,7 +711,7 @@ TEST_P(CordTest, CopyToString) {
 
 static void VerifyAppendCordToString(const turbo::Cord &cord) {
     std::string initially_empty;
-    turbo::AppendCordToString(cord, &initially_empty);
+    turbo::append_cord_to_string(cord, &initially_empty);
     EXPECT_EQ(initially_empty, cord);
 
     const std::string_view kInitialContents = "initial contents.";
@@ -719,16 +719,16 @@ static void VerifyAppendCordToString(const turbo::Cord &cord) {
             turbo::str_cat(kInitialContents, std::string(cord));
 
     std::string no_reserve(kInitialContents);
-    turbo::AppendCordToString(cord, &no_reserve);
+    turbo::append_cord_to_string(cord, &no_reserve);
     EXPECT_EQ(no_reserve, expected_after_append);
 
     std::string has_reserved_capacity(kInitialContents);
     has_reserved_capacity.reserve(has_reserved_capacity.size() + cord.size());
     const char *address_before_copy = has_reserved_capacity.data();
-    turbo::AppendCordToString(cord, &has_reserved_capacity);
+    turbo::append_cord_to_string(cord, &has_reserved_capacity);
     EXPECT_EQ(has_reserved_capacity, expected_after_append);
     EXPECT_EQ(has_reserved_capacity.data(), address_before_copy)
-                        << "AppendCordToString allocated new string storage; "
+                        << "append_cord_to_string allocated new string storage; "
                            "has_reserved_capacity = \""
                         << has_reserved_capacity << "\"";
 }
@@ -744,35 +744,35 @@ TEST_P(CordTest, AppendToString) {
 TEST_P(CordTest, AppendEmptyBuffer) {
     turbo::Cord cord;
     cord.append(turbo::CordBuffer());
-    cord.append(turbo::CordBuffer::CreateWithDefaultLimit(2000));
+    cord.append(turbo::CordBuffer::create_with_default_limit(2000));
 }
 
 TEST_P(CordTest, AppendEmptyBufferToFlat) {
     turbo::Cord cord(std::string(2000, 'x'));
     cord.append(turbo::CordBuffer());
-    cord.append(turbo::CordBuffer::CreateWithDefaultLimit(2000));
+    cord.append(turbo::CordBuffer::create_with_default_limit(2000));
 }
 
 TEST_P(CordTest, AppendEmptyBufferToTree) {
     turbo::Cord cord(std::string(2000, 'x'));
     cord.append(std::string(2000, 'y'));
     cord.append(turbo::CordBuffer());
-    cord.append(turbo::CordBuffer::CreateWithDefaultLimit(2000));
+    cord.append(turbo::CordBuffer::create_with_default_limit(2000));
 }
 
 TEST_P(CordTest, AppendSmallBuffer) {
     turbo::Cord cord;
-    turbo::CordBuffer buffer = turbo::CordBuffer::CreateWithDefaultLimit(3);
+    turbo::CordBuffer buffer = turbo::CordBuffer::create_with_default_limit(3);
     ASSERT_THAT(buffer.capacity(), Le(15));
     memcpy(buffer.data(), "Abc", 3);
-    buffer.SetLength(3);
+    buffer.set_length(3);
     cord.append(std::move(buffer));
     EXPECT_EQ(buffer.length(), 0);    // NOLINT
     EXPECT_GT(buffer.capacity(), 0);  // NOLINT
 
-    buffer = turbo::CordBuffer::CreateWithDefaultLimit(3);
+    buffer = turbo::CordBuffer::create_with_default_limit(3);
     memcpy(buffer.data(), "defgh", 5);
-    buffer.SetLength(5);
+    buffer.set_length(5);
     cord.append(std::move(buffer));
     EXPECT_EQ(buffer.length(), 0);    // NOLINT
     EXPECT_GT(buffer.capacity(), 0);  // NOLINT
@@ -788,14 +788,14 @@ TEST_P(CordTest, AppendAndPrependBufferArePrecise) {
     const size_t size1 = cord1.estimated_memory_usage();
     const size_t size2 = cord2.estimated_memory_usage();
 
-    turbo::CordBuffer buffer = turbo::CordBuffer::CreateWithDefaultLimit(3);
+    turbo::CordBuffer buffer = turbo::CordBuffer::create_with_default_limit(3);
     memcpy(buffer.data(), "Abc", 3);
-    buffer.SetLength(3);
+    buffer.set_length(3);
     cord1.append(std::move(buffer));
 
-    buffer = turbo::CordBuffer::CreateWithDefaultLimit(3);
+    buffer = turbo::CordBuffer::create_with_default_limit(3);
     memcpy(buffer.data(), "Abc", 3);
-    buffer.SetLength(3);
+    buffer.set_length(3);
     cord2.prepend(std::move(buffer));
 
 #ifndef NDEBUG
@@ -815,17 +815,17 @@ TEST_P(CordTest, AppendAndPrependBufferArePrecise) {
 
 TEST_P(CordTest, PrependSmallBuffer) {
     turbo::Cord cord;
-    turbo::CordBuffer buffer = turbo::CordBuffer::CreateWithDefaultLimit(3);
+    turbo::CordBuffer buffer = turbo::CordBuffer::create_with_default_limit(3);
     ASSERT_THAT(buffer.capacity(), Le(15));
     memcpy(buffer.data(), "Abc", 3);
-    buffer.SetLength(3);
+    buffer.set_length(3);
     cord.prepend(std::move(buffer));
     EXPECT_EQ(buffer.length(), 0);    // NOLINT
     EXPECT_GT(buffer.capacity(), 0);  // NOLINT
 
-    buffer = turbo::CordBuffer::CreateWithDefaultLimit(3);
+    buffer = turbo::CordBuffer::create_with_default_limit(3);
     memcpy(buffer.data(), "defgh", 5);
-    buffer.SetLength(5);
+    buffer.set_length(5);
     cord.prepend(std::move(buffer));
     EXPECT_EQ(buffer.length(), 0);    // NOLINT
     EXPECT_GT(buffer.capacity(), 0);  // NOLINT
@@ -837,17 +837,17 @@ TEST_P(CordTest, AppendLargeBuffer) {
     turbo::Cord cord;
 
     std::string s1(700, '1');
-    turbo::CordBuffer buffer = turbo::CordBuffer::CreateWithDefaultLimit(s1.size());
+    turbo::CordBuffer buffer = turbo::CordBuffer::create_with_default_limit(s1.size());
     memcpy(buffer.data(), s1.data(), s1.size());
-    buffer.SetLength(s1.size());
+    buffer.set_length(s1.size());
     cord.append(std::move(buffer));
     EXPECT_EQ(buffer.length(), 0);    // NOLINT
     EXPECT_GT(buffer.capacity(), 0);  // NOLINT
 
     std::string s2(1000, '2');
-    buffer = turbo::CordBuffer::CreateWithDefaultLimit(s2.size());
+    buffer = turbo::CordBuffer::create_with_default_limit(s2.size());
     memcpy(buffer.data(), s2.data(), s2.size());
-    buffer.SetLength(s2.size());
+    buffer.set_length(s2.size());
     cord.append(std::move(buffer));
     EXPECT_EQ(buffer.length(), 0);    // NOLINT
     EXPECT_GT(buffer.capacity(), 0);  // NOLINT
@@ -859,17 +859,17 @@ TEST_P(CordTest, PrependLargeBuffer) {
     turbo::Cord cord;
 
     std::string s1(700, '1');
-    turbo::CordBuffer buffer = turbo::CordBuffer::CreateWithDefaultLimit(s1.size());
+    turbo::CordBuffer buffer = turbo::CordBuffer::create_with_default_limit(s1.size());
     memcpy(buffer.data(), s1.data(), s1.size());
-    buffer.SetLength(s1.size());
+    buffer.set_length(s1.size());
     cord.prepend(std::move(buffer));
     EXPECT_EQ(buffer.length(), 0);    // NOLINT
     EXPECT_GT(buffer.capacity(), 0);  // NOLINT
 
     std::string s2(1000, '2');
-    buffer = turbo::CordBuffer::CreateWithDefaultLimit(s2.size());
+    buffer = turbo::CordBuffer::create_with_default_limit(s2.size());
     memcpy(buffer.data(), s2.data(), s2.size());
-    buffer.SetLength(s2.size());
+    buffer.set_length(s2.size());
     cord.prepend(std::move(buffer));
     EXPECT_EQ(buffer.length(), 0);    // NOLINT
     EXPECT_GT(buffer.capacity(), 0);  // NOLINT
@@ -892,8 +892,8 @@ public:
     }
 
     size_t maximum_payload() const {
-        return is_default() ? turbo::CordBuffer::MaximumPayload()
-                            : turbo::CordBuffer::MaximumPayload(limit());
+        return is_default() ? turbo::CordBuffer::maximum_payload()
+                            : turbo::CordBuffer::maximum_payload(limit());
     }
 
     turbo::CordBuffer get_append_buffer(turbo::Cord &cord, size_t capacity,
@@ -945,9 +945,9 @@ TEST_P(CordAppendBufferTest, GetAppendBufferOnInlinedCordCapacityCloseToMax) {
 TEST_P(CordAppendBufferTest, GetAppendBufferOnFlat) {
     // Create a cord with a single flat and extra capacity
     turbo::Cord cord;
-    turbo::CordBuffer buffer = turbo::CordBuffer::CreateWithDefaultLimit(500);
+    turbo::CordBuffer buffer = turbo::CordBuffer::create_with_default_limit(500);
     const size_t expected_capacity = buffer.capacity();
-    buffer.SetLength(3);
+    buffer.set_length(3);
     memcpy(buffer.data(), "Abc", 3);
     cord.append(std::move(buffer));
 
@@ -961,8 +961,8 @@ TEST_P(CordAppendBufferTest, GetAppendBufferOnFlat) {
 TEST_P(CordAppendBufferTest, GetAppendBufferOnFlatWithoutMinCapacity) {
     // Create a cord with a single flat and extra capacity
     turbo::Cord cord;
-    turbo::CordBuffer buffer = turbo::CordBuffer::CreateWithDefaultLimit(500);
-    buffer.SetLength(30);
+    turbo::CordBuffer buffer = turbo::CordBuffer::create_with_default_limit(500);
+    buffer.set_length(30);
     memset(buffer.data(), 'x', 30);
     cord.append(std::move(buffer));
 
@@ -982,8 +982,8 @@ TEST_P(CordAppendBufferTest, GetAppendBufferOnTree) {
         for (int i = 0; i < num_flats - 1; ++i) {
             prefix += last;
             last = RandomLowercaseString(&rng, 10);
-            turbo::CordBuffer buffer = turbo::CordBuffer::CreateWithDefaultLimit(500);
-            buffer.SetLength(10);
+            turbo::CordBuffer buffer = turbo::CordBuffer::create_with_default_limit(500);
+            buffer.set_length(10);
             memcpy(buffer.data(), last.data(), 10);
             cord.append(std::move(buffer));
         }
@@ -998,8 +998,8 @@ TEST_P(CordAppendBufferTest, GetAppendBufferOnTree) {
 TEST_P(CordAppendBufferTest, GetAppendBufferOnTreeWithoutMinCapacity) {
     turbo::Cord cord;
     for (int i = 0; i < 2; ++i) {
-        turbo::CordBuffer buffer = turbo::CordBuffer::CreateWithDefaultLimit(500);
-        buffer.SetLength(3);
+        turbo::CordBuffer buffer = turbo::CordBuffer::create_with_default_limit(500);
+        buffer.set_length(3);
         memcpy(buffer.data(), i ? "def" : "Abc", 3);
         cord.append(std::move(buffer));
     }
@@ -1012,8 +1012,8 @@ TEST_P(CordAppendBufferTest, GetAppendBufferOnTreeWithoutMinCapacity) {
 TEST_P(CordAppendBufferTest, GetAppendBufferOnSubstring) {
     // Create a large cord with a single flat and some extra capacity
     turbo::Cord cord;
-    turbo::CordBuffer buffer = turbo::CordBuffer::CreateWithDefaultLimit(500);
-    buffer.SetLength(450);
+    turbo::CordBuffer buffer = turbo::CordBuffer::create_with_default_limit(500);
+    buffer.set_length(450);
     memset(buffer.data(), 'x', 450);
     cord.append(std::move(buffer));
     cord.remove_prefix(1);
@@ -1027,8 +1027,8 @@ TEST_P(CordAppendBufferTest, GetAppendBufferOnSubstring) {
 TEST_P(CordAppendBufferTest, GetAppendBufferOnSharedCord) {
     // Create a shared cord with a single flat and extra capacity
     turbo::Cord cord;
-    turbo::CordBuffer buffer = turbo::CordBuffer::CreateWithDefaultLimit(500);
-    buffer.SetLength(3);
+    turbo::CordBuffer buffer = turbo::CordBuffer::create_with_default_limit(500);
+    buffer.set_length(3);
     memcpy(buffer.data(), "Abc", 3);
     cord.append(std::move(buffer));
     turbo::Cord shared_cord = cord;
@@ -1038,8 +1038,8 @@ TEST_P(CordAppendBufferTest, GetAppendBufferOnSharedCord) {
     EXPECT_EQ(buffer.length(), 0);
     EXPECT_EQ(cord, "Abc");
 
-    buffer = turbo::CordBuffer::CreateWithDefaultLimit(500);
-    buffer.SetLength(3);
+    buffer = turbo::CordBuffer::create_with_default_limit(500);
+    buffer.set_length(3);
     memcpy(buffer.data(), "def", 3);
     cord.append(std::move(buffer));
     shared_cord = cord;
@@ -1345,7 +1345,7 @@ namespace {
         MaybeHarden(blob);
         EXPECT_EQ(10, blob.size());
         std::string s;
-        turbo::CopyCordToString(blob, &s);
+        turbo::copy_cord_to_string(blob, &s);
         EXPECT_EQ("zzzzzzzzzz", s);
     }
 
@@ -1354,7 +1354,7 @@ namespace {
         MaybeHarden(blob);
         EXPECT_EQ(0, blob.size());
         std::string s;
-        turbo::CopyCordToString(blob, &s);
+        turbo::copy_cord_to_string(blob, &s);
         EXPECT_EQ("", s);
     }
 
@@ -1366,7 +1366,7 @@ namespace {
         suffix.remove_prefix(9);
         EXPECT_EQ(1, suffix.size());
         std::string s;
-        turbo::CopyCordToString(suffix, &s);
+        turbo::copy_cord_to_string(suffix, &s);
         EXPECT_EQ("z", s);
     }
 
@@ -1379,7 +1379,7 @@ namespace {
         suffix.remove_prefix(10);
         EXPECT_EQ(0, suffix.size());
         std::string s;
-        turbo::CopyCordToString(suffix, &s);
+        turbo::copy_cord_to_string(suffix, &s);
         EXPECT_EQ("", s);
     }
 
@@ -2208,7 +2208,7 @@ TEST_P(CordTest, DiabolicalGrowth) {
         MaybeHarden(cord);
     }
     std::string value;
-    turbo::CopyCordToString(cord, &value);
+    turbo::copy_cord_to_string(cord, &value);
     EXPECT_EQ(value, expected);
     LOG(INFO) << "Diabolical size allocated = " << cord.estimated_memory_usage();
 }
@@ -3192,7 +3192,7 @@ TEST_P(CordTest, expected_checksum) {
             EXPECT_EQ(std::string(cc3), base_value_as_string);
 
             std::string dest;
-            turbo::CopyCordToString(cc3, &dest);
+            turbo::copy_cord_to_string(cc3, &dest);
             EXPECT_EQ(dest, base_value_as_string);
 
             bool first_pass = true;
@@ -3303,7 +3303,7 @@ TEST_P(CordTest, ChecksummedEmptyCord) {
     EXPECT_EQ(std::string(cc3), "");
 
     std::string dest;
-    turbo::CopyCordToString(cc3, &dest);
+    turbo::copy_cord_to_string(cc3, &dest);
     EXPECT_EQ(dest, "");
 
     for (std::string_view chunk: cc3.chunks()) {  // NOLINT(unreachable loop)

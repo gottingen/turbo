@@ -108,9 +108,9 @@ namespace turbo {
     template<typename Releaser>
     Cord make_cord_from_external(std::string_view, Releaser &&);
 
-    void CopyCordToString(const Cord &src, turbo::Nonnull<std::string *> dst);
+    void copy_cord_to_string(const Cord &src, turbo::Nonnull<std::string *> dst);
 
-    void AppendCordToString(const Cord &src, turbo::Nonnull<std::string *> dst);
+    void append_cord_to_string(const Cord &src, turbo::Nonnull<std::string *> dst);
 
     // Cord memory accounting modes
     enum class CordMemoryAccounting {
@@ -296,7 +296,7 @@ namespace turbo {
         // available, then this method will return that buffer including its data
         // contents. I.e.; the returned buffer will have a non-zero length, and
         // a capacity of at least `buffer.length + min_capacity`. Otherwise, this
-        // method will return `CordBuffer::CreateWithDefaultLimit(capacity)`.
+        // method will return `CordBuffer::create_with_default_limit(capacity)`.
         //
         // Below an example of using get_append_buffer. Notice that in this example we
         // use `get_append_buffer()` only on the first iteration. As we know nothing
@@ -309,10 +309,10 @@ namespace turbo {
         //     bool first = true;
         //     while (n > 0) {
         //       CordBuffer buffer = first ? cord.get_append_buffer(n)
-        //                                 : CordBuffer::CreateWithDefaultLimit(n);
+        //                                 : CordBuffer::create_with_default_limit(n);
         //       turbo::span<char> data = buffer.available_up_to(n);
         //       FillRandomValues(data.data(), data.size());
-        //       buffer.IncreaseLengthBy(data.size());
+        //       buffer.increase_length_by(data.size());
         //       cord.append(std::move(buffer));
         //       n -= data.size();
         //       first = false;
@@ -325,10 +325,10 @@ namespace turbo {
         // This function is identical to `get_append_buffer`, except that in the case
         // where a new `CordBuffer` is allocated, it is allocated using the provided
         // custom limit instead of the default limit. `get_append_buffer` will default
-        // to `CordBuffer::CreateWithDefaultLimit(capacity)` whereas this method
-        // will default to `CordBuffer::CreateWithCustomLimit(block_size, capacity)`.
+        // to `CordBuffer::create_with_default_limit(capacity)` whereas this method
+        // will default to `CordBuffer::create_with_custom_limit(block_size, capacity)`.
         // This method is equivalent to `get_append_buffer` if `block_size` is zero.
-        // See the documentation for `CreateWithCustomLimit` for more details on the
+        // See the documentation for `create_with_custom_limit` for more details on the
         // restrictions and legal values for `block_size`.
         CordBuffer get_custom_append_buffer(size_t block_size, size_t capacity,
                                          size_t min_capacity = 16);
@@ -420,9 +420,9 @@ namespace turbo {
         // Cord::Contains()
         //
         // Determines whether the Cord contains the passed string data `rhs`.
-        bool Contains(std::string_view rhs) const;
+        bool contains(std::string_view rhs) const;
 
-        bool Contains(const Cord &rhs) const;
+        bool contains(const Cord &rhs) const;
 
         // Cord::operator std::string()
         //
@@ -430,7 +430,7 @@ namespace turbo {
         // prevent unintended Cord usage in functions that take a string.
         explicit operator std::string() const;
 
-        // CopyCordToString()
+        // copy_cord_to_string()
         //
         // Copies the contents of a `src` Cord into a `*dst` string.
         //
@@ -439,10 +439,10 @@ namespace turbo {
         // guarantee that pointers previously returned by `dst->data()` remain valid
         // even if `*dst` had enough capacity to hold `src`. If `*dst` is a new
         // object, prefer to simply use the conversion operator to `std::string`.
-        friend void CopyCordToString(const Cord &src,
+        friend void copy_cord_to_string(const Cord &src,
                                      turbo::Nonnull<std::string *> dst);
 
-        // AppendCordToString()
+        // append_cord_to_string()
         //
         // Appends the contents of a `src` Cord to a `*dst` string.
         //
@@ -451,7 +451,7 @@ namespace turbo {
         // this function does not invalidate pointers previously returned by
         // `dst->data()`. If `*dst` is a new object, prefer to simply use the
         // conversion operator to `std::string`.
-        friend void AppendCordToString(const Cord &src,
+        friend void append_cord_to_string(const Cord &src,
                                        turbo::Nonnull<std::string *> dst);
 
         class CharIterator;
@@ -815,7 +815,7 @@ namespace turbo {
         CharIterator find(const turbo::Cord &needle) const;
 
         // Supports turbo::Cord as a sink object for turbo::format().
-        friend void TurboFormatFlush(turbo::Nonnull<turbo::Cord *> cord,
+        friend void turbo_format_flush(turbo::Nonnull<turbo::Cord *> cord,
                                      std::string_view part) {
             cord->append(part);
         }
@@ -1426,13 +1426,13 @@ namespace turbo {
         if (const turbo::cord_internal::CordRep *rep = contents_.tree()) {
             switch (accounting_method) {
                 case CordMemoryAccounting::kFairShare:
-                    result += cord_internal::GetEstimatedFairShareMemoryUsage(rep);
+                    result += cord_internal::get_estimated_fair_share_memory_usage(rep);
                     break;
                 case CordMemoryAccounting::kTotalMorePrecise:
-                    result += cord_internal::GetMorePreciseMemoryUsage(rep);
+                    result += cord_internal::get_more_precise_memory_usage(rep);
                     break;
                 case CordMemoryAccounting::kTotal:
-                    result += cord_internal::GetEstimatedMemoryUsage(rep);
+                    result += cord_internal::get_estimated_memory_usage(rep);
                     break;
             }
         }
@@ -1496,7 +1496,7 @@ namespace turbo {
     }
 
     inline CordBuffer Cord::get_append_buffer(size_t capacity, size_t min_capacity) {
-        if (empty()) return CordBuffer::CreateWithDefaultLimit(capacity);
+        if (empty()) return CordBuffer::create_with_default_limit(capacity);
         return GetAppendBufferSlowPath(0, capacity, min_capacity);
     }
 
@@ -1504,8 +1504,8 @@ namespace turbo {
                                                   size_t capacity,
                                                   size_t min_capacity) {
         if (empty()) {
-            return block_size ? CordBuffer::CreateWithCustomLimit(block_size, capacity)
-                              : CordBuffer::CreateWithDefaultLimit(capacity);
+            return block_size ? CordBuffer::create_with_custom_limit(block_size, capacity)
+                              : CordBuffer::create_with_default_limit(capacity);
         }
         return GetAppendBufferSlowPath(block_size, capacity, min_capacity);
     }

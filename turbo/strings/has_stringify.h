@@ -37,7 +37,7 @@ namespace turbo {
             void Append(std::string_view v);
 
             // Support `turbo::format(&sink, format, args...)`.
-            friend void TurboFormatFlush(UnimplementedSink *sink, std::string_view v);
+            friend void turbo_format_flush(UnimplementedSink *sink, std::string_view v);
         };
 
     }  // namespace strings_internal

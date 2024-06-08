@@ -301,7 +301,7 @@ class StringifySink {
 
   void Append(std::string_view text);
   void Append(size_t length, char ch);
-  friend void TurboFormatFlush(StringifySink* sink, std::string_view text);
+  friend void turbo_format_flush(StringifySink* sink, std::string_view text);
 
  private:
   std::ostream& os_;

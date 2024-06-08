@@ -57,11 +57,11 @@ namespace turbo {
     //   turbo::Cord CreateRandomCord(size_t length) {
     //     turbo::Cord cord;
     //     while (length > 0) {
-    //       CordBuffer buffer = CordBuffer::CreateWithDefaultLimit(length);
+    //       CordBuffer buffer = CordBuffer::create_with_default_limit(length);
     //       turbo::span<char> data = buffer.available_up_to(length);
     //       FillRandomValues(data.data(), data.size());
-    //       buffer.IncreaseLengthBy(data.size());
-    //       cord.Append(std::move(buffer));
+    //       buffer.increase_length_by(data.size());
+    //       cord.append(std::move(buffer));
     //       length -= data.size();
     //     }
     //     return cord;
@@ -76,20 +76,20 @@ namespace turbo {
     // allocations being less granular. Using larger buffers may also increase the
     // risk of memory fragmentation.
     //
-    // Applications create a buffer using one of the `CreateWithDefaultLimit()` or
-    // `CreateWithCustomLimit()` methods. The returned instance will have a non-zero
+    // Applications create a buffer using one of the `create_with_default_limit()` or
+    // `create_with_custom_limit()` methods. The returned instance will have a non-zero
     // capacity and a zero length. Applications use the `data()` method to set the
     // contents of the managed memory, and once done filling the buffer, use the
-    // `IncreaseLengthBy()` or 'SetLength()' method to specify the length of the
+    // `increase_length_by()` or 'set_length()' method to specify the length of the
     // initialized data before adding the buffer to a Cord.
     //
-    // The `CreateWithCustomLimit()` method is intended for applications needing
+    // The `create_with_custom_limit()` method is intended for applications needing
     // larger buffers than the default memory limit, allowing the allocation of up
     // to a capacity of `kCustomLimit` bytes minus some minimum internal overhead.
-    // The usage of `CreateWithCustomLimit()` should be limited to only those use
+    // The usage of `create_with_custom_limit()` should be limited to only those use
     // cases where the distribution of the input is relatively well known, and/or
     // where the trade-off between the efficiency gains outweigh the risk of memory
-    // fragmentation. See the documentation for `CreateWithCustomLimit()` for more
+    // fragmentation. See the documentation for `create_with_custom_limit()` for more
     // information on using larger custom limits.
     //
     // The capacity of a `CordBuffer` returned by one of the `Create` methods may
@@ -115,7 +115,7 @@ namespace turbo {
 
         // kCustomLimit
         //
-        // Maximum size for CreateWithCustomLimit() allocated buffers.
+        // Maximum size for create_with_custom_limit() allocated buffers.
         // Note that the effective capacity may be slightly less
         // because of internal overhead of internal cord buffers.
         static constexpr size_t kCustomLimit = 64U << 10;
@@ -138,42 +138,42 @@ namespace turbo {
 
         CordBuffer &operator=(const CordBuffer &) = delete;
 
-        // CordBuffer::MaximumPayload()
+        // CordBuffer::maximum_payload()
         //
         // Returns the guaranteed maximum payload for a CordBuffer returned by the
-        // `CreateWithDefaultLimit()` method. While small, each internal buffer inside
+        // `create_with_default_limit()` method. While small, each internal buffer inside
         // a Cord incurs an overhead to manage the length, type and reference count
         // for the buffer managed inside the cord tree. Applications can use this
         // method to get approximate number of buffers required for a given byte
         // size, etc.
         //
         // For example:
-        //   const size_t payload = turbo::CordBuffer::MaximumPayload();
+        //   const size_t payload = turbo::CordBuffer::maximum_payload();
         //   const size_t buffer_count = (total_size + payload - 1) / payload;
         //   buffers.reserve(buffer_count);
-        static constexpr size_t MaximumPayload();
+        static constexpr size_t maximum_payload();
 
-        // Overload to the above `MaximumPayload()` except that it returns the
-        // maximum payload for a CordBuffer returned by the `CreateWithCustomLimit()`
+        // Overload to the above `maximum_payload()` except that it returns the
+        // maximum payload for a CordBuffer returned by the `create_with_custom_limit()`
         // method given the provided `block_size`.
-        static constexpr size_t MaximumPayload(size_t block_size);
+        static constexpr size_t maximum_payload(size_t block_size);
 
-        // CordBuffer::CreateWithDefaultLimit()
+        // CordBuffer::create_with_default_limit()
         //
         // Creates a CordBuffer instance of the desired `capacity`, capped at the
         // default limit `kDefaultLimit`. The returned buffer has a guaranteed
         // capacity of at least `min(kDefaultLimit, capacity)`. See the class comments
         // for more information on buffer capacities and intended usage.
-        static CordBuffer CreateWithDefaultLimit(size_t capacity);
+        static CordBuffer create_with_default_limit(size_t capacity);
 
-        // CordBuffer::CreateWithCustomLimit()
+        // CordBuffer::create_with_custom_limit()
         //
         // Creates a CordBuffer instance of the desired `capacity` rounded to an
         // appropriate power of 2 size less than, or equal to `block_size`.
         // Requires `block_size` to be a power of 2.
         //
         // If `capacity` is less than or equal to `kDefaultLimit`, then this method
-        // behaves identical to `CreateWithDefaultLimit`, which means that the caller
+        // behaves identical to `create_with_default_limit`, which means that the caller
         // is guaranteed to get a buffer of at least the requested capacity.
         //
         // If `capacity` is greater than or equal to `block_size`, then this method
@@ -195,11 +195,11 @@ namespace turbo {
         //   turbo::Cord ReadFromFile(int fd, size_t n) {
         //     turbo::Cord cord;
         //     while (n > 0) {
-        //       CordBuffer buffer = CordBuffer::CreateWithCustomLimit(64 << 10, n);
+        //       CordBuffer buffer = CordBuffer::create_with_custom_limit(64 << 10, n);
         //       turbo::span<char> data = buffer.available_up_to(n);
         //       ReadFileDataOrDie(fd, data.data(), data.size());
-        //       buffer.IncreaseLengthBy(data.size());
-        //       cord.Append(std::move(buffer));
+        //       buffer.increase_length_by(data.size());
+        //       cord.append(std::move(buffer));
         //       n -= data.size();
         //     }
         //     return cord;
@@ -208,11 +208,11 @@ namespace turbo {
         // If we'd use this function to read a file of 659KiB, we may get the
         // following pattern of allocated cord buffer sizes:
         //
-        //   CreateWithCustomLimit(64KiB, 674816) --> ~64KiB (65523)
-        //   CreateWithCustomLimit(64KiB, 674816) --> ~64KiB (65523)
+        //   create_with_custom_limit(64KiB, 674816) --> ~64KiB (65523)
+        //   create_with_custom_limit(64KiB, 674816) --> ~64KiB (65523)
         //   ...
-        //   CreateWithCustomLimit(64KiB,  19586) --> ~16KiB (16371)
-        //   CreateWithCustomLimit(64KiB,   3215) -->   3215 (at least 3215)
+        //   create_with_custom_limit(64KiB,  19586) --> ~16KiB (16371)
+        //   create_with_custom_limit(64KiB,   3215) -->   3215 (at least 3215)
         //
         // The reason the method returns a 16K buffer instead of a roughly 19K buffer
         // is to reduce memory overhead and fragmentation risks. Using carefully
@@ -232,7 +232,7 @@ namespace turbo {
         // and the cost or fragmentation effect of larger buffers.
         // Applications must pick a reasonable spot on that curve, and make sure their
         // data meets their expectations in size distributions such as "mostly large".
-        static CordBuffer CreateWithCustomLimit(size_t block_size, size_t capacity);
+        static CordBuffer create_with_custom_limit(size_t block_size, size_t capacity);
 
         // CordBuffer::available()
         //
@@ -269,7 +269,7 @@ namespace turbo {
         // capacity: default and `moved from` instances have a small internal buffer.
         size_t capacity() const;
 
-        // CordBuffer::IncreaseLengthBy()
+        // CordBuffer::increase_length_by()
         //
         // Increases the length of this buffer by the specified 'n' bytes.
         // Applications must make sure all data in this buffer up to the new length
@@ -278,21 +278,21 @@ namespace turbo {
         // Typically, applications will use 'available_up_to()` to get a span of the
         // desired capacity, and use `span.size()` to increase the length as in:
         //   turbo::span<char> span = buffer.available_up_to(desired);
-        //   buffer.IncreaseLengthBy(span.size());
+        //   buffer.increase_length_by(span.size());
         //   memcpy(span.data(), src, span.size());
         //   etc...
-        void IncreaseLengthBy(size_t n);
+        void increase_length_by(size_t n);
 
-        // CordBuffer::SetLength()
+        // CordBuffer::set_length()
         //
         // Sets the data length of this instance. Applications must make sure all data
         // of the specified length has been initialized before adding a CordBuffer to
         // a Cord: failure to do so will lead to undefined behavior.
         // Setting the length to a small value or zero does not release any memory
         // held by this CordBuffer instance. Requires `length <= capacity()`.
-        // Applications should preferably use the `IncreaseLengthBy()` method above
+        // Applications should preferably use the `increase_length_by()` method above
         // in combination with the 'available()` or `available_up_to()` methods.
-        void SetLength(size_t length);
+        void set_length(size_t length);
 
     private:
         // Make sure we don't accidentally over promise.
@@ -430,7 +430,7 @@ namespace turbo {
             return static_cast<size_t>(turbo::bit_width(size - 1));
         }
 
-        // Implementation of `CreateWithCustomLimit()`.
+        // Implementation of `create_with_custom_limit()`.
         // This implementation allows for future memory allocation hints to
         // be passed down into the CordRepFlat allocation function.
         template<typename... AllocationHints>
@@ -468,15 +468,15 @@ namespace turbo {
         friend class CordBufferTestPeer;
     };
 
-    inline constexpr size_t CordBuffer::MaximumPayload() {
+    inline constexpr size_t CordBuffer::maximum_payload() {
         return cord_internal::kMaxFlatLength;
     }
 
-    inline constexpr size_t CordBuffer::MaximumPayload(size_t block_size) {
+    inline constexpr size_t CordBuffer::maximum_payload(size_t block_size) {
         return (std::min)(kCustomLimit, block_size) - cord_internal::kFlatOverhead;
     }
 
-    inline CordBuffer CordBuffer::CreateWithDefaultLimit(size_t capacity) {
+    inline CordBuffer CordBuffer::create_with_default_limit(size_t capacity) {
         if (capacity > Rep::kInlineCapacity) {
             auto *rep = cord_internal::CordRepFlat::New(capacity);
             rep->length = 0;
@@ -516,7 +516,7 @@ namespace turbo {
         return CordBuffer(rep);
     }
 
-    inline CordBuffer CordBuffer::CreateWithCustomLimit(size_t block_size,
+    inline CordBuffer CordBuffer::create_with_custom_limit(size_t block_size,
                                                         size_t capacity) {
         return CreateWithCustomLimitImpl(block_size, capacity);
     }
@@ -562,7 +562,7 @@ namespace turbo {
         return rep_.is_short() ? rep_.short_length() : rep_.rep()->length;
     }
 
-    inline void CordBuffer::SetLength(size_t length) {
+    inline void CordBuffer::set_length(size_t length) {
         TURBO_HARDENING_ASSERT(length <= capacity());
         if (rep_.is_short()) {
             rep_.set_short_length(length);
@@ -571,7 +571,7 @@ namespace turbo {
         }
     }
 
-    inline void CordBuffer::IncreaseLengthBy(size_t n) {
+    inline void CordBuffer::increase_length_by(size_t n) {
         TURBO_HARDENING_ASSERT(n <= capacity() && length() + n <= capacity());
         if (rep_.is_short()) {
             rep_.add_short_length(n);

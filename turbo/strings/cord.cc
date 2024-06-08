@@ -559,10 +559,10 @@ namespace turbo {
         const size_t max_capacity = std::numeric_limits<size_t>::max() - size;
         capacity = (std::min)(max_capacity, capacity) + size;
         CordBuffer buffer =
-                block_size ? CordBuffer::CreateWithCustomLimit(block_size, capacity)
-                           : CordBuffer::CreateWithDefaultLimit(capacity);
+                block_size ? CordBuffer::create_with_custom_limit(block_size, capacity)
+                           : CordBuffer::create_with_default_limit(capacity);
         cord_internal::SmallMemmove(buffer.data(), data.as_chars(), size);
-        buffer.SetLength(size);
+        buffer.set_length(size);
         data = {};
         return buffer;
     }
@@ -578,8 +578,8 @@ namespace turbo {
                 contents_.SetTreeOrEmpty(result.tree, scope);
                 return CordBuffer(result.extracted->flat());
             }
-            return block_size ? CordBuffer::CreateWithCustomLimit(block_size, capacity)
-                              : CordBuffer::CreateWithDefaultLimit(capacity);
+            return block_size ? CordBuffer::create_with_custom_limit(block_size, capacity)
+                              : CordBuffer::create_with_default_limit(capacity);
         }
         return CreateAppendBuffer(contents_.data_, block_size, capacity);
     }
@@ -1055,11 +1055,11 @@ namespace turbo {
 
     Cord::operator std::string() const {
         std::string s;
-        turbo::CopyCordToString(*this, &s);
+        turbo::copy_cord_to_string(*this, &s);
         return s;
     }
 
-    void CopyCordToString(const Cord &src, turbo::Nonnull<std::string *> dst) {
+    void copy_cord_to_string(const Cord &src, turbo::Nonnull<std::string *> dst) {
         if (!src.contents_.is_tree()) {
             src.contents_.CopyTo(dst);
         } else {
@@ -1068,7 +1068,7 @@ namespace turbo {
         }
     }
 
-    void AppendCordToString(const Cord &src, turbo::Nonnull<std::string *> dst) {
+    void append_cord_to_string(const Cord &src, turbo::Nonnull<std::string *> dst) {
         const size_t cur_dst_size = dst->size();
         const size_t new_dst_size = cur_dst_size + src.size();
         turbo::strings_internal::STLStringResizeUninitializedAmortized(dst,
@@ -1367,11 +1367,11 @@ namespace turbo {
         return char_end();
     }
 
-    bool Cord::Contains(std::string_view rhs) const {
+    bool Cord::contains(std::string_view rhs) const {
         return rhs.empty() || find(rhs) != char_end();
     }
 
-    bool Cord::Contains(const turbo::Cord &rhs) const {
+    bool Cord::contains(const turbo::Cord &rhs) const {
         return rhs.empty() || find(rhs) != char_end();
     }
 

@@ -130,7 +130,7 @@ void StringifySink::Append(size_t length, char ch) {
   for (size_t i = 0; i < length; ++i) os_.put(ch);
 }
 
-void TurboFormatFlush(StringifySink* sink, std::string_view text) {
+void turbo_format_flush(StringifySink* sink, std::string_view text) {
   sink->Append(text);
 }
 
