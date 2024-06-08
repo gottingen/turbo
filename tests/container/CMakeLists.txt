@@ -44,7 +44,9 @@ set(CONTAINER_SRC_LIST
         sample_element_size_test
         unordered_map_test
         unordered_set_test
+        intrusive_list_test
         span_test
+        cache_test
 )
 
 foreach (SRC ${CONTAINER_SRC_LIST})
