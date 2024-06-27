@@ -19,7 +19,6 @@
 set(FLAGS_TEST_SRC
         commandlineflag_test
         config_test
-        flag_test
         marshalling_test
         parse_test
         path_util_test
@@ -45,3 +44,15 @@ foreach (test ${FLAGS_TEST_SRC})
             CXXOPTS ${CARBIN_CXX_OPTIONS}
     )
 endforeach ()
+carbin_cc_test(
+        NAME flag_test
+        MODULE flags
+        SOURCES flag_test.cc flag_test_defs.cc
+        LINKS
+        turbo::turbo
+        GTest::gtest
+        GTest::gmock
+        GTest::gmock_main
+        ${CARBIN_DEPS_LINK}
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)

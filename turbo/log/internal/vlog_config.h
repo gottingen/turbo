@@ -55,7 +55,7 @@ constexpr int kUseFlag = (std::numeric_limits<int16_t>::min)();
 // Represents a unique callsite for a `VLOG()` or `VLOG_IS_ON()` call.
 //
 // Libraries that provide `VLOG`-like functionality should use this to
-// efficiently handle --vmodule.
+// efficiently handle --vlog_module.
 //
 // VLogSite objects must not be destroyed until the program exits. Doing so will
 // probably yield nasty segfaults in VLogSiteManager::UpdateLogSites(). The
@@ -130,7 +130,7 @@ static_assert(std::is_trivially_destructible<VLogSite>::value,
 // Does not allocate memory.
 int VLogLevel(std::string_view file);
 
-// Registers a site `v` to get updated as `vmodule` and `v` change.  Also
+// Registers a site `v` to get updated as `vlog_module` and `v` change.  Also
 // initializes the site based on their current values, and returns that result.
 // Does not allocate memory.
 int RegisterAndInitialize(VLogSite* v);
@@ -138,21 +138,21 @@ int RegisterAndInitialize(VLogSite* v);
 // Allocates memory.
 void UpdateVLogSites();
 
-// Completely overwrites the saved value of `vmodule`.
+// Completely overwrites the saved value of `vlog_module`.
 // Allocates memory.
-void UpdateVModule(std::string_view vmodule);
+void UpdateVModule(std::string_view vlog_module);
 
 // Updates the global verbosity level to `v` and returns the prior value.
 // Allocates memory.
 int UpdateGlobalVLogLevel(int v);
 
-// Atomically prepends `module_pattern=log_level` to the start of vmodule.
+// Atomically prepends `module_pattern=log_level` to the start of vlog_module.
 // Returns the prior value for `module_pattern` if there was an exact match and
 // `global_v` otherwise.
 // Allocates memory.
 int PrependVModule(std::string_view module_pattern, int log_level);
 
-// Registers `on_update` to be called whenever `v` or `vmodule` change.
+// Registers `on_update` to be called whenever `v` or `vlog_module` change.
 // Allocates memory.
 void OnVLogVerbosityUpdate(std::function<void()> cb);
 

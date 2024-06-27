@@ -25,14 +25,14 @@
 // The Turbo Logging library supports the following command line flags to
 // configure logging behavior at runtime:
 //
-// --stderrthreshold=<value>
+// --stderr_threshold=<value>
 // Log messages at or above this threshold level are copied to stderr.
 //
-// --minloglevel=<value>
+// --min_log_level=<value>
 // Messages logged at a lower level than this are discarded and don't actually
 // get logged anywhere.
 //
-// --log_backtrace_at=<file:linenum>
+// --backtrace_log_at=<file:linenum>
 // Emit a backtrace (stack trace) when logging at file:linenum.
 //
 // To use these commandline flags, the //turbo/log:flags library must be

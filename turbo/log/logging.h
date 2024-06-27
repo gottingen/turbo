@@ -108,5 +108,7 @@ namespace turbo {
 
     void cleanup_log();
 
+    void load_flags_symbol();
+
 }  // namespace turbo
 

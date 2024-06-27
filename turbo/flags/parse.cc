@@ -102,42 +102,42 @@ namespace turbo::flags_internal {
 
 // These flags influence how command line flags are parsed and are only intended
 // to be set on the command line.  Avoid reading or setting them from C++ code.
-TURBO_FLAG(std::vector<std::string>, flagfile, {},
+TURBO_FLAG(std::vector<std::string>, flags_file, {},
            "comma-separated list of files to load flags from")
 .on_update([]() noexcept {
-    if (turbo::get_flag(FLAGS_flagfile).empty()) return;
+    if (turbo::get_flag(FLAGS_flags_file).empty()) return;
 
     turbo::MutexLock l(&turbo::flags_internal::processing_checks_guard);
 
     // Setting this flag twice before it is handled most likely an internal
     // error and should be reviewed by developers.
     if (turbo::flags_internal::flagfile_needs_processing) {
-        TURBO_INTERNAL_LOG(WARNING, "flagfile set twice before it is handled");
+        TURBO_INTERNAL_LOG(WARNING, "flags_file set twice before it is handled");
     }
 
     turbo::flags_internal::flagfile_needs_processing = true;
 });
-TURBO_FLAG(std::vector<std::string>, fromenv, {},
+TURBO_FLAG(std::vector<std::string>, from_env, {},
            "comma-separated list of flags to set from the environment"
            " [use 'export FLAGS_flag1=value']")
 .on_update([]() noexcept {
-    if (turbo::get_flag(FLAGS_fromenv).empty()) return;
+    if (turbo::get_flag(FLAGS_from_env).empty()) return;
 
     turbo::MutexLock l(&turbo::flags_internal::processing_checks_guard);
 
     // Setting this flag twice before it is handled most likely an internal
     // error and should be reviewed by developers.
     if (turbo::flags_internal::fromenv_needs_processing) {
-        TURBO_INTERNAL_LOG(WARNING, "fromenv set twice before it is handled.");
+        TURBO_INTERNAL_LOG(WARNING, "from_env set twice before it is handled.");
     }
 
     turbo::flags_internal::fromenv_needs_processing = true;
 });
-TURBO_FLAG(std::vector<std::string>, tryfromenv, {},
+TURBO_FLAG(std::vector<std::string>, try_from_env, {},
            "comma-separated list of flags to try to set from the environment if "
            "present")
 .on_update([]() noexcept {
-    if (turbo::get_flag(FLAGS_tryfromenv).empty()) return;
+    if (turbo::get_flag(FLAGS_try_from_env).empty()) return;
 
     turbo::MutexLock l(&turbo::flags_internal::processing_checks_guard);
 
@@ -145,15 +145,15 @@ TURBO_FLAG(std::vector<std::string>, tryfromenv, {},
     // error and should be reviewed by developers.
     if (turbo::flags_internal::tryfromenv_needs_processing) {
         TURBO_INTERNAL_LOG(WARNING,
-                           "tryfromenv set twice before it is handled.");
+                           "try_from_env set twice before it is handled.");
     }
 
     turbo::flags_internal::tryfromenv_needs_processing = true;
 });
 
-// Rather than reading or setting --undefok from C++ code, please consider using
+// Rather than reading or setting --undef_ok from C++ code, please consider using
 // TURBO_RETIRED_FLAG instead.
-TURBO_FLAG(std::vector<std::string>, undefok, {},
+TURBO_FLAG(std::vector<std::string>, undef_ok, {},
            "comma-separated list of flag names that it is okay to specify "
            "on the command line even if the program does not define a flag "
            "with that name");
@@ -191,7 +191,7 @@ namespace turbo::flags_internal {
 
             if (!flag_file) {
                 flags_internal::ReportUsageError(
-                        turbo::str_cat("Can't open flagfile ", flag_file_name), true);
+                        turbo::str_cat("Can't open flags_file ", flag_file_name), true);
 
                 return false;
             }
@@ -225,7 +225,7 @@ namespace turbo::flags_internal {
                 }
 
                 flags_internal::ReportUsageError(
-                        turbo::str_cat("Unexpected line in the flagfile ", flag_file_name, ": ",
+                        turbo::str_cat("Unexpected line in the flags_file ", flag_file_name, ": ",
                                        line),
                         true);
 
@@ -342,7 +342,7 @@ namespace turbo::flags_internal {
         // Returns success status, which is true if we successfully read all flag files,
         // in which case new ArgLists are appended to the input_args in a reverse order
         // of file names in the input flagfiles list. This order ensures that flags from
-        // the first flagfile in the input list are processed before the second flagfile
+        // the first flags_file in the input list are processed before the second flags_file
         // etc.
         bool ReadFlagfiles(const std::vector<std::string> &flagfiles,
                            std::vector<ArgsList> &input_args) {
@@ -377,7 +377,7 @@ namespace turbo::flags_internal {
 
             for (const auto &flag_name: flag_names) {
                 // Avoid infinite recursion.
-                if (flag_name == "fromenv" || flag_name == "tryfromenv") {
+                if (flag_name == "from_env" || flag_name == "try_from_env") {
                     flags_internal::ReportUsageError(
                             turbo::str_cat("Infinite recursion on flag ", flag_name), true);
 
@@ -409,32 +409,32 @@ namespace turbo::flags_internal {
         }
 
         // Returns success status, which is true if were able to handle all generator
-        // flags (flagfile, fromenv, tryfromemv) successfully.
+        // flags (flags_file, from_env, tryfromemv) successfully.
         bool HandleGeneratorFlags(std::vector<ArgsList> &input_args,
                                   std::vector<std::string> &flagfile_value) {
             bool success = true;
 
             turbo::MutexLock l(&flags_internal::processing_checks_guard);
 
-            // flagfile could have been set either on a command line or
+            // flags_file could have been set either on a command line or
             // programmatically before invoking parse_command_line. Note that we do not
-            // actually process arguments specified in the flagfile, but instead
+            // actually process arguments specified in the flags_file, but instead
             // create a secondary arguments list to be processed along with the rest
             // of the command line arguments. Since we always the process most recently
-            // created list of arguments first, this will result in flagfile argument
+            // created list of arguments first, this will result in flags_file argument
             // being processed before any other argument in the command line. If
             // FLAGS_flagfile contains more than one file name we create multiple new
             // levels of arguments in a reverse order of file names. Thus we always
             // process arguments from first file before arguments containing in a
-            // second file, etc. If flagfile contains another
-            // --flagfile inside of it, it will produce new level of arguments and
-            // processed before the rest of the flagfile. We are also collecting all
+            // second file, etc. If flags_file contains another
+            // --flags_file inside of it, it will produce new level of arguments and
+            // processed before the rest of the flags_file. We are also collecting all
             // flagfiles set on original command line. Unlike the rest of the flags,
             // this flag can be set multiple times and is expected to be handled
             // multiple times. We are collecting them all into a single list and set
-            // the value of FLAGS_flagfile to that value at the end of the parsing.
+            // the value of FLAGS_flags_file to that value at the end of the parsing.
             if (flags_internal::flagfile_needs_processing) {
-                auto flagfiles = turbo::get_flag(FLAGS_flagfile);
+                auto flagfiles = turbo::get_flag(FLAGS_flags_file);
 
                 if (input_args.size() == 1) {
                     flagfile_value.insert(flagfile_value.end(), flagfiles.begin(),
@@ -446,11 +446,11 @@ namespace turbo::flags_internal {
                 flags_internal::flagfile_needs_processing = false;
             }
 
-            // Similar to flagfile fromenv/tryfromemv can be set both
-            // programmatically and at runtime on a command line. Unlike flagfile these
+            // Similar to flags_file from_env/tryfromemv can be set both
+            // programmatically and at runtime on a command line. Unlike flags_file these
             // can't be recursive.
             if (flags_internal::fromenv_needs_processing) {
-                auto flags_list = turbo::get_flag(FLAGS_fromenv);
+                auto flags_list = turbo::get_flag(FLAGS_from_env);
 
                 success &= ReadFlagsFromEnv(flags_list, input_args, true);
 
@@ -458,7 +458,7 @@ namespace turbo::flags_internal {
             }
 
             if (flags_internal::tryfromenv_needs_processing) {
-                auto flags_list = turbo::get_flag(FLAGS_tryfromenv);
+                auto flags_list = turbo::get_flag(FLAGS_try_from_env);
 
                 success &= ReadFlagsFromEnv(flags_list, input_args, false);
 
@@ -470,22 +470,22 @@ namespace turbo::flags_internal {
 
 
         void ResetGeneratorFlags(const std::vector<std::string> &flagfile_value) {
-            // Setting flagfile to the value which collates all the values set on a
+            // Setting flags_file to the value which collates all the values set on a
             // command line and programmatically. So if command line looked like
-            // --flagfile=f1 --flagfile=f2 the final value of the FLAGS_flagfile flag is
+            // --flags_file=f1 --flags_file=f2 the final value of the FLAGS_flags_file flag is
             // going to be {"f1", "f2"}
             if (!flagfile_value.empty()) {
-                turbo::set_flag(&FLAGS_flagfile, flagfile_value);
+                turbo::set_flag(&FLAGS_flags_file, flagfile_value);
                 turbo::MutexLock l(&flags_internal::processing_checks_guard);
                 flags_internal::flagfile_needs_processing = false;
             }
 
-            // fromenv/tryfromenv are set to <undefined> value.
-            if (!turbo::get_flag(FLAGS_fromenv).empty()) {
-                turbo::set_flag(&FLAGS_fromenv, {});
+            // from_env/try_from_env are set to <undefined> value.
+            if (!turbo::get_flag(FLAGS_from_env).empty()) {
+                turbo::set_flag(&FLAGS_from_env, {});
             }
-            if (!turbo::get_flag(FLAGS_tryfromenv).empty()) {
-                turbo::set_flag(&FLAGS_tryfromenv, {});
+            if (!turbo::get_flag(FLAGS_try_from_env).empty()) {
+                turbo::set_flag(&FLAGS_try_from_env, {});
             }
 
             turbo::MutexLock l(&flags_internal::processing_checks_guard);
@@ -587,13 +587,13 @@ namespace turbo::flags_internal {
 
 
         bool CanIgnoreUndefinedFlag(std::string_view flag_name) {
-            auto undefok = turbo::get_flag(FLAGS_undefok);
-            if (std::find(undefok.begin(), undefok.end(), flag_name) != undefok.end()) {
+            auto undef_ok = turbo::get_flag(FLAGS_undef_ok);
+            if (std::find(undef_ok.begin(), undef_ok.end(), flag_name) != undef_ok.end()) {
                 return true;
             }
 
             if (turbo::consume_prefix(&flag_name, "no") &&
-                std::find(undefok.begin(), undefok.end(), flag_name) != undefok.end()) {
+                std::find(undef_ok.begin(), undef_ok.end(), flag_name) != undef_ok.end()) {
                 return true;
             }
 
@@ -665,7 +665,7 @@ namespace turbo::flags_internal {
     // the given flag.
     std::vector<std::string> GetMisspellingHints(const std::string_view flag) {
         const size_t maxCutoff = std::min(flag.size() / 2 + 1, kMaxDistance);
-        auto undefok = turbo::get_flag(FLAGS_undefok);
+        auto undef_ok = turbo::get_flag(FLAGS_undef_ok);
         BestHints best_hints(static_cast<uint8_t>(maxCutoff));
         flags_internal::ForEachFlag([&](const CommandLineFlag &f) {
             if (best_hints.hints.size() >= kMaxHints) return;
@@ -680,12 +680,12 @@ namespace turbo::flags_internal {
                 best_hints.AddHint(negated_flag, distance);
             }
         });
-        // Finally calculate distance to flags in "undefok".
-        turbo::c_for_each(undefok, [&](const std::string_view f) {
+        // Finally calculate distance to flags in "undef_ok".
+        turbo::c_for_each(undef_ok, [&](const std::string_view f) {
             if (best_hints.hints.size() >= kMaxHints) return;
             uint8_t distance = strings_internal::CappedDamerauLevenshteinDistance(
                     flag, f, best_hints.best_distance);
-            best_hints.AddHint(turbo::str_cat(f, " (undefok)"), distance);
+            best_hints.AddHint(turbo::str_cat(f, " (undef_ok)"), distance);
         });
         return best_hints.hints;
     }
@@ -770,7 +770,7 @@ namespace turbo::flags_internal {
 
         // Iterate through the list of the input arguments. First level are
         // arguments originated from argc/argv. Following levels are arguments
-        // originated from recursive parsing of flagfile(s).
+        // originated from recursive parsing of flags_file(s).
         bool success = true;
         while (!input_args.empty()) {
             // First we process the built-in generator flags.

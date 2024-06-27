@@ -59,19 +59,19 @@ TEST_F(LogFlagsTest, DISABLED_StderrKnobsDefault) {
 }
 
 TEST_F(LogFlagsTest, set_stderr_threshold) {
-  turbo::set_flag(&FLAGS_stderrthreshold,
+  turbo::set_flag(&FLAGS_stderr_threshold,
                 static_cast<int>(turbo::LogSeverityAtLeast::kInfo));
 
   EXPECT_EQ(turbo::stderr_threshold(), turbo::LogSeverityAtLeast::kInfo);
 
-  turbo::set_flag(&FLAGS_stderrthreshold,
+  turbo::set_flag(&FLAGS_stderr_threshold,
                 static_cast<int>(turbo::LogSeverityAtLeast::kError));
 
   EXPECT_EQ(turbo::stderr_threshold(), turbo::LogSeverityAtLeast::kError);
 }
 
 TEST_F(LogFlagsTest, set_min_log_level) {
-  turbo::set_flag(&FLAGS_minloglevel,
+  turbo::set_flag(&FLAGS_min_log_level,
                 static_cast<int>(turbo::LogSeverityAtLeast::kError));
 
   EXPECT_EQ(turbo::min_log_level(), turbo::LogSeverityAtLeast::kError);
@@ -79,18 +79,18 @@ TEST_F(LogFlagsTest, set_min_log_level) {
   turbo::log_internal::ScopedMinLogLevel scoped_min_log_level(
       turbo::LogSeverityAtLeast::kWarning);
 
-  EXPECT_EQ(turbo::get_flag(FLAGS_minloglevel),
+  EXPECT_EQ(turbo::get_flag(FLAGS_min_log_level),
             static_cast<int>(turbo::LogSeverityAtLeast::kWarning));
 }
 
 TEST_F(LogFlagsTest, PrependLogPrefix) {
-  turbo::set_flag(&FLAGS_log_prefix, false);
+  turbo::set_flag(&FLAGS_log_with_prefix, false);
 
   EXPECT_EQ(turbo::should_prepend_log_prefix(), false);
 
   turbo::enable_log_prefix(true);
 
-  EXPECT_EQ(turbo::get_flag(FLAGS_log_prefix), true);
+  EXPECT_EQ(turbo::get_flag(FLAGS_log_with_prefix), true);
 }
 
 TEST_F(LogFlagsTest, EmptyBacktraceAtFlag) {
@@ -100,7 +100,7 @@ TEST_F(LogFlagsTest, EmptyBacktraceAtFlag) {
   EXPECT_CALL(test_sink, Send(TextMessage(Not(HasSubstr("(stacktrace:")))));
 
   test_sink.StartCapturingLogs();
-  turbo::set_flag(&FLAGS_log_backtrace_at, "");
+  turbo::set_flag(&FLAGS_backtrace_log_at, "");
   LOG(INFO) << "hello world";
 }
 
@@ -111,7 +111,7 @@ TEST_F(LogFlagsTest, BacktraceAtNonsense) {
   EXPECT_CALL(test_sink, Send(TextMessage(Not(HasSubstr("(stacktrace:")))));
 
   test_sink.StartCapturingLogs();
-  turbo::set_flag(&FLAGS_log_backtrace_at, "gibberish");
+  turbo::set_flag(&FLAGS_backtrace_log_at, "gibberish");
   LOG(INFO) << "hello world";
 }
 
@@ -124,7 +124,7 @@ TEST_F(LogFlagsTest, BacktraceAtWrongFile) {
   EXPECT_CALL(test_sink, Send(TextMessage(Not(HasSubstr("(stacktrace:")))));
 
   test_sink.StartCapturingLogs();
-  turbo::set_flag(&FLAGS_log_backtrace_at,
+  turbo::set_flag(&FLAGS_backtrace_log_at,
                 turbo::str_cat("some_other_file.cc:", log_line));
   do_log();
 }
@@ -138,7 +138,7 @@ TEST_F(LogFlagsTest, BacktraceAtWrongLine) {
   EXPECT_CALL(test_sink, Send(TextMessage(Not(HasSubstr("(stacktrace:")))));
 
   test_sink.StartCapturingLogs();
-  turbo::set_flag(&FLAGS_log_backtrace_at,
+  turbo::set_flag(&FLAGS_backtrace_log_at,
                 turbo::str_cat("flags_test.cc:", log_line + 1));
   do_log();
 }
@@ -152,7 +152,7 @@ TEST_F(LogFlagsTest, BacktraceAtWholeFilename) {
   EXPECT_CALL(test_sink, Send(TextMessage(Not(HasSubstr("(stacktrace:")))));
 
   test_sink.StartCapturingLogs();
-  turbo::set_flag(&FLAGS_log_backtrace_at, turbo::str_cat(__FILE__, ":", log_line));
+  turbo::set_flag(&FLAGS_backtrace_log_at, turbo::str_cat(__FILE__, ":", log_line));
   do_log();
 }
 
@@ -165,7 +165,7 @@ TEST_F(LogFlagsTest, BacktraceAtNonmatchingSuffix) {
   EXPECT_CALL(test_sink, Send(TextMessage(Not(HasSubstr("(stacktrace:")))));
 
   test_sink.StartCapturingLogs();
-  turbo::set_flag(&FLAGS_log_backtrace_at,
+  turbo::set_flag(&FLAGS_backtrace_log_at,
                 turbo::str_cat("flags_test.cc:", log_line, "gibberish"));
   do_log();
 }
@@ -181,10 +181,10 @@ TEST_F(LogFlagsTest, LogsBacktrace) {
   EXPECT_CALL(test_sink, Send(TextMessage(Not(HasSubstr("(stacktrace:")))));
 
   test_sink.StartCapturingLogs();
-  turbo::set_flag(&FLAGS_log_backtrace_at,
+  turbo::set_flag(&FLAGS_backtrace_log_at,
                 turbo::str_cat("flags_test.cc:", log_line));
   do_log();
-  turbo::set_flag(&FLAGS_log_backtrace_at, "");
+  turbo::set_flag(&FLAGS_backtrace_log_at, "");
   do_log();
 }
 

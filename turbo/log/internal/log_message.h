@@ -248,7 +248,7 @@ class LogMessage {
 
   void SendToLog();
 
-  // Checks `FLAGS_log_backtrace_at` and appends a backtrace if appropriate.
+  // Checks `FLAGS_backtrace_log_at` and appends a backtrace if appropriate.
   void LogBacktraceIfNeeded();
 
   // This should be the first data member so that its initializer captures errno
