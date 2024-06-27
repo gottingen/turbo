@@ -52,5 +52,12 @@ int main() {
         LOG(WARNING) << "hello world";
         LOG(ERROR) << "hello world";
     }
+    turbo::set_min_log_level(turbo::LogSeverityAtLeast::kWarning);
+    turbo::set_global_vlog_level(20);
+    VLOG(1) << "hello world 1";
+    VLOG(2) << "hello world 2";
+    VLOG(3) << "hello world 3";
+    VLOG(20) << "hello world 20";
+    VLOG(21) << "hello world 21";
     call6();
 }

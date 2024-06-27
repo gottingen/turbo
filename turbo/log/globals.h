@@ -177,7 +177,7 @@ namespace turbo {
     //------------------------------------------------------------------------------
     //
     // Sets `(TURBO_)VLOG(_IS_ON)` level for `module_pattern` to `log_level`.  This
-    // allows programmatic control of what is normally set by the --vmodule flag.
+    // allows programmatic control of what is normally set by the --vlog_module flag.
     // Returns the level that previously applied to `module_pattern`.
     inline int set_vlog_level(std::string_view module_pattern, int log_level) {
         return turbo::log_internal::PrependVModule(module_pattern, log_level);

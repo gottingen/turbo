@@ -30,11 +30,11 @@
 //   }
 //
 // Each source file has an effective verbosity level that's a non-negative
-// integer computed from the `--vmodule` and `--v` flags.
+// integer computed from the `--vlog_module` and `--verbosity` flags.
 // `VLOG_IS_ON(n)` is true, and `VLOG(n)` logs, if that effective verbosity
 // level is greater than or equal to `n`.
 //
-// `--vmodule` takes a comma-delimited list of key=value pairs.  Each key is a
+// `--vlog_module` takes a comma-delimited list of key=value pairs.  Each key is a
 // pattern matched against filenames, and the values give the effective severity
 // level applied to matching files.  '?' and '*' characters in patterns are
 // interpreted as single-character and zero-or-more-character wildcards.
@@ -43,17 +43,17 @@
 // last . and everything after it) is stripped from each filename prior to
 // matching, as is the special suffix "-inl".
 //
-// Files are matched against globs in `--vmodule` in order, and the first match
+// Files are matched against globs in `--vlog_module` in order, and the first match
 // determines the verbosity level.
 //
-// Files which do not match any pattern in `--vmodule` use the value of `--v` as
+// Files which do not match any pattern in `--vlog_module` use the value of `--verbosity` as
 // their effective verbosity level.  The default is 0.
 //
 // set_vlog_level helper function is provided to do limited dynamic control over
-// V-logging by appending to `--vmodule`. Because these go at the beginning of
+// V-logging by appending to `--vlog_module`. Because these go at the beginning of
 // the list, they take priority over any globs previously added.
 //
-// Resetting --vmodule will override all previous modifications to `--vmodule`,
+// Resetting --vlog_module will override all previous modifications to `--vlog_module`,
 // including via set_vlog_level.
 
 #ifndef TURBO_LOG_VLOG_IS_ON_H_
@@ -65,7 +65,7 @@
 
 // Each VLOG_IS_ON call site gets its own VLogSite that registers with the
 // global linked list of sites to asynchronously update its verbosity level on
-// changes to --v or --vmodule. The verbosity can also be set by manually
+// changes to --verbosity or --vlog_module. The verbosity can also be set by manually
 // calling set_vlog_level.
 //
 // VLOG_IS_ON is not async signal safe, but it is guaranteed not to allocate

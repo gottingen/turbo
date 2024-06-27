@@ -541,7 +541,7 @@ path.
 }  // namespace
 
 int main(int argc, char* argv[]) {
-  (void)turbo::get_flag(FLAGS_undefok);  // Force linking of parse.cc
+  (void)turbo::get_flag(FLAGS_undef_ok);  // Force linking of parse.cc
   flags::SetProgramInvocationName("usage_test");
 #if !defined(GTEST_HAS_ABSL) || !GTEST_HAS_ABSL
   // GoogleTest calls turbo::set_program_usage_message() already.

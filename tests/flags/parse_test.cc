@@ -198,16 +198,16 @@ constexpr const char* const ff2_data[] = {
 };
 // clang-format on
 
-// Builds flagfile flag in the flagfile_flag buffer and returns it. This
-// function also creates a temporary flagfile based on FlagfileData input.
-// We create a flagfile in a temporary directory with the name specified in
+// Builds flags_file flag in the flagfile_flag buffer and returns it. This
+// function also creates a temporary flags_file based on FlagfileData input.
+// We create a flags_file in a temporary directory with the name specified in
 // FlagfileData and populate it with lines specified in FlagfileData. If $0 is
 // referenced in any of the lines in FlagfileData they are replaced with
-// temporary directory location. This way we can test inclusion of one flagfile
-// from another flagfile.
+// temporary directory location. This way we can test inclusion of one flags_file
+// from another flags_file.
 const char* GetFlagfileFlag(const std::vector<FlagfileData>& ffd,
                             std::string& flagfile_flag) {
-  flagfile_flag = "--flagfile=";
+  flagfile_flag = "--flags_file=";
   std::string_view separator;
   for (const auto& flagfile_data : ffd) {
     std::string flagfile_name =
@@ -647,10 +647,10 @@ TEST_F(ParseDeathTest, TestFlagSuggestions) {
       InvokeParse(in_args1),
       "Unknown command line flag 'legacy_boo'. Did you mean: legacy_bool ?");
 
-  const char* in_args2[] = {"testbin", "--foo", "--undefok=foo1"};
+  const char* in_args2[] = {"testbin", "--foo", "--undef_ok=foo1"};
   EXPECT_DEATH_IF_SUPPORTED(
       InvokeParse(in_args2),
-      "Unknown command line flag 'foo'. Did you mean: foo1 \\(undefok\\)?");
+      "Unknown command line flag 'foo'. Did you mean: foo1 \\(undef_ok\\)?");
 
   const char* in_args3[] = {
       "testbin",
@@ -754,8 +754,8 @@ TEST_F(ParseTest, TestFlagfileInFlagfile) {
   std::string flagfile_flag;
 
   constexpr const char* const ff3_data[] = {
-      "--flagfile=$0/parse_test.ff1",
-      "--flagfile=$0/parse_test.ff2",
+      "--flags_file=$0/parse_test.ff1",
+      "--flags_file=$0/parse_test.ff2",
   };
 
   GetFlagfileFlag({{"parse_test.ff2", turbo::MakeConstSpan(ff2_data)},
@@ -813,10 +813,10 @@ TEST_F(ParseDeathTest, TestInvalidFlagfiles) {
 
   const char* in_args4[] = {
       "testbin",
-      "--flagfile=invalid_flag_file",
+      "--flags_file=invalid_flag_file",
   };
   EXPECT_DEATH_IF_SUPPORTED(InvokeParse(in_args4),
-                            "Can't open flagfile invalid_flag_file");
+                            "Can't open flags_file invalid_flag_file");
 
   constexpr const char* const ff7_data[] = {
       "--int_flag=10",
@@ -830,14 +830,14 @@ TEST_F(ParseDeathTest, TestInvalidFlagfiles) {
                       flagfile_flag),
   };
   EXPECT_DEATH_IF_SUPPORTED(InvokeParse(in_args5),
-               "Unexpected line in the flagfile .*: \\*bin\\*");
+               "Unexpected line in the flags_file .*: \\*bin\\*");
 }
 
 // --------------------------------------------------------------------
 
 TEST_F(ParseTest, TestReadingRequiredFlagsFromEnv) {
   const char* in_args1[] = {"testbin",
-                            "--fromenv=int_flag,bool_flag,string_flag"};
+                            "--from_env=int_flag,bool_flag,string_flag"};
 
   ScopedSetEnv set_int_flag("FLAGS_int_flag", "33");
   ScopedSetEnv set_bool_flag("FLAGS_bool_flag", "True");
@@ -849,7 +849,7 @@ TEST_F(ParseTest, TestReadingRequiredFlagsFromEnv) {
 // --------------------------------------------------------------------
 
 TEST_F(ParseDeathTest, TestReadingUnsetRequiredFlagsFromEnv) {
-  const char* in_args1[] = {"testbin", "--fromenv=int_flag"};
+  const char* in_args1[] = {"testbin", "--from_env=int_flag"};
 
   EXPECT_DEATH_IF_SUPPORTED(InvokeParse(in_args1),
                "FLAGS_int_flag not found in environment");
@@ -858,19 +858,19 @@ TEST_F(ParseDeathTest, TestReadingUnsetRequiredFlagsFromEnv) {
 // --------------------------------------------------------------------
 
 TEST_F(ParseDeathTest, TestRecursiveFlagsFromEnv) {
-  const char* in_args1[] = {"testbin", "--fromenv=tryfromenv"};
+  const char* in_args1[] = {"testbin", "--from_env=try_from_env"};
 
-  ScopedSetEnv set_tryfromenv("FLAGS_tryfromenv", "int_flag");
+  ScopedSetEnv set_try_from_env("FLAGS_try_from_env", "int_flag");
 
   EXPECT_DEATH_IF_SUPPORTED(InvokeParse(in_args1),
-                            "Infinite recursion on flag tryfromenv");
+                            "Infinite recursion on flag try_from_env");
 }
 
 // --------------------------------------------------------------------
 
 TEST_F(ParseTest, TestReadingOptionalFlagsFromEnv) {
   const char* in_args1[] = {
-      "testbin", "--tryfromenv=int_flag,bool_flag,string_flag,other_flag"};
+      "testbin", "--try_from_env=int_flag,bool_flag,string_flag,other_flag"};
 
   ScopedSetEnv set_int_flag("FLAGS_int_flag", "17");
   ScopedSetEnv set_bool_flag("FLAGS_bool_flag", "Y");
@@ -884,7 +884,7 @@ TEST_F(ParseTest, TestReadingFlagsFromEnvMoxedWithRegularFlags) {
   const char* in_args1[] = {
       "testbin",
       "--bool_flag=T",
-      "--tryfromenv=int_flag,bool_flag",
+      "--try_from_env=int_flag,bool_flag",
       "--int_flag=-21",
   };
 
@@ -1033,7 +1033,7 @@ TEST_F(ParseDeathTest, ParseTurboFlagsOnlyFailure) {
 TEST_F(ParseTest, UndefOkFlagsAreIgnored) {
   const char* in_args[] = {
       "testbin",           "--undef_flag1",
-      "--undef_flag2=123", "--undefok=undef_flag2",
+      "--undef_flag2=123", "--undef_ok=undef_flag2",
       "--undef_flag3",     "value",
   };
 
@@ -1059,7 +1059,7 @@ TEST_F(ParseTest, AllUndefOkFlagsAreIgnored) {
       "testbin",
       "--undef_flag1",
       "--undef_flag2=123",
-      "--undefok=undef_flag2,undef_flag1,undef_flag3",
+      "--undef_ok=undef_flag2,undef_flag1,undef_flag3",
       "--undef_flag3",
       "value",
       "--",

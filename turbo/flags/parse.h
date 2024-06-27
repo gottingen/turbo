@@ -91,10 +91,10 @@ namespace turbo {
     // (argv[0]) are are returned in the `positional_args` output parameter.
     //
     // All unrecognized flags that are not otherwise ignored are returned in the
-    // `unrecognized_flags` output parameter. Note that the special `undefok`
-    // flag allows you to specify flags which can be safely ignored; `undefok`
+    // `unrecognized_flags` output parameter. Note that the special `undef_ok`
+    // flag allows you to specify flags which can be safely ignored; `undef_ok`
     // specifies these flags as a comma-separated list. Any unrecognized flags
-    // that appear within `undefok` will therefore be ignored and not included in
+    // that appear within `undef_ok` will therefore be ignored and not included in
     // the `unrecognized_flag` output parameter.
     //
     void parse_turbo_flags_only(int argc, char *argv[],

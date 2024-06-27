@@ -40,8 +40,8 @@ namespace turbo {
         namespace {
 
             void SyncLoggingFlags() {
-                turbo::set_flag(&FLAGS_minloglevel, static_cast<int>(turbo::min_log_level()));
-                turbo::set_flag(&FLAGS_log_prefix, turbo::should_prepend_log_prefix());
+                turbo::set_flag(&FLAGS_min_log_level, static_cast<int>(turbo::min_log_level()));
+                turbo::set_flag(&FLAGS_log_with_prefix, turbo::should_prepend_log_prefix());
             }
 
             bool RegisterSyncLoggingFlags() {
@@ -69,45 +69,58 @@ namespace turbo {
     }  // namespace log_internal
 }  // namespace turbo
 
-TURBO_FLAG(int, stderrthreshold,
+TURBO_FLAG(int, stderr_threshold,
            static_cast<int>(turbo::log_internal::StderrThresholdDefault()),
            "Log messages at or above this threshold level are copied to stderr.")
-.on_update([] () noexcept {
+.on_update([]() noexcept {
     turbo::log_internal::RawSetStderrThreshold(
             static_cast<turbo::LogSeverityAtLeast>(
-                    turbo::get_flag(FLAGS_stderrthreshold)));
+                    turbo::get_flag(FLAGS_stderr_threshold)));
 });
 
-TURBO_FLAG(int, minloglevel, static_cast<int>(turbo::LogSeverityAtLeast::kInfo),
+TURBO_FLAG(int, min_log_level, static_cast<int>(turbo::LogSeverityAtLeast::kInfo),
            "Messages logged at a lower level than this don't actually "
            "get logged anywhere")
-.on_update([] () noexcept {
-    turbo::log_internal::RawSetMinLogLevel(
-            static_cast<turbo::LogSeverityAtLeast>(
-                    turbo::get_flag(FLAGS_minloglevel)));
-});
+        .on_validate([](std::string_view value, std::string *err) noexcept -> bool {
+            int level;
+            auto r = turbo::parse_flag(value, &level, err);
+            if (!r) {
+                return false;
+            }
+            if (level < static_cast<int>(turbo::LogSeverityAtLeast::kInfo) ||
+                level > static_cast<int>(turbo::LogSeverityAtLeast::kFatal)) {
+                *err = "min_log_level must be in the range INFO(0) to FATAL(3)";
+                return false;
+            }
+            return true;
+        })
+        .on_update([]() noexcept {
+            turbo::log_internal::RawSetMinLogLevel(
+                    static_cast<turbo::LogSeverityAtLeast>(
+                            turbo::get_flag(FLAGS_min_log_level)));
+        });
 
-TURBO_FLAG(std::string, log_backtrace_at, "",
+TURBO_FLAG(std::string, backtrace_log_at, "",
            "Emit a backtrace when logging at file:linenum.")
-.on_update([] () noexcept {
-    const std::string log_backtrace_at =
-            turbo::get_flag(FLAGS_log_backtrace_at);
-    if (log_backtrace_at.empty()) {
+.on_update([]() noexcept {
+    const std::string backtrace_log_at =
+            turbo::get_flag(FLAGS_backtrace_log_at);
+    if (backtrace_log_at.empty()) {
         turbo::clear_log_backtrace_location();
         return;
     }
 
-    const size_t last_colon = log_backtrace_at.rfind(':');
-    if (last_colon == log_backtrace_at.npos) {
+    const size_t last_colon = backtrace_log_at.rfind(':');
+    if (last_colon == backtrace_log_at.npos) {
         turbo::clear_log_backtrace_location();
         return;
     }
 
     const std::string_view file =
-            std::string_view(log_backtrace_at).substr(0, last_colon);
+            std::string_view(backtrace_log_at).substr(0, last_colon);
     int line;
     if (!turbo::simple_atoi(
-            std::string_view(log_backtrace_at).substr(last_colon + 1),
+            std::string_view(backtrace_log_at).substr(last_colon + 1),
             &line)) {
         turbo::clear_log_backtrace_location();
         return;
@@ -115,20 +128,32 @@ TURBO_FLAG(std::string, log_backtrace_at, "",
     turbo::set_log_backtrace_location(file, line);
 });
 
-TURBO_FLAG(bool, log_prefix, true,
+TURBO_FLAG(bool, log_with_prefix, true,
            "prepend the log prefix to the start of each log line")
-.on_update([] () noexcept {
-    turbo::log_internal::RawEnableLogPrefix(turbo::get_flag(FLAGS_log_prefix));
+.on_update([]() noexcept {
+    turbo::log_internal::RawEnableLogPrefix(turbo::get_flag(FLAGS_log_with_prefix));
 });
 
-TURBO_FLAG(int, v, 0,
-           "Show all VLOG(m) messages for m <= this. Overridable by --vmodule.")
-.on_update([] () noexcept {
-    turbo::log_internal::UpdateGlobalVLogLevel(turbo::get_flag(FLAGS_v));
+TURBO_FLAG(int, verbosity, 0,
+           "Show all VLOG(m) messages for m <= this. Overridable by --vlog_module.")
+.on_validate([](std::string_view value, std::string *err) noexcept -> bool {
+    int level;
+    auto r = turbo::parse_flag(value, &level, err);
+    if (!r) {
+        return false;
+    }
+    if (level < 0) {
+        *err = "verbosity must be non-negative";
+        return false;
+    }
+    return true;
+})
+.on_update([]() noexcept {
+    turbo::log_internal::UpdateGlobalVLogLevel(turbo::get_flag(FLAGS_verbosity));
 });
 
 TURBO_FLAG(
-        std::string, vmodule, "",
+        std::string, vlog_module, "",
         "per-module log verbosity level."
         " Argument is a comma-separated list of <module name>=<log level>."
         " <module name> is a glob pattern, matched against the filename base"
@@ -138,7 +163,7 @@ TURBO_FLAG(
         " (still without .cc/.h./-inl.h) is matched."
         " ? and * in the glob pattern match any single or sequence of characters"
         " respectively including slashes."
-        " <log level> overrides any value given by --v.")
-.on_update([] () noexcept {
-    turbo::log_internal::UpdateVModule(turbo::get_flag(FLAGS_vmodule));
+        " <log level> overrides any value given by --verbosity.")
+.on_update([]() noexcept {
+    turbo::log_internal::UpdateVModule(turbo::get_flag(FLAGS_vlog_module));
 });

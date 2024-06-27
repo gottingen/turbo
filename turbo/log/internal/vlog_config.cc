@@ -128,7 +128,7 @@ std::vector<VModuleInfo>& get_vmodule_info()
 // Does not allocate or take locks.
 int VLogLevel(std::string_view file, const std::vector<VModuleInfo>* infos,
               int current_global_v) {
-  // `infos` is null during a call to `VLOG` prior to setting `vmodule` (e.g. by
+  // `infos` is null during a call to `VLOG` prior to setting `vlog_module` (e.g. by
   // parsing flags).  We can't allocate in `VLOG`, so we treat null as empty
   // here and press on.
   if (!infos || infos->empty()) return current_global_v;
@@ -284,10 +284,10 @@ void UpdateVLogSites() TURBO_UNLOCK_FUNCTION(mutex)
   }
 }
 
-void UpdateVModule(std::string_view vmodule)
+void UpdateVModule(std::string_view vlog_module)
     TURBO_LOCKS_EXCLUDED(mutex, GetUpdateSitesMutex()) {
   std::vector<std::pair<std::string_view, int>> glob_levels;
-  for (std::string_view glob_level : turbo::str_split(vmodule, ',')) {
+  for (std::string_view glob_level : turbo::str_split(vlog_module, ',')) {
     const size_t eq = glob_level.rfind('=');
     if (eq == glob_level.npos) continue;
     const std::string_view glob = glob_level.substr(0, eq);

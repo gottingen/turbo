@@ -28,10 +28,10 @@
 #include <turbo/flags/internal/usage.h>
 #include <turbo/strings/string_view.h>
 
-TURBO_DECLARE_FLAG(std::vector<std::string>, flagfile);
-TURBO_DECLARE_FLAG(std::vector<std::string>, fromenv);
-TURBO_DECLARE_FLAG(std::vector<std::string>, tryfromenv);
-TURBO_DECLARE_FLAG(std::vector<std::string>, undefok);
+TURBO_DECLARE_FLAG(std::vector<std::string>, flags_file);
+TURBO_DECLARE_FLAG(std::vector<std::string>, from_env);
+TURBO_DECLARE_FLAG(std::vector<std::string>, try_from_env);
+TURBO_DECLARE_FLAG(std::vector<std::string>, undef_ok);
 
 namespace turbo::flags_internal {
 

@@ -38,25 +38,25 @@
 // Log messages at this severity or above are sent to stderr in *addition* to
 // `LogSink`s.  Defaults to `ERROR`.  See log_severity.h for numeric values of
 // severity levels.
-TURBO_DECLARE_FLAG(int, stderrthreshold);
+TURBO_DECLARE_FLAG(int, stderr_threshold);
 
 // Log messages at this severity or above are logged; others are discarded.
 // Defaults to `INFO`, i.e. log all severities.  See log_severity.h for numeric
 // values of severity levels.
-TURBO_DECLARE_FLAG(int, minloglevel);
+TURBO_DECLARE_FLAG(int, min_log_level);
 
 // If specified in the form file:linenum, any messages logged from a matching
 // location will also include a backtrace.
-TURBO_DECLARE_FLAG(std::string, log_backtrace_at);
+TURBO_DECLARE_FLAG(std::string, backtrace_log_at);
 
 // If true, the log prefix (severity, date, time, PID, etc.) is prepended to
 // each message logged. Defaults to true.
-TURBO_DECLARE_FLAG(bool, log_prefix);
+TURBO_DECLARE_FLAG(bool, log_with_prefix);
 
 // Global log verbosity level. Default is 0.
-TURBO_DECLARE_FLAG(int, v);
+TURBO_DECLARE_FLAG(int, verbosity);
 
 // Per-module log verbosity level. By default is empty and is unused.
-TURBO_DECLARE_FLAG(std::string, vmodule);
+TURBO_DECLARE_FLAG(std::string, vlog_module);
 
 #endif  // TURBO_LOG_INTERNAL_FLAGS_H_

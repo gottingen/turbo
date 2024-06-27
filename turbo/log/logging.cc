@@ -23,6 +23,8 @@
 #include <turbo/log/sinks/daily_file_sink.h>
 #include <turbo/log/sinks/hourly_file_sink.h>
 #include <turbo/log/sinks/rotating_file_sink.h>
+#include <turbo/log/internal/flags.h>
+#include <turbo/flags/flag.h>
 #include <iostream>
 
 namespace turbo {
@@ -126,5 +128,14 @@ namespace turbo {
 
     void disable_stderr_logging() {
         set_stderr_threshold(LogSeverityAtLeast::kInfinity);
+    }
+
+    void load_flags_symbol() {
+        (void)turbo::get_flag(FLAGS_stderr_threshold);
+        (void)turbo::get_flag(FLAGS_min_log_level);
+        (void)turbo::get_flag(FLAGS_backtrace_log_at);
+        (void)turbo::get_flag(FLAGS_log_with_prefix);
+        (void)turbo::get_flag(FLAGS_verbosity);
+        (void)turbo::get_flag(FLAGS_vlog_module);
     }
 }  // namespace turbo

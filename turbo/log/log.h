@@ -230,11 +230,11 @@
 // disabled by default.  Negative levels should not be used.
 // Example:
 //
-//   VLOG(1) << "I print when you run the program with --v=1 or higher";
-//   VLOG(2) << "I print when you run the program with --v=2 or higher";
+//   VLOG(1) << "I print when you run the program with --verbosity=1 or higher";
+//   VLOG(2) << "I print when you run the program with --verbosity=2 or higher";
 //
 // See vlog_is_on.h for further documentation, including the usage of the
-// --vmodule flag to log at different levels in different source files.
+// --vlog_module flag to log at different levels in different source files.
 //
 // `VLOG` does not produce any output when verbose logging is not enabled.
 // However, simply testing whether verbose logging is enabled can be expensive.
