@@ -29,6 +29,8 @@ TURBO_FLAG(std::string, test_flag, "test", "test flag").on_validate(turbo::AllPa
 
 TURBO_FLAG(int, gt_flag, 10, "test flag").on_validate(turbo::GeValidator<int, 5>::validate);
 
+TURBO_FLAG(int, range_flag, 10, "test flag").on_validate(turbo::ClosedOpenInRangeValidator<int, 5,15>::validate);
+
 TURBO_FLAG(int, inset_flag, 3, "test flag").on_validate(turbo::InSetValidator<int, set>::validate);
 
 std::string_view prefix = "/opt/EA";
@@ -59,5 +61,13 @@ int main(int argc, char **argv) {
     auto prefix_flag = turbo::find_command_line_flag("prefix_flag");
     std::cout<<"this should be 0, "<<prefix_flag->user_validate("/opt/ea", nullptr)<<std::endl;
     std::cout<<"this should be 1, "<<prefix_flag->user_validate("/opt/EA/inf", nullptr)<<std::endl;
+
+    auto range_flag = turbo::find_command_line_flag("range_flag");
+    std::cout<<"this should be 0, "<<range_flag->user_validate("4", nullptr)<<std::endl;
+    std::cout<<"this should be 0, "<<range_flag->user_validate("15", nullptr)<<std::endl;
+    std::cout<<"this should be 0, "<<range_flag->user_validate("20", nullptr)<<std::endl;
+    std::cout<<"this should be 0, "<<range_flag->user_validate("a", nullptr)<<std::endl;
+    std::cout<<"this should be 1, "<<range_flag->user_validate("6", nullptr)<<std::endl;
+    std::cout<<"this should be 1, "<<range_flag->user_validate("5", nullptr)<<std::endl;
 
 }

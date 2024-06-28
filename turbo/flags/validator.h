@@ -66,7 +66,7 @@ namespace turbo {
     };
 
     template<typename T>
-    struct ltValidatorComparator {
+    struct LtValidatorComparator {
         static bool validate(T lhs, T rhs) noexcept {
             return lhs < rhs;
         }
@@ -114,7 +114,7 @@ namespace turbo {
     using LeValidator = UnaryValidator<T, Max, LeValidatorComparator<T>>;
 
     template<typename T, T Max>
-    using LtValidator = UnaryValidator<T, Max, ltValidatorComparator<T>>;
+    using LtValidator = UnaryValidator<T, Max, LtValidatorComparator<T>>;
 
     template<typename T, T Min, T Max, typename LCM, typename RCM,
             std::enable_if_t<std::is_integral_v<T> || std::is_floating_point_v<T>, int> = 0>
@@ -135,28 +135,28 @@ namespace turbo {
     };
 
     template<typename T, T Min, T Max>
-    using ClosedClosedInRangeValidator = BinaryValidator<T, Min, Max, GeValidator<T, Min>, LeValidator<T, Max>>;
+    using ClosedClosedInRangeValidator = BinaryValidator<T, Min, Max, GEValidatorComparator<T>, LeValidatorComparator<T>>;
 
     template<typename T, T Min, T Max>
-    using ClosedOpenInRangeValidator = BinaryValidator<T, Min, Max, GeValidator<T, Min>, LtValidator<T, Max>>;
+    using ClosedOpenInRangeValidator = BinaryValidator<T, Min, Max, GEValidatorComparator<T>, LtValidatorComparator<T>>;
 
     template<typename T, T Min, T Max>
-    using OpenClosedInRangeValidator = BinaryValidator<T, Min, Max, GtValidator<T, Min>, LeValidator<T, Max>>;
+    using OpenClosedInRangeValidator = BinaryValidator<T, Min, Max, GtValidatorComparator<T>, LeValidatorComparator<T>>;
 
     template<typename T, T Min, T Max>
-    using OpenOpenInRangeValidator = BinaryValidator<T, Min, Max, GtValidator<T, Min>, LtValidator<T, Max>>;
+    using OpenOpenInRangeValidator = BinaryValidator<T, Min, Max, GtValidatorComparator<T>, LtValidatorComparator<T>>;
 
     template<typename T, T Min, T Max>
-    using ClosedClosedOutRangeValidator = BinaryValidator<T, Min, Max, LtValidator<T, Min>, GtValidator<T, Max>>;
+    using ClosedClosedOutRangeValidator = BinaryValidator<T, Min, Max, LtValidatorComparator<T>, GtValidatorComparator<T>>;
 
     template<typename T, T Min, T Max>
-    using ClosedOpenOutRangeValidator = BinaryValidator<T, Min, Max, LtValidator<T, Min>, GeValidator<T, Max>>;
+    using ClosedOpenOutRangeValidator = BinaryValidator<T, Min, Max, LtValidatorComparator<T>, GEValidatorComparator<T>>;
 
     template<typename T, T Min, T Max>
-    using OpenClosedOutRangeValidator = BinaryValidator<T, Min, Max, LeValidator<T, Min>, GtValidator<T, Max>>;
+    using OpenClosedOutRangeValidator = BinaryValidator<T, Min, Max, LeValidatorComparator<T>, GtValidatorComparator<T>>;
 
     template<typename T, T Min, T Max>
-    using OpenOpenOutRangeValidator = BinaryValidator<T, Min, Max, LeValidator<T, Min>, GeValidator<T, Max>>;
+    using OpenOpenOutRangeValidator = BinaryValidator<T, Min, Max, LeValidatorComparator<T>, GEValidatorComparator<T>>;
 
     template<typename T, const turbo::flat_hash_set<T> &C, typename CM, std::enable_if_t<
             (std::is_integral_v<T> || std::is_floating_point_v<T>), int> = 0>
