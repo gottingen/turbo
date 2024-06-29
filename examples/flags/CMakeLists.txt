@@ -22,3 +22,44 @@ carbin_cc_binary(
         LINKS turbo::turbo
         CXXOPTS ${CARBIN_CXX_OPTIONS}
 )
+
+carbin_cc_binary(
+        NAME flag_file
+        SOURCES flag_file.cc
+        LINKS turbo::turbo
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+
+carbin_cc_binary(
+        NAME simple
+        SOURCES simple.cc
+        LINKS turbo::turbo
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+carbin_cc_binary(
+        NAME custom_parse
+        SOURCES custom_parse.cc
+        LINKS turbo::turbo
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+carbin_cc_binary(
+        NAME custom_flags_parser
+        SOURCES custom_flags_parser.cc
+        LINKS turbo::turbo
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+
+carbin_cc_binary(
+        NAME positional_arity
+        SOURCES positional_arity.cc
+        LINKS turbo::turbo
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+carbin_cc_binary(
+        NAME servlet
+        SOURCES servlet.cc
+        LINKS turbo::turbo
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+
+file(COPY conf.flags DESTINATION ${PROJECT_BINARY_DIR})
