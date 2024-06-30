@@ -27,57 +27,25 @@
 
 namespace turbo {
 
-    struct LogConfig {
-        /// format /path/to/log_file.log
-        /// or ./logs/log_file.log
-        std::string base_filename;
-        bool err_to_stderr{true};
-        LogSeverityAtLeast stderr_threshold{LogSeverityAtLeast::kError};
-        int rotation_hour{0};
-        int rotation_minute{0};
-        int check_interval_s{60};
-        bool truncate{false};
-        int max_files{0};
-        int max_file_size{0};
-
-        LogConfig &set_base_filename(const std::string &base_filename) {
-            this->base_filename = base_filename;
-            return *this;
-        }
-        LogConfig &set_err_to_stderr(bool err_to_stderr) {
-            this->err_to_stderr = err_to_stderr;
-            return *this;
-        }
-        LogConfig &set_stderr_threshold(LogSeverityAtLeast stderr_threshold) {
-            this->stderr_threshold = stderr_threshold;
-            return *this;
-        }
-        LogConfig &set_rotation_hour(int rotation_hour) {
-            this->rotation_hour = rotation_hour;
-            return *this;
-        }
-        LogConfig &set_rotation_minute(int rotation_minute) {
-            this->rotation_minute = rotation_minute;
-            return *this;
-        }
-        LogConfig &set_check_interval_s(int check_interval_s) {
-            this->check_interval_s = check_interval_s;
-            return *this;
-        }
-        LogConfig &set_truncate(bool truncate) {
-            this->truncate = truncate;
-            return *this;
-        }
-        LogConfig &set_max_files(uint16_t max_files) {
-            this->max_files = max_files;
-            return *this;
-        }
-
-        LogConfig &set_max_file_size(int max_file_size) {
-            this->max_file_size = max_file_size;
-            return *this;
-        }
+    enum class LogSinkType {
+        kColorStderr,
+        kDailyFile,
+        kHourlyFile,
+        kRotatingFile,
     };
+
+    // verbose log level for all
+    static constexpr int V_ALL = 0;
+
+    // verbose log level for important information
+    static constexpr int V_IMPORTANT = 100;
+
+    // verbose log level for debug information
+    static constexpr int V_DEBUG = 200;
+
+    // verbose log level for trace information
+    static constexpr int V_TRACE = 300;
+
 
     void setup_daily_file_sink(const std::string& base_filename,
                                    int rotation_hour = 0,
@@ -109,6 +77,8 @@ namespace turbo {
     void cleanup_log();
 
     void load_flags_symbol();
+
+    void setup_log_by_flags();
 
 }  // namespace turbo
 

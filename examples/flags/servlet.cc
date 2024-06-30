@@ -21,6 +21,7 @@
 #include <string>
 #include <turbo/flags/declare.h>
 #include <turbo/flags/parse.h>
+#include <turbo/log/logging.h>
 
 TURBO_DECLARE_FLAG(std::vector<std::string>, flags_file);
 
@@ -40,10 +41,10 @@ int main(int argc, char **argv) {
 
     svt.run_app()->add_option("--gt", FLAGS_gt_flag, "test flag");
     svt.run_app()->add_option_function<int>("--gtf", [](const int&v) {
-        std::cout << "gtf" << std::endl;
+        std::cout << "gtf" ;
         }, "test flag");
     svt.root().add_option_function<int>("--gtff", [](const int&v) {
-        std::cout << "root gtf" << std::endl;
+        std::cout << "root gtf" ;
     }, "test flag");
 
 
@@ -53,19 +54,22 @@ int main(int argc, char **argv) {
 
     double value{0.0};  // = 3.14;
     svt.run_app()->add_option("-d,--double", value, "Some Value");
-    turbo::setup_argv(argc, argv);
+    auto [exit, code] = svt.run(argc, argv);
+    if(exit) {
+        return code;
+    }
 
-    TURBO_SERVLET_PARSE(argc, argv);
-
-    std::cout << "Working on file: " << file << ", direct count: " << svt.run_app()->count("--file")
+    VLOG(20) << "Working on file: " << file << ", direct count: " << svt.run_app()->count("--file")
               << ", opt count: " << opt->count() << '\n';
-    std::cout << "Working on count: " << count << ", direct count: " << svt.run_app()->count("--count")
+    VLOG(0) << "Working on file: " << file << ", direct count: " << svt.run_app()->count("--file")
+             << ", opt count: " << opt->count() << '\n';
+    LOG(INFO) << "Working on count: " << count << ", direct count: " << svt.run_app()->count("--count")
               << ", opt count: " << copt->count() << '\n';
-    std::cout << "Received flag: " << v << " (" << flag->count() << ") times\n";
-    std::cout << "Some value: " << value << '\n';
-    std::cout << "gt_flag: " << turbo::get_flag(FLAGS_gt_flag) << std::endl;
+    LOG(INFO)<< "Received flag: " << v << " (" << flag->count() << ") times\n";
+    LOG(INFO)<< "Some value: " << value << '\n';
+    LOG(INFO) << "gt_flag: " << turbo::get_flag(FLAGS_gt_flag) ;
     for(auto &item : turbo::get_flag(FLAGS_flags_file)) {
-        std::cout << "flags_file: " << item << std::endl;
+        LOG(INFO) << "flags_file: " << item ;
     }
 
     return 0;

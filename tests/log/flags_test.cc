@@ -16,7 +16,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/log/internal/flags.h>
+#include <turbo/log/flags.h>
 
 #include <string>
 

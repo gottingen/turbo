@@ -33,7 +33,7 @@ namespace turbo {
             return instance_;
         }
 
-        void run(int argc, char **argv);
+        std::pair<bool,int> run(int argc, char **argv);
 
         Servlet &set_version(const std::string &version);
 

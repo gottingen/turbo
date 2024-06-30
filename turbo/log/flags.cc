@@ -16,7 +16,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/log/internal/flags.h>
+#include <turbo/log/flags.h>
 
 #include <stddef.h>
 
@@ -29,11 +29,13 @@
 #include <turbo/base/log_severity.h>
 #include <turbo/flags/flag.h>
 #include <turbo/flags/marshalling.h>
+#include <turbo/flags/validator.h>
 #include <turbo/log/globals.h>
 #include <turbo/log/internal/config.h>
 #include <turbo/log/internal/vlog_config.h>
 #include <turbo/strings/numbers.h>
 #include <turbo/strings/string_view.h>
+#include <turbo/container/flat_hash_set.h>
 
 namespace turbo {
     namespace log_internal {
@@ -69,31 +71,28 @@ namespace turbo {
     }  // namespace log_internal
 }  // namespace turbo
 
+static turbo::flat_hash_set<int> LogSeverityAtLeastSet = {
+        static_cast<int>(turbo::LogSeverityAtLeast::kInfo),
+        static_cast<int>(turbo::LogSeverityAtLeast::kWarning),
+        static_cast<int>(turbo::LogSeverityAtLeast::kError),
+        static_cast<int>(turbo::LogSeverityAtLeast::kFatal),
+        static_cast<int>(turbo::LogSeverityAtLeast::kInfinity),
+};
+
 TURBO_FLAG(int, stderr_threshold,
            static_cast<int>(turbo::log_internal::StderrThresholdDefault()),
            "Log messages at or above this threshold level are copied to stderr.")
-.on_update([]() noexcept {
-    turbo::log_internal::RawSetStderrThreshold(
-            static_cast<turbo::LogSeverityAtLeast>(
-                    turbo::get_flag(FLAGS_stderr_threshold)));
-});
+        .on_validate(turbo::InSetValidator<int, LogSeverityAtLeastSet>::validate)
+        .on_update([]() noexcept {
+            turbo::log_internal::RawSetStderrThreshold(
+                    static_cast<turbo::LogSeverityAtLeast>(
+                            turbo::get_flag(FLAGS_stderr_threshold)));
+        });
 
 TURBO_FLAG(int, min_log_level, static_cast<int>(turbo::LogSeverityAtLeast::kInfo),
            "Messages logged at a lower level than this don't actually "
            "get logged anywhere")
-        .on_validate([](std::string_view value, std::string *err) noexcept -> bool {
-            int level;
-            auto r = turbo::parse_flag(value, &level, err);
-            if (!r) {
-                return false;
-            }
-            if (level < static_cast<int>(turbo::LogSeverityAtLeast::kInfo) ||
-                level > static_cast<int>(turbo::LogSeverityAtLeast::kFatal)) {
-                *err = "min_log_level must be in the range INFO(0) to FATAL(3)";
-                return false;
-            }
-            return true;
-        })
+        .on_validate(turbo::InSetValidator<int, LogSeverityAtLeastSet>::validate)
         .on_update([]() noexcept {
             turbo::log_internal::RawSetMinLogLevel(
                     static_cast<turbo::LogSeverityAtLeast>(
@@ -136,21 +135,10 @@ TURBO_FLAG(bool, log_with_prefix, true,
 
 TURBO_FLAG(int, verbosity, 0,
            "Show all VLOG(m) messages for m <= this. Overridable by --vlog_module.")
-.on_validate([](std::string_view value, std::string *err) noexcept -> bool {
-    int level;
-    auto r = turbo::parse_flag(value, &level, err);
-    if (!r) {
-        return false;
-    }
-    if (level < 0) {
-        *err = "verbosity must be non-negative";
-        return false;
-    }
-    return true;
-})
-.on_update([]() noexcept {
-    turbo::log_internal::UpdateGlobalVLogLevel(turbo::get_flag(FLAGS_verbosity));
-});
+        .on_validate(turbo::GtValidator<int, 0>::validate)
+        .on_update([]() noexcept {
+            turbo::log_internal::UpdateGlobalVLogLevel(turbo::get_flag(FLAGS_verbosity));
+        });
 
 TURBO_FLAG(
         std::string, vlog_module, "",
@@ -167,3 +155,24 @@ TURBO_FLAG(
 .on_update([]() noexcept {
     turbo::log_internal::UpdateVModule(turbo::get_flag(FLAGS_vlog_module));
 });
+
+TURBO_FLAG(std::string, log_base_filename, "",
+           "The base filename for the log files. like /path/to/log_file.log");
+
+TURBO_FLAG(int, log_rotation_hour, 2, "The hour to rotate the log file.");
+
+TURBO_FLAG(int, log_rotation_minute, 30, "The minute to rotate the log file.");
+
+TURBO_FLAG(int, log_check_interval_s, 60, "The interval to check the log file.");
+
+TURBO_FLAG(bool, log_truncate, false, "Truncate the log file.");
+
+TURBO_FLAG(int, log_max_files, 0, "The max files to keep.");
+
+TURBO_FLAG(int, log_max_file_size, 100, "The max file size to rotate. unit is MB.");
+
+TURBO_FLAG(int, log_type, 0, "The log type corresponding to LogSinkType."
+                             " 0: console log"
+                             " 1: daily log file"
+                             " 2: hourly log file"
+                             " 3: rotating log file");
