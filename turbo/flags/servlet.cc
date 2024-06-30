@@ -74,6 +74,7 @@ namespace turbo {
         if(!no_log) {
             turbo::setup_log_by_flags();
         }
+        launch_params_ = &get_argv();
         return {false,0};
     }
 
@@ -90,6 +91,10 @@ namespace turbo {
     Servlet &Servlet::set_name(const std::string &name) {
         app_.name(name);
         return *this;
+    }
+
+    const std::vector<std::string> *Servlet::launch_params() const {
+        return launch_params_;
     }
 
 }  // namespace turbo

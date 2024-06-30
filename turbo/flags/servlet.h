@@ -22,10 +22,10 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <turbo/flags/app.h>
 
 namespace turbo {
-
     class Servlet {
     public:
 
@@ -57,6 +57,8 @@ namespace turbo {
             return run_app_;
         }
 
+        const std::vector<std::string> *launch_params() const;
+
     private:
         Servlet();
 
@@ -66,6 +68,7 @@ namespace turbo {
         static Servlet instance_;
         turbo::cli::App app_;
         turbo::cli::App *run_app_ = nullptr;
+        const std::vector<std::string> *launch_params_ = nullptr;
     };
 
 }  // namespace turbo
