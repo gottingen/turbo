@@ -60,11 +60,10 @@ namespace turbo {
         run_app_->add_option("--vlog_module", FLAGS_vlog_module, FLAGS_vlog_module.help());
         run_app_->add_option("--log_type", FLAGS_log_type, FLAGS_log_type.help());
         run_app_->add_flag("--no_log", no_log, "disable log setup");
-
-        app_.require_subcommand(true);
     }
 
     std::pair<bool,int>  Servlet::run(int argc, char **argv) {
+        app_.require_subcommand(true);
         setup_argv(argc, argv);
         try {
             app_.parse(argc, argv);
