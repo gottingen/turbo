@@ -434,11 +434,11 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreams
           TURBO_INTERNAL_STEP8BY3(l64, l641, l642, p, p1, p2);
           TURBO_INTERNAL_STEP8BY3(l64, l641, l642, p, p1, p2);
           TURBO_INTERNAL_STEP8BY3(l64, l641, l642, p, p1, p2);
-          PrefetchToLocalCache(
+          prefetch_to_local_cache(
               reinterpret_cast<const char*>(p + kPrefetchHorizonMedium));
-          PrefetchToLocalCache(
+          prefetch_to_local_cache(
               reinterpret_cast<const char*>(p1 + kPrefetchHorizonMedium));
-          PrefetchToLocalCache(
+          prefetch_to_local_cache(
               reinterpret_cast<const char*>(p2 + kPrefetchHorizonMedium));
         }
         // Don't run crc on last 8 bytes.
@@ -522,11 +522,11 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreams
       for (size_t i = 1; i < bs; i++) {
         // Prefetch data for next iterations.
         for (size_t j = 0; j < num_crc_streams; j++) {
-          PrefetchToLocalCache(
+          prefetch_to_local_cache(
               reinterpret_cast<const char*>(crc_streams[j] + kPrefetchHorizon));
         }
         for (size_t j = 0; j < num_pclmul_streams; j++) {
-          PrefetchToLocalCache(reinterpret_cast<const char*>(pclmul_streams[j] +
+          prefetch_to_local_cache(reinterpret_cast<const char*>(pclmul_streams[j] +
                                                              kPrefetchHorizon));
         }
 

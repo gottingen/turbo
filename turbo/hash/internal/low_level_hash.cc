@@ -35,7 +35,7 @@ namespace turbo::hash_internal {
     uint64_t LowLevelHashLenGt16(const void *data, size_t len, uint64_t seed,
                                  const uint64_t salt[5]) {
         // Prefetch the cacheline that data resides in.
-        PrefetchToLocalCache(data);
+        prefetch_to_local_cache(data);
         const uint8_t *ptr = static_cast<const uint8_t *>(data);
         uint64_t starting_length = static_cast<uint64_t>(len);
         const uint8_t *last_16_ptr = ptr + starting_length - 16;
@@ -51,7 +51,7 @@ namespace turbo::hash_internal {
 
             do {
                 // Always prefetch the next cacheline.
-                PrefetchToLocalCache(ptr + TURBO_CACHELINE_SIZE);
+                prefetch_to_local_cache(ptr + TURBO_CACHELINE_SIZE);
 
                 uint64_t a = turbo::base_internal::UnalignedLoad64(ptr);
                 uint64_t b = turbo::base_internal::UnalignedLoad64(ptr + 8);
@@ -114,7 +114,7 @@ namespace turbo::hash_internal {
         if (len > 16) return LowLevelHashLenGt16(data, len, seed, salt);
 
         // Prefetch the cacheline that data resides in.
-        PrefetchToLocalCache(data);
+        prefetch_to_local_cache(data);
         const uint8_t *ptr = static_cast<const uint8_t *>(data);
         uint64_t starting_length = static_cast<uint64_t>(len);
         uint64_t current_state = seed ^ salt[0];

@@ -534,7 +534,7 @@ namespace turbo {
     // Factory functions.
     //
 
-    Duration DurationFromTimespec(timespec ts) {
+    Duration Duration::from_timespec(timespec ts) {
         if (static_cast<uint64_t>(ts.tv_nsec) < 1000 * 1000 * 1000) {
             int64_t ticks = ts.tv_nsec * kTicksPerNanosecond;
             return time_internal::MakeDuration(ts.tv_sec, ticks);
@@ -542,7 +542,7 @@ namespace turbo {
         return Duration::seconds(ts.tv_sec) + Duration::nanoseconds(ts.tv_nsec);
     }
 
-    Duration DurationFromTimeval(timeval tv) {
+    Duration Duration::from_timeval(timeval tv) {
         if (static_cast<uint64_t>(tv.tv_usec) < 1000 * 1000) {
             int64_t ticks = tv.tv_usec * 1000 * kTicksPerNanosecond;
             return time_internal::MakeDuration(tv.tv_sec, ticks);
@@ -620,7 +620,7 @@ namespace turbo {
 
     double Duration::to_double_hours(Duration d) { return Duration::fdiv(d, Duration::hours(1)); }
 
-    timespec ToTimespec(Duration d) {
+    timespec Duration::to_timespec(Duration d) {
         timespec ts;
         if (!time_internal::IsInfiniteDuration(d)) {
             int64_t rep_hi = time_internal::GetRepHi(d);
@@ -650,9 +650,9 @@ namespace turbo {
         return ts;
     }
 
-    timeval ToTimeval(Duration d) {
+    timeval Duration::to_timeval(Duration d) {
         timeval tv;
-        timespec ts = ToTimespec(d);
+        timespec ts = to_timespec(d);
         if (ts.tv_sec < 0) {
             // Tweak the fields so that positive division of tv_nsec
             // maps to truncation (towards zero) for the timeval.

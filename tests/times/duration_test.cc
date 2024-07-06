@@ -1248,7 +1248,7 @@ namespace {
     }
 
     TEST(Duration, TruncConversions) {
-        // Tests ToTimespec()/DurationFromTimespec()
+        // Tests turbo::Duration::to_timespec()/DurationFromTimespec()
         const struct {
             turbo::Duration d;
             timespec ts;
@@ -1265,7 +1265,7 @@ namespace {
                 {turbo::Duration::seconds(-1) - turbo::Duration::nanoseconds(1) / 2, {-1, 0}},
         };
         for (const auto &test: to_ts) {
-            EXPECT_THAT(turbo::ToTimespec(test.d), TimespecMatcher(test.ts));
+            EXPECT_THAT(turbo::Duration::to_timespec(test.d), TimespecMatcher(test.ts));
         }
         const struct {
             timespec ts;
@@ -1282,10 +1282,10 @@ namespace {
                 {{-2, 999999999}, turbo::Duration::seconds(-1) - turbo::Duration::nanoseconds(1)},
         };
         for (const auto &test: from_ts) {
-            EXPECT_EQ(test.d, turbo::DurationFromTimespec(test.ts));
+            EXPECT_EQ(test.d, turbo::Duration::from_timespec(test.ts));
         }
 
-        // Tests ToTimeval()/DurationFromTimeval() (same as timespec above)
+        // Tests turbo::Duration::to_timeval()/DurationFromTimeval() (same as timespec above)
         const struct {
             turbo::Duration d;
             timeval tv;
@@ -1302,7 +1302,7 @@ namespace {
                 {turbo::Duration::seconds(-1) - turbo::Duration::microseconds(1) / 2, {-1, 0}},
         };
         for (const auto &test: to_tv) {
-            EXPECT_THAT(turbo::ToTimeval(test.d), TimevalMatcher(test.tv));
+            EXPECT_THAT(turbo::Duration::to_timeval(test.d), TimevalMatcher(test.tv));
         }
         const struct {
             timeval tv;
@@ -1319,7 +1319,7 @@ namespace {
                 {{-2, 999999}, turbo::Duration::seconds(-1) - turbo::Duration::microseconds(1)},
         };
         for (const auto &test: from_tv) {
-            EXPECT_EQ(test.d, turbo::DurationFromTimeval(test.tv));
+            EXPECT_EQ(test.d, turbo::Duration::from_timeval(test.tv));
         }
     }
 
@@ -1351,30 +1351,30 @@ namespace {
         timespec ts;
         ts.tv_sec = 0;
         ts.tv_nsec = 0;
-        EXPECT_THAT(ToTimespec(turbo::Duration::nanoseconds(0)), TimespecMatcher(ts));
+        EXPECT_THAT(turbo::Duration::to_timespec(turbo::Duration::nanoseconds(0)), TimespecMatcher(ts));
         // TODO(bww): Are the next three OK?
-        EXPECT_THAT(ToTimespec(turbo::Duration::nanoseconds(1) / 4), TimespecMatcher(ts));
-        EXPECT_THAT(ToTimespec(turbo::Duration::nanoseconds(2) / 4), TimespecMatcher(ts));
-        EXPECT_THAT(ToTimespec(turbo::Duration::nanoseconds(3) / 4), TimespecMatcher(ts));
+        EXPECT_THAT(turbo::Duration::to_timespec(turbo::Duration::nanoseconds(1) / 4), TimespecMatcher(ts));
+        EXPECT_THAT(turbo::Duration::to_timespec(turbo::Duration::nanoseconds(2) / 4), TimespecMatcher(ts));
+        EXPECT_THAT(turbo::Duration::to_timespec(turbo::Duration::nanoseconds(3) / 4), TimespecMatcher(ts));
         ts.tv_nsec = 1;
-        EXPECT_THAT(ToTimespec(turbo::Duration::nanoseconds(4) / 4), TimespecMatcher(ts));
-        EXPECT_THAT(ToTimespec(turbo::Duration::nanoseconds(5) / 4), TimespecMatcher(ts));
-        EXPECT_THAT(ToTimespec(turbo::Duration::nanoseconds(6) / 4), TimespecMatcher(ts));
-        EXPECT_THAT(ToTimespec(turbo::Duration::nanoseconds(7) / 4), TimespecMatcher(ts));
+        EXPECT_THAT(turbo::Duration::to_timespec(turbo::Duration::nanoseconds(4) / 4), TimespecMatcher(ts));
+        EXPECT_THAT(turbo::Duration::to_timespec(turbo::Duration::nanoseconds(5) / 4), TimespecMatcher(ts));
+        EXPECT_THAT(turbo::Duration::to_timespec(turbo::Duration::nanoseconds(6) / 4), TimespecMatcher(ts));
+        EXPECT_THAT(turbo::Duration::to_timespec(turbo::Duration::nanoseconds(7) / 4), TimespecMatcher(ts));
         ts.tv_nsec = 2;
-        EXPECT_THAT(ToTimespec(turbo::Duration::nanoseconds(8) / 4), TimespecMatcher(ts));
+        EXPECT_THAT(turbo::Duration::to_timespec(turbo::Duration::nanoseconds(8) / 4), TimespecMatcher(ts));
 
         timeval tv;
         tv.tv_sec = 0;
         tv.tv_usec = 0;
-        EXPECT_THAT(ToTimeval(turbo::Duration::nanoseconds(0)), TimevalMatcher(tv));
+        EXPECT_THAT(turbo::Duration::to_timeval(turbo::Duration::nanoseconds(0)), TimevalMatcher(tv));
         // TODO(bww): Is the next one OK?
-        EXPECT_THAT(ToTimeval(turbo::Duration::nanoseconds(999)), TimevalMatcher(tv));
+        EXPECT_THAT(turbo::Duration::to_timeval(turbo::Duration::nanoseconds(999)), TimevalMatcher(tv));
         tv.tv_usec = 1;
-        EXPECT_THAT(ToTimeval(turbo::Duration::nanoseconds(1000)), TimevalMatcher(tv));
-        EXPECT_THAT(ToTimeval(turbo::Duration::nanoseconds(1999)), TimevalMatcher(tv));
+        EXPECT_THAT(turbo::Duration::to_timeval(turbo::Duration::nanoseconds(1000)), TimevalMatcher(tv));
+        EXPECT_THAT(turbo::Duration::to_timeval(turbo::Duration::nanoseconds(1999)), TimevalMatcher(tv));
         tv.tv_usec = 2;
-        EXPECT_THAT(ToTimeval(turbo::Duration::nanoseconds(2000)), TimevalMatcher(tv));
+        EXPECT_THAT(turbo::Duration::to_timeval(turbo::Duration::nanoseconds(2000)), TimevalMatcher(tv));
     }
 
     void VerifyApproxSameAsMul(double time_as_seconds, int *const misses) {
@@ -1479,31 +1479,31 @@ namespace {
         timeval tv;
         tv.tv_sec = max_timeval_sec;
         tv.tv_usec = 999998;
-        d = turbo::DurationFromTimeval(tv);
-        tv = ToTimeval(d);
+        d = turbo::Duration::from_timeval(tv);
+        tv = turbo::Duration::to_timeval(d);
         EXPECT_EQ(max_timeval_sec, tv.tv_sec);
         EXPECT_EQ(999998, tv.tv_usec);
         d += turbo::Duration::microseconds(1);
-        tv = ToTimeval(d);
+        tv = turbo::Duration::to_timeval(d);
         EXPECT_EQ(max_timeval_sec, tv.tv_sec);
         EXPECT_EQ(999999, tv.tv_usec);
         d += turbo::Duration::microseconds(1);  // no effect
-        tv = ToTimeval(d);
+        tv = turbo::Duration::to_timeval(d);
         EXPECT_EQ(max_timeval_sec, tv.tv_sec);
         EXPECT_EQ(999999, tv.tv_usec);
 
         tv.tv_sec = min_timeval_sec;
         tv.tv_usec = 1;
-        d = turbo::DurationFromTimeval(tv);
-        tv = ToTimeval(d);
+        d = turbo::Duration::from_timeval(tv);
+        tv = turbo::Duration::to_timeval(d);
         EXPECT_EQ(min_timeval_sec, tv.tv_sec);
         EXPECT_EQ(1, tv.tv_usec);
         d -= turbo::Duration::microseconds(1);
-        tv = ToTimeval(d);
+        tv = turbo::Duration::to_timeval(d);
         EXPECT_EQ(min_timeval_sec, tv.tv_sec);
         EXPECT_EQ(0, tv.tv_usec);
         d -= turbo::Duration::microseconds(1);  // no effect
-        tv = ToTimeval(d);
+        tv = turbo::Duration::to_timeval(d);
         EXPECT_EQ(min_timeval_sec, tv.tv_sec);
         EXPECT_EQ(0, tv.tv_usec);
 
@@ -1514,31 +1514,31 @@ namespace {
         timespec ts;
         ts.tv_sec = max_timespec_sec;
         ts.tv_nsec = 999999998;
-        d = turbo::DurationFromTimespec(ts);
-        ts = turbo::ToTimespec(d);
+        d = turbo::Duration::from_timespec(ts);
+        ts = turbo::Duration::to_timespec(d);
         EXPECT_EQ(max_timespec_sec, ts.tv_sec);
         EXPECT_EQ(999999998, ts.tv_nsec);
         d += turbo::Duration::nanoseconds(1);
-        ts = turbo::ToTimespec(d);
+        ts = turbo::Duration::to_timespec(d);
         EXPECT_EQ(max_timespec_sec, ts.tv_sec);
         EXPECT_EQ(999999999, ts.tv_nsec);
         d += turbo::Duration::nanoseconds(1);  // no effect
-        ts = turbo::ToTimespec(d);
+        ts = turbo::Duration::to_timespec(d);
         EXPECT_EQ(max_timespec_sec, ts.tv_sec);
         EXPECT_EQ(999999999, ts.tv_nsec);
 
         ts.tv_sec = min_timespec_sec;
         ts.tv_nsec = 1;
-        d = turbo::DurationFromTimespec(ts);
-        ts = turbo::ToTimespec(d);
+        d = turbo::Duration::from_timespec(ts);
+        ts = turbo::Duration::to_timespec(d);
         EXPECT_EQ(min_timespec_sec, ts.tv_sec);
         EXPECT_EQ(1, ts.tv_nsec);
         d -= turbo::Duration::nanoseconds(1);
-        ts = turbo::ToTimespec(d);
+        ts = turbo::Duration::to_timespec(d);
         EXPECT_EQ(min_timespec_sec, ts.tv_sec);
         EXPECT_EQ(0, ts.tv_nsec);
         d -= turbo::Duration::nanoseconds(1);  // no effect
-        ts = turbo::ToTimespec(d);
+        ts = turbo::Duration::to_timespec(d);
         EXPECT_EQ(min_timespec_sec, ts.tv_sec);
         EXPECT_EQ(0, ts.tv_nsec);
     }

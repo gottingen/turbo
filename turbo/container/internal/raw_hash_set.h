@@ -3426,8 +3426,8 @@ using HashSetIteratorGenerationInfo = HashSetIteratorGenerationInfoEnabled;
 #ifdef TURBO_HAVE_PREFETCH
             prefetch_heap_block();
             auto seq = probe(common(), hash_ref()(key));
-            PrefetchToLocalCache(control() + seq.offset());
-            PrefetchToLocalCache(slot_array() + seq.offset());
+            prefetch_to_local_cache(control() + seq.offset());
+            prefetch_to_local_cache(slot_array() + seq.offset());
 #endif  // TURBO_HAVE_PREFETCH
         }
 

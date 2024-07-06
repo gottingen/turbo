@@ -146,18 +146,18 @@ namespace turbo {
         }
 
         struct timespec KernelTimeout::MakeAbsTimespec() const {
-            return turbo::ToTimespec(turbo::Duration::nanoseconds(MakeAbsNanos()));
+            return turbo::Duration::to_timespec(turbo::Duration::nanoseconds(MakeAbsNanos()));
         }
 
         struct timespec KernelTimeout::MakeRelativeTimespec() const {
-            return turbo::ToTimespec(turbo::Duration::nanoseconds(InNanosecondsFromNow()));
+            return turbo::Duration::to_timespec(turbo::Duration::nanoseconds(InNanosecondsFromNow()));
         }
 
 #ifndef _WIN32
 
         struct timespec KernelTimeout::MakeClockAbsoluteTimespec(clockid_t c) const {
             if (!has_timeout()) {
-                return turbo::ToTimespec(turbo::Duration::nanoseconds(kMaxNanos));
+                return turbo::Duration::to_timespec(turbo::Duration::nanoseconds(kMaxNanos));
             }
 
             int64_t nanos = RawAbsNanos();
@@ -170,14 +170,14 @@ namespace turbo {
             struct timespec now;
             TURBO_RAW_CHECK(clock_gettime(c, &now) == 0, "clock_gettime() failed");
             turbo::Duration from_clock_epoch =
-                    turbo::DurationFromTimespec(now) + turbo::Duration::nanoseconds(nanos);
+                    turbo::Duration::from_timespec(now) + turbo::Duration::nanoseconds(nanos);
             if (from_clock_epoch <= turbo::Duration::zero()) {
                 // Some callers have assumed that 0 means no timeout, so instead we return a
                 // time of 1 nanosecond after the epoch. For safety we also do not return
                 // negative values.
-                return turbo::ToTimespec(turbo::Duration::nanoseconds(1));
+                return turbo::Duration::to_timespec(turbo::Duration::nanoseconds(1));
             }
-            return turbo::ToTimespec(from_clock_epoch);
+            return turbo::Duration::to_timespec(from_clock_epoch);
         }
 
 #endif

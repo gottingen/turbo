@@ -250,10 +250,10 @@ AcceleratedCrcMemcpyEngine<vec_regions, int_regions>::Compute(
   while (copy_rounds > kBlocksPerCacheLine) {
     // Prefetch kPrefetchAhead bytes ahead of each pointer.
     for (size_t i = 0; i < kRegions; i++) {
-      turbo::PrefetchToLocalCache(src_bytes + kPrefetchAhead + region_size * i);
+      turbo::prefetch_to_local_cache(src_bytes + kPrefetchAhead + region_size * i);
 #ifdef TURBO_INTERNAL_HAVE_X86_64_ACCELERATED_CRC_MEMCPY_ENGINE
       // TODO(b/297082454): investigate dropping prefetch on x86.
-      turbo::PrefetchToLocalCache(dst_bytes + kPrefetchAhead + region_size * i);
+      turbo::prefetch_to_local_cache(dst_bytes + kPrefetchAhead + region_size * i);
 #endif
     }
 
