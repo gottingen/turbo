@@ -120,16 +120,20 @@ namespace turbo {
 
     turbo::Status annotate_status(const turbo::Status &s, std::string_view msg);
 
+    template<typename T>
+    inline turbo::Status annotate_status(const turbo::Result<T> &s, std::string_view msg) {
+        return annotate_status(s.status(), msg);
+    }
+
     StatusBuilder ret_check_fail(std::string_view msg);
 }  // namespace turbo
 
 #ifndef STATUS_MACROS_IMPL
 #define STATUS_MACROS_IMPL
 #define STATUS_RET_CHECK(cond)         \
-  while (TURBO_UNLIKELY(!(cond).ok())) \
+  while (TURBO_UNLIKELY(!(cond))) \
   return ret_check_fail(                \
-      "STATUS_RET_CHECK "              \
-      "failure ")
+      "STATUS_RET_CHECK failure ")
 
 #define STATUS_RET_CHECK_EQ(lhs, rhs)         \
   while (TURBO_UNLIKELY((lhs) != (rhs))) \
