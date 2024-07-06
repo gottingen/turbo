@@ -126,7 +126,7 @@ namespace turbo {
 #ifndef STATUS_MACROS_IMPL
 #define STATUS_MACROS_IMPL
 #define STATUS_RET_CHECK(cond)         \
-  while (TURBO_UNLIKELY(!(cond))) \
+  while (TURBO_UNLIKELY(!(cond).ok())) \
   return ret_check_fail(                \
       "STATUS_RET_CHECK "              \
       "failure ")

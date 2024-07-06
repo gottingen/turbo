@@ -309,7 +309,7 @@ void CRC32::Extend(uint32_t* crc, const void* bytes, size_t length) const {
 
     // Process kStride interleaved swaths through the data in parallel.
     while ((e - p) > kPrefetchHorizon) {
-      PrefetchToLocalCacheNta(
+      prefetch_to_local_cache_nta(
           reinterpret_cast<const void*>(p + kPrefetchHorizon));
       // Process 64 bytes at a time
       step_stride();

@@ -97,7 +97,7 @@ namespace {
                     turbo::Duration::milliseconds(10));
 #endif
             EXPECT_LE(
-                    turbo::Duration::abs(turbo::DurationFromTimespec(t.MakeRelativeTimespec()) -
+                    turbo::Duration::abs(turbo::Duration::from_timespec(t.MakeRelativeTimespec()) -
                                        std::max(duration, turbo::Duration::zero())),
                     kTimingBound);
             EXPECT_EQ(turbo::Time::from_nanoseconds(t.MakeAbsNanos()), when);
@@ -125,7 +125,7 @@ namespace {
         EXPECT_GT(turbo::Time::from_timespec(t.MakeClockAbsoluteTimespec(CLOCK_REALTIME)),
                   turbo::Time::current_time() + turbo::Duration::hours(100000));
 #endif
-        EXPECT_GT(turbo::DurationFromTimespec(t.MakeRelativeTimespec()),
+        EXPECT_GT(turbo::Duration::from_timespec(t.MakeRelativeTimespec()),
                   turbo::Duration::hours(100000));
         EXPECT_GT(turbo::Time::from_nanoseconds(t.MakeAbsNanos()),
                   turbo::Time::current_time() + turbo::Duration::hours(100000));
@@ -150,7 +150,7 @@ namespace {
         EXPECT_GT(turbo::Time::from_timespec(t.MakeClockAbsoluteTimespec(CLOCK_REALTIME)),
                   turbo::Time::current_time() + turbo::Duration::hours(100000));
 #endif
-        EXPECT_GT(turbo::DurationFromTimespec(t.MakeRelativeTimespec()),
+        EXPECT_GT(turbo::Duration::from_timespec(t.MakeRelativeTimespec()),
                   turbo::Duration::hours(100000));
         EXPECT_GT(turbo::Time::from_nanoseconds(t.MakeAbsNanos()),
                   turbo::Time::current_time() + turbo::Duration::hours(100000));
@@ -175,7 +175,7 @@ namespace {
         EXPECT_GT(turbo::Time::from_timespec(t.MakeClockAbsoluteTimespec(CLOCK_REALTIME)),
                   turbo::Time::current_time() + turbo::Duration::hours(100000));
 #endif
-        EXPECT_GT(turbo::DurationFromTimespec(t.MakeRelativeTimespec()),
+        EXPECT_GT(turbo::Duration::from_timespec(t.MakeRelativeTimespec()),
                   turbo::Duration::hours(100000));
         EXPECT_GT(turbo::Time::from_nanoseconds(t.MakeAbsNanos()),
                   turbo::Time::current_time() + turbo::Duration::hours(100000));
@@ -200,7 +200,7 @@ namespace {
         EXPECT_GT(turbo::Time::from_timespec(t.MakeClockAbsoluteTimespec(CLOCK_REALTIME)),
                   turbo::Time::current_time() + turbo::Duration::hours(100000));
 #endif
-        EXPECT_GT(turbo::DurationFromTimespec(t.MakeRelativeTimespec()),
+        EXPECT_GT(turbo::Duration::from_timespec(t.MakeRelativeTimespec()),
                   turbo::Duration::hours(100000));
         EXPECT_GT(turbo::Time::from_nanoseconds(t.MakeAbsNanos()),
                   turbo::Time::current_time() + turbo::Duration::hours(100000));
@@ -222,7 +222,7 @@ namespace {
         EXPECT_LE(turbo::Time::from_timespec(t.MakeClockAbsoluteTimespec(CLOCK_REALTIME)),
                   turbo::Time::from_seconds(1));
 #endif
-        EXPECT_EQ(turbo::DurationFromTimespec(t.MakeRelativeTimespec()),
+        EXPECT_EQ(turbo::Duration::from_timespec(t.MakeRelativeTimespec()),
                   turbo::Duration::zero());
         EXPECT_LE(turbo::Time::from_nanoseconds(t.MakeAbsNanos()), turbo::Time::from_nanoseconds(1));
         EXPECT_EQ(t.InMillisecondsFromNow(), KernelTimeout::DWord{0});
@@ -260,7 +260,7 @@ namespace {
                     turbo::Duration::milliseconds(5));
 #endif
             EXPECT_LE(
-                    turbo::Duration::abs(turbo::DurationFromTimespec(t.MakeRelativeTimespec()) -
+                    turbo::Duration::abs(turbo::Duration::from_timespec(t.MakeRelativeTimespec()) -
                                        duration),
                     kTimingBound);
             EXPECT_LE(turbo::Duration::abs(turbo::Time::current_time() + duration -
@@ -306,7 +306,7 @@ namespace {
                             CLOCK_REALTIME))),
                       turbo::Duration::milliseconds(5));
 #endif
-            EXPECT_EQ(turbo::DurationFromTimespec(t.MakeRelativeTimespec()),
+            EXPECT_EQ(turbo::Duration::from_timespec(t.MakeRelativeTimespec()),
                       turbo::Duration::zero());
             EXPECT_LE(
                     turbo::Duration::abs(turbo::Time::current_time() - turbo::Time::from_nanoseconds(t.MakeAbsNanos())),
@@ -332,7 +332,7 @@ namespace {
         EXPECT_GT(turbo::Time::from_timespec(t.MakeClockAbsoluteTimespec(CLOCK_REALTIME)),
                   turbo::Time::current_time() + turbo::Duration::hours(100000));
 #endif
-        EXPECT_GT(turbo::DurationFromTimespec(t.MakeRelativeTimespec()),
+        EXPECT_GT(turbo::Duration::from_timespec(t.MakeRelativeTimespec()),
                   turbo::Duration::hours(100000));
         EXPECT_GT(turbo::Time::from_nanoseconds(t.MakeAbsNanos()),
                   turbo::Time::current_time() + turbo::Duration::hours(100000));
@@ -357,7 +357,7 @@ namespace {
         EXPECT_GT(turbo::Time::from_timespec(t.MakeClockAbsoluteTimespec(CLOCK_REALTIME)),
                   turbo::Time::current_time() + turbo::Duration::hours(100000));
 #endif
-        EXPECT_GT(turbo::DurationFromTimespec(t.MakeRelativeTimespec()),
+        EXPECT_GT(turbo::Duration::from_timespec(t.MakeRelativeTimespec()),
                   turbo::Duration::hours(100000));
         EXPECT_GT(turbo::Time::from_nanoseconds(t.MakeAbsNanos()),
                   turbo::Time::current_time() + turbo::Duration::hours(100000));
@@ -382,7 +382,7 @@ namespace {
         EXPECT_GT(turbo::Time::from_timespec(t.MakeClockAbsoluteTimespec(CLOCK_REALTIME)),
                   turbo::Time::current_time() + turbo::Duration::hours(100000));
 #endif
-        EXPECT_GT(turbo::DurationFromTimespec(t.MakeRelativeTimespec()),
+        EXPECT_GT(turbo::Duration::from_timespec(t.MakeRelativeTimespec()),
                   turbo::Duration::hours(100000));
         EXPECT_GT(turbo::Time::from_nanoseconds(t.MakeAbsNanos()),
                   turbo::Time::current_time() + turbo::Duration::hours(100000));

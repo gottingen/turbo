@@ -214,11 +214,11 @@ namespace turbo {
     }
 
     turbo::Time Time::from_timespec(timespec ts) {
-        return time_internal::FromUnixDuration(turbo::DurationFromTimespec(ts));
+        return time_internal::FromUnixDuration(turbo::Duration::from_timespec(ts));
     }
 
     turbo::Time Time::from_timeval(timeval tv) {
-        return time_internal::FromUnixDuration(turbo::DurationFromTimeval(tv));
+        return time_internal::FromUnixDuration(turbo::Duration::from_timeval(tv));
     }
 
     timespec Time::to_timespec(Time t) {

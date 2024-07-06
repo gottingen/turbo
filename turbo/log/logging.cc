@@ -23,7 +23,7 @@
 #include <turbo/log/sinks/daily_file_sink.h>
 #include <turbo/log/sinks/hourly_file_sink.h>
 #include <turbo/log/sinks/rotating_file_sink.h>
-#include <turbo/log/internal/flags.h>
+#include <turbo/log/flags.h>
 #include <turbo/flags/flag.h>
 #include <iostream>
 
@@ -137,5 +137,36 @@ namespace turbo {
         (void)turbo::get_flag(FLAGS_log_with_prefix);
         (void)turbo::get_flag(FLAGS_verbosity);
         (void)turbo::get_flag(FLAGS_vlog_module);
+    }
+
+    void setup_log_by_flags() {
+        auto lt = static_cast<LogSinkType>(turbo::get_flag(FLAGS_log_type));
+        switch (lt) {
+            case LogSinkType::kColorStderr:
+                setup_color_stderr_sink();
+                break;
+            case LogSinkType::kDailyFile:
+                setup_daily_file_sink(turbo::get_flag(FLAGS_log_base_filename), turbo::get_flag(FLAGS_log_rotation_hour),
+                                      turbo::get_flag(FLAGS_log_rotation_minute),
+                                      turbo::get_flag(FLAGS_log_check_interval_s),
+                                      turbo::get_flag(FLAGS_log_truncate),
+                                      turbo::get_flag(FLAGS_log_max_files));
+                break;
+            case LogSinkType::kHourlyFile:
+                setup_hourly_file_sink(turbo::get_flag(FLAGS_log_base_filename), turbo::get_flag(FLAGS_log_rotation_minute),
+                                       turbo::get_flag(FLAGS_log_check_interval_s),
+                                       turbo::get_flag(FLAGS_log_truncate),
+                                       turbo::get_flag(FLAGS_log_max_files));
+                break;
+            case LogSinkType::kRotatingFile:
+                setup_rotating_file_sink(turbo::get_flag(FLAGS_log_base_filename), turbo::get_flag(FLAGS_log_max_file_size),
+                                         turbo::get_flag(FLAGS_log_max_files),
+                                         turbo::get_flag(FLAGS_log_truncate),
+                                         turbo::get_flag(FLAGS_log_check_interval_s));
+                break;
+            default:
+                setup_ansi_color_stdout_sink();
+                break;
+        }
     }
 }  // namespace turbo

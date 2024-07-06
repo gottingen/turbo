@@ -528,6 +528,10 @@ namespace turbo {
         TURBO_ATTRIBUTE_CONST_FUNCTION static std::chrono::minutes to_chrono_minutes(Duration d);
 
         TURBO_ATTRIBUTE_CONST_FUNCTION static std::chrono::hours to_chrono_hours(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static timespec to_timespec(Duration d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static timeval to_timeval(Duration d);
     public:
         // Duration::from_chrono()
         //
@@ -554,6 +558,10 @@ namespace turbo {
 
         TURBO_ATTRIBUTE_PURE_FUNCTION static constexpr Duration from_chrono(
                 const std::chrono::hours &d);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static Duration from_timespec(timespec ts);
+
+        TURBO_ATTRIBUTE_CONST_FUNCTION static Duration from_timeval(timeval tv);
 
     public:
         // Duration::format()
@@ -1210,29 +1218,6 @@ namespace turbo {
     TURBO_ATTRIBUTE_CONST_FUNCTION inline Duration operator-(Time lhs, Time rhs) {
         return lhs.rep_ - rhs.rep_;
     }
-
-    // DurationFromTimespec()
-    // DurationFromTimeval()
-    // ToTimespec()
-    // ToTimeval()
-    // Time::from_timespec()
-    // Time::from_timeval()
-    // ToTimespec()
-    // ToTimeval()
-    //
-    // Some APIs use a timespec or a timeval as a Duration (e.g., nanosleep(2)
-    // and select(2)), while others use them as a Time (e.g. clock_gettime(2)
-    // and gettimeofday(2)), so conversion functions are provided for both cases.
-    // The "to timespec/val" direction is easily handled via overloading, but
-    // for "from timespec/val" the desired type is part of the function name.
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration DurationFromTimespec(timespec ts);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration DurationFromTimeval(timeval tv);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION timespec ToTimespec(Duration d);
-
-    TURBO_ATTRIBUTE_CONST_FUNCTION timeval ToTimeval(Duration d);
-
 
     // turbo_parse_flag()
     //

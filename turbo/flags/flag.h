@@ -39,6 +39,7 @@
 #include <turbo/base/optimization.h>
 #include <turbo/flags/commandlineflag.h>
 #include <turbo/flags/config.h>
+#include <turbo/flags/validator.h>
 #include <turbo/flags/internal/flag.h>
 #include <turbo/flags/internal/registry.h>
 #include <turbo/strings/string_view.h>

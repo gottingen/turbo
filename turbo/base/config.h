@@ -49,8 +49,10 @@
 
 #ifndef TURBO_BASE_CONFIG_H_
 #define TURBO_BASE_CONFIG_H_
-
+#include <codecvt>
 #include <turbo/base/macros/visibility.h>
+#include <turbo/base/macros/rtti.h>
+#include <turbo/base/macros/pragma.h>
 // Included for the __GLIBC__ macro (or similar macros on other systems).
 #include <limits.h>
 

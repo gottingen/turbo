@@ -402,7 +402,7 @@ namespace {
     void BM_Duration_ToTimespec_TurboTime(benchmark::State &state) {
         turbo::Duration d = turbo::Duration::seconds(1);
         while (state.KeepRunning()) {
-            benchmark::DoNotOptimize(turbo::ToTimespec(d));
+            benchmark::DoNotOptimize(turbo::Duration::to_timespec(d));
         }
     }
 
@@ -432,7 +432,7 @@ namespace {
                 ++ts.tv_sec;
                 ts.tv_nsec = 0;
             }
-            benchmark::DoNotOptimize(turbo::DurationFromTimespec(ts));
+            benchmark::DoNotOptimize(turbo::Duration::from_timespec(ts));
         }
     }
 

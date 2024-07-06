@@ -30,38 +30,38 @@ namespace {
 
 TEST(PrefetchTest, PrefetchToLocalCache_StackA) {
   char buf[100] = {};
-  turbo::PrefetchToLocalCache(buf);
-  turbo::PrefetchToLocalCacheNta(buf);
-  turbo::PrefetchToLocalCacheForWrite(buf);
+  turbo::prefetch_to_local_cache(buf);
+  turbo::prefetch_to_local_cache_nta(buf);
+  turbo::prefetch_to_local_cache_for_write(buf);
 }
 
 TEST(PrefetchTest, PrefetchToLocalCache_Heap) {
   auto memory = std::make_unique<char[]>(200 << 10);
   memset(memory.get(), 0, 200 << 10);
-  turbo::PrefetchToLocalCache(memory.get());
-  turbo::PrefetchToLocalCacheNta(memory.get());
-  turbo::PrefetchToLocalCacheForWrite(memory.get());
-  turbo::PrefetchToLocalCache(memory.get() + (50 << 10));
-  turbo::PrefetchToLocalCacheNta(memory.get() + (50 << 10));
-  turbo::PrefetchToLocalCacheForWrite(memory.get() + (50 << 10));
-  turbo::PrefetchToLocalCache(memory.get() + (100 << 10));
-  turbo::PrefetchToLocalCacheNta(memory.get() + (100 << 10));
-  turbo::PrefetchToLocalCacheForWrite(memory.get() + (100 << 10));
-  turbo::PrefetchToLocalCache(memory.get() + (150 << 10));
-  turbo::PrefetchToLocalCacheNta(memory.get() + (150 << 10));
-  turbo::PrefetchToLocalCacheForWrite(memory.get() + (150 << 10));
+  turbo::prefetch_to_local_cache(memory.get());
+  turbo::prefetch_to_local_cache_nta(memory.get());
+  turbo::prefetch_to_local_cache_for_write(memory.get());
+  turbo::prefetch_to_local_cache(memory.get() + (50 << 10));
+  turbo::prefetch_to_local_cache_nta(memory.get() + (50 << 10));
+  turbo::prefetch_to_local_cache_for_write(memory.get() + (50 << 10));
+  turbo::prefetch_to_local_cache(memory.get() + (100 << 10));
+  turbo::prefetch_to_local_cache_nta(memory.get() + (100 << 10));
+  turbo::prefetch_to_local_cache_for_write(memory.get() + (100 << 10));
+  turbo::prefetch_to_local_cache(memory.get() + (150 << 10));
+  turbo::prefetch_to_local_cache_nta(memory.get() + (150 << 10));
+  turbo::prefetch_to_local_cache_for_write(memory.get() + (150 << 10));
 }
 
 TEST(PrefetchTest, PrefetchToLocalCache_Nullptr) {
-  turbo::PrefetchToLocalCache(nullptr);
-  turbo::PrefetchToLocalCacheNta(nullptr);
-  turbo::PrefetchToLocalCacheForWrite(nullptr);
+  turbo::prefetch_to_local_cache(nullptr);
+  turbo::prefetch_to_local_cache_nta(nullptr);
+  turbo::prefetch_to_local_cache_for_write(nullptr);
 }
 
 TEST(PrefetchTest, PrefetchToLocalCache_InvalidPtr) {
-  turbo::PrefetchToLocalCache(reinterpret_cast<const void*>(0x785326532L));
-  turbo::PrefetchToLocalCacheNta(reinterpret_cast<const void*>(0x785326532L));
-  turbo::PrefetchToLocalCacheForWrite(reinterpret_cast<const void*>(0x78532L));
+  turbo::prefetch_to_local_cache(reinterpret_cast<const void*>(0x785326532L));
+  turbo::prefetch_to_local_cache_nta(reinterpret_cast<const void*>(0x785326532L));
+  turbo::prefetch_to_local_cache_for_write(reinterpret_cast<const void*>(0x78532L));
 }
 
 }  // namespace
