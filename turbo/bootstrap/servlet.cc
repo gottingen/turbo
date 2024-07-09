@@ -19,10 +19,11 @@
 // Created by jeff on 24-6-30.
 //
 
-#include <turbo/flags/servlet.h>
+#include <turbo/bootstrap/servlet.h>
 #include <turbo/flags/declare.h>
 #include <turbo/log/flags.h>
 #include <turbo/log/logging.h>
+#include <turbo/strings/str_join.h>
 #include <vector>
 #include <string>
 
@@ -44,12 +45,27 @@ namespace turbo {
 
     void Servlet::setup() {
         run_app_ = app_.add_subcommand("run", "run Servlet");
-        app_.add_option_function<std::vector<std::string>>("-c,--config", [](const std::vector<std::string> &files) {
-            load_flags(files);
+        app_.add_option_function<std::vector<std::string>>("-c,--config", [this](const std::vector<std::string> &files) {
+            bool has_default = !default_flags_files_.empty();
+            if(!files.empty() && !files[0].empty()) {
+                load_flags(files);
+                if(has_default) {
+                    std::cerr<<"default config file: ["<<str_join(default_flags_files_, ",")<<"] will be ignored"<<std::endl;
+                }
+                std::cerr<<"load flags from config file: ["<<str_join(files, ",")<<"]"<<std::endl;
+                return ;
+            }
+
+            if(!default_flags_files_.empty()) {
+                load_flags(default_flags_files_);
+                std::cerr<<"load flags from default config file: ["<<str_join(default_flags_files_, ",")<<"]"<<std::endl;
+                return;
+            }
         }, "servlet config file, the config files can be a list of files"
            " separated by space, the later file will override the former file"
            "these file will load first, then the command line flags may override"
-           "the config file flags");
+           "the config file flags")->force_callback();
+
         run_app_->add_option("--log_stderr", FLAGS_stderr_threshold, FLAGS_stderr_threshold.help());
         run_app_->add_option("--min_log_level", FLAGS_min_log_level, FLAGS_min_log_level.help());
         run_app_->add_option("--backtrace_log_at", FLAGS_backtrace_log_at, FLAGS_backtrace_log_at.help());
@@ -94,6 +110,37 @@ namespace turbo {
 
     const std::vector<std::string> *Servlet::launch_params() const {
         return launch_params_;
+    }
+
+    Servlet &Servlet::add_default_flags_file(const std::string &file) {
+        if(file.empty()) {
+            return *this;
+        }
+        default_flags_files_.push_back(file);
+        return *this;
+    }
+
+    Servlet &Servlet::add_default_flags_files(const std::vector<std::string> &files) {
+        for(const auto& file : files) {
+            add_default_flags_file(file);
+        }
+        return *this;
+    }
+
+    Servlet &Servlet::clear_default_flags_files() {
+        default_flags_files_.clear();
+        return *this;
+    }
+
+    std::string Servlet::default_flags_file() const {
+        if(default_flags_files_.empty()) {
+            return "";
+        }
+        std::string  result;
+        for(const auto& file : default_flags_files_) {
+            result += file + " ";
+        }
+        return result;
     }
 
 }  // namespace turbo

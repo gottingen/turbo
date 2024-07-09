@@ -59,16 +59,25 @@ namespace turbo {
 
         const std::vector<std::string> *launch_params() const;
 
+        Servlet &add_default_flags_file(const std::string &file);
+
+        Servlet &add_default_flags_files(const std::vector<std::string> &files);
+
+        Servlet &clear_default_flags_files();
+
     private:
         Servlet();
 
         void setup();
+
+        std::string default_flags_file() const;
 
     private:
         static Servlet instance_;
         turbo::cli::App app_;
         turbo::cli::App *run_app_ = nullptr;
         const std::vector<std::string> *launch_params_ = nullptr;
+        std::vector<std::string> default_flags_files_;
     };
 
 }  // namespace turbo

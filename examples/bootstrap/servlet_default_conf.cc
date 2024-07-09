@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
-#include <turbo/flags/servlet.h>
+#include <turbo/bootstrap/servlet.h>
 #include <turbo/version.h>
 #include <iostream>
 #include <string>
@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
     auto &svt = turbo::Servlet::instance();
     svt.set_name("K3Pi")
         .set_version(TURBO_VERSION_STRING)
-        .set_description("K3Pi goofit fitter");
+        .set_description("K3Pi goofit fitter").add_default_flags_file("conf.flags");
 
     std::string file;
     turbo::cli::Option *opt = svt.run_app()->add_option("-f,--file,file", file, "File name");

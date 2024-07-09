@@ -23,3 +23,18 @@ carbin_cc_binary(
         LINKS turbo::turbo
         CXXOPTS ${CARBIN_CXX_OPTIONS}
 )
+carbin_cc_binary(
+        NAME servlet_ex
+        SOURCES servlet_ex.cc
+        LINKS turbo::turbo
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+carbin_cc_binary(
+        NAME servlet_default_conf
+        SOURCES servlet_default_conf.cc
+        LINKS turbo::turbo
+        CXXOPTS ${CARBIN_CXX_OPTIONS}
+)
+
+
+file(COPY conf.flags DESTINATION ${PROJECT_BINARY_DIR})
