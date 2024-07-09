@@ -65,6 +65,10 @@ namespace turbo {
 
         Servlet &clear_default_flags_files();
 
+        const std::vector<std::string> &default_flags_files() const {
+            return default_flags_files_;
+        }
+
     private:
         Servlet();
 
